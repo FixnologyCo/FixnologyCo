@@ -72,7 +72,9 @@ const submit = () => {
 
 <template>
   <div>
+
     <Head title="Inicia Sesion" />
+
     <div class="
     bg-mono-negro
             sm:bg-green-500 
@@ -85,18 +87,24 @@ const submit = () => {
       <main class="
        2xl:w-[100%] 2xl:p-[80px] 2xl:gap-16
       xl:w-[100%] xl:px-[80px] xl:gap-14
-      min-h-[100vh] flex items-center justify-between w-[100%] p-[40px] gap-14
+      min-h-[100vh] flex items-center justify-center w-[100%] p-[40px] gap-14
       ">
         <div class="
         left 
         2xl:w-[70%]
         xl:w-[65%]
-        w-full
+        max-w-[600px]
         ">
+          <div class="options flex gap-1 items-center text-[14px] mt-4">
+            <a :href="route('home.index')" class="hover:text-universal-azul flex items-center">
+              <span class="material-symbols-rounded text-[18px]">chevron_left</span>
+              <p>Home</p>
+            </a>
+          </div>
           <div class="logo
           2xl:flex 2xl:gap-3 2xl:items-center
           xl:flex xl:gap-2 xl:items-center
-          flex items-center gap-2
+          flex items-center gap-2 justify-center
           ">
             <div class="gota
              2xl:h-7 2xl:w-10
@@ -110,17 +118,20 @@ const submit = () => {
           </div>
 
           <div class="welcome">
+
             <h2 class="
             2xl:text-[35px] d 2xl:mt-[20px]
             xl:text-[35px] d xl:mt-[20px]
-            font-bold text-[22px] mt-3
+            font-bold text-[22px] mt-3 text-center
             
             ">Bienvenido Nuevamente 👋</h2>
             <p class="
             2xl:text-[20px]
             xl:text-[20px]
             text-[15px]
-            ">Hoy es un excelente día para vender, inicia sesión y sácale el jugo a tu App.</p>
+            text-center
+            px-8
+            ">Hoy es un excelente día para producir, inicia sesión y sácale el jugo a tu App.</p>
           </div>
 
 
@@ -173,26 +184,20 @@ const submit = () => {
 
             <p class="
             mt-4
+            text-center
             ">¿No tienes una cuenta?, <a :href="route('register.auth')" class="
                 text-universal-azul
                 ">Registrate aquí</a>.</p>
 
             <p class="
              text-[12px]
+             text-center
             text-universal-azul 
             ">Versión Deimos 1.0.0</p>
           </form>
         </div>
 
-        <div class="
-        2xl:w-[30%] 2xl:flex 2xl:justify-center 2xl:items-center 2xl:visible 2xl:p-0
-        xl:w-[35%] xl:flex xl:justify-center xl:items-center xl:visible xl:p-0
 
-        hidden right shadowM rounded-lg
-        ">
-          <img src="https://images.unsplash.com/photo-1638657527755-ca3e0d217260?q=80&w=1376&auto=format&fit=crop"
-            alt="Img login" class="rounded-lg" />
-        </div>
       </main>
       <div v-if="mostrarNotificacion && tipoNotificacion === 'success'"
         class="notificacion translate-y-8 absolute w-[max-content] left-0 right-0 top-6 ml-auto mr-auto rounded-md bg-semaforo-verde_opacity text-mono-blanco shadow-semaforo-verde">
