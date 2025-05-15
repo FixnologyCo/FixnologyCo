@@ -55,7 +55,7 @@ return new class extends Migration
                 'nombres_ct'=> 'Erick Manuel',
                 'apellidos_ct' => 'Guevara',
                 'id_tipo_documento' => '1',
-                'numero_documento_ct' => '0000',
+                'numero_documento_ct' => '777',
                 'contrasenia_ct' => '123456',
                 'email_ct' => 'emgladino@gmail.com',
                 'telefono_ct' => '3212820011',

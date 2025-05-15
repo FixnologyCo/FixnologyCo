@@ -309,20 +309,12 @@ onUnmounted(() => {
 })
 
 const coloresBg = {
-  'TaurusCO': 'bg-universal-naranja shadow-universal-naranja',
-  'Essentials': 'bg-essentials-primary shadow-essentials',
-  'Machine': 'bg-machine-primary shadow-machine',
-  'Shopper': 'bg-shopper-primary shadow-shopper',
-  'Smart': 'bg-smart-primary shadow-smart rounded-full z-10 text-mono-negro',
+  'FixnologyCO': 'bg-universal-naranja shadow-universal-naranja',
   'default': 'bg-gray-300 shadow-gray-300'
 };
 
 const coloresTexto = {
-  'TaurusCO': 'text-universal-naranja',
-  'Essentials': 'text-essentials-primary',
-  'Machine': 'text-machine-primary',
-  'Shopper': 'text-shopper-primary',
-  'Smart': 'text-smart-primary',
+  'FixnologyCO': 'text-universal-naranja',
   'default': 'text-gray-500'
 };
 

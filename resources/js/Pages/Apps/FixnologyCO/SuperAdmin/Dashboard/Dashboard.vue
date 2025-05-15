@@ -5,8 +5,9 @@ import axios from 'axios';
 import 'dayjs/locale/es';
 import dayjs from 'dayjs';
 import SaludoOpciones from '@/Components/header/SaludoOpciones.vue';
-import Clientes from '@/Components/TablaDatos/TaurusCO/Clientes.vue';
+import Clientes from '@/Components/TablaDatos/FixnologyCO/Clientes.vue';
 import ExportarExcel from '@/Components/ExportarExcel/ExportarExcel.vue';
+import Sidebar from '@/Components/Sidebar/Sidebar.vue';
 
 const props = defineProps({
   auth: {
@@ -133,26 +134,16 @@ onMounted(() => {
 
 
 const coloresBg = {
-  'TaurusCO': 'bg-universal-naranja shadow-universal-naranja',
-  'Essentials': 'bg-essentials-primary shadow-essentials',
-  'Machine': 'bg-machine-primary shadow-machine',
-  'Shopper': 'bg-shopper-primary shadow-shopper',
+  'FixnologyCO': 'bg-universal-naranja shadow-universal-naranja',
   'default': 'bg-gray-300 shadow-gray-300'
 };
 const coloresTexto = {
-  'TaurusCO': 'text-universal-naranja',
-  'Essentials': 'text-essentials-primary',
-  'Machine': 'text-machine-primary',
-  'Shopper': 'text-shopper-primary',
+  'FixnologyCO': 'text-universal-naranja',
   'default': 'text-gray-500'
 };
 
 const button = {
-  'TaurusCO': 'bg-universal-naranja shadow-universal-naranja rounded-[8px] py-[5px] px-[15px] flex items-center justify-center gap-2',
-  'Essentials': 'bg-essentials-primary shadow-essentials rounded-[8px] py-[5px] px-[15px] flex items-center justify-center gap-2',
-  'Machine': 'bg-machine-primary shadow-machine rounded-[8px] py-[5px] px-[15px] flex items-center justify-center gap-2',
-  'Shopper': 'bg-shopper-primary shadow-shopper rounded-[8px] py-[5px] px-[15px] flex items-center justify-center gap-2',
-  'Smart': 'bg-smart-primary shadow-smart text-mono-negro rounded-[8px] py-[5px] px-[15px] flex items-center justify-center gap-2',
+  'FixnologyCO': 'bg-universal-naranja shadow-universal-naranja rounded-[8px] py-[5px] px-[15px] flex items-center justify-center gap-2',
   'default': 'bg-gray-300 shadow-gray-300'
 };
 
@@ -177,9 +168,10 @@ const logout = () => {
   <div class="w-full h-[100%] px-[40px] py-[20px]">
     <SaludoOpciones :auth="auth" />
 
-    <main class="flex justify-between w-full h-[80vh] gap-4 mt-3">
-      <div class="righ w-full rounded-md">
 
+    <main class="flex justify-between w-full h-[80vh] gap-4 mt-3">
+      <Sidebar :auth="auth"/>
+      <div class="righ w-full rounded-md">
         <!-- navegable -->
         <div class="options flex gap-1 items-center text-[14px]">
           <p class="font-bold flex items-center gap-1"><span class="material-symbols-rounded">home</span> Inicio</p>
@@ -231,7 +223,7 @@ const logout = () => {
         </div>
         <!-- header administrativo -->
         <div class="titulo-input-btn my-4 flex justify-between items-center gap-5">
-          <h4 class="font-semibold text-[25px]">Gestion de tauranos</h4>
+          <h4 class="font-semibold text-[25px]">Gestion de Fixgys</h4>
           <div class="input-buscador">
             <input v-model="searchQuery" type="search" placeholder="Buscar clientes..." class="" />
             <span class="material-symbols-rounded" :class='[textoClase]'>travel_explore</span>

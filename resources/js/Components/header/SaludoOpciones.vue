@@ -73,7 +73,7 @@ const initials = computed(() => {
     const nombres = props.auth.user?.nombres_ct || '';
     const apellidos = props.auth.user?.apellidos_ct || '';
 
-    // ⚡ Toma la primera letra del primer nombre y primer apellido
+    
     const firstNameInitial = nombres.split(' ')[0]?.charAt(0).toUpperCase() || '';
     const lastNameInitial = apellidos.split(' ')[0]?.charAt(0).toUpperCase() || '';
 
@@ -89,35 +89,20 @@ const inicialesNombreTienda = computed(() => {
 
 // ✅ Clases dinámicas según la aplicación
 const colores = {
-    'TaurusCO': 'bg-universal-naranja shadow-universal-naranja rounded-full',
-    'Essentials': 'bg-essentials-primary shadow-essentials rounded-full z-10 ',
-    'Machine': 'bg-machine-primary shadow-machine rounded-full',
-    'Shopper': 'bg-shopper-primary shadow-shopper rounded-full',
-    'Smart': 'bg-smart-primary shadow-smart rounded-full z-10 text-mono-negro',
+    'FixnologyCO': 'bg-universal-naranja shadow-universal-naranja rounded-full',
     'default': 'bg-gray-300 shadow-gray-300'
 };
 const colores2 = {
-    'TaurusCO': 'bg-universal-naranja rounded-full',
-    'Essentials': 'bg-essentials-primary rounded-full z-10',
-    'Machine': 'bg-machine-primary rounded-full',
-    'Shopper': 'bg-shopper-primary rounded-full',
-    'Smart': 'bg-smart-primary rounded-full',
+    'FixnologyCO': 'bg-universal-naranja rounded-full',
+    
     'default': 'bg-gray-300 shadow-gray-300'
 };
 
 // Computed para la clase de hover
 const hoverClass = computed(() => {
     switch (appName.value) {
-        case 'TaurusCO':
+        case 'FixnologyCO':
             return 'hover:bg-universal-naranja';
-        case 'Essentials':
-            return 'hover:bg-essentials-primary';
-        case 'Machine':
-            return 'hover:bg-machine-primary';
-        case 'Shopper':
-            return 'hover:bg-shopper-primary';
-        case 'Smart':
-            return 'hover:bg-smart-primary hover:text-mono-negro';
         default:
             return 'hover:bg-gray-300';
     }

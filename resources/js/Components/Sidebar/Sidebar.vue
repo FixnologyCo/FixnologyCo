@@ -36,7 +36,7 @@ const resenasRoute = computed(() => new URL(route('aplicacion.resenas', { aplica
 
 // ✅ Clases dinámicas según la aplicación
 const colores = {
-  'TaurusCO': 'bg-universal-naranja shadow-universal-naranja',
+  'FixnologyCO': 'bg-universal-naranja shadow-universal-naranja rounded-full',
   'Essentials': 'bg-essentials-primary shadow-essentials rounded-full z-10 ',
   'Machine': 'bg-machine-primary shadow-machine',
   'Shopper': 'bg-shopper-primary shadow-shopper', 
@@ -44,7 +44,7 @@ const colores = {
   'default': 'bg-gray-300 shadow-gray-300'
 };
 const colores2 = {
-  'TaurusCO': 'bg-universal-naranja',
+  'FixnologyCO': 'bg-universal-naranja',
   'Essentials': 'bg-essentials-primary rounded-full z-10  ',
   'Machine': 'bg-machine-primary',
   'Shopper': 'bg-shopper-primary', 
@@ -54,7 +54,7 @@ const colores2 = {
 
 const hoverClass = computed(() => {
     switch (appName.value) {
-        case 'TaurusCO':
+        case 'FixnologyCO':
             return 'hover:bg-universal-naranja';
         case 'Essentials':
             return 'hover:bg-essentials-primary';
@@ -81,8 +81,8 @@ const bg = computed(() => colores2[appName.value]);
   <div class="h-[85vh] w-[60px] flex justify-center mx-3 items-center p-[20px]">
     <aside class="w-[60px] flex justify-center flex-col gap-2 items-center bg-secundary-default p-2 rounded-full">
       <!-- Logo del Sidebar -->
-      <div class="gota h-12 w-12 shadowM rounded-full z-10">
-        <img :src="logo" alt="Logo" class="h-12 w-12 rounded-full" />
+      <div class="gota h-12 w-12 shadowM bg-slate-400 rounded-full z-10">
+        <!-- <img :src="logo" alt="Logo" class="h-12 w-12 rounded-full" /> -->
       </div>
 
       <!-- Botón para Dashboard -->
