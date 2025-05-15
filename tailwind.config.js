@@ -9,21 +9,22 @@ module.exports = {
             
             colors: {
                 mono: {
-                  blanco: '#F5EFFF',
-                  negro: '#060809',
+                  blanco: '#f3fafe',
+                  negro: '#141414',
                 },
                 bg: {
                   empty: '#1F1D2B',
                 },
                 universal:{
-                  naranja: '#FE4F2D',
+                  naranja: '#f05235',
                   azul: '#4F959D',
+                  azul_secundaria: '#1c1b53'
                 },
                 semaforo: {
                   verde: '#1BCC75',
-                  verde_opacity: '#1bcc763f',
                   amarillo: '#FFA823',
                   rojo: '#FF3131',
+                  verde_opacity: '#1bcc763f',
                   rojo_opacity : '#ff31312d'
                 },
                 secundary: {
@@ -58,8 +59,8 @@ module.exports = {
                 },
             },
             boxShadow: {
-              'universal-naranja': '0px 8px 28px #FE4F2D;',
-              'essentials': '0 8px 28px rgba(79, 70, 229, 0.5)',
+              'universal-naranja': '0px 8px 20px #FE4F2D;',
+              'essentials': '0 8px 20px rgba(79, 70, 229, 0.5)',
               'machine': '0 4px 6px rgba(22, 163, 74, 0.5)',
               'shopper': '0 4px 6px rgba(239, 68, 68, 0.5)'
             }
