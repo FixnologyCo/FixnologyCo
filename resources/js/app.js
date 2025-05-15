@@ -25,13 +25,12 @@ createInertiaApp({
         const app = createApp({
             render: () => h('div', [
                 h(App, props),
-                h(Notifications) // 📌 Agregamos Notifications.vue globalmente
+                h(Notifications)
             ])
         });
 
         app.use(plugin).use(ZiggyVue, Ziggy);
 
-        // 📌 Método global para mostrar notificaciones
         app.config.globalProperties.$notify = (type) => {
             window.dispatchEvent(new CustomEvent('show-notification', { detail: type }));
         };
