@@ -41,6 +41,16 @@ return new class extends Migration
                 'fecha_activacion' => now(),
                 'dias_restantes' => '999999',
             ],
+            [
+                'id_cliente' => '2',
+                'id_tienda' => '1',
+                'monto_total' => '9200000',
+                'id_medio_pago' => '1',
+                'id_estado' => '8',
+                'fecha_pago'       => now(),
+                'fecha_activacion' => now(),
+                'dias_restantes' => '999999',
+            ],
 
         ]);
         

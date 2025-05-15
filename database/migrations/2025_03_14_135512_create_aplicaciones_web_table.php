@@ -27,143 +27,32 @@ return new class extends Migration {
 
         // Insertar datos iniciales
         DB::table('aplicaciones_web')->insert([
-            [
-                'id_plan_aplicacion' => '1',
-                'id_membresia' => '1',
-                'nombre_app' => 'Machine'
-            ],
-            [
-                'id_plan_aplicacion' => '1',
-                'id_membresia' => '1',
-                'nombre_app' => 'Guru'
-            ],
-            [
-                'id_plan_aplicacion' => '1',
-                'id_membresia' => '1',
-                'nombre_app' => 'Smart'
-            ],
-            [
-                'id_plan_aplicacion' => '1',
-                'id_membresia' => '1',
-                'nombre_app' => 'Essentials'
-            ],
-            [
-                'id_plan_aplicacion' => '1',
-                'id_membresia' => '1',
-                'nombre_app' => 'Shopper'
-            ],
-
-            [
-                'id_plan_aplicacion' => '2',
-                'id_membresia' => '2',
-                'nombre_app' => 'Machine'
-            ],
-            [
-                'id_plan_aplicacion' => '2',
-                'id_membresia' => '2',
-                'nombre_app' => 'Guru'
-            ],
-            [
-                'id_plan_aplicacion' => '2',
-                'id_membresia' => '2',
-                'nombre_app' => 'Smart'
-            ],
-            [
-                'id_plan_aplicacion' => '2',
-                'id_membresia' => '2',
-                'nombre_app' => 'Essentials'
-            ],
-            [
-                'id_plan_aplicacion' => '2',
-                'id_membresia' => '2',
-                'nombre_app' => 'Shopper'
-            ],
-
-            [
-                'id_plan_aplicacion' => '3',
-                'id_membresia' => '3',
-                'nombre_app' => 'Machine'
-            ],
-            [
-                'id_plan_aplicacion' => '3',
-                'id_membresia' => '3',
-                'nombre_app' => 'Guru'
-            ],
-            [
-                'id_plan_aplicacion' => '3',
-                'id_membresia' => '3',
-                'nombre_app' => 'Smart'
-            ],
-            [
-                'id_plan_aplicacion' => '3',
-                'id_membresia' => '3',
-                'nombre_app' => 'Essentials'
-            ],
-            [
-                'id_plan_aplicacion' => '3',
-                'id_membresia' => '3',
-                'nombre_app' => 'Shopper'
-            ],
-
-            [
-                'id_plan_aplicacion' => '4',
-                'id_membresia' => '4',
-                'nombre_app' => 'Machine'
-            ],
-            [
-                'id_plan_aplicacion' => '4',
-                'id_membresia' => '4',
-                'nombre_app' => 'Guru'
-            ],
-            [
-                'id_plan_aplicacion' => '4',
-                'id_membresia' => '4',
-                'nombre_app' => 'Smart'
-            ],
-            [
-                'id_plan_aplicacion' => '4',
-                'id_membresia' => '4',
-                'nombre_app' => 'Essentials'
-            ],
-            [
-                'id_plan_aplicacion' => '4',
-                'id_membresia' => '4',
-                'nombre_app' => 'Shopper'
-            ],
-
-            [
-                'id_plan_aplicacion' => '3',
-                'id_membresia' => '5',
-                'nombre_app' => 'Machine'
-            ],
-            [
-                'id_plan_aplicacion' => '3',
-                'id_membresia' => '5',
-                'nombre_app' => 'Guru'
-            ],
-            [
-                'id_plan_aplicacion' => '3',
-                'id_membresia' => '5',
-                'nombre_app' => 'Smart'
-            ],
-            [
-                'id_plan_aplicacion' => '3',
-                'id_membresia' => '5',
-                'nombre_app' => 'Essentials'
-            ],
-            [
-                'id_plan_aplicacion' => '3',
-                'id_membresia' => '5',
-                'nombre_app' => 'Shopper'
-            ],
 
             [
                 'id_plan_aplicacion' => '4',
                 'id_membresia' => '6',
-                'nombre_app' => 'TaurusCO'
+                'nombre_app' => 'FixnologyCO'
             ],
-
-
+            [
+                'id_plan_aplicacion' => '1',
+                'id_membresia' => '1',
+                'nombre_app' => 'Control de votaciones'
+            ],
+            [
+                'id_plan_aplicacion' => '2',
+                'id_membresia' => '2',
+                'nombre_app' => 'Control de votaciones'
+            ],
+            [
+                'id_plan_aplicacion' => '3',
+                'id_membresia' => '3',
+                'nombre_app' => 'Control de votaciones'
+            ],
+            [
+                'id_plan_aplicacion' => '4',
+                'id_membresia' => '4',
+                'nombre_app' => 'Control de votaciones'
+            ]
         ]);
     }
 

@@ -32,18 +32,14 @@ return new class extends Migration
         DB::table('tiendas_sistematizadas')->insert([
             [
                 'id_token' => '1',
-                'id_aplicacion_web' => '26',
-                'nombre_tienda'=> 'Taurus Comunity CO',
-                'email_tienda' => 'tauruscomunityco@gmail.com',
+                'id_aplicacion_web' => '1',
+                'nombre_tienda'=> 'Fixnology CO',
+                'email_tienda' => 'fixnologyco@gmail.com',
                 'telefono_tienda' => '3219631459',
-                'direccion_tienda' => 'Calle 58c sur #45 03',
-                'barrio_tienda' => 'Arborizadora Baja',
+                'direccion_tienda' => 'Conjunto Naranjo',
+                'barrio_tienda' => 'NA',
             ],
-
-        ]);
-        
-        
-        
+        ]);     
     }
 
     /**

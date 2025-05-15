@@ -46,8 +46,19 @@ return new class extends Migration
                 'id_tipo_documento' => '1',
                 'numero_documento_ct' => '1013580753',
                 'contrasenia_ct' => '123456',
-                'email_ct' => 'tauruscomunityco@gmail.com',
+                'email_ct' => 'sebastianzamudio2004@gmail.com',
                 'telefono_ct' => '3165114410',
+            ],
+            [
+                'id_rol' => '4',
+                'id_tienda' => '1',
+                'nombres_ct'=> 'Erick Manuel',
+                'apellidos_ct' => 'Guevara',
+                'id_tipo_documento' => '1',
+                'numero_documento_ct' => '0000',
+                'contrasenia_ct' => '123456',
+                'email_ct' => 'emgladino@gmail.com',
+                'telefono_ct' => '3212820011',
             ],
 
         ]);
