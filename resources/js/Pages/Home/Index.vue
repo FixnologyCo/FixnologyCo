@@ -21,7 +21,7 @@ import { route } from 'ziggy-js';
             h-5 w-8 rounded-full shadow-universal-naranja bg-universal-naranja
             "></div>
         <div class="logo">
-          <h1 class="text-[20px] font-semibold">Taurus Comunity CO</h1>
+          <h1 class="text-[20px] font-semibold">Fixnology CO</h1>
           <p class="-mt-[8px] text-[14px] font-medium">Empresa de software especializada</p>
         </div>
       </div>

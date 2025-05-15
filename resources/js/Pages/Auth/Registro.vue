@@ -130,7 +130,7 @@ const handleInput = (event, field) => {
               <h1 class="
               text-[20px] 
               font-semibold
-              ">Taurus Comunity CO</h1>
+              ">Fixnology CO</h1>
               <p class="
               -mt-[8px] text-[14px] 
               font-medium
@@ -148,7 +148,7 @@ const handleInput = (event, field) => {
             2xl:text-[20px]
             xl:text-[18px]
             text-[15px]
-            ">No te arrepentiras de unirte a la familia Taurus Comunity, especializado en software
+            ">No te arrepentiras de unirte a la familia Fixgy, especializado en software
             </p>
           </div>
 
