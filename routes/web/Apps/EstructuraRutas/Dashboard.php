@@ -2,7 +2,6 @@
 
 use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Gate;
 
 Route::middleware('auth')->group(function () {
 
@@ -12,7 +11,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/status', [DashboardController::class, 'status']);
 
     Route::prefix('{aplicacion}/{rol}')->group(function () {
-        Route::get('/dashboard', [DashboardController::class, 'index'])
+        Route::get('/dashboard', [DashboardController::class, 'show'])
             ->name('aplicacion.dashboard');
 
 
@@ -34,8 +33,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/dashboard/dinero-activo', [DashboardController::class, 'getDineroActivo'])
             ->name('dinero.activo');
 
-        // Route::get('/clientes/lista', [DashboardController::class, 'listarClientes'])
-        //     ->name('clientes.lista');
+       
     });
 });
 

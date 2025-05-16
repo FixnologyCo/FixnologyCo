@@ -14,6 +14,7 @@ use App\Traits\RegistraAuditoria; // 👈 Importa el trait correctamente aquí
 
 class DashboardController extends Controller
 {
+
     use RegistraAuditoria; // 👈 Usa el trait aquí a nivel de clase
 
     /**
@@ -24,27 +25,16 @@ class DashboardController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Inertia\Response
      */
-    public function index($aplicacion, $rol, Request $request)
+
+    public function show($aplicacion, $rol, Request $request)
     {
         // Cargar relaciones necesarias del usuario autenticado
         $user = auth()->user()->load([
-            'rol',
-            'tienda',
-            'tienda.token',
-            'tienda.token.estado',
-            'tienda.estado',
-            'tienda.aplicacion',
-            'tienda.aplicacion.plan',
-            'tienda.aplicacion.plan.detalles',
-            'tienda.aplicacion.membresia',
             'tienda.aplicacion.membresia.estado',
-            'tienda.pagosMembresia',  // Nota que "pagosMembresia" está en singular
-            'estado',
-            'tipoDocumento'
+            'tienda.pagosMembresia',
         ]);
 
-        // Validar acceso con Gate (rol 4)
-        if (!in_array($user->rol->id, [1, 2, 3, 4])) {
+        if (!in_array($user->rol->id, [4])) {
             abort(403, 'No tienes permisos para acceder a esta sección.');
         }
 
@@ -103,7 +93,6 @@ class DashboardController extends Controller
         abort(404);
     }
 
-
     public function listarClientes($aplicacion, $rol)
     {
         $user = auth()->user()->load(['rol', 'tienda.aplicacion']);
@@ -113,6 +102,49 @@ class DashboardController extends Controller
         }
 
         if ($user->tienda && $user->tienda->aplicacion->nombre_app === $aplicacion) {
+            $clientes = ClienteTaurus::select(
+                'clientes_taurus.id',
+                \DB::raw("CONCAT(clientes_taurus.nombres_ct, ' ', clientes_taurus.apellidos_ct) AS nombre_completo"),
+                'clientes_taurus.telefono_ct as telefono',
+                'tiendas_sistematizadas.nombre_tienda',
+                'token_accesos.token_activacion as token',
+                'aplicaciones_web.nombre_app as aplicacion',
+                'membresias.nombre_membresia as membresia',
+                \DB::raw('IFNULL(membresias.precio, 0) as precio'),
+                \DB::raw('COALESCE(estados.tipo_estado, "Sin estado") as estado_tipo'),
+                \DB::raw('COALESCE(token_estado.tipo_estado, "Sin estado") as estado_token'),
+                'clientes_taurus.fecha_creacion',
+                'pagos_membresia.monto_total as monto_pago',
+                'pagos_membresia.fecha_pago as fecha_pago',
+                'estado_pago.tipo_estado as estado_pago'
+            )
+                ->leftJoin('tiendas_sistematizadas', 'clientes_taurus.id_tienda', '=', 'tiendas_sistematizadas.id')
+                ->leftJoin('token_accesos', 'tiendas_sistematizadas.id_token', '=', 'token_accesos.id')
+                ->leftJoin('aplicaciones_web', 'tiendas_sistematizadas.id_aplicacion_web', '=', 'aplicaciones_web.id')
+                ->leftJoin('membresias', 'aplicaciones_web.id_membresia', '=', 'membresias.id')
+                ->leftJoin('estados', 'clientes_taurus.id_estado', '=', 'estados.id')
+                ->leftJoin('estados as token_estado', 'token_accesos.id_estado', '=', 'token_estado.id')
+                ->leftJoin('pagos_membresia', 'clientes_taurus.id', '=', 'pagos_membresia.id_cliente')
+                ->leftJoin('estados as estado_pago', 'pagos_membresia.id_estado', '=', 'estado_pago.id')
+                ->orderBy('clientes_taurus.fecha_creacion', 'DESC')
+                ->get();
+
+            return response()->json($clientes);
+        }
+
+        return response()->json([], 403);
+    }
+
+    // Este método es para polling sin parámetros dinámicos
+    public function listarClientesSinParametros()
+    {
+        $user = auth()->user()->load(['rol', 'tienda.aplicacion']);
+
+        if (!in_array($user->rol->id, [1, 2, 3, 4])) {
+            abort(403, 'No tienes permisos para acceder a esta sección.');
+        }
+
+        if ($user->tienda && $user->tienda->aplicacion) {
             $clientes = ClienteTaurus::select(
                 'clientes_taurus.id',
                 \DB::raw("CONCAT(clientes_taurus.nombres_ct, ' ', clientes_taurus.apellidos_ct) AS nombre_completo"),
@@ -146,50 +178,7 @@ class DashboardController extends Controller
         return response()->json([], 403);
     }
 
-    // Este método es para polling sin parámetros dinámicos
-public function listarClientesSinParametros()
-{
-    $user = auth()->user()->load(['rol', 'tienda.aplicacion']);
-
-    if (!in_array($user->rol->id, [1, 2, 3, 4])) {
-        abort(403, 'No tienes permisos para acceder a esta sección.');
-    }
-
-    if ($user->tienda && $user->tienda->aplicacion) {
-        $clientes = ClienteTaurus::select(
-            'clientes_taurus.id',
-            \DB::raw("CONCAT(clientes_taurus.nombres_ct, ' ', clientes_taurus.apellidos_ct) AS nombre_completo"),
-            'clientes_taurus.telefono_ct as telefono',
-            \DB::raw('COALESCE(tiendas_sistematizadas.nombre_tienda, "Sin tienda") as nombre_tienda'),
-            'token_accesos.token_activacion as token',
-            'aplicaciones_web.nombre_app as aplicacion',
-            'membresias.nombre_membresia as membresia',
-            \DB::raw('IFNULL(membresias.precio, 0) as precio'),
-            \DB::raw('COALESCE(estados.tipo_estado, "Sin estado") as estado_tipo'),
-            \DB::raw('COALESCE(token_estado.tipo_estado, "Sin estado") as estado_token'),
-            'clientes_taurus.fecha_creacion',
-            'pagos_membresia.monto_total as monto_pago',
-            'pagos_membresia.fecha_pago as fecha_pago',
-            'estado_pago.tipo_estado as estado_pago'
-        )
-            ->leftJoin('tiendas_sistematizadas', 'clientes_taurus.id_tienda', '=', 'tiendas_sistematizadas.id')
-            ->leftJoin('token_accesos', 'tiendas_sistematizadas.id_token', '=', 'token_accesos.id')
-            ->leftJoin('aplicaciones_web', 'tiendas_sistematizadas.id_aplicacion_web', '=', 'aplicaciones_web.id')
-            ->leftJoin('membresias', 'aplicaciones_web.id_membresia', '=', 'membresias.id')
-            ->leftJoin('estados', 'clientes_taurus.id_estado', '=', 'estados.id')
-            ->leftJoin('estados as token_estado', 'token_accesos.id_estado', '=', 'token_estado.id')
-            ->leftJoin('pagos_membresia', 'clientes_taurus.id', '=', 'pagos_membresia.id_cliente')
-            ->leftJoin('estados as estado_pago', 'pagos_membresia.id_estado', '=', 'estado_pago.id')
-            ->orderBy('clientes_taurus.fecha_creacion', 'DESC')
-            ->get();
-
-        return response()->json($clientes);
-    }
-
-    return response()->json([], 403);
-}
-
-public function getClientesPorActivacion($aplicacion, $rol)
+    public function getClientesPorActivacion($aplicacion, $rol)
     {
         $clientes = ClienteTaurus::select(
             'clientes_taurus.id',
@@ -206,24 +195,24 @@ public function getClientesPorActivacion($aplicacion, $rol)
     }
 
 
-     // Método que retorna si hay cambios desde el último cliente
-     public function status(Request $request)
-     {
-         $lastId = $request->input('lastId', 0); // ID que envía el frontend
- 
-         $cliente = ClienteTaurus::latest('id')->first();
- 
-         if ($cliente && $cliente->id > $lastId) {
-             return response()->json([
-                 'update' => true,
-                 'newId' => $cliente->id,
-             ]);
-         }
- 
-         return response()->json([
-             'update' => false,
-         ]);
-     }
+    // Método que retorna si hay cambios desde el último cliente
+    public function status(Request $request)
+    {
+        $lastId = $request->input('lastId', 0); // ID que envía el frontend
+
+        $cliente = ClienteTaurus::latest('id')->first();
+
+        if ($cliente && $cliente->id > $lastId) {
+            return response()->json([
+                'update' => true,
+                'newId' => $cliente->id,
+            ]);
+        }
+
+        return response()->json([
+            'update' => false,
+        ]);
+    }
 
 
     // Agrega este método al DashboardController
@@ -262,7 +251,7 @@ public function getClientesPorActivacion($aplicacion, $rol)
     }
 
 
-    
+
 
     public function getDineroActivo()
     {
