@@ -61,6 +61,10 @@ class TiendaSistematizada extends Model
             ->latestOfMany(); // O usa un scope si quieres solo los activos
     }
 
+    public function clientesTaurus()
+    {
+        return $this->hasMany(ClienteTaurus::class, 'id_tienda');
+    }
 
 
 

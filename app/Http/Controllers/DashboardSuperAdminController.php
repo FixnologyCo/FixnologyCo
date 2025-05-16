@@ -12,7 +12,7 @@ use App\Traits\RegistraAuditoria; // 👈 Importa el trait correctamente aquí
 
 
 
-class DashboardController extends Controller
+class DashboardSuperAdminController extends Controller
 {
 
     use RegistraAuditoria; // 👈 Usa el trait aquí a nivel de clase
@@ -204,66 +204,78 @@ class DashboardController extends Controller
     use AuthorizesRequests;
 
 
-    public function destroy(Request $request, $aplicacion, $rol, $id)
-    {
-        $cliente = ClienteTaurus::with([
-            'rol',
-            'tienda.token',
-            'tienda.pagosMembresia',
-            'tienda.membresia.detallesPlan'
-        ])->find($id);
+  public function destroy(Request $request, $aplicacion, $rol, $id)
+{
+    $cliente = ClienteTaurus::with([
+        'rol',
+        'tienda.token',
+        'tienda.pagosMembresia',
+        'tienda.membresia.detallesPlan',
+        'pagosMembresia'
+    ])->find($id);
 
-        if (!$cliente) {
-            abort(404, 'Cliente no encontrado');
+    if (!$cliente) {
+        return redirect()->route('aplicacion.dashboard', [
+            'aplicacion' => $aplicacion,
+            'rol' => ucfirst($rol)
+        ])->with('error', 'Cliente no encontrado.');
+    }
+
+    $tienda = $cliente->tienda;
+    $mensaje = 'Cliente eliminado exitosamente.'; // ✅ Mensaje por defecto
+
+    // 1. Eliminar pagos de membresía asociados al cliente
+    $cliente->pagosMembresia()->delete();
+
+    // 2. Eliminar el cliente
+    $cliente->deleteOrFail();
+
+    // 3. Verificar si quedan otros clientes en la misma tienda
+    if ($tienda && $tienda->clientesTaurus()->count() === 0) {
+        // Eliminar pagos de membresía de la tienda
+        $tienda->pagosMembresia()->delete();
+
+        // Eliminar token
+        if ($tienda->token) {
+            $tienda->token()->delete();
         }
+
+        // Eliminar detalles del plan si existen
+        if ($tienda->membresia && $tienda->membresia->detallesPlan) {
+            $tienda->membresia->detallesPlan()->delete();
+        }
+
+        // Eliminar membresía
+        if ($tienda->membresia) {
+            $tienda->membresia()->delete();
+        }
+
+        // Eliminar tienda
+        $tienda->delete();
+
+        $mensaje2 = ' También se eliminó la tienda ya que no tenía más clientes.'; // ✅ Mensaje extendido
+    }
+
+    // Auditoría
+    $this->registrarAuditoria(
+        'Eliminado',
+        'ClienteTaurus',
+        $cliente->numero_documento_ct,
+        'Eliminación de cliente Taurus',
+        ['evento' => 'Eliminación de cliente taurus']
+    );
 
         $nombreRol = $cliente->rol ? $cliente->rol->nombre_rol : 'SuperAdmin';
 
-        // ✅ Eliminar relaciones en cascada
-        if ($cliente->tienda) {
-            if ($cliente->tienda->pagosMembresia) {
-                $cliente->tienda->pagosMembresia()->delete();
-            }
-            if ($cliente->tienda->token) {
-                $cliente->tienda->token()->delete();
-            }
-            if ($cliente->tienda->membresia) {
-                if ($cliente->tienda->membresia->detallesPlan) {
-                    $cliente->tienda->membresia->detallesPlan()->delete();
-                }
-                $cliente->tienda->membresia()->delete();
-            }
-            $cliente->tienda()->delete();
-        }
+    return redirect()->route('aplicacion.dashboard', [
+        'aplicacion' => $aplicacion,
+        'rol' => ucfirst($nombreRol ?: 'SuperAdmin')
+    ])->with('success', $mensaje);
+}
 
-        // ✅ Eliminar relaciones directas del cliente
-        if ($cliente->estado) {
-            $cliente->estado()->dissociate()->delete();
-        }
-        if ($cliente->tipoDocumento) {
-            $cliente->tipoDocumento()->dissociate()->delete();
-        }
-        if ($cliente->rol) {
-            $cliente->rol()->dissociate()->delete();
-        }
 
-        $clienteId = $cliente->id;
-        $cliente->deleteOrFail();
 
-        $this->registrarAuditoria(
-            'Eliminado',
-            'ClienteTaurus',
-            $cliente->numero_documento_ct,
-            'Eliminacion de cliente t',
-            ['evento' => 'Eliminacion de cliente taurus']
-        );
 
-        // ✅ Redirigir con la notificación de éxito
-        return redirect()->route('aplicacion.dashboard', [
-            'aplicacion' => $aplicacion,
-            'rol' => ucfirst($nombreRol ?: 'SuperAdmin')
-        ])->with('success', 'Cliente eliminado con éxito');
-    }
 
     public function show($aplicacion, $rol, Request $request)
     {
@@ -278,7 +290,9 @@ class DashboardController extends Controller
 
             $request->session()->invalidate();
             $request->session()->regenerateToken();
-            return redirect()->route('login.auth')->with('error', 'No tienes permisos para acceder a esta sección.');
+            $mensaje = 'No tienes permisos para acceder a esta sección.';
+
+            return redirect()->route('login.auth')->with('error', $mensaje);
         }
 
         // Verificar que el usuario tenga tienda y la aplicación coincida

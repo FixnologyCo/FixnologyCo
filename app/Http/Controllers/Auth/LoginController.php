@@ -32,7 +32,13 @@ class LoginController extends Controller
             'contrasenia_ct.required' => 'La contraseña es requerida.',
         ]);
 
-        $cliente = ClienteTaurus::with('rol', 'tienda.aplicacion', 'tienda.token', 'tienda.membresia.pagos_membresia')
+        $cliente = ClienteTaurus::with([
+            'rol',
+            'tienda.aplicacion',
+            'tienda.token',
+            'tienda.membresia.pagos_membresia',
+            'pagosMembresia'
+        ])
             ->where('numero_documento_ct', $request->numero_documento_ct)
             ->first();
 
@@ -48,27 +54,37 @@ class LoginController extends Controller
             ]);
         }
 
-        $ultimoPago = $cliente->pagosMembresias->last();
-        if ($ultimoPago && $ultimoPago->id_estado === 9) {
-            Auth::logout();
-            return back()->withErrors([
-                'numero_documento_ct' => 'Ponte al día con tu pago para seguir disfrutando de la app.',
-            ]);
+        // Validación de pago
+        $pagos = $cliente->pagosMembresia;
+        if ($pagos && $pagos->isNotEmpty()) {
+            $ultimoPago = $pagos->sortByDesc('fecha_pago')->first();
+
+            $estadoInvalido = $ultimoPago->id_estado === 9;
+            $sinDias = $ultimoPago->dias_restantes <= 0;
+
+            if ($estadoInvalido || $sinDias) {
+                Auth::logout();
+                return back()->withErrors([
+                    'numero_documento_ct' => 'Ponte al día con tu pago para seguir disfrutando de la app.',
+                ]);
+            }
         }
 
         Auth::login($cliente);
 
-        // ✅ Registrar el login
-        $this->registrarAuditoria(
-            'Iniciado sesión',
-            'ClienteTaurus',
-            $cliente->numero_documento_ct,
-            'Ingreso al sistema',
-            ['evento' => 'inicio de sesion']
-        );
-
+        // ✅ Tienda inactiva o eliminada
         if (
             !$cliente->tienda ||
+            $cliente->tienda->id_estado === 2
+        ) {
+            Auth::logout();
+            return back()->withErrors([
+                'numero_documento_ct' => 'Tu tienda ha sido desactivada. Por favor contáctanos.',
+            ]);
+        }
+
+        // ✅ Token inactivo
+        if (
             !$cliente->tienda->token ||
             !$cliente->tienda->token->token_activacion ||
             $cliente->tienda->token->id_estado === 2
@@ -78,6 +94,14 @@ class LoginController extends Controller
                 'numero_documento_ct' => 'Token no válido o inactivo, contáctanos.',
             ]);
         }
+
+        $this->registrarAuditoria(
+            'Iniciado sesión',
+            'ClienteTaurus',
+            $cliente->numero_documento_ct,
+            'Ingreso al sistema',
+            ['evento' => 'inicio de sesion']
+        );
 
         $nombreAplicacion = $cliente->tienda->aplicacion->nombre_app ?? null;
         $rol = $cliente->rol->tipo_rol ?? null;
@@ -93,14 +117,14 @@ class LoginController extends Controller
             'aplicacion' => ucfirst($nombreAplicacion),
             'rol' => ucfirst($rol),
         ])->with('success', 'Bienvenido por aquí, ' . ($cliente->nombres_ct ?? 'Usuario'));
-
     }
+
 
     // ✅ Cerrar sesión
     public function logout(Request $request)
     {
         $clienteId = auth()->id(); // Guardamos el ID antes de cerrar sesión
-    
+
         $this->registrarAuditoria(
             'Cerrado sesión',
             'ClienteTaurus',
@@ -108,13 +132,13 @@ class LoginController extends Controller
             'Cierre de sesion',
             ['evento' => 'cierre de sesion']
         );
-    
+
         Auth::logout();
-    
+
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-    
+
         return redirect()->route('login.auth')->with('success', 'Gracias por usar la App, cuídate.');
     }
-    
+
 }

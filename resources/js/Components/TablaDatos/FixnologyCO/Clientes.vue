@@ -180,18 +180,10 @@ const deleteCliente = (id) => {
     rol: props.rol.id,
     id: id
   }), {
-    onSuccess: () => {
-      props.clientes = props.clientes.filter(cliente => cliente.id !== id);
-
-      mostrarMensaje('Cliente eliminado con éxito', 'success');
-      
-
-    },
-    onError: (error) => {
-      mostrarMensaje('Error al eliminar el cliente', 'error');
-    }
+    preserveScroll: true, // Opcional: mantiene scroll
   });
 };
+
 
 
 function handleBeforeEnter(el) {
