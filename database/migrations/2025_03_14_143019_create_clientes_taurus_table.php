@@ -52,7 +52,7 @@ return new class extends Migration
             [
                 'id_rol' => '4',
                 'id_tienda' => '1',
-                'nombres_ct'=> 'Erick Manuel',
+                'nombres_ct'=> 'Erik Manuel',
                 'apellidos_ct' => 'Guevara',
                 'id_tipo_documento' => '1',
                 'numero_documento_ct' => '777',
