@@ -5,7 +5,6 @@ use App\Models\ClienteTaurus;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB; // ✅ Importa la clase DB correctamente
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use App\Traits\RegistraAuditoria; // 👈 Importa el trait correctamente aquí
@@ -185,8 +184,6 @@ class DashboardSuperAdminController extends Controller
     }
 
 
-
-
     public function getDineroActivo()
     {
         $dineroActivo = DB::table('pagos_membresia')
@@ -275,9 +272,6 @@ class DashboardSuperAdminController extends Controller
     }
 
 
-
-
-
     public function show($aplicacion, $rol, Request $request)
     {
 
@@ -303,11 +297,4 @@ class DashboardSuperAdminController extends Controller
 
         abort(404);
     }
-
-
-
-
-
-
-
 }
