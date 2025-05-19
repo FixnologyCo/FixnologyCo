@@ -29,6 +29,6 @@ class Controller
             abort(404);
         }
 
-        return null; // acceso válido
+        return null;
     }
 }
