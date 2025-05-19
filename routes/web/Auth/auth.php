@@ -14,13 +14,18 @@ Route::prefix('login')->group(function () {
 });
 
 Route::prefix('register')->group(function () {
-     // ✅ Ruta GET para mostrar el formulario de registro
-     Route::get('/auth', [RegisterController::class, 'show'])->name('register.auth');
+    // ✅ Ruta GET para mostrar el formulario de registro
+    Route::get('/auth', [RegisterController::class, 'show'])->name('register.auth');
 
     Route::post('/auth', [RegisterController::class, 'register'])->name('register.post');
 });
 
 Route::prefix('linkRecuperacion')->group(function () {
-     // ✅ Ruta GET para mostrar el formulario de registro
-     Route::get('/linkRecuperacion', [LinkRecuperacionController::class, 'show'])->name('linkRecuperacion.auth');
+    // ✅ Ruta GET para mostrar el formulario de registro
+    Route::get('/linkRecuperacion', [LinkRecuperacionController::class, 'show'])->name('linkRecuperacion.auth');
+    Route::post('/linkRecuperacion', [LinkRecuperacionController::class, 'LinkRecuperacion'])->name('linkRecuperacion.post');
+    Route::get('/reset-password/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
+    Route::post('/reset-password', [ResetPasswordController::class, 'reset'])->name('password.update');
+
+
 });
