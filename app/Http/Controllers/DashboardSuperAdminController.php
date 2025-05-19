@@ -27,15 +27,22 @@ class DashboardSuperAdminController extends Controller
      */
 
 
-
-    public function listarClientes($aplicacion, $rol)
+    
+    public function listarClientes($aplicacion, $rol, Request $request)
     {
         $user = auth()->user()->load(['rol', 'tienda.aplicacion']);
 
-        if (!in_array($user->rol->id, [1, 2, 3, 4])) {
-            abort(403, 'No tienes permisos para acceder a esta sección.');
-        }
+        if (!in_array($user->rol->id, [4])) {
+            Auth::logout();
 
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+            $mensaje = 'No tienes permisos para acceder a esta sección.';
+
+            // return redirect()->route('login.auth')->with('error', $mensaje);
+        } 
+
+         
         if ($user->tienda && $user->tienda->aplicacion->nombre_app === $aplicacion) {
             $clientes = ClienteTaurus::select(
                 'clientes_taurus.id',
@@ -66,7 +73,6 @@ class DashboardSuperAdminController extends Controller
 
             return response()->json($clientes);
         }
-
         return response()->json([], 403);
     }
 
@@ -279,21 +285,17 @@ class DashboardSuperAdminController extends Controller
 
     public function show($aplicacion, $rol, Request $request)
     {
+        // Llamamos a la función base para validar el acceso
+        if ($respuesta = $this->validarAcceso($aplicacion, $rol, $request, [4])) {
+            return $respuesta; // redirección o abort
+        }
+
         // Cargar relaciones necesarias del usuario autenticado
         $user = auth()->user()->load([
             'tienda.aplicacion.membresia.estado',
             'tienda.pagosMembresia',
         ]);
 
-        if (!in_array($user->rol->id, [4])) {
-            Auth::logout();
-
-            $request->session()->invalidate();
-            $request->session()->regenerateToken();
-            $mensaje = 'No tienes permisos para acceder a esta sección.';
-
-            return redirect()->route('login.auth')->with('error', $mensaje);
-        }
 
         // Verificar que el usuario tenga tienda y la aplicación coincida
         if ($user->tienda && $user->tienda->aplicacion->nombre_app === $aplicacion) {
