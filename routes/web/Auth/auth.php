@@ -22,10 +22,10 @@ Route::prefix('register')->group(function () {
 
 Route::prefix('linkRecuperacion')->group(function () {
     // ✅ Ruta GET para mostrar el formulario de registro
-    Route::get('/linkRecuperacion', [LinkRecuperacionController::class, 'show'])->name('linkRecuperacion.auth');
-    Route::post('/linkRecuperacion', [LinkRecuperacionController::class, 'LinkRecuperacion'])->name('linkRecuperacion.post');
-    Route::get('/reset-password/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
-    Route::post('/reset-password', [ResetPasswordController::class, 'reset'])->name('password.update');
+    Route::get('/validacionUsuario', [LinkRecuperacionController::class, 'show'])->name('linkRecuperacion.auth');
+    Route::post('/validacionUsuario', [LinkRecuperacionController::class, 'LinkRecuperacion'])->name('validacionUsuario.post');
+    Route::get('/reset-password/{token}', [LinkRecuperacionController::class, 'showResetForm'])->name('password.reset');
+    Route::post('/reset-password', [LinkRecuperacionController::class, 'reset'])->name('password.update');
 
 
 });

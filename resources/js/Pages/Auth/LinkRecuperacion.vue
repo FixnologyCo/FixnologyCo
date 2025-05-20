@@ -56,7 +56,7 @@ const form = useForm({
 
 
 const submit = () => {
-  form.post(route('linkRecuperacion.auth'), {
+  form.post(route('validacionUsuario.post'), {
     onSuccess: () => {
       mostrarMensaje('Link enviado a tu correo', 'success')
 
