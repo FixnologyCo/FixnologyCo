@@ -1,79 +1,54 @@
-<script>
-import { Head, useForm, usePage } from '@inertiajs/vue3';
-import { ref, onMounted } from 'vue'
-import { route } from 'ziggy-js';
-
-export default {
-  name: 'Auth',
-  components: {
-    Head,
-  },
-  mounted() {
-    window.history.pushState(null, '', window.location.href);
-    window.onpopstate = function () {
-      window.history.pushState(null, '', window.location.href);
-      alert('Debes iniciar sesión primero.');
-    };
-  }
-}
-
-const page = usePage();
-</script>
-
 <script setup>
+import { Head,useForm } from '@inertiajs/vue3'
+import { computed, ref } from 'vue';
 
 const props = defineProps({
-  success: String
+  token: String,
+  email: String,
 })
 
+const form = useForm({
+  token: props.token,
+  email: props.email,
+  password: '',
+  password_confirmation: '',
+})
+
+// ✅ Estado para la notificación
 const mensajeNotificacion = ref('')
 const tipoNotificacion = ref(null)
 const mostrarNotificacion = ref(false)
 
-onMounted(() => {
-  if (usePage().props.flash && usePage().props.flash.success) {
-    mostrarMensaje(usePage().props.flash.success, 'success');
-  } else if (usePage().props.flash.error) {
-    mostrarMensaje(usePage().props.flash.error, 'error');
-  }
-});
-
-
+// ✅ Función para mostrar la notificación
 const mostrarMensaje = (mensaje, tipo) => {
   mensajeNotificacion.value = mensaje
   tipoNotificacion.value = tipo
   mostrarNotificacion.value = true
 
+  // Ocultar la notificación después de 3 segundos
   setTimeout(() => {
     mostrarNotificacion.value = false
   }, 5000)
 }
 
-const form = useForm({
-  numero_documento_ct: '',
-  contrasenia_ct: ''
-})
-
-
 
 const submit = () => {
-  form.post(route('login.auth'), {
+  form.post(route('password.update'), {
     onSuccess: () => {
-      mostrarMensaje('Bienvenido nuevamente', 'success')
-
+      mostrarMensaje('Su contraseñas se ha restablecido', 'success')
     },
     onError: () => {
-      mostrarMensaje('Error al iniciar sesión, verifica los datos.', 'error')
+     mostrarMensaje('Error al intentar cambiar la contraseña.', 'error')
     }
   })
 }
-
 </script>
 
 <template>
+  <Head title="Registrate" />
   <div>
 
-    <Head title="Inicia Sesion" />
+    <Head title="Restablece tu contraseña" />
 
     <div class="
     bg-mono-negro
@@ -95,12 +70,7 @@ const submit = () => {
         xl:w-[65%]
         max-w-[600px]
         ">
-          <div class="options flex gap-1 items-center text-[14px] mt-4">
-            <a :href="route('home.index')" class="hover:text-universal-azul flex items-center">
-              <span class="material-symbols-rounded text-[18px]">chevron_left</span>
-              <p>Home</p>
-            </a>
-          </div>
+          
           <div class="logo
           2xl:flex 2xl:gap-3 2xl:items-center
           xl:flex xl:gap-2 xl:items-center
@@ -124,14 +94,14 @@ const submit = () => {
             xl:text-[35px] d xl:mt-[20px]
             font-bold text-[22px] mt-3 text-center
             
-            ">Bienvenido Nuevamente 👋</h2>
+            ">¡Felicidades!, estas de regreso</h2>
             <p class="
             2xl:text-[20px]
             xl:text-[20px]
             text-[15px]
             text-center
-            px-8
-            ">Hoy es un excelente día para producir, inicia sesión y sácale el jugo a tu App.</p>
+            px-7
+            ">Por favor ingresa tu nueva contraseña</p>
           </div>
 
 
@@ -139,45 +109,46 @@ const submit = () => {
           <!-- ✅ FORMULARIO DE LOGIN -->
           <form @submit.prevent="submit" class="mt-5 flex flex-col gap-5">
             <!-- ✅ Campo Usuario -->
-            <div class="w-[100%]">
-              <p class="my-[5px] text-[14px]">Usuario:</p>
-              <div
-                class="w-[100%] transition-all rounded-[5px] border-[1px] border-secundary-light p-[3px] flex items-center gap-[8px]"
-                :class="{ 'border-universal-naranja': form.errors.numero_documento_ct }">
-                <span class="material-symbols-rounded text-universal-naranja text-[20px] pl-[5px]">people</span>
-                <input type="text" v-model="form.numero_documento_ct"
-                  class="w-full focus:outline-none focus:border-none font-normal bg-mono-negro text-blanco"
-                  placeholder="Ingresa tu usuario establecido." />
-              </div>
-              <span v-if="form.errors.contrasenia_ct" class="text-universal-naranja text-sm">
-                {{ form.errors.contrasenia_ct }}
-              </span>
-              <span v-if="form.errors.numero_documento_ct" class="text-universal-naranja text-sm">
-                {{ form.errors.numero_documento_ct }}
-              </span>
-            </div>
-
-            <!-- ✅ Campo Contraseña -->
-            <div class="w-[100%]">
+             <div class="flex justify-between items-center gap-5">
+              <div class="w-[50%]">
               <p class="my-[5px] text-[14px]">Contraseña:</p>
               <div
                 class="w-[100%] transition-all rounded-[5px] border-[1px] border-secundary-light p-[3px] flex items-center gap-[8px]"
-                :class="{ 'border-universal-naranja': form.errors.contrasenia_ct }">
+                :class="{ 'border-universal-naranja': form.errors.password }">
                 <span class="material-symbols-rounded text-universal-naranja text-[20px] pl-[5px]">password</span>
-                <input type="password" v-model="form.contrasenia_ct"
+                <input type="password" v-model="form.password"
                   class="w-full focus:outline-none focus:border-none font-normal bg-mono-negro text-blanco"
-                  placeholder="Ingresa tu contraseña." />
+                  placeholder="Ingresa tu nueva contraseña" />
               </div>
-              <span v-if="form.errors.contrasenia_ct" class="text-universal-naranja text-sm">
-                {{ form.errors.contrasenia_ct }}
+              
+             
+              <span v-if="form.errors.password" class="text-universal-naranja text-sm">
+                {{ form.errors.password }}
               </span>
             </div>
 
-            <a :href="route('linkRecuperacion.auth')" class="text-universal-azul text-right">Olvidé mi contraseña</a>
+            <div class="w-[50%]">
+              <p class="my-[5px] text-[14px]">Repite tu contraseña:</p>
+              <div
+                class="w-[100%] transition-all rounded-[5px] border-[1px] border-secundary-light p-[3px] flex items-center gap-[8px]"
+                :class="{ 'border-universal-naranja': form.errors.correo_vinculado }">
+                <span class="material-symbols-rounded text-universal-naranja text-[20px] pl-[5px]">password</span>
+                <input type="password" v-model="form.password_confirmation"
+                  class="w-full focus:outline-none focus:border-none font-normal bg-mono-negro text-blanco"
+                  placeholder="Repite tu nueva contraseña" />
+              </div>
+              
+             
+              <span v-if="form.errors.correo_vinculado" class="text-universal-naranja text-sm">
+                {{ form.errors.correo_vinculado }}
+              </span>
+            </div>
+             </div>
+            
 
             <!-- ✅ BOTÓN DE INICIAR SESIÓN -->
             <button type="submit" class="btn-taurus">
-              Iniciar sesión
+              Restablecer
               <span class="material-symbols-rounded bg-transparent">bolt</span>
             </button>
 
@@ -185,9 +156,9 @@ const submit = () => {
             <p class="
             mt-4
             text-center
-            ">¿No tienes una cuenta?, <a :href="route('register.auth')" class="
+            ">¿Tienes problemas?, <a href="https://api.whatsapp.com/send/?phone=573219631459&text=Buen+día,+vengo+desde+la+app%2C+necesito+ayuda+con+mi+cuenta.&type=phone_number&app_absent=0" class="
                 text-universal-azul
-                ">Registrate aquí</a>.</p>
+                ">Contactanos</a>.</p>
 
             <p class="
              text-[12px]
@@ -227,3 +198,5 @@ const submit = () => {
     </div>
   </div>
 </template>
+
+

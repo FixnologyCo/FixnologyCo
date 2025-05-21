@@ -50,20 +50,19 @@ const mostrarMensaje = (mensaje, tipo) => {
 }
 
 const form = useForm({
-  numero_documento_ct: '',
-  contrasenia_ct: ''
+  correo_vinculado: ''
 })
 
 
 
 const submit = () => {
-  form.post(route('login.auth'), {
+  form.post(route('validacionUsuario.post'), {
     onSuccess: () => {
-      mostrarMensaje('Bienvenido nuevamente', 'success')
+      mostrarMensaje('Link enviado a tu correo', 'success')
 
     },
     onError: () => {
-      mostrarMensaje('Error al iniciar sesión, verifica los datos.', 'error')
+      mostrarMensaje('Error al recuperar tu cuenta, verifica los datos.', 'error')
     }
   })
 }
@@ -73,7 +72,7 @@ const submit = () => {
 <template>
   <div>
 
-    <Head title="Inicia Sesion" />
+    <Head title="Recupera tu cuenta FixnologyCO" />
 
     <div class="
     bg-mono-negro
@@ -96,9 +95,9 @@ const submit = () => {
         max-w-[600px]
         ">
           <div class="options flex gap-1 items-center text-[14px] mt-4">
-            <a :href="route('home.index')" class="hover:text-universal-azul flex items-center">
+            <a :href="route('login.auth')" class="hover:text-universal-azul flex items-center">
               <span class="material-symbols-rounded text-[18px]">chevron_left</span>
-              <p>Home</p>
+              <p>Inicia sesión</p>
             </a>
           </div>
           <div class="logo
@@ -124,14 +123,14 @@ const submit = () => {
             xl:text-[35px] d xl:mt-[20px]
             font-bold text-[22px] mt-3 text-center
             
-            ">Bienvenido Nuevamente 👋</h2>
+            ">Vamos a a recuperar tu cuenta</h2>
             <p class="
             2xl:text-[20px]
             xl:text-[20px]
             text-[15px]
             text-center
-            px-8
-            ">Hoy es un excelente día para producir, inicia sesión y sácale el jugo a tu App.</p>
+            px-7
+            ">Por favor ingresa tu correo electrónico vinculado a tu usuario</p>
           </div>
 
 
@@ -140,44 +139,24 @@ const submit = () => {
           <form @submit.prevent="submit" class="mt-5 flex flex-col gap-5">
             <!-- ✅ Campo Usuario -->
             <div class="w-[100%]">
-              <p class="my-[5px] text-[14px]">Usuario:</p>
+              <p class="my-[5px] text-[14px]">Correo electrónico:</p>
               <div
                 class="w-[100%] transition-all rounded-[5px] border-[1px] border-secundary-light p-[3px] flex items-center gap-[8px]"
-                :class="{ 'border-universal-naranja': form.errors.numero_documento_ct }">
-                <span class="material-symbols-rounded text-universal-naranja text-[20px] pl-[5px]">people</span>
-                <input type="text" v-model="form.numero_documento_ct"
+                :class="{ 'border-universal-naranja': form.errors.correo_vinculado }">
+                <span class="material-symbols-rounded text-universal-naranja text-[20px] pl-[5px]">email</span>
+                <input type="text" v-model="form.correo_vinculado"
                   class="w-full focus:outline-none focus:border-none font-normal bg-mono-negro text-blanco"
-                  placeholder="Ingresa tu usuario establecido." />
+                  placeholder="Ingresa tu correo vinculado." />
               </div>
-              <span v-if="form.errors.contrasenia_ct" class="text-universal-naranja text-sm">
-                {{ form.errors.contrasenia_ct }}
-              </span>
-              <span v-if="form.errors.numero_documento_ct" class="text-universal-naranja text-sm">
-                {{ form.errors.numero_documento_ct }}
+             
+              <span v-if="form.errors.correo_vinculado" class="text-universal-naranja text-sm">
+                {{ form.errors.correo_vinculado }}
               </span>
             </div>
-
-            <!-- ✅ Campo Contraseña -->
-            <div class="w-[100%]">
-              <p class="my-[5px] text-[14px]">Contraseña:</p>
-              <div
-                class="w-[100%] transition-all rounded-[5px] border-[1px] border-secundary-light p-[3px] flex items-center gap-[8px]"
-                :class="{ 'border-universal-naranja': form.errors.contrasenia_ct }">
-                <span class="material-symbols-rounded text-universal-naranja text-[20px] pl-[5px]">password</span>
-                <input type="password" v-model="form.contrasenia_ct"
-                  class="w-full focus:outline-none focus:border-none font-normal bg-mono-negro text-blanco"
-                  placeholder="Ingresa tu contraseña." />
-              </div>
-              <span v-if="form.errors.contrasenia_ct" class="text-universal-naranja text-sm">
-                {{ form.errors.contrasenia_ct }}
-              </span>
-            </div>
-
-            <a :href="route('linkRecuperacion.auth')" class="text-universal-azul text-right">Olvidé mi contraseña</a>
 
             <!-- ✅ BOTÓN DE INICIAR SESIÓN -->
             <button type="submit" class="btn-taurus">
-              Iniciar sesión
+              Validar usuario
               <span class="material-symbols-rounded bg-transparent">bolt</span>
             </button>
 
@@ -185,9 +164,9 @@ const submit = () => {
             <p class="
             mt-4
             text-center
-            ">¿No tienes una cuenta?, <a :href="route('register.auth')" class="
+            ">¿Tienes problemas?, <a href="https://api.whatsapp.com/send/?phone=573219631459&text=Buen+día,+vengo+desde+la+app%2C+necesito+ayuda+con+mi+cuenta.&type=phone_number&app_absent=0" class="
                 text-universal-azul
-                ">Registrate aquí</a>.</p>
+                ">Contactanos</a>.</p>
 
             <p class="
              text-[12px]
