@@ -12,11 +12,13 @@ class RecuperarPassword extends Mailable
 
     public $token;
     public $correo;
+     public $nombre;
 
-    public function __construct($token, $correo)
+    public function __construct($token, $correo, $nombre)
     {
         $this->token = $token;
         $this->correo = $correo;
+         $this->nombre = $nombre;
     }
 
 
@@ -28,6 +30,7 @@ class RecuperarPassword extends Mailable
         ->view('emails.recuperar-password')
         ->with([
             'url' => $url,
+            'nombre' => $this->nombre,
         ]);
 }
 

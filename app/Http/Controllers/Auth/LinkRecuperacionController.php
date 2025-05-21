@@ -48,7 +48,7 @@ class LinkRecuperacionController extends Controller
             ]
         );
 
-        Mail::to($correo)->send(new RecuperarPassword($token, $correo));
+        Mail::to($correo)->send(new RecuperarPassword($token, $correo, $cliente->nombres_ct));
 
 
         return back()->with('success', 'Se ha enviado el enlace a tu correo.');

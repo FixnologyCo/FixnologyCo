@@ -13,7 +13,7 @@ class EnviarCorreoPrueba extends Command
 
     public function handle()
     {
-        $correoDestino = 'sebastianzamudio2004@gmail.com'; // ← Cambia esto por tu correo personal
+        $correoDestino = 'alexandra.m1503@gmail.com';
 
         Mail::to($correoDestino)->send(new PruebaCorreo('📬 Este es un correo de prueba con un nuevo nombre de usuario'));
 

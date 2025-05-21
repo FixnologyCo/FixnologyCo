@@ -1,63 +1,30 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <title>Recuperar contraseña</title>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" rel="stylesheet" />
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-
 </head>
-
-<body style="font-family: Arial, sans-serif; background-color: #141414; padding: 20px; color: #f3fafe ;">
-    <div class="logo
-         
-          flex items-center gap-2 justify-center
-          ">
-        <div class="gota
-           
-            h-5 w-8 rounded-full bg-[#f05235]
-            "
-            style="box-shadow: 0px 8px 20px #FE4F2D;"></div>
-        <div class="logo">
-            <h1 class="text-[20px] font-semibold">Fixnology CO</h1>
-            <p class="-mt-[8px] text-[14px] font-medium">Empresa de software especializada</p>
+<body style="font-family: Arial, sans-serif; background-color: #141414; padding: 20px;">
+    <div style="max-width: 600px; margin: 0 auto; padding: 30px; border-radius: 8px; box-shadow: 0 0 10px rgba(255, 255, 255, 0.05); border: 1px solid #f2f4f8; color: #f2f4f8;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <div style="box-shadow: 0px 8px 20px #FE4F2D; width: 36px; height: 25px; border-radius: 20%; background: #f05235;"></div>
+            <h1 style="margin: 0; font-size: 24px;">Fixnology CO</h1>
         </div>
+
+        <h2 style="color: #f2f4f8;">Hola, <span style="color: #f2f4f8;">{{ $nombre }}</span> 👋</h2>
+        <p style="color:#f2f4f8;">Recibiste este correo porque solicitaste restablecer tu contraseña en <strong>Fixnology Co</strong>.</p>
+        <p style="color:#f2f4f8;">Haz clic en el botón de abajo para crear una nueva contraseña:</p>
+
+        <p style="text-align: center; margin: 30px 0;">
+            <a href="{{ $url }}" style="background-color: #f05235; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px;">
+                Restablecer contraseña
+            </a>
+        </p>
+
+        <p style="color:#f2f4f8;">Si no realizaste esta solicitud, puedes ignorar este mensaje.</p>
+        <p style="color: #f05235;">Este enlace expirará en 15 minutos por razones de seguridad.</p>
+
+        <p style="color:#f2f4f8; margin-top: 30px; font-weight: bolder;">Gracias,<br>Equipo Fixnology Co</p>
     </div>
-
-    <div class="welcome flex items-center flex-col gap-3">
-
-        <h2 class="
-           
-            font-bold text-[22px] mt-3 text-center
-            
-            ">¡Hola! 👋</h2>
-        <p class="
-            
-            text-[15px]
-            text-center
-            px-8
-            ">Recibiste este correo porque solicitaste restablecer tu contraseña en <strong>Fixnology Co</strong>.</p>
-
-            <a href="{{ $url }}">
-        <button type="submit" style="box-shadow: 0px 8px 20px #FE4F2D; font-weight: 500;"  class="bg-[#FE4F2D] w-full p-2 rounded-sm flex items-center gap-2 shadow-[0px 8px 20px #FE4F2D]">
-            Restablecer contraseña 
-            <span class="material-symbols-rounded bg-transparent">bolt</span>
-        </button>
-        <br>
-    </a>
-
-    <p>Si no realizaste esta solicitud, puedes ignorar este mensaje.</p>
-    <p>Este enlace expirará en 15 minutos por razones de seguridad.</p>
-
-    
-    <p style="margin-top: 30px; text-align: left;">Gracias, Equipo Fixnology Co.</p>
-</div>
-
-    
-
-    
-
 </body>
-
 </html>
