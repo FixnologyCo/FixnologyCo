@@ -68,12 +68,13 @@ class LinkRecuperacionController extends Controller
     {
         $request->validate([
             'email' => 'required|email|exists:clientes_taurus,email_ct',
-            'password' => 'required|string|min:8|confirmed',
+            'password' => 'required|string|min:6|confirmed',
             'token' => 'required'
         ], [
             'email.exists' => 'Este correo no está registrado.',
             'password.confirmed' => 'Las contraseñas no coinciden.',
-            'password.min' => 'La contraseña debe tener al menos 8 caracteres.',
+            'password.required' => 'La contraseña no puede quedar vacia.',
+            'password.min' => 'La contraseña debe tener al menos 6 caracteres.',
         ]);
 
         $resetRecord = DB::table('password_reset_table')
@@ -103,6 +104,6 @@ class LinkRecuperacionController extends Controller
         // Borramos el token de recuperación
         DB::table('password_reset_table')->where('email', $request->email)->delete();
 
-        return redirect()->route('login')->with('success', '¡Contraseña restablecida correctamente!');
+        return redirect()->route('login.auth')->with('success', '¡Contraseña restablecida correctamente!');
     }
 }

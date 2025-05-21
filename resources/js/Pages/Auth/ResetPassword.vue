@@ -1,5 +1,6 @@
 <script setup>
 import { Head,useForm } from '@inertiajs/vue3'
+import { computed, ref } from 'vue';
 
 const props = defineProps({
   token: String,
@@ -13,13 +14,31 @@ const form = useForm({
   password_confirmation: '',
 })
 
+// ✅ Estado para la notificación
+const mensajeNotificacion = ref('')
+const tipoNotificacion = ref(null)
+const mostrarNotificacion = ref(false)
+
+// ✅ Función para mostrar la notificación
+const mostrarMensaje = (mensaje, tipo) => {
+  mensajeNotificacion.value = mensaje
+  tipoNotificacion.value = tipo
+  mostrarNotificacion.value = true
+
+  // Ocultar la notificación después de 3 segundos
+  setTimeout(() => {
+    mostrarNotificacion.value = false
+  }, 5000)
+}
+
+
 const submit = () => {
   form.post(route('password.update'), {
     onSuccess: () => {
-      alert('¡Contraseña restablecida correctamente!')
+      mostrarMensaje('Su contraseñas se ha restablecido', 'success')
     },
-    onError: (errors) => {
-      console.error(errors)
+    onError: () => {
+     mostrarMensaje('Error al intentar cambiar la contraseña.', 'error')
     }
   })
 }
@@ -95,7 +114,7 @@ const submit = () => {
               <p class="my-[5px] text-[14px]">Contraseña:</p>
               <div
                 class="w-[100%] transition-all rounded-[5px] border-[1px] border-secundary-light p-[3px] flex items-center gap-[8px]"
-                :class="{ 'border-universal-naranja': form.errors.correo_vinculado }">
+                :class="{ 'border-universal-naranja': form.errors.password }">
                 <span class="material-symbols-rounded text-universal-naranja text-[20px] pl-[5px]">password</span>
                 <input type="password" v-model="form.password"
                   class="w-full focus:outline-none focus:border-none font-normal bg-mono-negro text-blanco"
@@ -103,8 +122,8 @@ const submit = () => {
               </div>
               
              
-              <span v-if="form.errors.correo_vinculado" class="text-universal-naranja text-sm">
-                {{ form.errors.correo_vinculado }}
+              <span v-if="form.errors.password" class="text-universal-naranja text-sm">
+                {{ form.errors.password }}
               </span>
             </div>
 
