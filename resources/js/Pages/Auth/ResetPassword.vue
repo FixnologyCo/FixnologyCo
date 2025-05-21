@@ -1,78 +1,54 @@
-<script>
-import { Head, useForm, usePage } from '@inertiajs/vue3';
-import { ref, onMounted } from 'vue'
-import { route } from 'ziggy-js';
-
-export default {
-  name: 'Auth',
-  components: {
-    Head,
-  },
-  mounted() {
-    window.history.pushState(null, '', window.location.href);
-    window.onpopstate = function () {
-      window.history.pushState(null, '', window.location.href);
-      alert('Debes iniciar sesión primero.');
-    };
-  }
-}
-
-const page = usePage();
-</script>
-
 <script setup>
+import { Head,useForm } from '@inertiajs/vue3'
+import { computed, ref } from 'vue';
 
 const props = defineProps({
-  success: String
+  token: String,
+  email: String,
 })
 
+const form = useForm({
+  token: props.token,
+  email: props.email,
+  password: '',
+  password_confirmation: '',
+})
+
+// ✅ Estado para la notificación
 const mensajeNotificacion = ref('')
 const tipoNotificacion = ref(null)
 const mostrarNotificacion = ref(false)
 
-onMounted(() => {
-  if (usePage().props.flash && usePage().props.flash.success) {
-    mostrarMensaje(usePage().props.flash.success, 'success');
-  } else if (usePage().props.flash.error) {
-    mostrarMensaje(usePage().props.flash.error, 'error');
-  }
-});
-
-
+// ✅ Función para mostrar la notificación
 const mostrarMensaje = (mensaje, tipo) => {
   mensajeNotificacion.value = mensaje
   tipoNotificacion.value = tipo
   mostrarNotificacion.value = true
 
+  // Ocultar la notificación después de 3 segundos
   setTimeout(() => {
     mostrarNotificacion.value = false
   }, 5000)
 }
 
-const form = useForm({
-  correo_vinculado: ''
-})
-
-
 
 const submit = () => {
-  form.post(route('validacionUsuario.post'), {
+  form.post(route('password.update'), {
     onSuccess: () => {
-      mostrarMensaje('Link enviado a tu correo', 'success')
-
+      mostrarMensaje('Su contraseñas se ha restablecido', 'success')
     },
     onError: () => {
-      mostrarMensaje('Error al recuperar tu cuenta, verifica los datos.', 'error')
+     mostrarMensaje('Error al intentar cambiar la contraseña.', 'error')
     }
   })
 }
-
 </script>
 
 <template>
+  <Head title="Registrate" />
   <div>
 
-    <Head title="Recupera tu cuenta FixnologyCO" />
+    <Head title="Restablece tu contraseña" />
 
     <div class="
     bg-mono-negro
@@ -94,12 +70,7 @@ const submit = () => {
         xl:w-[65%]
         max-w-[600px]
         ">
-          <div class="options flex gap-1 items-center text-[14px] mt-4">
-            <a :href="route('login.auth')" class="hover:text-universal-azul flex items-center">
-              <span class="material-symbols-rounded text-[18px]">chevron_left</span>
-              <p>Inicia sesión</p>
-            </a>
-          </div>
+          
           <div class="logo
           2xl:flex 2xl:gap-3 2xl:items-center
           xl:flex xl:gap-2 xl:items-center
@@ -123,14 +94,14 @@ const submit = () => {
             xl:text-[35px] d xl:mt-[20px]
             font-bold text-[22px] mt-3 text-center
             
-            ">Vamos a a recuperar tu cuenta</h2>
+            ">¡Felicidades!, estas de regreso</h2>
             <p class="
             2xl:text-[20px]
             xl:text-[20px]
             text-[15px]
             text-center
             px-7
-            ">Por favor ingresa tu correo electrónico vinculado a tu usuario</p>
+            ">Por favor ingresa tu nueva contraseña</p>
           </div>
 
 
@@ -138,25 +109,46 @@ const submit = () => {
           <!-- ✅ FORMULARIO DE LOGIN -->
           <form @submit.prevent="submit" class="mt-5 flex flex-col gap-5">
             <!-- ✅ Campo Usuario -->
-            <div class="w-[100%]">
-              <p class="my-[5px] text-[14px]">Correo electrónico:</p>
+             <div class="flex justify-between items-center gap-5">
+              <div class="w-[50%]">
+              <p class="my-[5px] text-[14px]">Contraseña:</p>
+              <div
+                class="w-[100%] transition-all rounded-[5px] border-[1px] border-secundary-light p-[3px] flex items-center gap-[8px]"
+                :class="{ 'border-universal-naranja': form.errors.password }">
+                <span class="material-symbols-rounded text-universal-naranja text-[20px] pl-[5px]">password</span>
+                <input type="password" v-model="form.password"
+                  class="w-full focus:outline-none focus:border-none font-normal bg-mono-negro text-blanco"
+                  placeholder="Ingresa tu nueva contraseña" />
+              </div>
+              
+             
+              <span v-if="form.errors.password" class="text-universal-naranja text-sm">
+                {{ form.errors.password }}
+              </span>
+            </div>
+
+            <div class="w-[50%]">
+              <p class="my-[5px] text-[14px]">Repite tu contraseña:</p>
               <div
                 class="w-[100%] transition-all rounded-[5px] border-[1px] border-secundary-light p-[3px] flex items-center gap-[8px]"
                 :class="{ 'border-universal-naranja': form.errors.correo_vinculado }">
-                <span class="material-symbols-rounded text-universal-naranja text-[20px] pl-[5px]">email</span>
-                <input type="text" v-model="form.correo_vinculado"
+                <span class="material-symbols-rounded text-universal-naranja text-[20px] pl-[5px]">password</span>
+                <input type="password" v-model="form.password_confirmation"
                   class="w-full focus:outline-none focus:border-none font-normal bg-mono-negro text-blanco"
-                  placeholder="Ingresa tu correo vinculado." />
+                  placeholder="Repite tu nueva contraseña" />
               </div>
+              
              
               <span v-if="form.errors.correo_vinculado" class="text-universal-naranja text-sm">
                 {{ form.errors.correo_vinculado }}
               </span>
             </div>
+             </div>
+            
 
             <!-- ✅ BOTÓN DE INICIAR SESIÓN -->
             <button type="submit" class="btn-taurus">
-              Validar usuario
+              Restablecer
               <span class="material-symbols-rounded bg-transparent">bolt</span>
             </button>
 
@@ -206,3 +198,5 @@ const submit = () => {
     </div>
   </div>
 </template>
+
+
