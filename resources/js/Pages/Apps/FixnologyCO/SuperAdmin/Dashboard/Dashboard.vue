@@ -1,6 +1,6 @@
 <script setup>
 import { router, Head, usePage } from '@inertiajs/vue3';
-import { ref, onMounted, onUnmounted, computed, watch } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import axios from 'axios';
 import 'dayjs/locale/es';
 import SaludoOpciones from '@/Components/header/SaludoOpciones.vue';
