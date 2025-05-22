@@ -3,11 +3,12 @@ import { router, Head, usePage } from '@inertiajs/vue3';
 import { ref, onMounted, onUnmounted, computed, watch } from 'vue';
 import axios from 'axios';
 import 'dayjs/locale/es';
-import dayjs from 'dayjs';
 import SaludoOpciones from '@/Components/header/SaludoOpciones.vue';
 import Clientes from '@/Components/TablaDatos/FixnologyCO/Clientes.vue';
 import ExportarExcel from '@/Components/ExportarExcel/ExportarExcel.vue';
 import Sidebar from '@/Components/Sidebar/Sidebar.vue';
+import AppLayout from '@/Layouts/AppLayout.vue';
+defineOptions({ layout: AppLayout });
 
 const props = defineProps({
   auth: {

@@ -5,10 +5,7 @@ import { InertiaProgress } from '@inertiajs/progress';
 import { ZiggyVue } from 'ziggy-js';
 import { Ziggy } from './ziggy';
 
-import Notifications from './Components/DeteccionInternet/Notifications.vue';
-
 const pages = import.meta.glob('./Pages/**/*.vue');
-
 
 const resolvePageComponent = (name) => {
     const path = `./Pages/${name}.vue`;
@@ -22,12 +19,7 @@ createInertiaApp({
     title: (title) => `${title} | Fixnology CO`,
     resolve: (name) => resolvePageComponent(name),
     setup({ el, App, props, plugin }) {
-        const app = createApp({
-            render: () => h('div', [
-                h(App, props),
-                h(Notifications)
-            ])
-        });
+        const app = createApp({ render: () => h(App, props) });
 
         app.use(plugin).use(ZiggyVue, Ziggy);
 
@@ -37,8 +29,6 @@ createInertiaApp({
 
         app.mount(el);
         return app;
-
-        
     },
 });
 

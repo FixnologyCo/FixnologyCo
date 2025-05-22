@@ -4,7 +4,6 @@
 @tailwind components;
 @tailwind utilities;
 
-
 :root {
   /* UNIVERSAL */
   --mono_blanco: #F5EFFF;
