@@ -5,12 +5,12 @@ namespace App\Models;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-class ClienteTaurus extends Authenticatable
+class ClienteFixgi extends Authenticatable
 {
     use Notifiable;
 
     // Definir la tabla y las columnas personalizadas para las fechas
-    protected $table = 'clientes_taurus';
+    protected $table = 'clientes_fixgis';
 
     public const CREATED_AT = 'fecha_creacion';
     public const UPDATED_AT = 'fecha_modificacion';

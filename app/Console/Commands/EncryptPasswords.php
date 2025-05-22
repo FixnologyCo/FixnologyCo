@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use App\Models\ClienteTaurus; // Ajusta el modelo según tu tabla de clientes
+use App\Models\ClienteFixgi; // Ajusta el modelo según tu tabla de clientes
 use Illuminate\Support\Facades\Hash;
 
 class EncryptPasswords extends Command
@@ -14,7 +14,7 @@ class EncryptPasswords extends Command
     public function handle()
     {
         // Buscar usuarios con contraseñas sin encriptar
-        $clientes = ClienteTaurus::whereRaw('CHAR_LENGTH(contrasenia_ct) < 60')->get(); 
+        $clientes = ClienteFixgi::whereRaw('CHAR_LENGTH(contrasenia_ct) < 60')->get(); 
 
         if ($clientes->isEmpty()) {
             $this->info('Todas las contraseñas ya están encriptadas.');

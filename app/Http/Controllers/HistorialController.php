@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Models\ClienteTaurus;
+use App\Models\ClienteFixgi;
 use Illuminate\Http\Request;
 use App\Models\Auditoria;
 use Inertia\Inertia;
@@ -49,7 +49,7 @@ class HistorialController extends Controller
             $idTienda = $user->tienda->id;
 
             // Obtener los IDs de los usuarios que pertenecen a esa tienda
-            $userIds = ClienteTaurus::where('id_tienda', $idTienda)->pluck('id');
+            $userIds = ClienteFixgi::where('id_tienda', $idTienda)->pluck('id');
             $auditorias = Auditoria::with('user')
                 ->whereIn('user_id', $userIds)
                 ->latest()

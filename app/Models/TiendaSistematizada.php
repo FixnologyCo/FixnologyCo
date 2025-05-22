@@ -63,7 +63,7 @@ class TiendaSistematizada extends Model
 
     public function clientesTaurus()
     {
-        return $this->hasMany(ClienteTaurus::class, 'id_tienda');
+        return $this->hasMany(ClienteFixgi::class, 'id_tienda');
     }
 
 

@@ -17,7 +17,7 @@ class Estados extends Model
 
     public function clientes()
     {
-        return $this->hasMany(ClienteTaurus::class, 'id_estado');
+        return $this->hasMany(ClienteFixgi::class, 'id_estado');
     }
 
     public function token()

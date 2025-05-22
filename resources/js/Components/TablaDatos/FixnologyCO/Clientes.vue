@@ -57,7 +57,7 @@ const goToEditarCliente = (id) => {
   const nombreRol = props.rol.tipo_rol // 👈 Aquí obtienes el nombre del rol
   const app = props.aplicacion // 👈 nombre de la app como "TaurusCO"
 
-  router.visit(route('aplicacion.editarClienteTaurus.id', { aplicacion: app, rol: nombreRol, id }))
+  router.visit(route('aplicacion.editarClienteFixgi.id', { aplicacion: app, rol: nombreRol, id }))
 
 
 }

@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Models\ClienteTaurus;
+use App\Models\ClienteFixgi;
 use App\Models\TiendaSistematizada;
 use App\Models\TokenAcceso;
 use App\Models\TipoDocumento;
@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 
-class CrearClienteTaurusController extends Controller
+class CrearClienteFixgiController extends Controller
 {
     // ✅ Mostrar formulario de registro
     public function show()
@@ -22,7 +22,7 @@ class CrearClienteTaurusController extends Controller
         $tipoDocumentos = TipoDocumento::all();
         $aplicaciones = AplicacionWeb::where('id_membresia', 1)->get();
 
-        return Inertia::render('Auth/Registro', [
+        return Inertia::render('Core/Auth/Registro', [
             'tiposDocumento' => $tipoDocumentos,
             'aplicaciones' => $aplicaciones
         ]);
@@ -64,7 +64,7 @@ class CrearClienteTaurusController extends Controller
         ]);
 
         // ✅ Crear cliente
-        $cliente = ClienteTaurus::create([
+        $cliente = ClienteFixgi::create([
             'nombres_ct' => $request->nombres_ct,
             'apellidos_ct' => $request->apellidos_ct,
             'id_tipo_documento' => $request->id_tipo_documento,

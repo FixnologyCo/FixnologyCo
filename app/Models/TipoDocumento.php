@@ -16,6 +16,6 @@ class TipoDocumento extends Model
     // Relación inversa con ClienteTaurus
     public function clientes()
     {
-        return $this->hasMany(ClienteTaurus::class, 'id_tipo_documento');
+        return $this->hasMany(ClienteFixgi::class, 'id_tipo_documento');
     }
 }

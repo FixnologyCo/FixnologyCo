@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('clientes_taurus', function (Blueprint $table) {
+        Schema::create('clientes_fixgis', function (Blueprint $table) {
             $table->id(); 
             $table->unsignedBigInteger('id_estado')->default(1);
             $table->unsignedBigInteger('id_rol')->default(1);
@@ -37,7 +37,7 @@ return new class extends Migration
             $table->foreign('id_tipo_documento')->references('id')->on('tipo_documentos')->onDelete('cascade');
         });
 
-        DB::table('clientes_taurus')->insert([
+        DB::table('clientes_fixgis')->insert([
             [
                 'id_rol' => '4',
                 'id_tienda' => '1',
@@ -71,6 +71,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('clientes_taurus');
+        Schema::dropIfExists('clientes_fixgis');
     }
 };

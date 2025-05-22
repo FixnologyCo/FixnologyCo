@@ -24,7 +24,7 @@ return new class extends Migration
             $table->timestamp('fecha_activacion')->nullable();
             $table->integer('dias_restantes')->nullable();
         
-            $table->foreign('id_cliente')->references('id')->on('clientes_taurus');
+            $table->foreign('id_cliente')->references('id')->on('clientes_fixgis');
             $table->foreign('id_tienda')->references('id')->on('tiendas_sistematizadas');
             $table->foreign('id_medio_pago')->references('id')->on('medios_pago');
             $table->foreign('id_estado')->references('id')->on('estados');

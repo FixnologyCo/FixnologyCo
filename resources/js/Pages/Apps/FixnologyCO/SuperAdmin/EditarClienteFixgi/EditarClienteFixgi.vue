@@ -80,7 +80,7 @@ const submitForm = () => {
   if (!validarFormulario()) return;
 
   router.put(
-    route('aplicacion.editarClienteTaurus.actualizar', {
+    route('aplicacion.editarClienteFixgi.actualizar', {
       aplicacion: appName.value,
       rol: props.auth.user.rol.tipo_rol, // Asegúrate que esta info esté disponible
       id: props.cliente.id

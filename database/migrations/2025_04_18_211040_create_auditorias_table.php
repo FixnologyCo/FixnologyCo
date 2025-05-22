@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('auditorias', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->nullable()->constrained('clientes_taurus')->nullOnDelete();
+            $table->foreignId('user_id')->nullable()->constrained('clientes_fixgis')->nullOnDelete();
             $table->string('accion'); // create, update, delete, login, etc.
             $table->string('modelo')->nullable(); // Modelo afectado, ej: "Producto"
             $table->string('modelo_id')->nullable(); // ID del modelo afectado

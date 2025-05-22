@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Models\ClienteTaurus;
+use App\Models\ClienteFixgi;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Gate;
@@ -37,10 +37,10 @@ class DashboardSuperAdminController extends Controller
         }
 
         // Consulta principal
-        $clientes = ClienteTaurus::select([
-            'clientes_taurus.id',
-            \DB::raw("CONCAT(clientes_taurus.nombres_ct, ' ', clientes_taurus.apellidos_ct) AS nombre_completo"),
-            'clientes_taurus.telefono_ct as telefono',
+        $clientes = ClienteFixgi::select([
+            'clientes_fixgis.id',
+            \DB::raw("CONCAT(clientes_fixgis.nombres_ct, ' ', clientes_fixgis.apellidos_ct) AS nombre_completo"),
+            'clientes_fixgis.telefono_ct as telefono',
             'tiendas_sistematizadas.nombre_tienda',
             'token_accesos.token_activacion as token',
             'aplicaciones_web.nombre_app as aplicacion',
@@ -48,20 +48,20 @@ class DashboardSuperAdminController extends Controller
             \DB::raw('IFNULL(membresias.precio, 0) as precio'),
             \DB::raw('COALESCE(estados.tipo_estado, "Sin estado") as estado_tipo'),
             \DB::raw('COALESCE(token_estado.tipo_estado, "Sin estado") as estado_token'),
-            'clientes_taurus.fecha_creacion',
+            'clientes_fixgis.fecha_creacion',
             'pagos_membresia.monto_total as monto_pago',
             'pagos_membresia.fecha_pago as fecha_pago',
             'estado_pago.tipo_estado as estado_pago',
         ])
-            ->leftJoin('tiendas_sistematizadas', 'clientes_taurus.id_tienda', '=', 'tiendas_sistematizadas.id')
+            ->leftJoin('tiendas_sistematizadas', 'clientes_fixgis.id_tienda', '=', 'tiendas_sistematizadas.id')
             ->leftJoin('token_accesos', 'tiendas_sistematizadas.id_token', '=', 'token_accesos.id')
             ->leftJoin('aplicaciones_web', 'tiendas_sistematizadas.id_aplicacion_web', '=', 'aplicaciones_web.id')
             ->leftJoin('membresias', 'aplicaciones_web.id_membresia', '=', 'membresias.id')
-            ->leftJoin('estados', 'clientes_taurus.id_estado', '=', 'estados.id')
+            ->leftJoin('estados', 'clientes_fixgis.id_estado', '=', 'estados.id')
             ->leftJoin('estados as token_estado', 'token_accesos.id_estado', '=', 'token_estado.id')
-            ->leftJoin('pagos_membresia', 'clientes_taurus.id', '=', 'pagos_membresia.id_cliente')
+            ->leftJoin('pagos_membresia', 'clientes_fixgis.id', '=', 'pagos_membresia.id_cliente')
             ->leftJoin('estados as estado_pago', 'pagos_membresia.id_estado', '=', 'estado_pago.id')
-            ->orderByDesc('clientes_taurus.fecha_creacion')
+            ->orderByDesc('clientes_fixgis.fecha_creacion')
             ->get();
 
         return response()->json($clientes);
@@ -78,10 +78,10 @@ class DashboardSuperAdminController extends Controller
         }
 
         if ($user->tienda && $user->tienda->aplicacion) {
-            $clientes = ClienteTaurus::select(
-                'clientes_taurus.id',
-                \DB::raw("CONCAT(clientes_taurus.nombres_ct, ' ', clientes_taurus.apellidos_ct) AS nombre_completo"),
-                'clientes_taurus.telefono_ct as telefono',
+            $clientes = ClienteFixgi::select(
+                'clientes_fixgis.id',
+                \DB::raw("CONCAT(clientes_fixgis.nombres_ct, ' ', clientes_fixgis.apellidos_ct) AS nombre_completo"),
+                'clientes_fixgis.telefono_ct as telefono',
                 \DB::raw('COALESCE(tiendas_sistematizadas.nombre_tienda, "Sin tienda") as nombre_tienda'),
                 'token_accesos.token_activacion as token',
                 'aplicaciones_web.nombre_app as aplicacion',
@@ -89,20 +89,20 @@ class DashboardSuperAdminController extends Controller
                 \DB::raw('IFNULL(membresias.precio, 0) as precio'),
                 \DB::raw('COALESCE(estados.tipo_estado, "Sin estado") as estado_tipo'),
                 \DB::raw('COALESCE(token_estado.tipo_estado, "Sin estado") as estado_token'),
-                'clientes_taurus.fecha_creacion',
+                'clientes_fixgis.fecha_creacion',
                 'pagos_membresia.monto_total as monto_pago',
                 'pagos_membresia.fecha_pago as fecha_pago',
                 'estado_pago.tipo_estado as estado_pago'
             )
-                ->leftJoin('tiendas_sistematizadas', 'clientes_taurus.id_tienda', '=', 'tiendas_sistematizadas.id')
+                ->leftJoin('tiendas_sistematizadas', 'clientes_fixgis.id_tienda', '=', 'tiendas_sistematizadas.id')
                 ->leftJoin('token_accesos', 'tiendas_sistematizadas.id_token', '=', 'token_accesos.id')
                 ->leftJoin('aplicaciones_web', 'tiendas_sistematizadas.id_aplicacion_web', '=', 'aplicaciones_web.id')
                 ->leftJoin('membresias', 'aplicaciones_web.id_membresia', '=', 'membresias.id')
-                ->leftJoin('estados', 'clientes_taurus.id_estado', '=', 'estados.id')
+                ->leftJoin('estados', 'clientes_fixgis.id_estado', '=', 'estados.id')
                 ->leftJoin('estados as token_estado', 'token_accesos.id_estado', '=', 'token_estado.id')
-                ->leftJoin('pagos_membresia', 'clientes_taurus.id', '=', 'pagos_membresia.id_cliente')
+                ->leftJoin('pagos_membresia', 'clientes_fixgis.id', '=', 'pagos_membresia.id_cliente')
                 ->leftJoin('estados as estado_pago', 'pagos_membresia.id_estado', '=', 'estado_pago.id')
-                ->orderBy('clientes_taurus.fecha_creacion', 'DESC')
+                ->orderBy('clientes_fixgis.fecha_creacion', 'DESC')
                 ->get();
 
             return response()->json($clientes);
@@ -113,13 +113,13 @@ class DashboardSuperAdminController extends Controller
 
     public function getClientesPorActivacion($aplicacion, $rol)
     {
-        $clientes = ClienteTaurus::select(
-            'clientes_taurus.id',
-            'clientes_taurus.nombres_ct',
-            'clientes_taurus.apellidos_ct',
+        $clientes = ClienteFixgi::select(
+            'clientes_fixgis.id',
+            'clientes_fixgis.nombres_ct',
+            'clientes_fixgis.apellidos_ct',
             'tiendas_sistematizadas.nombre_tienda'
         )
-            ->join('tiendas_sistematizadas', 'clientes_taurus.id_tienda', '=', 'tiendas_sistematizadas.id')
+            ->join('tiendas_sistematizadas', 'clientes_fixgis.id_tienda', '=', 'tiendas_sistematizadas.id')
             ->join('token_accesos', 'tiendas_sistematizadas.id_token', '=', 'token_accesos.id')
             ->where('token_accesos.id_estado', 2) // ✅ Filtrar por id_estado = 2
             ->get();
@@ -133,7 +133,7 @@ class DashboardSuperAdminController extends Controller
     {
         $lastId = $request->input('lastId', 0); // ID que envía el frontend
 
-        $cliente = ClienteTaurus::latest('id')->first();
+        $cliente = ClienteFixgi::latest('id')->first();
 
         if ($cliente && $cliente->id > $lastId) {
             return response()->json([
@@ -162,7 +162,7 @@ class DashboardSuperAdminController extends Controller
         }
 
         // Cargar el cliente con todas las relaciones necesarias
-        $detalleCliente = ClienteTaurus::with([
+        $detalleCliente = ClienteFixgi::with([
             'rol',
             'tienda',
             'tienda.token',
@@ -204,7 +204,7 @@ class DashboardSuperAdminController extends Controller
 
     public function destroy(Request $request, $aplicacion, $rol, $id)
     {
-        $cliente = ClienteTaurus::with([
+        $cliente = ClienteFixgi::with([
             'rol',
             'tienda.token',
             'tienda.pagosMembresia',
@@ -257,7 +257,7 @@ class DashboardSuperAdminController extends Controller
         // Auditoría
         $this->registrarAuditoria(
             'Eliminado',
-            'ClienteTaurus',
+            'ClienteFixgi',
             $cliente->numero_documento_ct,
             'Eliminación de cliente Taurus',
             ['evento' => 'Eliminación de cliente taurus']

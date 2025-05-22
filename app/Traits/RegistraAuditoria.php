@@ -3,7 +3,7 @@
 namespace App\Traits;
 
 use App\Models\Auditoria;
-use App\Models\ClienteTaurus;
+use App\Models\ClienteFixgi;
 
 
 trait RegistraAuditoria
@@ -26,7 +26,7 @@ trait RegistraAuditoria
         }
 
 
-        $user = ClienteTaurus::where('numero_documento_ct', auth()->id())->first();
+        $user = ClienteFixgi::where('numero_documento_ct', auth()->id())->first();
 
         $user = auth()->user();
 

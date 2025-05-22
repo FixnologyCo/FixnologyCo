@@ -23,7 +23,7 @@ class PagoMembresia extends Model
 
     public function cliente()
     {
-        return $this->belongsTo(ClienteTaurus::class, 'id_cliente');
+        return $this->belongsTo(ClienteFixgi::class, 'id_cliente');
     }
 
     public function tienda()

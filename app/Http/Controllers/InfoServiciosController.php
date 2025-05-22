@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\ClienteTaurus;
+use App\Models\ClienteFixgi;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\DB; // ✅ Importa la clase DB correctamente
@@ -47,7 +47,7 @@ class InfoServiciosController extends Controller
         if ($user->tienda && $user->tienda->aplicacion->nombre_app === $aplicacion) {
 
             // Consulta principal con joins (alias renombrados para evitar conflictos con relaciones cargadas)
-            $clientes = ClienteTaurus::select(
+            $clientes = ClienteFixgi::select(
                 'clientes_taurus.id',
                 \DB::raw("CONCAT(clientes_taurus.nombres_ct, ' ', clientes_taurus.apellidos_ct) AS nombre_completo"),
                 'clientes_taurus.telefono_ct as telefono',

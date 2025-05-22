@@ -11,7 +11,7 @@ class TipoDocumentoController extends Controller
     {
         $tiposDocumento = TipoDocumento::all();
 
-        return Inertia::render('Auth/Registro', [
+        return Inertia::render('Core/Auth/Registro', [
             'tiposDocumento' => $tiposDocumento
         ]);
     }

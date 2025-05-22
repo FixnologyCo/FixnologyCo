@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\ClienteTaurus;
+use App\Models\ClienteFixgi;
 use App\Models\Producto;
 use App\Models\Servicio;
 use App\Models\Empleado;
@@ -17,7 +17,7 @@ class PlanAplicacionController extends Controller
     {
         $clienteId = Auth::id();
 
-        $detalles = ClienteTaurus::with('detallesPlan')->where('id', $clienteId)->first();
+        $detalles = ClienteFixgi::with('detallesPlan')->where('id', $clienteId)->first();
 
         // Contamos los registros reales desde la base de datos
         $data = [

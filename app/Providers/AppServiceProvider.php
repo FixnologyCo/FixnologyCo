@@ -4,7 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia; // 👉 Asegúrate de que esta línea esté presente
-use App\Models\ClienteTaurus;
+use App\Models\ClienteFixgi;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
 
@@ -16,7 +16,7 @@ class AppServiceProvider extends ServiceProvider
         $this->registerPolicies();
 
         // ✅ Definir el Gate para roles
-        Gate::define('access-role', function (ClienteTaurus $user, $role) {
+        Gate::define('access-role', function (ClienteFixgi $user, $role) {
             return $user->id_rol == $role;
         });
 

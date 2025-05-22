@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Models\ClienteTaurus;
+use App\Models\Clientefixgi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -32,7 +32,7 @@ class LoginController extends Controller
             'contrasenia_ct.required' => 'La contraseña es requerida.',
         ]);
 
-        $cliente = ClienteTaurus::with([
+        $cliente = Clientefixgi::with([
             'rol',
             'tienda.aplicacion',
             'tienda.token',
@@ -97,7 +97,7 @@ class LoginController extends Controller
 
         $this->registrarAuditoria(
             'Iniciado sesión',
-            'ClienteTaurus',
+            'Clientefixgi',
             $cliente->numero_documento_ct,
             'Ingreso al sistema',
             ['evento' => 'inicio de sesion']
@@ -127,7 +127,7 @@ class LoginController extends Controller
 
         $this->registrarAuditoria(
             'Cerrado sesión',
-            'ClienteTaurus',
+            'Clientefixgi',
             $clienteId,
             'Cierre de sesion',
             ['evento' => 'cierre de sesion']

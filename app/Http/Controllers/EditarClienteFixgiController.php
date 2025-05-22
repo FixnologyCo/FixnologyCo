@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\ClienteTaurus;
+use App\Models\ClienteFixgi;
 use App\Models\Rol;
 use App\Models\TiendaSistematizada;
 use App\Models\TipoDocumento;
@@ -18,7 +18,7 @@ use App\Traits\RegistraAuditoria; // 👈 Importa el trait correctamente aquí
 
 
 
-class EditarClienteTaurusController extends Controller
+class EditarClienteFixgiController extends Controller
 {
     use RegistraAuditoria; // 👈 Usa el trait aquí a nivel de clase
     /**
@@ -56,23 +56,23 @@ class EditarClienteTaurusController extends Controller
         }
 
         // Consulta del cliente por ID
-        $cliente = ClienteTaurus::select(
-            'clientes_taurus.id',
-            DB::raw("CONCAT(clientes_taurus.nombres_ct, ' ', clientes_taurus.apellidos_ct) AS nombre_completo"),
-            'clientes_taurus.nombres_ct',
-            'clientes_taurus.apellidos_ct',
-            'clientes_taurus.numero_documento_ct',
-            'clientes_taurus.email_ct',
-            'clientes_taurus.telefono_ct',
-            'clientes_taurus.id',
-            'clientes_taurus.id_rol',
-            'clientes_taurus.id_estado',
-            'clientes_taurus.id_tienda',
-            'clientes_taurus.id_tipo_documento',
-            'clientes_taurus.id_estado',
+        $cliente = ClienteFixgi::select(
+            'clientes_fixgis.id',
+            DB::raw("CONCAT(clientes_fixgis.nombres_ct, ' ', clientes_fixgis.apellidos_ct) AS nombre_completo"),
+            'clientes_fixgis.nombres_ct',
+            'clientes_fixgis.apellidos_ct',
+            'clientes_fixgis.numero_documento_ct',
+            'clientes_fixgis.email_ct',
+            'clientes_fixgis.telefono_ct',
+            'clientes_fixgis.id',
+            'clientes_fixgis.id_rol',
+            'clientes_fixgis.id_estado',
+            'clientes_fixgis.id_tienda',
+            'clientes_fixgis.id_tipo_documento',
+            'clientes_fixgis.id_estado',
 
-            'clientes_taurus.fecha_creacion',
-            'clientes_taurus.fecha_modificacion',
+            'clientes_fixgis.fecha_creacion',
+            'clientes_fixgis.fecha_modificacion',
 
             DB::raw('COALESCE(tiendas_sistematizadas.nombre_tienda, "Sin tienda") as nombre_tienda'),
             'token_accesos.token_activacion as token',
@@ -84,7 +84,7 @@ class EditarClienteTaurusController extends Controller
             DB::raw('IFNULL(membresias.precio, 0) as precio'),
             DB::raw('COALESCE(estados.tipo_estado, "Sin estado") as estado_tipo'),
             DB::raw('COALESCE(token_estado.tipo_estado, "Sin estado") as estado_token'),
-            'clientes_taurus.fecha_creacion',
+            'clientes_fixgis.fecha_creacion',
 
             // Datos de pago
             'pagos_membresia.id_estado as id_estado_pago',
@@ -92,15 +92,15 @@ class EditarClienteTaurusController extends Controller
             'pagos_membresia.fecha_pago as fecha_pago',
             'estado_pago.tipo_estado as estado_pago',
         )
-            ->leftJoin('tiendas_sistematizadas', 'clientes_taurus.id_tienda', '=', 'tiendas_sistematizadas.id')
+            ->leftJoin('tiendas_sistematizadas', 'clientes_fixgis.id_tienda', '=', 'tiendas_sistematizadas.id')
             ->leftJoin('token_accesos', 'tiendas_sistematizadas.id_token', '=', 'token_accesos.id')
             ->leftJoin('aplicaciones_web', 'tiendas_sistematizadas.id_aplicacion_web', '=', 'aplicaciones_web.id')
             ->leftJoin('membresias', 'aplicaciones_web.id_membresia', '=', 'membresias.id')
-            ->leftJoin('estados', 'clientes_taurus.id_estado', '=', 'estados.id')
+            ->leftJoin('estados', 'clientes_fixgis.id_estado', '=', 'estados.id')
             ->leftJoin('estados as token_estado', 'token_accesos.id_estado', '=', 'token_estado.id')
-            ->leftJoin('pagos_membresia', 'clientes_taurus.id', '=', 'pagos_membresia.id_cliente')
+            ->leftJoin('pagos_membresia', 'clientes_fixgis.id', '=', 'pagos_membresia.id_cliente')
             ->leftJoin('estados as estado_pago', 'pagos_membresia.id_estado', '=', 'estado_pago.id')
-            ->where('clientes_taurus.id', $id)
+            ->where('clientes_fixgis.id', $id)
             ->first();
 
         if (!$cliente) {
@@ -134,7 +134,7 @@ class EditarClienteTaurusController extends Controller
 
 
 
-        return Inertia::render('Apps/' . ucfirst($aplicacion) . '/' . ucfirst($rol) . '/EditarClienteTaurus/EditarClienteTaurus', [
+        return Inertia::render('Apps/' . ucfirst($aplicacion) . '/' . ucfirst($rol) . '/EditarClienteFixgi/EditarClienteFixgi', [
             'auth' => ['user' => $user],
             'cliente' => $cliente,
             'tiendas' => $tiendas,
@@ -149,13 +149,13 @@ class EditarClienteTaurusController extends Controller
 
     public function actualizar(Request $request, $aplicacion, $rol, $id)
 {
-    $cliente = ClienteTaurus::with(['tienda.token', 'tienda.aplicacion.membresia', 'tienda.pagoMembresiaActual'])->findOrFail($id);
+    $cliente = ClienteFixgi::with(['tienda.token', 'tienda.aplicacion.membresia', 'tienda.pagoMembresiaActual'])->findOrFail($id);
     $original = $cliente->toArray(); // Estado antes del cambio
 
     $validated = $request->validate([
         'nombres_ct' => 'required|string|max:100',
         'apellidos_ct' => 'required|string|max:100',
-        'numero_documento_ct' => 'required|string|max:50|unique:clientes_taurus,numero_documento_ct,' . $cliente->id,
+        'numero_documento_ct' => 'required|string|max:50|unique:clientes_fixgis,numero_documento_ct,' . $cliente->id,
         'email_ct' => 'nullable|email|max:100',
         'telefono_ct' => 'nullable|string|max:20',
         'id_rol' => 'required|exists:roles_administrativos,id',
@@ -218,13 +218,13 @@ class EditarClienteTaurusController extends Controller
 
         $this->registrarAuditoria(
             'Modificado',
-            'ClienteTaurus',
+            'ClienteFixgi',
             $cliente->id,
             'El usuario ' . $user->nombres_ct . ' actualizó los datos del cliente.',
             $cambios
         );
 
-    return redirect()->route('aplicacion.editarClienteTaurus.id', [
+    return redirect()->route('aplicacion.editarClienteFixgi.id', [
         'aplicacion' => ucfirst($nombreAplicacion),
         'id' => ucfirst($id),
         'rol' => ucfirst($rol),

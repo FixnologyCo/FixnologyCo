@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
 use Illuminate\Http\Request;
-use App\Models\ClienteTaurus;
+use App\Models\ClienteFixgi;
 use App\Mail\RecuperarPassword;
 
 class LinkRecuperacionController extends Controller
@@ -23,14 +23,14 @@ class LinkRecuperacionController extends Controller
     public function LinkRecuperacion(Request $request)
     {
         $request->validate([
-            'correo_vinculado' => 'required|email|exists:clientes_taurus,email_ct',
+            'correo_vinculado' => 'required|email|exists:clientes_fixgis,email_ct',
         ], [
             'correo_vinculado.exists' => 'Verifica, ese usuario no existe.',
             'correo_vinculado.required' => 'El correo es requerido.',
         ]);
 
         $correo = $request->correo_vinculado;
-        $cliente = ClienteTaurus::where('email_ct', $correo)->first();
+        $cliente = ClienteFixgi::where('email_ct', $correo)->first();
 
         if (!$cliente) {
             return back()->withErrors([
@@ -67,7 +67,7 @@ class LinkRecuperacionController extends Controller
     public function reset(Request $request)
     {
         $request->validate([
-            'email' => 'required|email|exists:clientes_taurus,email_ct',
+            'email' => 'required|email|exists:clientes_fixgis,email_ct',
             'password' => 'required|string|min:6|confirmed',
             'token' => 'required'
         ], [
@@ -86,7 +86,7 @@ class LinkRecuperacionController extends Controller
             return back()->withErrors(['email' => 'Token inválido o expirado.']);
         }
 
-        $cliente = ClienteTaurus::where('email_ct', $request->email)->first();
+        $cliente = ClienteFixgi::where('email_ct', $request->email)->first();
 
         if (!$cliente) {
             return back()->withErrors(['email' => 'Cliente no encontrado.']);

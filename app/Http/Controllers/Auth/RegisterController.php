@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Models\ClienteTaurus;
+use App\Models\ClienteFixgi;
 use App\Models\TiendaSistematizada;
 use App\Models\TokenAcceso;
 use App\Models\TipoDocumento;
@@ -65,7 +65,7 @@ class RegisterController extends Controller
         ]);
 
         // ✅ Crear cliente
-        $cliente = ClienteTaurus::create([
+        $cliente = ClienteFixgi::create([
             'nombres_ct' => $request->nombres_ct,
             'apellidos_ct' => $request->apellidos_ct,
             'id_tipo_documento' => $request->id_tipo_documento,

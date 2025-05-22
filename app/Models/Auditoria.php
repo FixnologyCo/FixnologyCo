@@ -3,7 +3,7 @@
 // app/Models/Auditoria.php
 
 namespace App\Models;
-use App\Models\ClienteTaurus;
+use App\Models\ClienteFixgi;
 use Illuminate\Database\Eloquent\Model;
 
 class Auditoria extends Model
@@ -37,6 +37,6 @@ class Auditoria extends Model
 
     public function user()
 {
-    return $this->belongsTo(ClienteTaurus::class, 'user_id');
+    return $this->belongsTo(ClienteFixgi::class, 'user_id');
 }
 }

@@ -62,7 +62,7 @@ return [
    'providers' => [
     'users' => [
         'driver' => 'eloquent',
-        'model' => App\Models\ClienteTaurus::class,
+        'model' => App\Models\ClienteFixgi::class,
     ],
 ],
 
