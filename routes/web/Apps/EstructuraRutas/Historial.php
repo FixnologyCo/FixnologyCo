@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\HistorialController;
+use Core\Http\Controllers\HistorialController;
 use Illuminate\Support\Facades\Route;
 
 

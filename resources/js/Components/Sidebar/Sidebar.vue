@@ -19,20 +19,20 @@ const rol = props.auth.user.rol?.tipo_rol || 'Sin rol'; // Obtén el tipo de rol
 // Normaliza las rutas para que la comparación funcione
 const currentRoute = computed(() => new URL(page.url, window.location.origin).pathname);
 const dashboardRoute = computed(() => new URL(route('aplicacion.dashboard', { aplicacion, rol }), window.location.origin).pathname);
-const multisucursalRoute = computed(() => new URL(route('aplicacion.multisucursales', { aplicacion, rol }), window.location.origin).pathname);
-const overviewRoute = computed(() => new URL(route('aplicacion.overviews', { aplicacion, rol }), window.location.origin).pathname);
-const gastosRoute = computed(() => new URL(route('aplicacion.gastos', { aplicacion, rol }), window.location.origin).pathname);
-const usuariosRoute = computed(() => new URL(route('aplicacion.usuarios', { aplicacion, rol }), window.location.origin).pathname);
-const reservasRoute = computed(() => new URL(route('aplicacion.reservas', { aplicacion, rol }), window.location.origin).pathname);
-const inventarioRoute = computed(() => new URL(route('aplicacion.inventarios', { aplicacion, rol }), window.location.origin).pathname);
-const infoProductosRoute = computed(() => new URL(route('aplicacion.infoProductos', { aplicacion, rol }), window.location.origin).pathname);
-const productosRoute = computed(() => new URL(route('aplicacion.crearProductos', { aplicacion, rol }), window.location.origin).pathname);
-const infoCategoriasRoute = computed(() => new URL(route('aplicacion.infoCategorias', { aplicacion, rol }), window.location.origin).pathname);
-const categoriasRoute = computed(() => new URL(route('aplicacion.crearCategorias', { aplicacion, rol }), window.location.origin).pathname);
-const codigoBarrasRoute = computed(() => new URL(route('aplicacion.codigoBarras', { aplicacion, rol }), window.location.origin).pathname);
-const generadorQrsRoute = computed(() => new URL(route('aplicacion.generadorQrs', { aplicacion, rol }), window.location.origin).pathname);
-const ordenTrabajoRoute = computed(() => new URL(route('aplicacion.ordenTrabajos', { aplicacion, rol }), window.location.origin).pathname);
-const resenasRoute = computed(() => new URL(route('aplicacion.resenas', { aplicacion, rol }), window.location.origin).pathname);
+// const multisucursalRoute = computed(() => new URL(route('aplicacion.multisucursales', { aplicacion, rol }), window.location.origin).pathname);
+// const overviewRoute = computed(() => new URL(route('aplicacion.overviews', { aplicacion, rol }), window.location.origin).pathname);
+// const gastosRoute = computed(() => new URL(route('aplicacion.gastos', { aplicacion, rol }), window.location.origin).pathname);
+// const usuariosRoute = computed(() => new URL(route('aplicacion.usuarios', { aplicacion, rol }), window.location.origin).pathname);
+// const reservasRoute = computed(() => new URL(route('aplicacion.reservas', { aplicacion, rol }), window.location.origin).pathname);
+// const inventarioRoute = computed(() => new URL(route('aplicacion.inventarios', { aplicacion, rol }), window.location.origin).pathname);
+// const infoProductosRoute = computed(() => new URL(route('aplicacion.infoProductos', { aplicacion, rol }), window.location.origin).pathname);
+// const productosRoute = computed(() => new URL(route('aplicacion.crearProductos', { aplicacion, rol }), window.location.origin).pathname);
+// const infoCategoriasRoute = computed(() => new URL(route('aplicacion.infoCategorias', { aplicacion, rol }), window.location.origin).pathname);
+// const categoriasRoute = computed(() => new URL(route('aplicacion.crearCategorias', { aplicacion, rol }), window.location.origin).pathname);
+// const codigoBarrasRoute = computed(() => new URL(route('aplicacion.codigoBarras', { aplicacion, rol }), window.location.origin).pathname);
+// const generadorQrsRoute = computed(() => new URL(route('aplicacion.generadorQrs', { aplicacion, rol }), window.location.origin).pathname);
+// const ordenTrabajoRoute = computed(() => new URL(route('aplicacion.ordenTrabajos', { aplicacion, rol }), window.location.origin).pathname);
+// const resenasRoute = computed(() => new URL(route('aplicacion.resenas', { aplicacion, rol }), window.location.origin).pathname);
 
 // ✅ Clases dinámicas según la aplicación
 const colores = {
@@ -95,7 +95,7 @@ const bg = computed(() => colores2[appName.value]);
 
 
 
-      <!-- Botón para Multisucursales -->
+      <!-- Botón para Multisucursales
       <div :class="[currentRoute === multisucursalRoute ?  bgFocus : 'cursor-pointer rounded-full', hoverClass]">
         <a :href="route('aplicacion.multisucursales', { aplicacion, rol })"
           class="bg-transparent flex items-center p-[6px] justify-center">
@@ -103,7 +103,7 @@ const bg = computed(() => colores2[appName.value]);
         </a>
       </div>
 
-      <!-- Botón para Overviews -->
+
       <div :class="[currentRoute === overviewRoute ?  bgFocus : 'cursor-pointer rounded-full', hoverClass]">
         <a :href="route('aplicacion.overviews', { aplicacion, rol })"
           class="bg-transparent flex items-center p-[6px] justify-center">
@@ -111,7 +111,7 @@ const bg = computed(() => colores2[appName.value]);
         </a>
       </div>
 
-      <!-- Botón para Gastos -->
+
       <div :class="[currentRoute === gastosRoute ?  bgFocus : 'cursor-pointer rounded-full', hoverClass]">
         <a :href="route('aplicacion.gastos', { aplicacion, rol })"
           class="bg-transparent flex items-center p-[6px] justify-center">
@@ -119,7 +119,7 @@ const bg = computed(() => colores2[appName.value]);
         </a>
       </div>
 
-      <!-- Botón para usuarios -->
+
       <div :class="[currentRoute === usuariosRoute ?  bgFocus : 'cursor-pointer rounded-full', hoverClass]">
         <a :href="route('aplicacion.usuarios', { aplicacion, rol })"
           class="bg-transparent flex items-center p-[6px] justify-center">
@@ -127,7 +127,7 @@ const bg = computed(() => colores2[appName.value]);
         </a>
       </div>
 
-      <!-- Botón para reservas -->
+
       <div :class="[currentRoute === reservasRoute ?  bgFocus : 'cursor-pointer rounded-full', hoverClass]">
         <a :href="route('aplicacion.reservas', { aplicacion, rol })"
           class="bg-transparent flex items-center p-[6px] justify-center">
@@ -135,7 +135,7 @@ const bg = computed(() => colores2[appName.value]);
         </a>
       </div>
 
-      <!-- Botón para inventario -->
+
       <div :class="[currentRoute === inventarioRoute || currentRoute === infoProductosRoute || currentRoute === productosRoute || currentRoute === infoCategoriasRoute || currentRoute === categoriasRoute ?  bgFocus : 'cursor-pointer rounded-full', hoverClass]">
         <a :href="route('aplicacion.inventarios', { aplicacion, rol })"
           class="bg-transparent flex items-center p-[6px] justify-center">
@@ -143,7 +143,7 @@ const bg = computed(() => colores2[appName.value]);
         </a>
       </div>
 
-      <!-- Botón para Etiquetado -->
+
       <div :class="[currentRoute === codigoBarrasRoute ?  bgFocus : 'cursor-pointer rounded-full', hoverClass]">
         <a :href="route('aplicacion.codigoBarras', { aplicacion, rol })"
           class="bg-transparent flex items-center p-[6px] justify-center">
@@ -151,7 +151,7 @@ const bg = computed(() => colores2[appName.value]);
         </a>
       </div>
 
-      <!-- Botón para Generador de QR -->
+
       <div :class="[currentRoute === generadorQrsRoute ?  bgFocus : 'cursor-pointer rounded-full', hoverClass]">
         <a :href="route('aplicacion.generadorQrs', { aplicacion, rol })"
           class="bg-transparent flex items-center p-[6px] justify-center">
@@ -159,7 +159,7 @@ const bg = computed(() => colores2[appName.value]);
         </a>
       </div>
 
-      <!-- Botón para orden trabajo -->
+
       <div :class="[currentRoute === ordenTrabajoRoute ?  bgFocus : 'cursor-pointer rounded-full', hoverClass]">
         <a :href="route('aplicacion.ordenTrabajos', { aplicacion, rol })"
           class="bg-transparent flex items-center p-[6px] justify-center">
@@ -167,13 +167,13 @@ const bg = computed(() => colores2[appName.value]);
         </a>
       </div>
 
-      <!-- Botón para resenas -->
+
       <div :class="[currentRoute === resenasRoute ?  bgFocus : 'cursor-pointer rounded-full', hoverClass]">
         <a :href="route('aplicacion.resenas', { aplicacion, rol })"
           class="bg-transparent flex items-center p-[6px] justify-center">
           <span class="material-symbols-rounded"> diversity_1 </span>
         </a>
-      </div>
+      </div> -->
     </aside>
   </div>
 </template>

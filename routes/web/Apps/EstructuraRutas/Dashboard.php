@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\DashboardSuperAdminController;
+use Core\Http\Controllers\DashboardSuperAdminController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth')->group(function () {

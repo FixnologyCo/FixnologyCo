@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\CrearClienteTaurusController;
+use App\Http\Controllers\CrearClienteFixgiController;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Route;
 
