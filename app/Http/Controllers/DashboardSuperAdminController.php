@@ -229,7 +229,7 @@ class DashboardSuperAdminController extends Controller
         $cliente->deleteOrFail();
 
         // 3. Verificar si quedan otros clientes en la misma tienda
-        if ($tienda && $tienda->clientesTaurus()->count() === 0) {
+        if ($tienda && $tienda->clientesFixgis()->count() === 0) {
             // Eliminar pagos de membresía de la tienda
             $tienda->pagosMembresia()->delete();
 

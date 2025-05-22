@@ -61,7 +61,7 @@ class TiendaSistematizada extends Model
             ->latestOfMany(); // O usa un scope si quieres solo los activos
     }
 
-    public function clientesTaurus()
+    public function clientesFixgis()
     {
         return $this->hasMany(ClienteFixgi::class, 'id_tienda');
     }

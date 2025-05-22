@@ -39,9 +39,9 @@ class RegisterController extends Controller
             'nombres_ct' => 'required|string|max:25',
             'apellidos_ct' => 'required|string|max:25',
             'id_tipo_documento' => 'required|integer|exists:tipo_documentos,id',
-            'numero_documento_ct' => 'required|string|max:15|unique:clientes_taurus,numero_documento_ct',
-            'email_ct' => 'required|string|email|max:60|unique:clientes_taurus,email_ct',
-            'telefono_ct' => 'required|string|max:10|min:10|unique:clientes_taurus,telefono_ct',
+            'numero_documento_ct' => 'required|string|max:15|unique:clientes_fixgis,numero_documento_ct',
+            'email_ct' => 'required|string|email|max:60|unique:clientes_fixgis,email_ct',
+            'telefono_ct' => 'required|string|max:10|min:10|unique:clientes_fixgis,telefono_ct',
             'contrasenia_ct' => 'required|string|min:6|confirmed',
             'id_aplicacion' => 'required|nullable|integer|exists:aplicaciones_web,id',
 
