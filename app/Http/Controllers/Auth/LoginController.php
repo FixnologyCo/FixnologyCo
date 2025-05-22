@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Hash;
-use App\Traits\RegistraAuditoria; // 👈 Importa el trait correctamente aquí
+use App\Traits\RegistraAuditoria;
 
 class LoginController extends Controller
 {
@@ -17,7 +17,7 @@ class LoginController extends Controller
     // ✅ Mostrar formulario de login
     public function show()
     {
-        return Inertia::render('Auth/Auth');
+        return Inertia::render('Core/Auth/Auth');
     }
 
     // ✅ Procesar el login

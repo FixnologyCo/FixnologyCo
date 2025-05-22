@@ -17,7 +17,7 @@ class LinkRecuperacionController extends Controller
 {
     public function show()
     {
-        return Inertia::render('Auth/LinkRecuperacion');
+        return Inertia::render('Core/Auth/LinkRecuperacion');
     }
 
     public function LinkRecuperacion(Request $request)
@@ -58,7 +58,7 @@ class LinkRecuperacionController extends Controller
     {
         $email = $request->query('email');
 
-        return Inertia::render('Auth/ResetPassword', [
+        return Inertia::render('Core/Auth/ResetPassword', [
             'token' => $token,
             'email' => $email,
         ]);
