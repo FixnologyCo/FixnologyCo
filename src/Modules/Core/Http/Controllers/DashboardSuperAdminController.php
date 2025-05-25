@@ -1,6 +1,7 @@
 <?php
 
 namespace Core\Http\Controllers;
+use App\Http\Controllers\Controller;
 use App\Models\ClienteFixgi;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
