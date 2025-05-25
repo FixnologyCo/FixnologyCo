@@ -3,6 +3,7 @@ import { Head, usePage } from '@inertiajs/vue3';
 import { ref, onMounted } from 'vue';
 import 'dayjs/locale/es';
 import SaludoOpciones from '@/Components/header/SaludoOpciones.vue';
+import SidebarSuperAdmin from '@/Components/Sidebar/FixnologyCO/Sidebar.vue'
 import Colors from '@/Composables/ModularColores';
 
 const { appName, bgClase, textoClase, buttonFocus } = Colors();
@@ -56,22 +57,16 @@ onMounted(() => {
 
 const user = props.auth.user
 const auth = usePage().props.auth;
-const clientes = ref(props.clientes);
 </script>
 
 <template>
 
   <Head :title="`Bienvenido ${user.nombres_ct || 'Dashboard'}`" />
 
-  <div class="w-full h-[100%] px-[40px] py-[20px]">
+
+  <div class="flex">
+    <SidebarSuperAdmin :auth="auth" />
+
     <SaludoOpciones :auth="auth" />
-
-<div :class="bgClase">
-</div>
-<p :class="textoClase">Bienvenido a {{ appName }}</p>
-
-<button :class="buttonFocus">Acción</button>
   </div>
-
-
-</template>
+  </template>

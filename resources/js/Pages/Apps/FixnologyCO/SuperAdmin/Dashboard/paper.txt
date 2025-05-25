@@ -270,3 +270,10 @@ const logout = () => {
 
 
 </template>
+
+
+<div :class="bgClase">
+    </div>
+    <p :class="textoClase">Bienvenido a {{ appName }}</p>
+
+    <button :class="buttonFocus">Acción</button>
