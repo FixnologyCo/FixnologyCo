@@ -1,25 +1,18 @@
-<script>
+<script setup>
 import { ref, onMounted, onUnmounted, computed, } from 'vue';
 import { usePage } from '@inertiajs/vue3';
 import { route } from 'ziggy-js';
-</script>
+import Colors from '@/Composables/ModularColores';
 
-<script setup>
-// Traer datos del usuario logueado
+const { NombreApp, bgClase, textoClase, focus, buttonLink, hover } = Colors();
+
 const props = defineProps({
     auth: { type: Object, required: true },
 });
 
 const page = usePage();
 
-const aplicacion = props.auth?.user?.tienda?.aplicacion?.nombre_app || 'Sin app';
-const rol = props.auth.user.rol?.tipo_rol || 'Sin rol'; // Obtén el tipo de rol
-
-// Normaliza las rutas para que la comparación funcione
 const currentRoute = computed(() => new URL(page.url, window.location.origin).pathname);
-const configuracionesRoute = computed(() => new URL(route('aplicacion.configuraciones', { aplicacion, rol }), window.location.origin).pathname);
-const historialRoute = computed(() => new URL(route('aplicacion.historial', { aplicacion, rol }), window.location.origin).pathname);
-
 
 const dia = ref('');
 const mes = ref('');
@@ -49,14 +42,6 @@ function actualizarFechaHora() {
         horas = 12;
     }
     hora.value = `${horas}:${minutos}:${segundos} ${periodo}`;
-
-    if (fecha.getHours() < 12) {
-        saludo.value = "¡Buenos días";
-    } else if (fecha.getHours() < 18) {
-        saludo.value = "¡Buenas tardes";
-    } else {
-        saludo.value = "¡Buenas noches";
-    }
 }
 
 let clockInterval = null;
@@ -73,7 +58,7 @@ const initials = computed(() => {
     const nombres = props.auth.user?.nombres_ct || '';
     const apellidos = props.auth.user?.apellidos_ct || '';
 
-    
+
     const firstNameInitial = nombres.split(' ')[0]?.charAt(0).toUpperCase() || '';
     const lastNameInitial = apellidos.split(' ')[0]?.charAt(0).toUpperCase() || '';
 
@@ -81,127 +66,67 @@ const initials = computed(() => {
 });
 
 const inicialesNombreTienda = computed(() => {
-  const nombreTienda =  props.auth.user?.tienda?.nombre_tienda || '';
+    const nombreTienda = props.auth.user?.tienda?.nombre_tienda || '';
 
-  const inicialTienda = nombreTienda.split(' ')[0]?.charAt(0).toUpperCase() || '';
-  return inicialTienda;
+    const inicialTienda = nombreTienda.split(' ')[0]?.charAt(0).toUpperCase() || '';
+    return inicialTienda;
 });
 
-// ✅ Clases dinámicas según la aplicación
-const colores = {
-    'FixnologyCO': 'bg-universal-naranja shadow-universal-naranja rounded-full',
-    'default': 'bg-gray-300 shadow-gray-300'
-};
-const colores2 = {
-    'FixnologyCO': 'bg-universal-naranja rounded-full',
-    
-    'default': 'bg-gray-300 shadow-gray-300'
-};
-
-// Computed para la clase de hover
-const hoverClass = computed(() => {
-    switch (appName.value) {
-        case 'FixnologyCO':
-            return 'hover:bg-universal-naranja';
-        default:
-            return 'hover:bg-gray-300';
-    }
-});
-const appName = computed(() => props.auth?.user?.tienda?.aplicacion?.nombre_app || 'default');
-
-const bgFocus = computed(() => colores[appName.value]);
-const bg = computed(() => colores2[appName.value]);
 const diasRestantes = computed(() => props.auth.user?.tienda?.pagos_membresia?.dias_restantes ?? 'sin días');
 
 </script>
 
 <template>
-    <div class="header w-[80%] flex items-center gap-3 p-1 m-3">
-        <div class="left p-2  bg-secundary-opacity w-[20%] rounded-md">
-            <div class="infoTienda flex gap-2">
-                <div class="user h-[40px] w-[40px] rounded-full overflow-hidden flex items-center justify-center"
-                        :class="[bgFocus]">
-                        <span class="text-md font-bold">
-                            {{ inicialesNombreTienda }}
-                        </span>
-                    </div>
+    <header class="header px-4 py-2 flex items-center justify-between gap-3">
+        <div class="left w-[20%] rounded-md">
+            <div class="infoTienda flex items-center gap-2">
+                <div class="user h-[30px] w-[30px] rounded-full overflow-hidden flex items-center justify-center"
+                    :class="[bgClase]">
+                    <span class="text-md font-bold">
+                        {{ inicialesNombreTienda }}
+                    </span>
+                </div>
                 <div class="logo">
-                    <div v-if="auth && auth.user">
-                        <h3 class="font-semibold">{{ auth.user.tienda?.nombre_tienda || 'Sin tienda' }}</h3>
-                        <p class="-mt-[5px] text-secundary-light text-[13px] font-medium">
-                            {{ auth.user.tienda?.aplicacion?.membresia?.nombre_membresia || 'Sin membresía' }} -
-                            {{ diasRestantes === 999999 ? "Membresía Infinita" : diasRestantes + " días restantes." }}
-                        </p>
+                    <div class="flex items-center" v-if="auth && auth.user">
+                        <h3 class="font-semibold">{{ auth.user.tienda?.nombre_tienda || 'Sin tienda' }} App</h3>
+                        <span class="material-symbols-rounded text-[17px]">keyboard_arrow_down</span>
                     </div>
-
                     <div v-else>
                         <p>Cargando información del usuario...</p>
                     </div>
                 </div>
-
             </div>
         </div>
-        <header
-            class="p-2 bg-secundary-opacity rounded-md w-[80%] flex items-center justify-between">
-            <div class="date flex gap-3 items-center">
-                <div class="dia flex items-center justify-center font-semibold h-10 w-7 rounded-full" :class="[bgFocus]"
+        <div class="date w-[23%] flex gap-3 items-center">
+                <div class="dia flex items-center justify-center font-semibold h-10 w-7 rounded-full" :class="[bgClase]"
                     id="dia">
                     {{ dia }}
                 </div>
-                <div class="mes-año flex flex-col text-[14px] font-medium" id="mes-año">
+                <div class="mes-año flex gap-1 text-[14px] font-medium" id="mes-año">
                     <span id="mes">{{ mes }}</span>
                     <span id="anio">{{ anio }}</span>
                 </div>
-                <div :class="[bgFocus]" class="separador h-8 w-[2px] rounded-lg"></div>
+                <div :class="[bgClase]" class="separador h-8 w-[2px] rounded-lg"></div>
                 <div class="hora text-[14px]" id="hora">{{ hora }}</div>
             </div>
-
-            <div class="options-user flex gap-2 items-center justify-center">
-                <div
-                    :class="[currentRoute === historialRoute ? bgFocus : 'cursor-pointer rounded-full', hoverClass]">
-                    <a :href="route('aplicacion.historial', { aplicacion, rol })"
-                        class="flex items-center p-[6px] rounded-full justify-center">
-                        <span class="material-symbols-rounded"> history </span>
-                    </a>
-                </div>
-
-                <div :class="['cursor-pointer', 'rounded-full', hoverClass]"
-                    class="flex items-center p-[6px] justify-center">
-                    <span class="bg-transparent material-symbols-rounded">
-                        notifications
+        <div v-if="currentRoute !== configuracionesRoute" class="flex gap-3 items-center">
+                <div class="user h-[40px] w-[40px] rounded-full overflow-hidden flex items-center justify-center"
+                    :class="[bgClase]">
+                    <span class="text-md font-bold">
+                        {{ initials }}
                     </span>
                 </div>
-
-                <div
-                    :class="[currentRoute === configuracionesRoute ? bgFocus : 'cursor-pointer rounded-full', hoverClass]">
-                    <a :href="route('aplicacion.configuraciones', { aplicacion, rol })"
-                        class="flex items-center p-[6px] rounded-full justify-center">
-                        <span class="material-symbols-rounded"> settings </span>
-                    </a>
-                </div>
-
-                <div v-if="currentRoute !== configuracionesRoute" class="logo flex gap-3 items-center">
-                    <div class="user h-[40px] w-[40px] rounded-full overflow-hidden flex items-center justify-center"
-                        :class="[bgFocus]">
-                        <span class="text-md font-bold">
-                            {{ initials }}
-                        </span>
+                <div class="usuario">
+                    <div v-if="auth && auth.user">
+                        <h3 class="font-semibold"> {{ auth.user.nombres_ct }} </h3>
+                        <p class="-mt-[5px] text-secundary-light text-[13px] font-medium">
+                            {{ auth.user.rol?.tipo_rol || 'Sin rol' }}
+                        </p>
                     </div>
-                    <div class="logo">
-                        <div v-if="auth && auth.user">
-                            <h3 class="font-semibold"> {{ auth.user.nombres_ct }} {{ auth.user.apellidos_ct }}</h3>
-                            <p class="-mt-[5px] text-secundary-light text-[13px] font-medium">
-                                {{ auth.user.rol?.tipo_rol || 'Sin rol' }}
-                            </p>
-                        </div>
-                        <div v-else>
-                            <p>Cargando información del usuario...</p>
-                        </div>
+                    <div v-else>
+                        <p>Cargando información del usuario...</p>
                     </div>
                 </div>
             </div>
-        </header>
-    </div>
-
-
+    </header>
 </template>

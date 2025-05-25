@@ -57,6 +57,26 @@ onMounted(() => {
 
 const user = props.auth.user
 const auth = usePage().props.auth;
+
+const saludo = ref('');
+
+let fecha = new Date();
+ let horas = fecha.getHours();
+
+ if (horas > 12) {
+        horas -= 12;
+    } else if (horas === 0) {
+        horas = 12;
+    }
+    
+
+    if (fecha.getHours() < 12) {
+        saludo.value = "¡Buenos días!";
+    } else if (fecha.getHours() < 18) {
+        saludo.value = "¡Buenas tardes!";
+    } else {
+        saludo.value = "¡Buenas noches!";
+    }
 </script>
 
 <template>
@@ -67,6 +87,13 @@ const auth = usePage().props.auth;
   <div class="flex">
     <SidebarSuperAdmin :auth="auth" />
 
-    <SaludoOpciones :auth="auth" />
+    <div class="w-full">
+      <SaludoOpciones :auth="auth" />
+
+      <div class="contenido px-4">
+        {{ saludo }}
+
+      </div>
+    </div>
   </div>
   </template>

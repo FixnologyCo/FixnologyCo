@@ -54,7 +54,7 @@ const bgClase = computed(() => coloresBg[appName.value] || coloresBg['default'])
 const textoClase = computed(() => coloresTexto[appName.value] || coloresTexto['default']);
 const focus = computed(() => bgFocus[appName.value] || bgFocus['default']);
 const buttonLink = computed(() => btn_link[appName.value] || btn_link['default']);
-const Hover = computed(() => hoverClass[appName.value] || hoverClass['default'])
+const hover = computed(() => hoverClass[appName.value] || hoverClass['default'])
 
 return {
     appName,
@@ -62,7 +62,7 @@ return {
     textoClase,
     focus,
     buttonLink,
-    Hover
+    hover
 };
 }
 

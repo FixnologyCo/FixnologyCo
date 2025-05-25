@@ -4,7 +4,7 @@ import { usePage } from '@inertiajs/vue3';
 import { route } from 'ziggy-js';
 import Colors from '@/Composables/ModularColores';
 
-const { NombreApp, bgClase, textoClase, focus, buttonLink, Hover } = Colors();
+const { NombreApp, bgClase, textoClase, focus, buttonLink, hover } = Colors();
 
 const props = defineProps({
     auth: Object,
@@ -72,7 +72,7 @@ const inicialesNombreTienda = computed(() => {
                                 </div>
                                 <span class="text-[15px] text-secundary-light">Dashboard</span>
                             </div>
-                            <div :class="[currentRoute === dashboardRoute ? focus : hoverClass]"></div>
+                            <div :class="[currentRoute === dashboardRoute ? focus : hover]"></div>
                         </a>
                     </li>
 
@@ -86,7 +86,7 @@ const inicialesNombreTienda = computed(() => {
                                 </div>
                                 <span class="text-[15px] text-secundary-light">Aplicaciones</span>
                             </div>
-                            <div :class="[currentRoute === aplicacionesRoute ? focus : hoverClass]"></div>
+                            <div :class="[currentRoute === aplicacionesRoute ? focus : hover]"></div>
                             <div
                                 class="h-[20px] w-[30px] rounded-full bg-universal-azul_opacity grid place-content-center text-[12px]">
                                 <span>0</span></div>
@@ -103,7 +103,7 @@ const inicialesNombreTienda = computed(() => {
                                 </div>
                                 <span class="text-[15px] text-secundary-light">Clientes Fix</span>
                             </div>
-                            <div :class="[currentRoute === clientesFixRoute ? focus : hoverClass]"></div>
+                            <div :class="[currentRoute === clientesFixRoute ? focus : hover]"></div>
                             <div
                                 class="h-[20px] w-[30px] rounded-full bg-universal-azul_opacity grid place-content-center text-[12px]">
                                 <span>0</span></div>
@@ -120,7 +120,7 @@ const inicialesNombreTienda = computed(() => {
                                 </div>
                                 <span class="text-[15px] text-secundary-light">Notificaciones</span>
                             </div>
-                            <div :class="[currentRoute === notificacionesRoute ? focus : hoverClass]"></div>
+                            <div :class="[currentRoute === notificacionesRoute ? focus : hover]"></div>
                             <div
                                 class="h-[20px] w-[30px] rounded-full bg-universal-azul_opacity grid place-content-center text-[12px]">
                                 <span>0</span></div>
@@ -137,7 +137,7 @@ const inicialesNombreTienda = computed(() => {
                                 </div>
                                 <span class="text-[15px] text-secundary-light">Actividad de app</span>
                             </div>
-                            <div :class="[currentRoute === historialRoute ? focus : hoverClass]"></div>
+                            <div :class="[currentRoute === historialRoute ? focus : hover]"></div>
                             <div
                                 class="h-[20px] w-full max-w-[45px] rounded-full bg-semaforo-verde_opacity grid place-content-center text-[12px] ">
                                 <span>Nuevo</span></div>
@@ -216,7 +216,7 @@ const inicialesNombreTienda = computed(() => {
                                 </div>
                                 <span class="text-[15px] text-secundary-light">Configuraciones</span>
                             </div>
-                            <div :class="[currentRoute === configuracionesRoute ? focus : hoverClass]"></div>
+                            <div :class="[currentRoute === configuracionesRoute ? focus : hover]"></div>
                         </a>
                     </li>
                     <li :class="[currentRoute === ayudaRoute ? 'bg-secundary-opacity' : 'bg-transparent']"
@@ -229,7 +229,7 @@ const inicialesNombreTienda = computed(() => {
                                 </div>
                                 <span class="text-[15px] text-secundary-light">Centro ayuda</span>
                             </div>
-                            <div :class="[currentRoute === ayudaRoute ? focus : hoverClass]"></div>
+                            <div :class="[currentRoute === ayudaRoute ? focus : hover]"></div>
                         </a>
                     </li>
                 </ul>
