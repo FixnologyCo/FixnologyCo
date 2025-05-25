@@ -80,16 +80,28 @@ class ConfiguracionesController extends Controller
                 ->get();
 
 
-            $totalPrecio = $clientes->sum('precio');
+            $cantidadApps = DB::table('aplicaciones_web')
+                ->select(DB::raw('COUNT(DISTINCT nombre_app) as totalApps'))
+                ->value('totalApps');
+
+            $cantidadClientesRol1 = DB::table('clientes_fixgis')
+                ->where('id_rol', 1)
+                ->count();
+
+            $usuariosRol4 = ClienteFixgi::where('id_rol', 4)
+                ->select('id', 'nombres_ct', 'apellidos_ct') // puedes agregar 'apellidos' si necesitas
+                ->get();
 
             return Inertia::render('Apps/' . ucfirst($aplicacion) . '/' . ucfirst($rol) . '/Configuraciones/Configuraciones', [
                 'auth' => ['user' => $user],
                 'clientes' => $clientes,
-                'totalPrecio' => $totalPrecio ?: 0, // Asegurar que no sea NULL
                 'aplicacion' => $aplicacion,
                 'rol' => $rol,
+                'cantidadApps' => $cantidadApps,
+                'cantidadClientesRol1' => $cantidadClientesRol1,
+                'usuariosRol4' => $usuariosRol4,
             ]);
-            
+
 
 
         }

@@ -2,7 +2,7 @@
 import { Head, usePage } from '@inertiajs/vue3';
 import { ref, onMounted } from 'vue';
 import 'dayjs/locale/es';
-import SaludoOpciones from '@/Components/header/SaludoOpciones.vue';
+import Header from '@/Components/header/Header.vue';
 import SidebarSuperAdmin from '@/Components/Sidebar/FixnologyCO/Sidebar.vue'
 import Colors from '@/Composables/ModularColores';
 
@@ -24,6 +24,18 @@ const props = defineProps({
   errors: {
     type: Object,
     required: true
+  },
+  cantidadApps: {
+    type: Number,
+    default: 0
+  },
+  cantidadClientesRol1: {
+    type: Number,
+    default: 0
+  },
+  usuariosRol4: {
+    type: Array,
+    default: () => [],
   },
 })
 
@@ -61,22 +73,22 @@ const auth = usePage().props.auth;
 const saludo = ref('');
 
 let fecha = new Date();
- let horas = fecha.getHours();
+let horas = fecha.getHours();
 
- if (horas > 12) {
-        horas -= 12;
-    } else if (horas === 0) {
-        horas = 12;
-    }
-    
+if (horas > 12) {
+  horas -= 12;
+} else if (horas === 0) {
+  horas = 12;
+}
 
-    if (fecha.getHours() < 12) {
-        saludo.value = "¡Buenos días!";
-    } else if (fecha.getHours() < 18) {
-        saludo.value = "¡Buenas tardes!";
-    } else {
-        saludo.value = "¡Buenas noches!";
-    }
+
+if (fecha.getHours() < 12) {
+  saludo.value = "¡Buenos días!";
+} else if (fecha.getHours() < 18) {
+  saludo.value = "¡Buenas tardes!";
+} else {
+  saludo.value = "¡Buenas noches!";
+}
 </script>
 
 <template>
@@ -85,15 +97,15 @@ let fecha = new Date();
 
 
   <div class="flex">
-    <SidebarSuperAdmin :auth="auth" />
+    <SidebarSuperAdmin :auth="auth" :cantidad-apps="cantidadApps" :cantidad-clientes-rol1="cantidadClientesRol1" :usuarios-rol4="usuariosRol4"/>
 
     <div class="w-full">
-      <SaludoOpciones :auth="auth" />
+      <Header :auth="auth" />
 
       <div class="contenido px-4">
-        {{ saludo }}
+        <p class="text-[25px] my-3">{{ saludo }}, {{ user.nombres_ct }}</p>
 
       </div>
     </div>
   </div>
-  </template>
+</template>

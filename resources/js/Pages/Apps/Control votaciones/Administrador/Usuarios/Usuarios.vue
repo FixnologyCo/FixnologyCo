@@ -13,7 +13,7 @@ export default {
 <script setup>
 import { Head } from '@inertiajs/vue3';
 import Sidebar from '@/Components/Sidebar/Sidebar.vue';
-import SaludoOpciones from '@/Components/header/SaludoOpciones.vue';
+import SaludoOpciones from '@/Components/header/Header.vue';
 import Modal from '@/Components/Modales/Essentials/Modal.vue';
 import GeneradorQr from '@/Components/Qrs/GeneradorQr.vue'
 import JsBarcode from 'jsbarcode'

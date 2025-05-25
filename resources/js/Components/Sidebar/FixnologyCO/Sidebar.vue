@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { usePage } from '@inertiajs/vue3';
 import { route } from 'ziggy-js';
 import Colors from '@/Composables/ModularColores';
@@ -8,7 +8,39 @@ const { NombreApp, bgClase, textoClase, focus, buttonLink, hover } = Colors();
 
 const props = defineProps({
     auth: Object,
+    cantidadApps: {
+        type: Number,
+        default: 0
+    },
+    cantidadClientesRol1: {
+        type: Number,
+        default: 0
+    },
+    usuariosRol4: {
+        type: Array,
+        default: () => [],
+    },
 });
+
+const currentPage = ref(1);
+const perPage = 4;
+
+const totalPages = computed(() => {
+    return Math.ceil(props.usuariosRol4.length / perPage);
+});
+
+const paginatedUsuarios = computed(() => {
+    const start = (currentPage.value - 1) * perPage;
+    return props.usuariosRol4.slice(start, start + perPage);
+});
+
+const nextPage = () => {
+    if (currentPage.value < totalPages.value) currentPage.value++;
+};
+
+const prevPage = () => {
+    if (currentPage.value > 1) currentPage.value--;
+};
 
 const page = usePage();
 
@@ -18,6 +50,7 @@ const rol = props.auth.user.rol?.tipo_rol || 'Sin rol'; // Obtén el tipo de rol
 // Normaliza las rutas para que la comparación funcione
 const currentRoute = computed(() => new URL(page.url, window.location.origin).pathname);
 const dashboardRoute = computed(() => new URL(route('aplicacion.dashboard', { aplicacion, rol }), window.location.origin).pathname);
+const configuracionesRoute = computed(() => new URL(route('aplicacion.configuraciones', { aplicacion, rol }), window.location.origin).pathname);
 // const multisucursalRoute = computed(() => new URL(route('aplicacion.multisucursales', { aplicacion, rol }), window.location.origin).pathname);
 // const overviewRoute = computed(() => new URL(route('aplicacion.overviews', { aplicacion, rol }), window.location.origin).pathname);
 // const gastosRoute = computed(() => new URL(route('aplicacion.gastos', { aplicacion, rol }), window.location.origin).pathname);
@@ -39,12 +72,23 @@ const inicialesNombreTienda = computed(() => {
     const inicialTienda = nombreTienda.split(' ')[0]?.charAt(0).toUpperCase() || '';
     return inicialTienda;
 });
+
+const obtenerIniciales = (usuario) => {
+    const nombres = usuario.nombres_ct || '';
+    const apellidos = usuario.apellidos_ct || '';
+
+    const firstNameInitial = nombres.split(' ')[0]?.charAt(0).toUpperCase() || '';
+    const lastNameInitial = apellidos.split(' ')[0]?.charAt(0).toUpperCase() || '';
+
+    return firstNameInitial + lastNameInitial;
+};
+
 </script>
 
 
 <template>
     <div class="w-[20%] min-h-[100vh] bg-secundary-opacity p-3">
-        <aside>
+        <aside class="relative h-full">
             <div class="logo">
                 <div class="infoTienda flex items-center gap-2">
                     <div
@@ -89,7 +133,8 @@ const inicialesNombreTienda = computed(() => {
                             <div :class="[currentRoute === aplicacionesRoute ? focus : hover]"></div>
                             <div
                                 class="h-[20px] w-[30px] rounded-full bg-universal-azul_opacity grid place-content-center text-[12px]">
-                                <span>0</span></div>
+                                <span>{{ cantidadApps }}</span>
+                            </div>
                         </a>
                     </li>
 
@@ -106,7 +151,8 @@ const inicialesNombreTienda = computed(() => {
                             <div :class="[currentRoute === clientesFixRoute ? focus : hover]"></div>
                             <div
                                 class="h-[20px] w-[30px] rounded-full bg-universal-azul_opacity grid place-content-center text-[12px]">
-                                <span>0</span></div>
+                                <span>{{ cantidadClientesRol1 }}</span>
+                            </div>
                         </a>
                     </li>
 
@@ -123,7 +169,8 @@ const inicialesNombreTienda = computed(() => {
                             <div :class="[currentRoute === notificacionesRoute ? focus : hover]"></div>
                             <div
                                 class="h-[20px] w-[30px] rounded-full bg-universal-azul_opacity grid place-content-center text-[12px]">
-                                <span>0</span></div>
+                                <span>0</span>
+                            </div>
                         </a>
                     </li>
 
@@ -140,7 +187,8 @@ const inicialesNombreTienda = computed(() => {
                             <div :class="[currentRoute === historialRoute ? focus : hover]"></div>
                             <div
                                 class="h-[20px] w-full max-w-[45px] rounded-full bg-semaforo-verde_opacity grid place-content-center text-[12px] ">
-                                <span>Nuevo</span></div>
+                                <span>Nuevo</span>
+                            </div>
                         </a>
                     </li>
                 </ul>
@@ -150,66 +198,59 @@ const inicialesNombreTienda = computed(() => {
                 <div class="navegadorMiembros flex justify-between items-center my-2">
                     <h2>Miembros</h2>
                     <div class="botones flex items-center gap-2">
-                        <div class="left grid place-content-center rounded-full w-7 h-7 bg-secundary-opacity">
+                        <div @click="prevPage"
+                            class="left grid place-content-center rounded-full w-7 h-7 bg-secundary-opacity cursor-pointer">
                             <span class="material-symbols-rounded">chevron_left</span>
                         </div>
-                        <div class="left grid place-content-center rounded-full w-7 h-7 bg-secundary-opacity">
+                        <div @click="nextPage"
+                            class="left grid place-content-center rounded-full w-7 h-7 bg-secundary-opacity cursor-pointer">
                             <span class="material-symbols-rounded">chevron_right</span>
                         </div>
                     </div>
                 </div>
-                <div class="listaMiembros flex flex-col gap-2">
-                    <div class="miembro-estado flex items-center justify-between">
-                        <div class="miembro flex items-center gap-2">
-                            <div
-                                class="user h-[30px] w-[30px] rounded-full overflow-hidden flex items-center justify-center bg-slate-500 shadowM">
-                                <span class="text-[12px] font-bold">
-                                    NU
-                                </span>
-                            </div>
-                            <div class="logo">
-                                <h1 class="font-semibold text-[13px]">Nombre usuario</h1>
-                            </div>
-                        </div>
-                        <div class="estado bg-semaforo-rojo w-2 h-2 rounded-full mx-2"></div>
-                    </div>
 
-                    <div class="miembro-estado flex items-center justify-between">
-                        <div class="miembro flex items-center gap-2">
-                            <div
-                                class="user h-[30px] w-[30px] rounded-full overflow-hidden flex items-center justify-center bg-slate-500 shadowM">
-                                <span class="text-[12px] font-bold">
-                                    NU
-                                </span>
+                <div class="listaMiembros flex flex-col gap-2">
+                    <div v-for="usuario in paginatedUsuarios" :key="usuario.id"
+                        class="miembro-estado flex items-center justify-between">
+                        <div class="miembro-estado flex items-center justify-between">
+                            <div class="miembro flex items-center gap-2">
+                                <div
+                                    class="user h-[30px] w-[30px] rounded-full overflow-hidden flex items-center justify-center" :class="bgClase">
+                                    <span class="text-[12px] font-bold">
+                                        {{ obtenerIniciales(usuario) }}
+                                    </span>
+
+                                </div>
+                                <div class="logo">
+                                    <h1 class="font-semibold text-[13px]">{{ usuario.nombres_ct }}</h1>
+                                    <p class="text-[11px] font-semibold -mt-[5px]">{{ usuario.apellidos_ct }}</p>
+                                </div>
                             </div>
-                            <div class="logo">
-                                <h1 class="font-semibold text-[13px]">Nombre usuario</h1>
-                            </div>
+
                         </div>
                         <div class="estado bg-semaforo-verde w-2 h-2 rounded-full mx-2"></div>
                     </div>
 
+                    <!-- Botón Agregar -->
                     <div class="nuevoMiembro cursor-pointer flex items-center gap-2">
-                            <div
-                                class="user h-[30px] w-[30px] rounded-full overflow-hidden flex items-center justify-center border border-universal-azul border-dashed">
-                                <span class="material-symbols-rounded text-universal-azul text-[12px] font-bold">
-                                    add
-                                </span>
-                            </div>
-                            <div class="logo">
-                                <h1 class="font-semibold text-[13px] text-universal-azul">Agregar miembro</h1>
-                            </div>
+                        <div
+                            class="user h-[30px] w-[30px] rounded-full overflow-hidden flex items-center justify-center border border-universal-azul border-dashed">
+                            <span class="material-symbols-rounded text-universal-azul text-[12px] font-bold">add</span>
                         </div>
-
+                        <div class="logo">
+                            <h1 class="font-semibold text-[13px] text-universal-azul">Agregar miembro</h1>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div class="gestion absolute bottom-0"> 
+
+            <div class="gestion absolute bottom-0 w-full">
                 <ul class="flex flex-col gap-2">
                     <li :class="[currentRoute === configuracionesRoute ? 'bg-secundary-opacity' : 'bg-transparent']"
                         class="hover:bg-secundary-opacity p-2 rounded-lg cursor-pointer">
                         <a class="flex items-center justify-between"
-                            :href="route('aplicacion.dashboard', { aplicacion, rol })">
+                            :href="route('aplicacion.configuraciones', { aplicacion, rol })">
                             <div class="flex items-center gap-4">
                                 <div class="flex items-center text-secundary-light">
                                     <span class="text-[20px] material-symbols-rounded">settings</span>

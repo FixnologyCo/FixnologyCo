@@ -4,7 +4,7 @@ import { defineProps, ref, onMounted, computed } from 'vue';
 import Sidebar from '@/Components/Sidebar/Sidebar.vue';
 import BarraCalendario from '@/Components/BarraCalendario/BarraCalendario.vue';
 import DetallesPlan from '@/Components/Dashboard/DetallesPlan.vue';
-import SaludoOpciones from '@/Components/header/SaludoOpciones.vue';
+import SaludoOpciones from '@/Components/header/Header.vue';
 
 const props = defineProps({
     auth: {

@@ -1,7 +1,7 @@
 <script>
 import { Head } from '@inertiajs/vue3';
 import Sidebar from '@/Components/Sidebar/Sidebar.vue';
-import SaludoOpciones from '@/Components/header/SaludoOpciones.vue';
+import SaludoOpciones from '@/Components/header/Header.vue';
 import Productos from '@/Components/TablaDatos/Essentials/Productos.vue';
 import ExportarExcel from '@/components/ExportarExcel/ExportarExcel.vue';
 

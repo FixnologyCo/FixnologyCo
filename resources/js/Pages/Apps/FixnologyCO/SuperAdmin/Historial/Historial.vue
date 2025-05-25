@@ -3,7 +3,7 @@ import { ref, computed } from 'vue';
 import { usePage, Head } from '@inertiajs/vue3';
 import { route } from 'ziggy-js';
 import Sidebar from '@/Components/Sidebar/Sidebar.vue';
-import SaludoOpciones from '@/Components/header/SaludoOpciones.vue';;
+import SaludoOpciones from '@/Components/header/Header.vue';;
 import dayjs from 'dayjs'
 import 'dayjs/locale/es'
 import localizedFormat from 'dayjs/plugin/localizedFormat'

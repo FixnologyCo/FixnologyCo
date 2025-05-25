@@ -5,7 +5,7 @@ import { route } from 'ziggy-js';
 import { ref } from 'vue';
 import { Head } from '@inertiajs/vue3';
 import Sidebar from '@/Components/Sidebar/Sidebar.vue';
-import SaludoOpciones from '@/Components/header/SaludoOpciones.vue';
+import SaludoOpciones from '@/Components/header/Header.vue';
 import Productos from '@/Components/TablaDatos/Essentials/Productos.vue';
 import ExportarExcel from '@/Components/ExportarExcel/ExportarExcel.vue';
 import dayjs from 'dayjs'

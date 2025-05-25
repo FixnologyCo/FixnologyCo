@@ -3,7 +3,7 @@ import { Head, usePage, router } from '@inertiajs/vue3';
 import Sidebar from '@/Components/Sidebar/Sidebar.vue';
 import BarraCalendario from '@/Components/BarraCalendario/BarraCalendario.vue';
 import DetallesPlan from '@/Components/Dashboard/DetallesPlan.vue';
-import SaludoOpciones from '@/Components/header/SaludoOpciones.vue';
+import SaludoOpciones from '@/Components/header/Header.vue';
 import CardHistorial from '@/Components/Dashboard/CardHistorial.vue';
 import dayjs from 'dayjs'
 import 'dayjs/locale/es' // ✅ Importa el idioma español

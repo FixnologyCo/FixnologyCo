@@ -3,7 +3,7 @@ import { Head, usePage } from '@inertiajs/vue3';
 import { ref, computed } from 'vue';
 import { route } from 'ziggy-js';
 import Sidebar from '@/Components/Sidebar/Sidebar.vue';
-import SaludoOpciones from '@/Components/header/SaludoOpciones.vue';
+import SaludoOpciones from '@/Components/header/Header.vue';
 import ExportarExcel from '@/Components/ExportarExcel/ExportarExcel.vue';
 import Modal from '@/Components/Modales/Essentials/Modal.vue';
 import Gastos from '@/Components/TablaDatos/Essentials/Gastos.vue';

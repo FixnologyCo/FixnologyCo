@@ -5,7 +5,7 @@ import { route } from 'ziggy-js';
 import { ref } from 'vue';
 import { Head } from '@inertiajs/vue3';
 import Sidebar from '@/Components/Sidebar/Sidebar.vue';
-import SaludoOpciones from '@/Components/header/SaludoOpciones.vue';
+import SaludoOpciones from '@/Components/header/Header.vue';
 import CrearItem from '@/Components/CrearProductos/CrearItem.vue';
 
 import dayjs from 'dayjs'

@@ -4,7 +4,7 @@ import { ref, onMounted, onUnmounted, computed } from 'vue';
 import 'dayjs/locale/es';
 import { route } from 'ziggy-js';
 import dayjs from 'dayjs';
-import SaludoOpciones from '@/Components/header/SaludoOpciones.vue';
+import SaludoOpciones from '@/Components/header/Header.vue';
 
 
 const props = defineProps({
