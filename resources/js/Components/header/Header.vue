@@ -109,7 +109,7 @@ const diasRestantes = computed(() => props.auth.user?.tienda?.pagos_membresia?.d
                 <div :class="[bgClase]" class="separador h-8 w-[2px] rounded-lg"></div>
                 <div class="hora text-[14px]" id="hora">{{ hora }}</div>
             </div>
-        <div v-if="currentRoute !== configuracionesRoute" class="flex gap-3 items-center">
+        <div class="flex gap-3 items-center">
                 <div class="user h-[40px] w-[40px] rounded-full overflow-hidden flex items-center justify-center"
                     :class="[bgClase]">
                     <span class="text-md font-bold">
@@ -123,9 +123,7 @@ const diasRestantes = computed(() => props.auth.user?.tienda?.pagos_membresia?.d
                             {{ auth.user.rol?.tipo_rol || 'Sin rol' }}
                         </p>
                     </div>
-                    <div v-else>
-                        <p>Cargando información del usuario...</p>
-                    </div>
+                   
                 </div>
             </div>
     </header>

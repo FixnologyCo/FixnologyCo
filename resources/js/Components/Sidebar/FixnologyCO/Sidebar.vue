@@ -50,6 +50,7 @@ const rol = props.auth.user.rol?.tipo_rol || 'Sin rol'; // Obtén el tipo de rol
 // Normaliza las rutas para que la comparación funcione
 const currentRoute = computed(() => new URL(page.url, window.location.origin).pathname);
 const dashboardRoute = computed(() => new URL(route('aplicacion.dashboard', { aplicacion, rol }), window.location.origin).pathname);
+const clientesFixRoute = computed(() => new URL(route('aplicacion.clientesFix', { aplicacion, rol }), window.location.origin).pathname);
 const configuracionesRoute = computed(() => new URL(route('aplicacion.configuraciones', { aplicacion, rol }), window.location.origin).pathname);
 // const multisucursalRoute = computed(() => new URL(route('aplicacion.multisucursales', { aplicacion, rol }), window.location.origin).pathname);
 // const overviewRoute = computed(() => new URL(route('aplicacion.overviews', { aplicacion, rol }), window.location.origin).pathname);
@@ -141,7 +142,7 @@ const obtenerIniciales = (usuario) => {
                     <li :class="[currentRoute === clientesFixRoute ? 'bg-secundary-opacity' : 'bg-transparent']"
                         class="hover:bg-secundary-opacity p-2 rounded-lg cursor-pointer">
                         <a class="flex items-center justify-between"
-                            :href="route('aplicacion.dashboard', { aplicacion, rol })">
+                            :href="route('aplicacion.clientesFix', { aplicacion, rol })">
                             <div class="flex items-center gap-4">
                                 <div class="flex items-center text-secundary-light">
                                     <span class="text-[20px] material-symbols-rounded">people</span>
