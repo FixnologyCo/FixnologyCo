@@ -13,11 +13,10 @@ export default {
   }
 }
 
-const page = usePage();
 </script>
 
 <script setup>
-import { Head, useForm, usePage } from '@inertiajs/vue3';
+import { Head, useForm } from '@inertiajs/vue3';
 import { route } from 'ziggy-js';
 import MensajesLayout from '@/Layouts/MensajesLayout.vue';
 
@@ -31,6 +30,7 @@ const submit = () => {
     onFinish: () => form.reset('contrasenia_ct'),
   })
 }
+
 </script>
 
 <template>

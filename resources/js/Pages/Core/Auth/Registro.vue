@@ -2,6 +2,7 @@
 import { Head, useForm, usePage } from '@inertiajs/vue3'
 import { computed, ref } from 'vue';
 import { route } from 'ziggy-js';
+import MensajesLayout from '@/Layouts/MensajesLayout.vue';
 
 
 defineProps({
@@ -15,9 +16,6 @@ defineProps({
   }
 })
 
-const page = usePage();
-const currentRoute = computed(() => new URL(page.url, window.location.origin).pathname);
-
 const form = useForm({
   nombres_ct: '',
   apellidos_ct: '',
@@ -30,34 +28,10 @@ const form = useForm({
   id_aplicacion: ''
 })
 
-// ✅ Estado para la notificación
-const mensajeNotificacion = ref('')
-const tipoNotificacion = ref(null)
-const mostrarNotificacion = ref(false)
-
-// ✅ Función para mostrar la notificación
-const mostrarMensaje = (mensaje, tipo) => {
-  mensajeNotificacion.value = mensaje
-  tipoNotificacion.value = tipo
-  mostrarNotificacion.value = true
-
-  // Ocultar la notificación después de 3 segundos
-  setTimeout(() => {
-    mostrarNotificacion.value = false
-  }, 5000)
-}
-
-// ✅ Función para enviar el formulario
 const submit = () => {
-  form.post('/register/auth', {
-    onSuccess: () => {
-      mostrarMensaje('Registro exitoso', 'success')
-    },
-    onError: () => {
-      mostrarMensaje('Error al registrar, verifica los datos.', 'error')
-    }
-  })
+  form.post(route('register.auth'))
 }
+
 // ✅ Límites de caracteres para cada campo
 const limitesCaracteres = {
   nombres_ct: 25,
@@ -95,6 +69,7 @@ const handleInput = (event, field) => {
   <div>
 
     <Head title="Registrate" />
+    <MensajesLayout />
 
     <div class="bg-mono-negro
             sm:bg-green-500 
@@ -547,33 +522,8 @@ const handleInput = (event, field) => {
         </div>
 
       </main>
-      <!-- ✅ Notificación de éxito -->
-      <div v-if="mostrarNotificacion && tipoNotificacion === 'success'"
-        class="notificacion translate-y-8 absolute w-[max-content] left-0 right-0 top-6 ml-auto mr-auto rounded-md bg-semaforo-verde_opacity text-mono-blanco shadow-semaforo-verde">
-        <div class="notificacion_body flex justify-center gap-3 items-center py-3 px-2">
-          <div class="flex gap-2 items-center">
-            <i class="material-symbols-rounded text-semaforo-verde">check_circle</i>
-            <p>{{ mensajeNotificacion }}</p>
-          </div>
-        </div>
-        <div
-          class="progreso_notificacion absolute left-1 bottom-1 h-1 scale-x-0 origin-left rounded-sm bg-semaforo-verde">
-        </div>
-      </div>
+      
 
-      <!-- ✅ Notificación de error -->
-      <div v-if="mostrarNotificacion && tipoNotificacion === 'error'"
-        class="notificacion translate-y-8 absolute w-[max-content] left-0 right-0 top-6 ml-auto mr-auto rounded-md bg-semaforo-rojo_opacity text-mono-blanco shadow-semaforo-verde">
-        <div class="notificacion_body flex justify-center gap-3 items-center py-3 px-2">
-          <div class="flex gap-2 items-center">
-            <i class="material-symbols-rounded text-semaforo-rojo">cancel</i>
-            <p>{{ mensajeNotificacion }}</p>
-          </div>
-        </div>
-        <div
-          class="progreso_notificacion absolute left-1 bottom-1 h-1 scale-x-0 origin-left rounded-sm bg-semaforo-rojo">
-        </div>
-      </div>
     </div>
   </div>
 </template>

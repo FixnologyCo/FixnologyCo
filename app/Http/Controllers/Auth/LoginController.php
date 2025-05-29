@@ -60,9 +60,8 @@ class LoginController extends Controller
             $ultimoPago = $pagos->sortByDesc('fecha_pago')->first();
 
             $estadoInvalido = $ultimoPago->id_estado === 9;
-            $sinDias = $ultimoPago->dias_restantes <= 0;
 
-            if ($estadoInvalido || $sinDias) {
+            if ($estadoInvalido) {
                 Auth::logout();
                 return back()->with('error', 'Ponte al día con tu pago para seguir disfrutando de la app.');
                 

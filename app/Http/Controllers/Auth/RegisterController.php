@@ -119,7 +119,7 @@ class RegisterController extends Controller
         ]);
 
         // ✅ Guarda el mensaje en la sesión y redirige a login con Inertia
-        return redirect()->route('login.auth')->with('success', 'Registro exitoso, Activa el token');
+        return redirect()->route('login.auth')->with('success', 'Registro exitoso, Activa el token y ¡empecemos!');
 
     }
 }
