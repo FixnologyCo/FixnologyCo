@@ -17,6 +17,7 @@ module.exports = {
                 },
                 universal:{
                   naranja: '#f05235',
+                  naranja_opacity: '#fe502d36',
                   azul: '#4F959D',
                   azul_opacity: '#4f959d3a',
                   azul_secundaria: '#1c1b53'

@@ -14,6 +14,11 @@ export default function useAppColors() {
         'default': 'bg-gray-300 shadow-gray-300'
     };
 
+    const bgFocusOpacity = {
+        'FixnologyCO': 'bg-universal-naranja_opacity rounded-[10px]',
+        'default': 'bg-gray-300 shadow-gray-300'
+    };
+
     const coloresTexto = {
         'FixnologyCO': 'text-universal-naranja',
         'default': 'text-gray-500'
@@ -51,6 +56,7 @@ const appName = computed(() =>
 );
 
 const bgClase = computed(() => coloresBg[appName.value] || coloresBg['default']);
+const bgOpacity = computed(() => bgFocusOpacity[appName.value] || bgFocusOpacity['default']);
 const textoClase = computed(() => coloresTexto[appName.value] || coloresTexto['default']);
 const focus = computed(() => bgFocus[appName.value] || bgFocus['default']);
 const buttonLink = computed(() => btn_link[appName.value] || btn_link['default']);
@@ -59,6 +65,7 @@ const hover = computed(() => hoverClass[appName.value] || hoverClass['default'])
 return {
     appName,
     bgClase,
+    bgOpacity,
     textoClase,
     focus,
     buttonLink,

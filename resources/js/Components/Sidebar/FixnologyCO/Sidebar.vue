@@ -4,7 +4,7 @@ import { usePage } from '@inertiajs/vue3';
 import { route } from 'ziggy-js';
 import Colors from '@/Composables/ModularColores';
 
-const { NombreApp, bgClase, textoClase, focus, buttonLink, hover } = Colors();
+const { NombreApp, bgClase, bgOpacity, textoClase, focus, buttonLink, hover } = Colors();
 
 const props = defineProps({
     auth: Object,
@@ -21,26 +21,6 @@ const props = defineProps({
         default: () => [],
     },
 });
-
-const currentPage = ref(1);
-const perPage = 4;
-
-const totalPages = computed(() => {
-    return Math.ceil(props.usuariosRol4.length / perPage);
-});
-
-const paginatedUsuarios = computed(() => {
-    const start = (currentPage.value - 1) * perPage;
-    return props.usuariosRol4.slice(start, start + perPage);
-});
-
-const nextPage = () => {
-    if (currentPage.value < totalPages.value) currentPage.value++;
-};
-
-const prevPage = () => {
-    if (currentPage.value > 1) currentPage.value--;
-};
 
 const page = usePage();
 
@@ -74,24 +54,19 @@ const inicialesNombreTienda = computed(() => {
     return inicialTienda;
 });
 
-const obtenerIniciales = (usuario) => {
-    const nombres = usuario.nombres_ct || '';
-    const apellidos = usuario.apellidos_ct || '';
 
-    const firstNameInitial = nombres.split(' ')[0]?.charAt(0).toUpperCase() || '';
-    const lastNameInitial = apellidos.split(' ')[0]?.charAt(0).toUpperCase() || '';
-
-    return firstNameInitial + lastNameInitial;
-};
+const sidebarExpandido = ref(true); // true = expandido, false = colapsado
 
 </script>
 
 
 <template>
-    <div class="w-[20%] min-h-[100vh] bg-secundary-opacity p-3">
+    <div :class="[sidebarExpandido ? 'w-[20%]' : 'w-[60px]']"
+        class="min-h-[100vh] bg-secundary-opacity p-3 transition-all duration-300 relative">
         <aside class="relative h-full">
-            <div class="logo">
-                <div class="infoTienda flex items-center gap-2">
+
+            <div class="infoTienda flex items-center justify-between gap-2 px-2">
+                <div v-if="sidebarExpandido" class="flex gap-2 items-center">
                     <div
                         class="user h-[25px] w-[25px] rounded-[5px] overflow-hidden flex items-center justify-center bg-slate-500">
                         <span class="text-md font-bold">
@@ -102,12 +77,20 @@ const obtenerIniciales = (usuario) => {
                         <h1 class="font-semibold text-[14px]">FixnologyCO</h1>
                     </div>
                 </div>
+
+                <button @click="sidebarExpandido = !sidebarExpandido">
+                    <span class="material-symbols-rounded">
+                        {{ sidebarExpandido ? 'right_panel_open' : 'left_panel_open' }}
+                    </span>
+                </button>
             </div>
 
-            <div class="tienda rounded-md border border-universal-azul_secundaria p-1 mt-3 flex items-center gap-2">
-                <div class="user h-[20px] w-[20px] rounded-full overflow-hidden flex items-center justify-center" :class="[bgClase]">
+
+            <div class="tienda rounded-md border px-2 py-1 mt-3 flex items-center gap-2">
+                <div class="user h-[20px] w-[20px] rounded-full overflow-hidden flex items-center justify-center"
+                    :class="[bgClase]">
                 </div>
-                <div class="nombreApp">
+                <div v-if="sidebarExpandido" class="nombreApp">
                     <h2 class="text-[14px]">{{ aplicacion }}</h2>
                     <p class="text-[12px] -mt-[3px]">{{ diasRestantes }} días restantes</p>
                 </div>
@@ -116,180 +99,99 @@ const obtenerIniciales = (usuario) => {
 
             <div class="navegacion mt-5">
                 <ul class="flex flex-col gap-1">
-                    <a :href="route('aplicacion.dashboard', { aplicacion, rol })">
-                        <li :class="[currentRoute === dashboardRoute ? 'bg-secundary-opacity' : 'bg-transparent']"
-                            class="hover:bg-secundary-opacity p-2 rounded-lg cursor-pointer">
+                    <li :class="[currentRoute === dashboardRoute ? [bgOpacity] : 'bg-transparent']"
+                        class="px-2 py-1.5 rounded-[5px] cursor-pointer">
+                        <a :href="route('aplicacion.dashboard', { aplicacion, rol })">
                             <span class="flex items-center justify-between">
-                                <div class="flex items-center gap-4">
-                                    <div class="flex items-center text-secundary-light">
-                                        <span class="text-[20px] material-symbols-rounded">space_dashboard</span>
+                                <div class="flex items-center gap-1">
+                                    <div class="flex items-center">
+                                        <span
+                                            class="text-[18px] material-symbols-rounded text-secundary-light">space_dashboard</span>
                                     </div>
-                                    <span class="text-[15px] text-secundary-light">Dashboard</span>
+                                    <span v-if="sidebarExpandido" class="text-[14px]">Dashboard</span>
                                 </div>
                                 <div :class="[currentRoute === dashboardRoute ? focus : hover]"></div>
                             </span>
-                        </li>
-                    </a>
+                        </a>
+                    </li>
 
+                    <div v-if="!sidebarExpandido" class="text-center text-secundary-light">-</div>
+                    <p v-if="sidebarExpandido" class="text-secundary-light text-[12px] mt-2.5">Gestión</p>
 
-                    <a :href="route('aplicacion.dashboard', { aplicacion, rol })">
-                        <li :class="[currentRoute === aplicacionesRoute ? 'bg-secundary-opacity' : 'bg-transparent']"
-                            class="hover:bg-secundary-opacity p-2 rounded-lg cursor-pointer">
+                    <li :class="[currentRoute === aplicacionesRoute ? [bgOpacity] : 'bg-transparent']"
+                        class=" px-2 py-1.5 rounded-[5px] cursor-pointer">
+                        <a :href="route('aplicacion.dashboard', { aplicacion, rol })">
                             <span class="flex items-center justify-between">
-                                <div class="flex items-center gap-4">
-                                    <div class="flex items-center text-secundary-light">
-                                        <span class="text-[20px] material-symbols-rounded">apps</span>
+                                <div class="flex items-center gap-1">
+                                    <div class="flex items-center">
+                                        <span
+                                            class="text-[18px] material-symbols-rounded text-secundary-light">apps</span>
                                     </div>
-                                    <span class="text-[15px] text-secundary-light">Aplicaciones</span>
+                                    <span v-if="sidebarExpandido" class="text-[14px]">Mis aplicaciones</span>
                                 </div>
                                 <div :class="[currentRoute === aplicacionesRoute ? focus : hover]"></div>
-                                <div
-                                    class="h-[20px] w-[30px] rounded-full bg-universal-azul_opacity grid place-content-center text-[12px]">
-                                    <span>{{ cantidadApps }}</span>
-                                </div>
                             </span>
-                        </li>
-                    </a>
-
-
-                    <li :class="[currentRoute === clientesFixRoute ? 'bg-secundary-opacity' : 'bg-transparent']"
-                        class="hover:bg-secundary-opacity p-2 rounded-lg cursor-pointer">
-                        <a class="flex items-center justify-between"
-                            :href="route('aplicacion.clientesFix', { aplicacion, rol })">
-                            <div class="flex items-center gap-4">
-                                <div class="flex items-center text-secundary-light">
-                                    <span class="text-[20px] material-symbols-rounded">people</span>
+                        </a>
+                    </li>
+                    <li :class="[currentRoute === aplicacionesRoute ? [bgOpacity] : 'bg-transparent']"
+                        class=" px-2 py-1.5 rounded-[5px] cursor-pointer">
+                        <a :href="route('aplicacion.dashboard', { aplicacion, rol })">
+                            <span class="flex items-center justify-between">
+                                <div class="flex items-center gap-1">
+                                    <div class="flex items-center">
+                                        <span
+                                            class="text-[18px] material-symbols-rounded text-secundary-light">people</span>
+                                    </div>
+                                    <span v-if="sidebarExpandido" class="text-[14px]">Gestor usuarios</span>
                                 </div>
-                                <span class="text-[15px] text-secundary-light">Clientes Fix</span>
-                            </div>
-                            <div :class="[currentRoute === clientesFixRoute ? focus : hover]"></div>
-                            <div
-                                class="h-[20px] w-[30px] rounded-full bg-universal-azul_opacity grid place-content-center text-[12px]">
-                                <span>{{ cantidadClientesRol1 }}</span>
-                            </div>
+                                <div :class="[currentRoute === aplicacionesRoute ? focus : hover]"></div>
+                            </span>
                         </a>
                     </li>
 
-                    <li :class="[currentRoute === notificacionesRoute ? 'bg-secundary-opacity' : 'bg-transparent']"
-                        class="hover:bg-secundary-opacity p-2 rounded-lg cursor-pointer">
-                        <a class="flex items-center justify-between"
-                            :href="route('aplicacion.dashboard', { aplicacion, rol })">
-                            <div class="flex items-center gap-4">
-                                <div class="flex items-center text-secundary-light">
-                                    <span class="text-[20px] material-symbols-rounded">notifications</span>
+                    <div v-if="!sidebarExpandido" class="text-center text-secundary-light">-</div>
+                    <p v-if="sidebarExpandido" class="text-secundary-light text-[12px] mt-2.5">Financias</p>
+
+                    <li :class="[currentRoute === aplicacionesRoute ? [bgOpacity] : 'bg-transparent']"
+                        class=" px-2 py-1.5 rounded-[5px] cursor-pointer">
+                        <a :href="route('aplicacion.dashboard', { aplicacion, rol })">
+                            <span class="flex items-center justify-between">
+                                <div class="flex items-center gap-1">
+                                    <div class="flex items-center">
+                                        <span
+                                            class="text-[18px] material-symbols-rounded text-secundary-light">payment</span>
+                                    </div>
+                                    <span v-if="sidebarExpandido" class="text-[14px]">Pagos membresías</span>
                                 </div>
-                                <span class="text-[15px] text-secundary-light">Notificaciones</span>
-                            </div>
-                            <div :class="[currentRoute === notificacionesRoute ? focus : hover]"></div>
-                            <div
-                                class="h-[20px] w-[30px] rounded-full bg-universal-azul_opacity grid place-content-center text-[12px]">
-                                <span>0</span>
-                            </div>
+                                <div :class="[currentRoute === aplicacionesRoute ? focus : hover]"></div>
+                            </span>
                         </a>
                     </li>
 
-                    <li :class="[currentRoute === historialRoute ? 'bg-secundary-opacity' : 'bg-transparent']"
-                        class="hover:bg-secundary-opacity p-2 rounded-lg cursor-pointer">
-                        <a class="flex items-center justify-between"
-                            :href="route('aplicacion.dashboard', { aplicacion, rol })">
-                            <div class="flex items-center gap-4">
-                                <div class="flex items-center text-secundary-light">
-                                    <span class="text-[20px] material-symbols-rounded">history</span>
+                    <div v-if="!sidebarExpandido" class="text-center text-secundary-light">-</div>
+                    <p v-if="sidebarExpandido" class="text-secundary-light text-[12px] mt-2.5">Seguridad</p>
+
+                    <li :class="[currentRoute === aplicacionesRoute ? [bgOpacity] : 'bg-transparent']"
+                        class=" px-2 py-1.5 rounded-[5px] cursor-pointer">
+                        <a :href="route('aplicacion.dashboard', { aplicacion, rol })">
+                            <span class="flex items-center justify-between">
+                                <div class="flex items-center gap-1">
+                                    <div class="flex items-center">
+                                        <span
+                                            class="text-[18px] material-symbols-rounded text-secundary-light">key</span>
+                                    </div>
+                                    <span v-if="sidebarExpandido" class="text-[14px]">Tokens acceso</span>
                                 </div>
-                                <span class="text-[15px] text-secundary-light">Actividad de app</span>
-                            </div>
-                            <div :class="[currentRoute === historialRoute ? focus : hover]"></div>
-                            <div
-                                class="h-[20px] w-full max-w-[45px] rounded-full bg-semaforo-verde_opacity grid place-content-center text-[12px] ">
-                                <span>Nuevo</span>
-                            </div>
+                                <div :class="[currentRoute === aplicacionesRoute ? focus : hover]"></div>
+                            </span>
                         </a>
                     </li>
+
                 </ul>
             </div>
 
-            <div class="miembros mt-2">
-                <div class="navegadorMiembros flex justify-between items-center my-2">
-                    <h2>Miembros</h2>
-                    <div class="botones flex items-center gap-2">
-                        <div @click="prevPage"
-                            class="left grid place-content-center rounded-full w-7 h-7 bg-secundary-opacity cursor-pointer">
-                            <span class="material-symbols-rounded">chevron_left</span>
-                        </div>
-                        <div @click="nextPage"
-                            class="left grid place-content-center rounded-full w-7 h-7 bg-secundary-opacity cursor-pointer">
-                            <span class="material-symbols-rounded">chevron_right</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="listaMiembros flex flex-col gap-2">
-                    <div v-for="usuario in paginatedUsuarios" :key="usuario.id"
-                        class="miembro-estado flex items-center justify-between">
-                        <div class="miembro-estado flex items-center justify-between">
-                            <div class="miembro flex items-center gap-2">
-                                <div class="user h-[30px] w-[30px] rounded-full overflow-hidden flex items-center justify-center"
-                                    :class="bgClase">
-                                    <span class="text-[12px] font-bold">
-                                        {{ obtenerIniciales(usuario) }}
-                                    </span>
-
-                                </div>
-                                <div class="logo">
-                                    <h1 class="font-semibold text-[13px]">{{ usuario.nombres_ct }}</h1>
-                                    <p class="text-[11px] font-semibold -mt-[5px]">{{ usuario.apellidos_ct }}</p>
-                                </div>
-                            </div>
-
-                        </div>
-                        <div class="estado bg-semaforo-verde w-2 h-2 rounded-full mx-2"></div>
-                    </div>
-
-                    <!-- Botón Agregar -->
-                    <div class="nuevoMiembro cursor-pointer flex items-center gap-2">
-                        <div
-                            class="user h-[30px] w-[30px] rounded-full overflow-hidden flex items-center justify-center border border-universal-azul border-dashed">
-                            <span class="material-symbols-rounded text-universal-azul text-[12px] font-bold">add</span>
-                        </div>
-                        <div class="logo">
-                            <h1 class="font-semibold text-[13px] text-universal-azul">Agregar miembro</h1>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-
-            <div class="gestion absolute bottom-0 w-full">
-                <ul class="flex flex-col gap-2">
-                    <li :class="[currentRoute === configuracionesRoute ? 'bg-secundary-opacity' : 'bg-transparent']"
-                        class="hover:bg-secundary-opacity p-2 rounded-lg cursor-pointer">
-                        <a class="flex items-center justify-between"
-                            :href="route('aplicacion.configuraciones', { aplicacion, rol })">
-                            <div class="flex items-center gap-4">
-                                <div class="flex items-center text-secundary-light">
-                                    <span class="text-[20px] material-symbols-rounded">settings</span>
-                                </div>
-                                <span class="text-[15px] text-secundary-light">Configuraciones</span>
-                            </div>
-                            <div :class="[currentRoute === configuracionesRoute ? focus : hover]"></div>
-                        </a>
-                    </li>
-                    <li :class="[currentRoute === ayudaRoute ? 'bg-secundary-opacity' : 'bg-transparent']"
-                        class="hover:bg-secundary-opacity p-2 rounded-lg cursor-pointer">
-                        <a class="flex items-center justify-between"
-                            :href="route('aplicacion.dashboard', { aplicacion, rol })">
-                            <div class="flex items-center gap-4">
-                                <div class="flex items-center text-secundary-light">
-                                    <span class="text-[20px] material-symbols-rounded">help</span>
-                                </div>
-                                <span class="text-[15px] text-secundary-light">Centro ayuda</span>
-                            </div>
-                            <div :class="[currentRoute === ayudaRoute ? focus : hover]"></div>
-                        </a>
-                    </li>
-                </ul>
-            </div>
 
         </aside>
     </div>
+
 </template>
