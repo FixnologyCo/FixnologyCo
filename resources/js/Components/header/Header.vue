@@ -64,22 +64,7 @@ const diasRestantes = computed(() => props.auth.user?.tienda?.pagos_membresia?.d
                 </div>
             </div>
         </div>
-        <div class="date w-[23%] flex gap-3 items-center">
-            <ul class="flex items-center gap-2">
-                <li :class="[currentRoute === dashboardRoute ? [bgClase] : 'bg-transparent']"
-                    class="hover:bg-secundary-opacity py-1 px-2 text-[14px] rounded-full cursor-pointer">
-                    <a :href="route('aplicacion.dashboard', { aplicacion, rol })">Home</a>
-                </li>
-                <li :class="[currentRoute === aplicacionesdRoute ? [bgClase] : 'bg-transparent']"
-                    class="hover:bg-secundary-opacity py-1 px-2 rounded-full cursor-pointer">
-                    <a :href="route('aplicacion.configuraciones', { aplicacion, rol })">Apps</a>
-                </li>
-                <li :class="[currentRoute === clientesFixRoute ? [bgClase] : 'bg-transparent']"
-                    class="hover:bg-secundary-opacity py-1 px-2 rounded-full cursor-pointer">
-                    <a :href="route('aplicacion.clientesFix', { aplicacion, rol })">Usuarios</a>
-                </li>
-            </ul>
-        </div>
+       
         <div class="flex gap-2 items-center">
             <a :href="route('aplicacion.configuraciones', { aplicacion, rol })">
                 <div class="user h-[30px] w-[30px] rounded-full overflow-hidden flex items-center justify-center cursor-pointer"
@@ -107,16 +92,16 @@ const diasRestantes = computed(() => props.auth.user?.tienda?.pagos_membresia?.d
             </a>
 
 
-            <div class="user h-[40px] w-[40px] rounded-full overflow-hidden flex items-center justify-center"
+            <div class="user h-[35px] w-[35px] rounded-full overflow-hidden flex items-center justify-center"
                 :class="[bgClase]">
-                <span class="text-md font-bold">
+                <span class="text-[12px] font-bold">
                     {{ initials }}
                 </span>
             </div>
             <div class="usuario">
                 <div v-if="auth && auth.user">
-                    <h3 class="font-semibold"> {{ auth.user.nombres_ct }} </h3>
-                    <p class="-mt-[5px] text-secundary-light text-[13px] font-medium">
+                    <h3 class="font-semibold text-[13px]"> {{ auth.user.nombres_ct }} </h3>
+                    <p class="-mt-[5px] text-secundary-light text-[12px] font-medium">
                         {{ auth.user.rol?.tipo_rol || 'Sin rol' }}
                     </p>
                 </div>

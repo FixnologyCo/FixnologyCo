@@ -53,7 +53,7 @@ class DashboardSuperAdminController extends Controller
             ->count();
 
         $usuariosRol4 = ClienteFixgi::where('id_rol', 4)
-            ->select('id', 'nombres_ct', 'apellidos_ct') // puedes agregar 'apellidos' si necesitas
+            ->select('id', 'nombres_ct', 'apellidos_ct')
             ->get();
 
 

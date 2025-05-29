@@ -104,6 +104,16 @@ const obtenerIniciales = (usuario) => {
                 </div>
             </div>
 
+            <div class="tienda rounded-md border border-universal-azul_secundaria p-1 mt-3 flex items-center gap-2">
+                <div class="user h-[20px] w-[20px] rounded-full overflow-hidden flex items-center justify-center" :class="[bgClase]">
+                </div>
+                <div class="nombreApp">
+                    <h2 class="text-[14px]">{{ aplicacion }}</h2>
+                    <p class="text-[12px] -mt-[3px]">{{ diasRestantes }} días restantes</p>
+                </div>
+
+            </div>
+
             <div class="navegacion mt-5">
                 <ul class="flex flex-col gap-1">
                     <a :href="route('aplicacion.dashboard', { aplicacion, rol })">
