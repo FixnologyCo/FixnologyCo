@@ -59,7 +59,7 @@ class ClientesFixController extends Controller
 
         if ($user->tienda && $user->tienda->aplicacion->nombre_app === $aplicacion) {
 
-            return Inertia::render('Apps/' . ucfirst($aplicacion) . '/' . ucfirst($rol) . '/ClientesFix/ClientesFixShow', [
+            return Inertia::render('Apps/' . ucfirst($aplicacion) . '/' . ucfirst($rol) . '/ClientesFix/UsuariosFix', [
                 'auth' => ['user' => $user],
                 'aplicacion' => $aplicacion,
                 'rol' => $rol,

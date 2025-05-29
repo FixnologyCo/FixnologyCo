@@ -93,51 +93,54 @@ const obtenerIniciales = (usuario) => {
             <div class="logo">
                 <div class="infoTienda flex items-center gap-2">
                     <div
-                        class="user h-[50px] w-[50px] rounded-[10px] overflow-hidden flex items-center justify-center bg-slate-500">
+                        class="user h-[25px] w-[25px] rounded-[5px] overflow-hidden flex items-center justify-center bg-slate-500">
                         <span class="text-md font-bold">
                             {{ inicialesNombreTienda }}
                         </span>
                     </div>
                     <div class="logo">
-                        <h1 class="font-semibold text-[20px]">FixnologyCO</h1>
-                        <p class="text-[14px] -mt-[8px] font-light">Expertos en software</p>
+                        <h1 class="font-semibold text-[14px]">FixnologyCO</h1>
                     </div>
                 </div>
             </div>
 
             <div class="navegacion mt-5">
                 <ul class="flex flex-col gap-1">
-                    <li :class="[currentRoute === dashboardRoute ? 'bg-secundary-opacity' : 'bg-transparent']"
-                        class="hover:bg-secundary-opacity p-2 rounded-lg cursor-pointer">
-                        <a class="flex items-center justify-between"
-                            :href="route('aplicacion.dashboard', { aplicacion, rol })">
-                            <div class="flex items-center gap-4">
-                                <div class="flex items-center text-secundary-light">
-                                    <span class="text-[20px] material-symbols-rounded">space_dashboard</span>
+                    <a :href="route('aplicacion.dashboard', { aplicacion, rol })">
+                        <li :class="[currentRoute === dashboardRoute ? 'bg-secundary-opacity' : 'bg-transparent']"
+                            class="hover:bg-secundary-opacity p-2 rounded-lg cursor-pointer">
+                            <span class="flex items-center justify-between">
+                                <div class="flex items-center gap-4">
+                                    <div class="flex items-center text-secundary-light">
+                                        <span class="text-[20px] material-symbols-rounded">space_dashboard</span>
+                                    </div>
+                                    <span class="text-[15px] text-secundary-light">Dashboard</span>
                                 </div>
-                                <span class="text-[15px] text-secundary-light">Dashboard</span>
-                            </div>
-                            <div :class="[currentRoute === dashboardRoute ? focus : hover]"></div>
-                        </a>
-                    </li>
+                                <div :class="[currentRoute === dashboardRoute ? focus : hover]"></div>
+                            </span>
+                        </li>
+                    </a>
 
-                    <li :class="[currentRoute === aplicacionesRoute ? 'bg-secundary-opacity' : 'bg-transparent']"
-                        class="hover:bg-secundary-opacity p-2 rounded-lg cursor-pointer">
-                        <a class="flex items-center justify-between"
-                            :href="route('aplicacion.dashboard', { aplicacion, rol })">
-                            <div class="flex items-center gap-4">
-                                <div class="flex items-center text-secundary-light">
-                                    <span class="text-[20px] material-symbols-rounded">apps</span>
+
+                    <a :href="route('aplicacion.dashboard', { aplicacion, rol })">
+                        <li :class="[currentRoute === aplicacionesRoute ? 'bg-secundary-opacity' : 'bg-transparent']"
+                            class="hover:bg-secundary-opacity p-2 rounded-lg cursor-pointer">
+                            <span class="flex items-center justify-between">
+                                <div class="flex items-center gap-4">
+                                    <div class="flex items-center text-secundary-light">
+                                        <span class="text-[20px] material-symbols-rounded">apps</span>
+                                    </div>
+                                    <span class="text-[15px] text-secundary-light">Aplicaciones</span>
                                 </div>
-                                <span class="text-[15px] text-secundary-light">Aplicaciones</span>
-                            </div>
-                            <div :class="[currentRoute === aplicacionesRoute ? focus : hover]"></div>
-                            <div
-                                class="h-[20px] w-[30px] rounded-full bg-universal-azul_opacity grid place-content-center text-[12px]">
-                                <span>{{ cantidadApps }}</span>
-                            </div>
-                        </a>
-                    </li>
+                                <div :class="[currentRoute === aplicacionesRoute ? focus : hover]"></div>
+                                <div
+                                    class="h-[20px] w-[30px] rounded-full bg-universal-azul_opacity grid place-content-center text-[12px]">
+                                    <span>{{ cantidadApps }}</span>
+                                </div>
+                            </span>
+                        </li>
+                    </a>
+
 
                     <li :class="[currentRoute === clientesFixRoute ? 'bg-secundary-opacity' : 'bg-transparent']"
                         class="hover:bg-secundary-opacity p-2 rounded-lg cursor-pointer">
@@ -215,8 +218,8 @@ const obtenerIniciales = (usuario) => {
                         class="miembro-estado flex items-center justify-between">
                         <div class="miembro-estado flex items-center justify-between">
                             <div class="miembro flex items-center gap-2">
-                                <div
-                                    class="user h-[30px] w-[30px] rounded-full overflow-hidden flex items-center justify-center" :class="bgClase">
+                                <div class="user h-[30px] w-[30px] rounded-full overflow-hidden flex items-center justify-center"
+                                    :class="bgClase">
                                     <span class="text-[12px] font-bold">
                                         {{ obtenerIniciales(usuario) }}
                                     </span>

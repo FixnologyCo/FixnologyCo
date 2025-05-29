@@ -1,6 +1,6 @@
 <script setup>
 import { Head, usePage } from '@inertiajs/vue3';
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, onUnmounted, computed } from 'vue';
 import 'dayjs/locale/es';
 import Header from '@/Components/header/Header.vue';
 import SidebarSuperAdmin from '@/Components/Sidebar/FixnologyCO/Sidebar.vue'
@@ -70,7 +70,49 @@ onMounted(() => {
 const user = props.auth.user
 const auth = usePage().props.auth;
 
+const nombreDia = ref('');
+const dia = ref('');
+const mes = ref('');
+const anio = ref('');
+const hora = ref('');
 const saludo = ref('');
+
+function actualizarFechaHora() {
+  const fecha = new Date();
+  dia.value = fecha.getDate();
+
+  const nombreDias = [
+    "Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"
+  ];
+  const monthNamesClock = [
+    "enero", "febrero", "marzo", "abril", "mayo", "junio",
+    "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"
+  ];
+  mes.value = monthNamesClock[fecha.getMonth()];
+  nombreDia.value = nombreDias[fecha.getDay()];
+  anio.value = fecha.getFullYear();
+
+  let horas = fecha.getHours();
+  const minutos = fecha.getMinutes().toString().padStart(2, "0");
+  const segundos = fecha.getSeconds().toString().padStart(2, "0");
+  const periodo = horas >= 12 ? "pm" : "am";
+
+  if (horas > 12) {
+    horas -= 12;
+  } else if (horas === 0) {
+    horas = 12;
+  }
+  hora.value = `${horas}:${minutos}:${segundos} ${periodo}`;
+}
+
+let clockInterval = null;
+onMounted(() => {
+  actualizarFechaHora();
+  clockInterval = setInterval(actualizarFechaHora, 1000);
+});
+onUnmounted(() => {
+  clearInterval(clockInterval);
+});
 
 let fecha = new Date();
 let horas = fecha.getHours();
@@ -89,22 +131,29 @@ if (fecha.getHours() < 12) {
 } else {
   saludo.value = "¡Buenas noches!";
 }
+
+const aplicacion = props.auth?.user?.tienda?.aplicacion?.nombre_app || 'Sin app';
+const rol = props.auth.user.rol?.tipo_rol || 'Sin rol'; // Obtén el tipo de rol
+
+const dashboardRoute = computed(() => new URL(route('aplicacion.dashboard', { aplicacion, rol }), window.location.origin).pathname);
+
 </script>
 
 <template>
 
   <Head :title="`Bienvenido ${user.nombres_ct || 'Dashboard'}`" />
 
-
   <div class="flex">
     <SidebarSuperAdmin :auth="auth" :cantidad-apps="cantidadApps" :cantidad-clientes-rol1="cantidadClientesRol1" :usuarios-rol4="usuariosRol4"/>
 
-    <div class="w-full">
+    <div class="w-full px-3">
       <Header :auth="auth" />
 
-      <div class="contenido px-4">
-        <p class="text-[25px] my-3">{{ saludo }}, {{ user.nombres_ct }}</p>
-
+      <div class="contenido">
+        <div class="">
+          <p class="text-[20px]">{{ saludo }}, {{ user.nombres_ct }}</p>
+          <p class="text-[14px] -mt-[5px]">{{ nombreDia }} {{ dia }} de {{ mes }} {{ anio }}, {{ hora }}</p>
+        </div>
       </div>
     </div>
   </div>

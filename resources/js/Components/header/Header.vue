@@ -11,47 +11,21 @@ const props = defineProps({
 });
 
 const page = usePage();
-
+const aplicacion = props.auth?.user?.tienda?.aplicacion?.nombre_app || 'Sin app';
+const rol = props.auth.user.rol?.tipo_rol || 'Sin rol'; // Obtén el tipo de rol
+// Normaliza las rutas para que la comparación funcione
 const currentRoute = computed(() => new URL(page.url, window.location.origin).pathname);
+const dashboardRoute = computed(() => new URL(route('aplicacion.dashboard', { aplicacion, rol }), window.location.origin).pathname);
+const clientesFixRoute = computed(() => new URL(route('aplicacion.clientesFix', { aplicacion, rol }), window.location.origin).pathname);
+const configuracionesRoute = computed(() => new URL(route('aplicacion.configuraciones', { aplicacion, rol }), window.location.origin).pathname);
 
-const dia = ref('');
-const mes = ref('');
-const anio = ref('');
-const hora = ref('');
-const saludo = ref('');
+const componente = usePage().component.split('/').pop();
 
-function actualizarFechaHora() {
-    const fecha = new Date();
-    dia.value = fecha.getDate();
-
-    const monthNamesClock = [
-        "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
-        "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
-    ];
-    mes.value = monthNamesClock[fecha.getMonth()];
-    anio.value = fecha.getFullYear();
-
-    let horas = fecha.getHours();
-    const minutos = fecha.getMinutes().toString().padStart(2, "0");
-    const segundos = fecha.getSeconds().toString().padStart(2, "0");
-    const periodo = horas >= 12 ? "pm" : "am";
-
-    if (horas > 12) {
-        horas -= 12;
-    } else if (horas === 0) {
-        horas = 12;
-    }
-    hora.value = `${horas}:${minutos}:${segundos} ${periodo}`;
+function separarCamelCase(texto) {
+  return texto.replace(/([a-z])([A-Z])/g, '$1 $2');
 }
 
-let clockInterval = null;
-onMounted(() => {
-    actualizarFechaHora();
-    clockInterval = setInterval(actualizarFechaHora, 1000);
-});
-onUnmounted(() => {
-    clearInterval(clockInterval);
-});
+const ruta = separarCamelCase(componente);
 
 
 const initials = computed(() => {
@@ -77,19 +51,12 @@ const diasRestantes = computed(() => props.auth.user?.tienda?.pagos_membresia?.d
 </script>
 
 <template>
-    <header class="header px-4 py-2 flex items-center justify-between gap-3">
+    <header class="header py-2 flex items-center justify-between gap-3">
         <div class="left w-[20%] rounded-md">
             <div class="infoTienda flex items-center gap-2">
-                <div class="user h-[30px] w-[30px] rounded-full overflow-hidden flex items-center justify-center"
-                    :class="[bgClase]">
-                    <span class="text-md font-bold">
-                        {{ inicialesNombreTienda }}
-                    </span>
-                </div>
-                <div class="logo">
+                <div class="">
                     <div class="flex items-center" v-if="auth && auth.user">
-                        <h3 class="font-semibold">{{ auth.user.tienda?.nombre_tienda || 'Sin tienda' }} App</h3>
-                        <span class="material-symbols-rounded text-[17px]">keyboard_arrow_down</span>
+                        <h1 class="text-[25px] font-semibold">{{ ruta }}</h1>
                     </div>
                     <div v-else>
                         <p>Cargando información del usuario...</p>
@@ -98,33 +65,66 @@ const diasRestantes = computed(() => props.auth.user?.tienda?.pagos_membresia?.d
             </div>
         </div>
         <div class="date w-[23%] flex gap-3 items-center">
-                <div class="dia flex items-center justify-center font-semibold h-10 w-7 rounded-full" :class="[bgClase]"
-                    id="dia">
-                    {{ dia }}
-                </div>
-                <div class="mes-año flex gap-1 text-[14px] font-medium" id="mes-año">
-                    <span id="mes">{{ mes }}</span>
-                    <span id="anio">{{ anio }}</span>
-                </div>
-                <div :class="[bgClase]" class="separador h-8 w-[2px] rounded-lg"></div>
-                <div class="hora text-[14px]" id="hora">{{ hora }}</div>
-            </div>
-        <div class="flex gap-3 items-center">
-                <div class="user h-[40px] w-[40px] rounded-full overflow-hidden flex items-center justify-center"
-                    :class="[bgClase]">
-                    <span class="text-md font-bold">
-                        {{ initials }}
+            <ul class="flex items-center gap-2">
+                <li :class="[currentRoute === dashboardRoute ? [bgClase] : 'bg-transparent']"
+                    class="hover:bg-secundary-opacity py-1 px-2 text-[14px] rounded-full cursor-pointer">
+                    <a :href="route('aplicacion.dashboard', { aplicacion, rol })">Home</a>
+                </li>
+                <li :class="[currentRoute === aplicacionesdRoute ? [bgClase] : 'bg-transparent']"
+                    class="hover:bg-secundary-opacity py-1 px-2 rounded-full cursor-pointer">
+                    <a :href="route('aplicacion.configuraciones', { aplicacion, rol })">Apps</a>
+                </li>
+                <li :class="[currentRoute === clientesFixRoute ? [bgClase] : 'bg-transparent']"
+                    class="hover:bg-secundary-opacity py-1 px-2 rounded-full cursor-pointer">
+                    <a :href="route('aplicacion.clientesFix', { aplicacion, rol })">Usuarios</a>
+                </li>
+            </ul>
+        </div>
+        <div class="flex gap-2 items-center">
+            <a :href="route('aplicacion.configuraciones', { aplicacion, rol })">
+                <div class="user h-[30px] w-[30px] rounded-full overflow-hidden flex items-center justify-center cursor-pointer"
+                    :class="[currentRoute === configuracionesRoute ? [bgClase] : 'bg-transparent']">
+                    <span class="material-symbols-rounded text-[20px]">
+                        help
                     </span>
                 </div>
-                <div class="usuario">
-                    <div v-if="auth && auth.user">
-                        <h3 class="font-semibold"> {{ auth.user.nombres_ct }} </h3>
-                        <p class="-mt-[5px] text-secundary-light text-[13px] font-medium">
-                            {{ auth.user.rol?.tipo_rol || 'Sin rol' }}
-                        </p>
-                    </div>
-                   
+            </a>
+            <a :href="route('aplicacion.configuraciones', { aplicacion, rol })">
+                <div class="user h-[30px] w-[30px] rounded-full overflow-hidden flex items-center justify-center cursor-pointer"
+                    :class="[currentRoute === configuracionesRoute ? [bgClase] : 'bg-transparent']">
+                    <span class="material-symbols-rounded text-[20px]">
+                        notifications
+                    </span>
+                </div>
+            </a>
+            <a :href="route('aplicacion.configuraciones', { aplicacion, rol })">
+                <div class="user h-[30px] w-[30px] rounded-full overflow-hidden flex items-center justify-center cursor-pointer"
+                    :class="[currentRoute === configuracionesRoute ? [bgClase] : 'bg-transparent']">
+                    <span class="material-symbols-rounded text-[20px]">
+                        settings
+                    </span>
+                </div>
+            </a>
+
+
+            <div class="user h-[40px] w-[40px] rounded-full overflow-hidden flex items-center justify-center"
+                :class="[bgClase]">
+                <span class="text-md font-bold">
+                    {{ initials }}
+                </span>
+            </div>
+            <div class="usuario">
+                <div v-if="auth && auth.user">
+                    <h3 class="font-semibold"> {{ auth.user.nombres_ct }} </h3>
+                    <p class="-mt-[5px] text-secundary-light text-[13px] font-medium">
+                        {{ auth.user.rol?.tipo_rol || 'Sin rol' }}
+                    </p>
+                </div>
+                <div v-else>
+                    <p>Cargando información del usuario...</p>
                 </div>
             </div>
+            <span class="material-symbols-rounded text-[20px]">keyboard_arrow_down</span>
+        </div>
     </header>
 </template>
