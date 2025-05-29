@@ -138,32 +138,32 @@ const rol = props.auth.user.rol?.tipo_rol || 'Sin rol'; // Obtén el tipo de rol
 
 const dashboardRoute = computed(() => new URL(route('aplicacion.dashboard', { aplicacion, rol }), window.location.origin).pathname);
 const obtenerIniciales = (usuario) => {
-    const nombres = usuario.nombres_ct || '';
-    const apellidos = usuario.apellidos_ct || '';
+  const nombres = usuario.nombres_ct || '';
+  const apellidos = usuario.apellidos_ct || '';
 
-    const firstNameInitial = nombres.split(' ')[0]?.charAt(0).toUpperCase() || '';
-    const lastNameInitial = apellidos.split(' ')[0]?.charAt(0).toUpperCase() || '';
+  const firstNameInitial = nombres.split(' ')[0]?.charAt(0).toUpperCase() || '';
+  const lastNameInitial = apellidos.split(' ')[0]?.charAt(0).toUpperCase() || '';
 
-    return firstNameInitial + lastNameInitial;
+  return firstNameInitial + lastNameInitial;
 };
 const currentPage = ref(1);
 const perPage = 4;
 
 const totalPages = computed(() => {
-    return Math.ceil(props.usuariosRol4.length / perPage);
+  return Math.ceil(props.usuariosRol4.length / perPage);
 });
 
 const paginatedUsuarios = computed(() => {
-    const start = (currentPage.value - 1) * perPage;
-    return props.usuariosRol4.slice(start, start + perPage);
+  const start = (currentPage.value - 1) * perPage;
+  return props.usuariosRol4.slice(start, start + perPage);
 });
 
 const nextPage = () => {
-    if (currentPage.value < totalPages.value) currentPage.value++;
+  if (currentPage.value < totalPages.value) currentPage.value++;
 };
 
 const prevPage = () => {
-    if (currentPage.value > 1) currentPage.value--;
+  if (currentPage.value > 1) currentPage.value--;
 };
 </script>
 
@@ -173,7 +173,8 @@ const prevPage = () => {
   <MensajesLayout />
 
   <div class="flex">
-    <SidebarSuperAdmin :auth="auth" :cantidad-apps="cantidadApps" :cantidad-clientes-rol1="cantidadClientesRol1" :usuarios-rol4="usuariosRol4"/>
+    <SidebarSuperAdmin :auth="auth" :cantidad-apps="cantidadApps" :cantidad-clientes-rol1="cantidadClientesRol1"
+      :usuarios-rol4="usuariosRol4" />
 
     <div class="w-full px-3">
       <Header :auth="auth" />
@@ -183,55 +184,9 @@ const prevPage = () => {
           <p class="text-[20px]">{{ saludo }}, {{ user.nombres_ct }}</p>
           <p class="text-[14px] -mt-[5px]">{{ nombreDia }} {{ dia }} de {{ mes }} {{ anio }}, {{ hora }}</p>
         </div>
-        <div class="miembros mt-2">
-                <div class="navegadorMiembros flex justify-between items-center my-2">
-                    <h2>Miembros</h2>
-                    <div class="botones flex items-center gap-2">
-                        <div @click="prevPage"
-                            class="left grid place-content-center rounded-full w-7 h-7 bg-secundary-opacity cursor-pointer">
-                            <span class="material-symbols-rounded">chevron_left</span>
-                        </div>
-                        <div @click="nextPage"
-                            class="left grid place-content-center rounded-full w-7 h-7 bg-secundary-opacity cursor-pointer">
-                            <span class="material-symbols-rounded">chevron_right</span>
-                        </div>
-                    </div>
-                </div>
 
-                <div class="listaMiembros flex flex-col gap-2">
-                    <div v-for="usuario in paginatedUsuarios" :key="usuario.id"
-                        class="miembro-estado flex items-center justify-between">
-                        <div class="miembro-estado flex items-center justify-between">
-                            <div class="miembro flex items-center gap-2">
-                                <div class="user h-[30px] w-[30px] rounded-full overflow-hidden flex items-center justify-center"
-                                    :class="bgClase">
-                                    <span class="text-[12px] font-bold">
-                                        {{ obtenerIniciales(usuario) }}
-                                    </span>
+       
 
-                                </div>
-                                <div class="logo">
-                                    <h1 class="font-semibold text-[13px]">{{ usuario.nombres_ct }}</h1>
-                                    <p class="text-[11px] font-semibold -mt-[5px]">{{ usuario.apellidos_ct }}</p>
-                                </div>
-                            </div>
-
-                        </div>
-                        <div class="estado bg-semaforo-verde w-2 h-2 rounded-full mx-2"></div>
-                    </div>
-
-                    <!-- Botón Agregar -->
-                    <div class="nuevoMiembro cursor-pointer flex items-center gap-2">
-                        <div
-                            class="user h-[30px] w-[30px] rounded-full overflow-hidden flex items-center justify-center border border-universal-azul border-dashed">
-                            <span class="material-symbols-rounded text-universal-azul text-[12px] font-bold">add</span>
-                        </div>
-                        <div class="logo">
-                            <h1 class="font-semibold text-[13px] text-universal-azul">Agregar miembro</h1>
-                        </div>
-                    </div>
-                </div>
-            </div>
       </div>
     </div>
   </div>

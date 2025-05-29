@@ -277,3 +277,39 @@ const logout = () => {
     <p :class="textoClase">Bienvenido a {{ appName }}</p>
 
     <button :class="buttonFocus">Acción</button>
+
+
+
+    <div class="listaMiembros flex items-center gap-2">
+
+                <div @click="prevPage"
+                  class="left grid place-content-center rounded-full w-7 h-7 bg-secundary-opacity cursor-pointer">
+                  <span class="material-symbols-rounded">chevron_left</span>
+                </div>
+
+
+                <div v-for="usuario in paginatedUsuarios" :key="usuario.id"
+                  class="flex justify-center flex-col items-center gap-1 relative">
+                  <div class="flex justify-center flex-col items-center gap-1 relative">
+                    <div
+                      class="z-10 h-2 w-2 bg-semaforo-verde rounded-full shadow-semaforo-verde right-0 top-0 absolute ">
+                    </div>
+                    <div
+                      class="user h-[40px] w-[40px] rounded-full overflow-hidden flex items-center justify-center relative" :class="[bgClase]">
+                      <span class="text-[12px] font-bold">
+                        {{ obtenerIniciales(usuario) }}
+                      </span>
+
+                    </div>
+                    <div class="logo">
+                      <!-- <h1 class="font-semibold text-[10px]">{{ usuario.nombres_ct }}</h1> -->
+                    </div>
+                  </div>
+
+                </div>
+                <div @click="nextPage"
+                  class="left grid place-content-center rounded-full w-7 h-7 bg-secundary-opacity cursor-pointer">
+                  <span class="material-symbols-rounded">chevron_right</span>
+                </div>
+
+              </div>
