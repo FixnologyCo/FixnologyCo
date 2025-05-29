@@ -1,32 +1,10 @@
-<script>
-import { usePage } from '@inertiajs/vue3';
-import { ref, onMounted } from 'vue'
-
-
-export default {
-  name: 'Auth',
-}
-
-</script>
-
 <script setup>
-
-const props = defineProps({
-  success: String
-})
+import { usePage } from '@inertiajs/vue3'
+import { ref, watch } from 'vue'
 
 const mensajeNotificacion = ref('')
 const tipoNotificacion = ref(null)
 const mostrarNotificacion = ref(false)
-
-onMounted(() => {
-  if (usePage().props.flash && usePage().props.flash.success) {
-    mostrarMensaje(usePage().props.flash.success, 'success');
-  } else if (usePage().props.flash.error) {
-    mostrarMensaje(usePage().props.flash.error, 'error');
-  }
-});
-
 
 const mostrarMensaje = (mensaje, tipo) => {
   mensajeNotificacion.value = mensaje
@@ -38,6 +16,18 @@ const mostrarMensaje = (mensaje, tipo) => {
   }, 5000)
 }
 
+// 🔁 Observa los cambios en flash
+watch(
+  () => usePage().props.flash,
+  (flash) => {
+    if (flash.success) {
+      mostrarMensaje(flash.success, 'success')
+    } else if (flash.error) {
+      mostrarMensaje(flash.error, 'error')
+    }
+  },
+  { immediate: true }
+)
 </script>
 
 

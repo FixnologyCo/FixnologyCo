@@ -143,7 +143,7 @@ const dashboardRoute = computed(() => new URL(route('aplicacion.dashboard', { ap
 <template>
 
   <Head :title="`Bienvenido ${user.nombres_ct || 'Dashboard'}`" />
-  <MensajesLayout :success="flash.success" :error="flash.error" />
+  <MensajesLayout />
 
   <div class="flex">
     <SidebarSuperAdmin :auth="auth" :cantidad-apps="cantidadApps" :cantidad-clientes-rol1="cantidadClientesRol1" :usuarios-rol4="usuariosRol4"/>

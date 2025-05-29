@@ -43,15 +43,15 @@ class LoginController extends Controller
             ->first();
 
         if (!$cliente) {
-            return back()->withErrors([
-                'numero_documento_ct' => 'No reconocemos ese usuario :(',
-            ]);
+            return back()
+                ->withErrors([
+                    'numero_documento_ct' => 'No encontramos un usuario relacionado.',
+                ])
+                ->with('error', 'No reconocemos ese usuario :(');
         }
 
         if (!Hash::check($request->contrasenia_ct, $cliente->contrasenia_ct)) {
-            return back()->withErrors([
-                'contrasenia_ct' => 'Credenciales incorrectas, intenta de nuevo.',
-            ]);
+            return back()->with('error', 'Usuario o contraseña incorrectos');
         }
 
         // Validación de pago
@@ -64,9 +64,8 @@ class LoginController extends Controller
 
             if ($estadoInvalido || $sinDias) {
                 Auth::logout();
-                return back()->withErrors([
-                    'numero_documento_ct' => 'Ponte al día con tu pago para seguir disfrutando de la app.',
-                ]);
+                return back()->with('error', 'Ponte al día con tu pago para seguir disfrutando de la app.');
+                
             }
         }
 
@@ -78,9 +77,7 @@ class LoginController extends Controller
             $cliente->tienda->id_estado === 2
         ) {
             Auth::logout();
-            return back()->withErrors([
-                'numero_documento_ct' => 'Tu tienda ha sido desactivada. Por favor contáctanos.',
-            ]);
+            return back()->with('error', 'Tu tienda está inactiva o eliminada, contáctanos.');
         }
 
         // ✅ Token inactivo
@@ -90,9 +87,7 @@ class LoginController extends Controller
             $cliente->tienda->token->id_estado === 2
         ) {
             Auth::logout();
-            return back()->withErrors([
-                'numero_documento_ct' => 'Token no válido o inactivo, contáctanos.',
-            ]);
+             return back()->with('error', 'Token inactivo, contáctanos para activarlo.');
         }
 
         $this->registrarAuditoria(
@@ -113,10 +108,13 @@ class LoginController extends Controller
             ]);
         }
 
+
         return redirect()->route('aplicacion.dashboard', [
             'aplicacion' => ucfirst($nombreAplicacion),
             'rol' => ucfirst($rol),
         ])->with('success', 'Bienvenido por aquí, ' . ($cliente->nombres_ct ?? 'Usuario'));
+
+
     }
 
 
