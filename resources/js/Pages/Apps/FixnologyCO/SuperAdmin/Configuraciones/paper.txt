@@ -1,14 +1,5 @@
-<div class="bg-mono flex scrollbar-custom">
-      <Sidebar :auth="auth" />
-
-
-
-      <main class="w-full h-[100%] px-[40px] py-[20px] bg-transparent">
-        <SaludoOpciones :auth="auth" />
-
-        <!-- navegable -->
-        <div class="options flex gap-1 items-center text-[14px] mt-4">
-          <a :href="route('aplicacion.dashboard', { aplicacion, rol })" class="hover:text-essentials-secundary">
+<div class="options flex gap-1 items-center text-[14px] mt-4">
+         <a :href="route('aplicacion.dashboard', { aplicacion, rol })">
             <p>Dashboard</p>
           </a>
           <span class="material-symbols-rounded text-[18px]">chevron_right</span>
@@ -32,7 +23,7 @@
               <div
                 class="user h-[120px] w-[120px] rounded-lg overflow-hidden flex items-center justify-center bg-black shadowM ">
                 <span class="text-white text-4xl font-bold">
-                  {{ initials }}
+                  {{ inicialesNombreUsuario }}
                 </span>
               </div>
 
@@ -159,15 +150,4 @@
           </div>
 
         </div>
-        <button @click="logout" class="opcion flex items-center gap- shadow-essentials cursor-pointer px-4 rounded-lg"
-          :class="[bgClase]">
-          <p>Salir</p>
-          <div class="icono flex justify-center items-center h-[40px] w-[40px]">
-            <span class="material-symbols-rounded">logout</span>
-          </div>
-        </button>
-
-      </main>
-
-
-    </div>
+        

@@ -34,10 +34,15 @@ export default function useAppColors() {
         'default': 'bg-gray-300 shadow-gray-300'
     };
 
+    const border = {
+        'FixnologyCO': 'border-b-2 border-universal-naranja',
+        'default': 'border-gray-300'
+    };
+
     const hoverClass = computed(() => {
     switch (appName.value) {
         case 'FixnologyCO':
-            return 'hover:bg-universal-naranja';
+            return 'hover:text-universal-naranja';
         case 'Essentials':
             return 'hover:bg-essentials-primary';
         case 'Machine':
@@ -61,6 +66,7 @@ const textoClase = computed(() => coloresTexto[appName.value] || coloresTexto['d
 const focus = computed(() => bgFocus[appName.value] || bgFocus['default']);
 const buttonLink = computed(() => btn_link[appName.value] || btn_link['default']);
 const hover = computed(() => hoverClass[appName.value] || hoverClass['default'])
+const borderClase = computed(() => border[appName.value] || border['default'])
 
 return {
     appName,
@@ -69,7 +75,8 @@ return {
     textoClase,
     focus,
     buttonLink,
-    hover
+    hover,
+    borderClase
 };
 }
 

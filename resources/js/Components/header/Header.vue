@@ -109,7 +109,7 @@ const diasRestantes = computed(() => props.auth.user?.tienda?.pagos_membresia?.d
                     <p>Cargando información del usuario...</p>
                 </div>
             </div>
-            <span class="material-symbols-rounded text-[20px]">keyboard_arrow_down</span>
+            
         </div>
     </header>
 </template>
