@@ -22,7 +22,7 @@ const configuracionesRoute = computed(() => new URL(route('aplicacion.configurac
 const componente = usePage().component.split('/').pop();
 
 function separarCamelCase(texto) {
-  return texto.replace(/([a-z])([A-Z])/g, '$1 $2');
+    return texto.replace(/([a-z])([A-Z])/g, '$1 $2');
 }
 
 const ruta = separarCamelCase(componente);
@@ -64,7 +64,7 @@ const diasRestantes = computed(() => props.auth.user?.tienda?.pagos_membresia?.d
                 </div>
             </div>
         </div>
-       
+
         <div class="flex gap-2 items-center">
             <a :href="route('aplicacion.configuraciones', { aplicacion, rol })">
                 <div class="user h-[30px] w-[30px] rounded-full overflow-hidden flex items-center justify-center cursor-pointer"
@@ -91,25 +91,28 @@ const diasRestantes = computed(() => props.auth.user?.tienda?.pagos_membresia?.d
                 </div>
             </a>
 
-
-            <div class="user h-[35px] w-[35px] rounded-full overflow-hidden flex items-center justify-center"
-                :class="[bgClase]">
-                <span class="text-[12px] font-bold">
-                    {{ initials }}
-                </span>
-            </div>
-            <div class="usuario">
-                <div v-if="auth && auth.user">
-                    <h3 class="font-semibold text-[13px]"> {{ auth.user.nombres_ct }} </h3>
-                    <p class="-mt-[5px] text-secundary-light text-[12px] font-medium">
-                        {{ auth.user.rol?.tipo_rol || 'Sin rol' }}
-                    </p>
+            <div class="flex gap-1" v-if="currentRoute != configuracionesRoute">
+                <div class="user h-[35px] w-[35px] rounded-full overflow-hidden flex items-center justify-center"
+                    :class="[bgClase]">
+                    <span class="text-[12px] font-bold">
+                        {{ initials }}
+                    </span>
                 </div>
-                <div v-else>
-                    <p>Cargando información del usuario...</p>
+                <div class="usuario">
+                    <div v-if="auth && auth.user">
+                        <h3 class="font-semibold text-[13px]"> {{ auth.user.nombres_ct }} </h3>
+                        <p class="-mt-[5px] text-secundary-light text-[12px] font-medium">
+                            {{ auth.user.rol?.tipo_rol || 'Sin rol' }}
+                        </p>
+                    </div>
+                    <div v-else>
+                        <p>Cargando información del usuario...</p>
+                    </div>
                 </div>
             </div>
             
+
+
         </div>
     </header>
 </template>
