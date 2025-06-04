@@ -25,6 +25,7 @@ const props = defineProps({
 const page = usePage();
 
 const aplicacion = props.auth?.user?.tienda?.aplicacion?.nombre_app || 'Sin app';
+const nombre_tienda = props.auth?.user?.tienda?.nombre_tienda || 'Sin tienda';
 const rol = props.auth.user.rol?.tipo_rol || 'Sin rol'; // Obtén el tipo de rol
 
 // Normaliza las rutas para que la comparación funcione
@@ -55,7 +56,7 @@ const inicialesNombreTienda = computed(() => {
 });
 
 
-const sidebarExpandido = ref(true); // true = expandido, false = colapsado
+const sidebarExpandido = ref(false); // true = expandido, false = colapsado
 
 </script>
 
@@ -91,7 +92,7 @@ const sidebarExpandido = ref(true); // true = expandido, false = colapsado
                     :class="[bgClase]">
                 </div>
                 <div v-if="sidebarExpandido" class="nombreApp">
-                    <h2 class="text-[14px]">{{ aplicacion }}</h2>
+                    <h2 class="text-[14px]">{{ nombre_tienda }}</h2>
                     <p class="text-[12px] -mt-[3px]">{{ diasRestantes }} días restantes</p>
                 </div>
 

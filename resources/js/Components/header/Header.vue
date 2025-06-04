@@ -116,7 +116,7 @@ const diasRestantes = computed(() => props.auth.user?.tienda?.pagos_membresia?.d
                 </div>
             </a>
 
-            <div class="flex gap-1" v-if="currentRoute != configuracionesRoute">
+            <div class="flex gap-1">
                 
                 <template v-if="foto_base64">
                         <img :src="foto_base64" class="rounded-[50px] w-[35px] h-[35px] object-cover" />
