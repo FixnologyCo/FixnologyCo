@@ -114,7 +114,7 @@ onMounted(() => {
 
 onUnmounted(() => {
   clearInterval(intervalo),
-   clearInterval(intervaloRestante)
+    clearInterval(intervaloRestante)
 })
 
 const diasRestantes = ref(0)
@@ -195,11 +195,31 @@ const onFileChange = (event) => {
               <div
                 class="grid place-content-center foto w-[250px] h-[250px] rounded-[60px] bg-secundary-opacity backdrop-blur-lg">
                 <template v-if="foto_base64">
-                  <img :src="foto_base64" class="rounded-[50px] w-[210px] h-[210px] object-cover" />
+                  <div class="relative w-[220px] h-[220px] group">
+                   
+                    <img v-if="foto_base64" :src="foto_base64"
+                      class="rounded-[50px] w-full h-full object-cover shadow-lg" />
+
+                   
+                    <div
+                      class="absolute inset-0 bg-black/40 rounded-[50px] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                   
+                      <label for="fotoInput"
+                        class="cursor-pointer bg-white p-3 rounded-full shadow-md hover:bg-gray-200 transition"
+                        title="Cambiar foto">
+                        <span class="material-symbols-rounded text-2xl" :class="[textoClase]">edit</span>
+                      </label>
+                    </div>
+
+                    <!-- Input oculto -->
+                    <input id="fotoInput" type="file" accept="image/*" @change="onFileChange" class="hidden" />
+                  </div>
                 </template>
 
+
+
                 <template v-else>
-                  <div class="p-2 w-[210px] h-[210px] rounded-[50px] grid place-content-center" :class="[bgClase]">
+                  <div class="p-2 w-[220px] h-[220px] rounded-[50px] grid place-content-center" :class="[bgClase]">
                     <p class="text-[45px] font-semibold">{{ inicialesNombreUsuario }}</p>
                   </div>
                 </template>
@@ -211,7 +231,8 @@ const onFileChange = (event) => {
                   user.apellidos_ct }}</h3>
 
                 <div class="flex items-center justify-between">
-                  <p class="-mt-[8px] text-secundary-light text-[16px] font-medium">
+                  <p id="rol-usuario" class="flex items-center gap-1.5 py-1">
+                    <span class="material-symbols-rounded text-[20px] text-universal-azul">local_police</span>
                     {{ user.rol?.tipo_rol || 'Sin rol' }}
                   </p>
                   <div class="flex items-center gap-1 shadowM bg-universal-azul w-[auto] py-1 px-2 rounded-md">{{
@@ -236,7 +257,8 @@ const onFileChange = (event) => {
               <div class="datos-recurentes flex items-end flex-col gap-2">
                 <div class="dias-restante text-right w-auto rounded-md">
                   <h4 class="">Tu membresía finaliza en:</h4>
-                  <p class="text-[35px] font-semibold -mt-3">{{ diasRestantes }}<span class="text-[14px]">Días</span></p>
+                  <p class="text-[35px] font-semibold -mt-3">{{ diasRestantes }}<span class="text-[14px]">Días</span>
+                  </p>
                 </div>
                 <div class="dias-activo w-auto rounded-md">
                   <h4 class="text-right">Te uniste a la familia: </h4>
@@ -546,9 +568,6 @@ const onFileChange = (event) => {
 
             <div v-else-if="activeTab === 4">
               <h2 class="text-2xl font-bold mb-4">Configuraciones Avanzadas</h2>
-              <div>
-                <input type="file" accept="image/*" @change="onFileChange" />
-              </div>
               <p>Esta sección está reservada para configuraciones avanzadas que no están disponibles en la interfaz
                 principal.</p>
               <p>Próximamente...</p>
