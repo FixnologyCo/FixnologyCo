@@ -43,6 +43,11 @@ class ConfiguracionesController extends Controller
             abort(403, 'No tienes permisos para acceder a esta sección.');
         }
 
+        $fotoBase64 = $user->foto_binaria
+            ? 'data:image/jpeg;base64,' . base64_encode($user->foto_binaria)
+            : null;
+
+
         // Verificar que el usuario tenga tienda y la aplicación coincida
         if ($user->tienda && $user->tienda->aplicacion->nombre_app === $aplicacion) {
 
@@ -92,15 +97,18 @@ class ConfiguracionesController extends Controller
                 ->select('id', 'nombres_ct', 'apellidos_ct') // puedes agregar 'apellidos' si necesitas
                 ->get();
 
+            $fotoBase64 = $user->foto_binaria
+                ? 'data:image/webp;base64,' . $user->foto_binaria
+                : null;
             return Inertia::render('Apps/' . ucfirst($aplicacion) . '/' . ucfirst($rol) . '/Configuraciones/Configuraciones', [
                 'auth' => ['user' => $user],
                 'clientes' => $clientes,
                 'aplicacion' => $aplicacion,
                 'rol' => $rol,
-                'cantidadApps' => $cantidadApps,
-                'cantidadClientesRol1' => $cantidadClientesRol1,
-                'usuariosRol4' => $usuariosRol4,
+
+                'foto_base64' => $fotoBase64,
             ]);
+
 
 
 

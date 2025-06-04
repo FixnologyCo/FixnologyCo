@@ -38,6 +38,10 @@ const props = defineProps({
     type: Array,
     default: () => [],
   },
+  foto_base64: {
+    type: String,
+    default: ''
+  }
 })
 
 // Acceder a los datos de Inertia, incluyendo flash
@@ -177,7 +181,7 @@ const prevPage = () => {
       :usuarios-rol4="usuariosRol4" />
 
     <div class="w-full px-3">
-      <Header :auth="auth" />
+      <Header :auth="auth" :foto_base64="foto_base64"/>
 
       <div class="contenido">
         <div class="">

@@ -26,6 +26,7 @@ const props = defineProps({
     type: String,
     default: ''
   },
+  foto_base64: String,
   errors: {
     type: Object,
     required: true
@@ -53,6 +54,8 @@ const inicialesNombreUsuario = computed(() => {
   return firstNameInitial + lastNameInitial;
 });
 
+
+
 const formatCOP = (value) => {
   if (value === null || value === undefined || isNaN(value)) {
     return 'Sin precio';
@@ -79,7 +82,6 @@ const tabs = [
   { label: 'Tienda' },
   { label: 'Plan' },
   { label: 'Membresía' },
-  { label: 'Token' },
   { label: 'Ajustes avanzados' }
 ]
 
@@ -89,6 +91,23 @@ function getEstadoClass(estado) {
   if (estado === 'Activo' || estado === 'Pagada') return 'bg-semaforo-verde shadow-verde';
   return '';
 }
+
+
+const onFileChange = (event) => {
+  const file = event.target.files[0]
+  if (!file) return
+
+  const formData = new FormData()
+  formData.append('foto', file)
+
+  router.post(route('usuario.actualizar.foto'), formData, {
+    preserveScroll: true,
+    preserveState: true,
+  })
+}
+
+
+
 </script>
 
 <template>
@@ -99,8 +118,7 @@ function getEstadoClass(estado) {
 
 
     <div class="flex">
-      <SidebarSuperAdmin :auth="auth" :cantidad-apps="cantidadApps" :cantidad-clientes-rol1="cantidadClientesRol1"
-        :usuarios-rol4="usuariosRol4" />
+      <SidebarSuperAdmin :auth="auth" />
 
       <div class="w-full px-3">
         <Header :auth="auth" />
@@ -111,10 +129,17 @@ function getEstadoClass(estado) {
             <div class="left-foto -mt-[120px] flex items-end gap-4">
               <div
                 class="grid place-content-center foto w-[250px] h-[250px] rounded-[60px] bg-secundary-opacity backdrop-blur-lg">
-                <div class="p-2 w-[210px] h-[210px] rounded-[50px] grid place-content-center" :class="[bgClase]">
-                  <p class="text-[45px] font-semibold">{{ inicialesNombreUsuario }}</p>
-                </div>
+                <template v-if="foto_base64">
+                  <img :src="foto_base64" class="rounded-[50px] w-[210px] h-[210px] object-cover" />
+                </template>
+
+                <template v-else>
+                  <div class="p-2 w-[210px] h-[210px] rounded-[50px] grid place-content-center" :class="[bgClase]">
+                    <p class="text-[45px] font-semibold">{{ inicialesNombreUsuario }}</p>
+                  </div>
+                </template>
               </div>
+
 
               <div class="nombre">
                 <h3 class="font-semibold text-[30px]">{{ user.nombres_ct }} {{
@@ -142,6 +167,7 @@ function getEstadoClass(estado) {
             </div>
 
             <div class="right-info">
+
               <div class="datos-recurentes flex items-center gap-10">
                 <div class="dias-restante w-auto rounded-md">
                   <h4 class="">Restantes</h4>
@@ -263,23 +289,84 @@ function getEstadoClass(estado) {
             </div>
 
             <div v-else-if="activeTab === 1">
-              <h2 class="text-2xl font-bold mb-4">Datos de la Tienda</h2>
-              <div class="flex justify-between">
-                <div class="left-table">
-                  <p><strong>ID:</strong> {{ user.tienda?.id }}</p>
-                  <p class="flex items-center gap-1.5">
-                  <div class="h-3 w-4 rounded-full" :class="getEstadoClass(user.tienda?.estado?.tipo_estado)"></div> {{
-                    user.tienda?.estado?.tipo_estado || 'Sin estado' }}</p>
-                  <p><strong>Token:</strong> {{ user.tienda?.token?.token_activacion }}</p>
-                  <p><strong>Nombre:</strong> {{ user.tienda?.nombre_tienda }}</p>
-                  <p><strong>Dirección:</strong> {{ user.tienda?.direccion_tienda }}</p>
+              <h2 class="text-2xl font-bold mb-4">Datos mi tienda</h2>
+              <div class="flex justify-between w-full gap-10">
+                <div class="left-table w-[50%] flex flex-col gap-1">
+                  <div class="id-tienda">
+                    <label for="id-tienda" class="text-[14px] text-secundary-light">ID tienda:</label>
+                    <p id="id-tienda" class="flex items-center gap-1.5 border px-2 py-1 rounded-md w-full">
+                      <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">store</span>
+                      {{ user.tienda?.id || 'Sin ID' }}
+                    </p>
+                  </div>
+
+                  <div class="estado-tienda">
+                    <label for="estado-tienda" class="text-[14px] text-secundary-light">Estado tienda:</label>
+                    <p id="estado-tienda" class="flex items-center gap-1.5 border px-2 py-1 rounded-md w-full">
+                    <div class="h-3 w-4 rounded-full" :class="getEstadoClass(user.tienda?.estado?.tipo_estado)"></div>
+                    {{ user.tienda?.estado?.tipo_estado || 'Sin estado' }}
+                    </p>
+                  </div>
+
+                  <div class="token-tienda">
+                    <label for="id-tienda" class="text-[14px] text-secundary-light">Token asignado:</label>
+                    <p id="id-tienda" class="flex items-center gap-1.5 border px-2 py-1 rounded-md w-full">
+                      <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">key</span>
+                      {{ user.tienda?.token?.token_activacion || 'Sin ID' }}
+                    </p>
+                  </div>
+                  <div class="fecha-creacion">
+                    <label for="fecha-creacion-tienda" class="text-[14px] text-secundary-light">Fecha de
+                      creación:</label>
+                    <p id="fecha-creacion-tienda" class="flex items-center gap-1.5 border px-2 py-1 rounded-md w-full">
+                      <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">calendar_month</span>
+                      {{ formatFecha(user.tienda?.fecha_creacion) || 'Sin fecha' }}
+                    </p>
+                  </div>
+
+                  <div class="fecha-modificacion-tienda">
+                    <label for="fecha-modificacion-tienda" class="text-[14px] text-secundary-light">Fecha de
+                      modificación:</label>
+                    <p id="fecha-modificacion-tienda"
+                      class="flex items-center gap-1.5 border px-2 py-1 rounded-md w-full">
+                      <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">update</span>
+                      {{ formatFecha(user.tienda?.fecha_modificacion) || 'Sin fecha' }}
+                    </p>
+                  </div>
+
                 </div>
-                <div class="right-table">
-                  <p><strong>Email:</strong> {{ user.tienda?.email_tienda }}</p>
-                  <p><strong>Teléfono:</strong> {{ user.tienda?.telefono_tienda }}</p>
-                  <p><strong>Fecha de creación:</strong> {{ formatFecha(user.tienda?.fecha_creacion) }}</p>
-                  <p><strong>Fecha de modificación:</strong> {{ formatFecha(user.tienda?.fecha_modificacion) }}</p>
-                  <p><strong>Ciudad:</strong> {{ user.tienda?.barrio_tienda }}</p>
+                <div class="right-table w-[50%] flex flex-col gap-1">
+                  <div class="nombre-tienda">
+                    <label for="nombre-tienda" class="text-[14px] text-secundary-light">Nombre tienda:</label>
+                    <p id="nombre-tienda" class="flex items-center gap-1.5 border px-2 py-1 rounded-md w-full">
+                      <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">store</span>
+                      {{ user.tienda?.nombre_tienda || 'Sin nombre' }}
+                    </p>
+                  </div>
+
+                  <div class="ciudad-tienda">
+                    <label for="ciudad-tienda" class="text-[14px] text-secundary-light">Ubicación tienda:</label>
+                    <p id="ciudad-tienda" class="flex items-center gap-1.5 border px-2 py-1 rounded-md w-full">
+                      <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">location_city</span>
+                      {{ user.tienda?.barrio_tienda }}, {{ user.tienda?.direccion_tienda }}
+                    </p>
+                  </div>
+
+                  <div class="email-tienda">
+                    <label for="email-tienda" class="text-[14px] text-secundary-light">Email tienda:</label>
+                    <p id="email-tienda" class="flex items-center gap-1.5 border px-2 py-1 rounded-md w-full">
+                      <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">email</span>
+                      {{ user.tienda?.email_tienda || 'Sin email' }}
+                    </p>
+                  </div>
+
+                  <div class="telefono-tienda">
+                    <label for="telefono-tienda" class="text-[14px] text-secundary-light">Teléfono tienda:</label>
+                    <p id="telefono-tienda" class="flex items-center gap-1.5 border px-2 py-1 rounded-md w-full">
+                      <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">phone</span>
+                      {{ user.tienda?.telefono_tienda || 'Sin teléfono' }}
+                    </p>
+                  </div>
                 </div>
               </div>
 
@@ -309,33 +396,94 @@ function getEstadoClass(estado) {
             </div>
 
             <div v-else-if="activeTab === 3">
-              <h2 class="text-2xl font-bold mb-4">Datos de la Membresía</h2>
-              <p><strong>ID:</strong> {{ user.tienda?.aplicacion?.membresia?.id }}</p>
-              <p><strong>Nombre:</strong> {{ user.tienda?.aplicacion?.membresia?.nombre_membresia }}</p>
-              <p><strong>Precio:</strong> {{ user.tienda?.aplicacion?.membresia?.precio }} USD</p>
-              <p><strong>Periodo:</strong> {{ user.tienda?.aplicacion?.membresia?.periodo }}</p>
-              <p><strong>Duración:</strong> {{ user.tienda?.aplicacion?.membresia?.duracion }} días</p>
-              <p class="flex items-center gap-1.5">
-              <div class="h-3 w-4 rounded-full"
-                :class="getEstadoClass(user.tienda?.aplicacion?.membresia?.estado?.tipo_estado)"></div> {{
-                  user.tienda?.aplicacion?.membresia?.estado?.tipo_estado }}</p>
-              <p><strong>Descripción:</strong> {{ user.tienda?.aplicacion?.membresia?.descripcion }}</p>
+              <h2 class="text-2xl font-bold mb-4">Datos membresía activa </h2>
+              <div class="flex justify-between w-full gap-10">
+                <div class="left-table w-[50%] flex flex-col gap-1">
+                  <div class="id-membresia">
+                    <label for="id-membresia" class="text-[14px] text-secundary-light">ID membresía:</label>
+                    <p id="id-membresia" class="flex items-center gap-1.5 border px-2 py-1 rounded-md w-full">
+                      <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">card_membership</span>
+                      {{ user.tienda?.aplicacion?.membresia?.id || 'Sin ID' }}
+                    </p>
+                  </div>
+
+                  <div class="estado-membresia">
+                    <div class="estado-tienda">
+                      <label for="estado-tienda" class="text-[14px] text-secundary-light">Estado tienda:</label>
+                      <p id="estado-tienda" class="flex items-center gap-1.5 border px-2 py-1 rounded-md w-full">
+                      <div class="h-3 w-4 rounded-full" :class="getEstadoClass(user.tienda?.estado?.tipo_estado)"></div>
+                      {{ user.tienda?.aplicacion?.membresia?.estado?.tipo_estado || 'Sin estado' }}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="precio-membresia">
+                    <label for="precio-membresia" class="text-[14px] text-secundary-light">Precio membresía:</label>
+                    <p id="precio-membresia" class="flex items-center gap-1.5 border px-2 py-1 rounded-md w-full">
+                      <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">attach_money</span>
+                      {{ formatCOP(user.tienda?.aplicacion?.membresia?.precio) || 'Sin precio' }}
+                    </p>
+                  </div>
+
+                  <div class="duracion-membresia">
+                    <label for="duracion-membresia" class="text-[14px] text-secundary-light">Duración
+                      membresía:</label>
+                    <p id="duracion-membresia" class="flex items-center gap-1.5 border px-2 py-1 rounded-md w-full">
+                      <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">timer</span>
+                      {{ user.tienda?.aplicacion?.membresia?.duracion || 'Sin duración' }} días
+                    </p>
+                  </div>
+                </div>
+                <div class="right-table w-[50%] flex flex-col gap-1">
+                  <div class="nombre-membresia">
+                    <label for="nombre-membresia" class="text-[14px] text-secundary-light">
+                      Nombre membresía:
+                    </label>
+                    <p id="nombre-membresia" class="flex items-center gap-1.5 border px-2 py-1 rounded-md w-full">
+                      <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">card_membership</span>
+                      {{ user.tienda?.aplicacion?.membresia?.nombre_membresia || 'Sin nombre' }}
+                    </p>
+                  </div>
+
+                  <div class="perioro-membresia">
+                    <label for="periodo-membresia" class="text-[14px] text-secundary-light">Periodo
+                      membresía:</label>
+                    <p id="periodo-membresia" class="flex items-center gap-1.5 border px-2 py-1 rounded-md w-full">
+                      <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">date_range</span>
+                      {{ user.tienda?.aplicacion?.membresia?.periodo || 'Sin periodo' }}
+                    </p>
+                  </div>
+
+                  <div class="descripcion-membresia">
+                    <label for="descripcion-membresia" class="text-[14px] text-secundary-light">Descripción
+                      membresía:</label>
+                    <p id="descripcion-membresia" class="flex items-center gap-1.5 border px-2 py-1 rounded-md w-full">
+                      <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">description</span>
+                      {{ user.tienda?.aplicacion?.membresia?.descripcion || 'Sin descripción' }}
+                    </p>
+                  </div>
+
+                  <div class="fecha-creacion-membresia">
+                    <label for="fecha-creacion-membresia" class="text-[14px] text-secundary-light">Fecha de
+                      creación:</label>
+                    <p id="fecha-creacion-membresia"
+                      class="flex items-center gap-1.5 border px-2 py-1 rounded-md w-full">
+                      <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">calendar_month</span>
+                      {{ formatFecha(user.tienda?.aplicacion?.membresia?.fecha_creacion) || 'Sin fecha' }}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
             </div>
+
+
 
             <div v-else-if="activeTab === 4">
-              <h2 class="text-2xl font-bold mb-4">Datos del Token</h2>
-              <p><strong>ID:</strong> {{ user.tienda?.token?.id }}</p>
-              <p class="flex items-center gap-1.5">
-              <div class="h-3 w-4 rounded-full" :class="getEstadoClass(user.tienda?.token?.estado?.tipo_estado)"></div>
-              {{ user.tienda?.token?.estado?.tipo_estado }}</p>
-              <p><strong>Tienda:</strong> {{ user.tienda?.nombre_tienda }}</p>
-              <p><strong>Token Activación:</strong> {{ user.tienda?.token?.token_activacion }}</p>
-              <p><strong>Fecha creación:</strong> {{ formatFecha(user.tienda?.token?.fecha_creacion) }}</p>
-              <p><strong>Fecha modificación:</strong> {{ formatFecha(user.tienda?.token?.fecha_modificacion) }}</p>
-            </div>
-
-            <div v-else-if="activeTab === 5">
               <h2 class="text-2xl font-bold mb-4">Configuraciones Avanzadas</h2>
+              <div>
+                <input type="file" accept="image/*" @change="onFileChange" />
+              </div>
               <p>Esta sección está reservada para configuraciones avanzadas que no están disponibles en la interfaz
                 principal.</p>
               <p>Próximamente...</p>

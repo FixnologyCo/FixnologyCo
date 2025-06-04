@@ -118,7 +118,7 @@ const sidebarExpandido = ref(true); // true = expandido, false = colapsado
                     <div v-if="!sidebarExpandido" class="text-center text-secundary-light text-[10px]">Gestión</div>
                     <p v-if="sidebarExpandido" class="text-secundary-light text-[12px] mt-2.5">Gestión</p>
 
-                    <li :class="[currentRoute === aplicacionesRoute ? [bgOpacity] : 'bg-transparent']"
+                    <li :class="[currentRoute === dashboardRoute ? [bgOpacity] : 'bg-transparent']"
                         class=" px-2 py-1.5 rounded-[5px] cursor-pointer">
                         <a :href="route('aplicacion.dashboard', { aplicacion, rol })">
                             <span class="flex items-center justify-between">
@@ -129,11 +129,11 @@ const sidebarExpandido = ref(true); // true = expandido, false = colapsado
                                     </div>
                                     <span v-if="sidebarExpandido" class="text-[14px]">Mis aplicaciones</span>
                                 </div>
-                                <div :class="[currentRoute === aplicacionesRoute ? focus : hover]"></div>
+                                <div :class="[currentRoute === dashboardRoute ? focus : hover]"></div>
                             </span>
                         </a>
                     </li>
-                    <li :class="[currentRoute === aplicacionesRoute ? [bgOpacity] : 'bg-transparent']"
+                    <li :class="[currentRoute === dashboardRoute ? [bgOpacity] : 'bg-transparent']"
                         class=" px-2 py-1.5 rounded-[5px] cursor-pointer">
                         <a :href="route('aplicacion.dashboard', { aplicacion, rol })">
                             <span class="flex items-center justify-between">
@@ -144,7 +144,7 @@ const sidebarExpandido = ref(true); // true = expandido, false = colapsado
                                     </div>
                                     <span v-if="sidebarExpandido" class="text-[14px]">Gestor usuarios</span>
                                 </div>
-                                <div :class="[currentRoute === aplicacionesRoute ? focus : hover]"></div>
+                                <div :class="[currentRoute === dashboardRoute ? focus : hover]"></div>
                             </span>
                         </a>
                     </li>
@@ -152,7 +152,7 @@ const sidebarExpandido = ref(true); // true = expandido, false = colapsado
                     <div v-if="!sidebarExpandido" class="text-center text-secundary-light text-[10px]">Finanzas</div>
                     <p v-if="sidebarExpandido" class="text-secundary-light text-[12px] mt-2.5">Finanzas</p>
 
-                    <li :class="[currentRoute === aplicacionesRoute ? [bgOpacity] : 'bg-transparent']"
+                    <li :class="[currentRoute === dashboardRoute ? [bgOpacity] : 'bg-transparent']"
                         class=" px-2 py-1.5 rounded-[5px] cursor-pointer">
                         <a :href="route('aplicacion.dashboard', { aplicacion, rol })">
                             <span class="flex items-center justify-between">
@@ -163,7 +163,7 @@ const sidebarExpandido = ref(true); // true = expandido, false = colapsado
                                     </div>
                                     <span v-if="sidebarExpandido" class="text-[14px]">Pagos membresías</span>
                                 </div>
-                                <div :class="[currentRoute === aplicacionesRoute ? focus : hover]"></div>
+                                <div :class="[currentRoute === dashboardRoute ? focus : hover]"></div>
                             </span>
                         </a>
                     </li>
@@ -171,7 +171,7 @@ const sidebarExpandido = ref(true); // true = expandido, false = colapsado
                     <div v-if="!sidebarExpandido" class="text-center text-secundary-light text-[10px]">Seguro</div>
                     <p v-if="sidebarExpandido" class="text-secundary-light text-[12px] mt-2.5">Seguridad</p>
 
-                    <li :class="[currentRoute === aplicacionesRoute ? [bgOpacity] : 'bg-transparent']"
+                    <li :class="[currentRoute === dashboardRoute ? [bgOpacity] : 'bg-transparent']"
                         class=" px-2 py-1.5 rounded-[5px] cursor-pointer">
                         <a :href="route('aplicacion.dashboard', { aplicacion, rol })">
                             <span class="flex items-center justify-between">
@@ -182,7 +182,7 @@ const sidebarExpandido = ref(true); // true = expandido, false = colapsado
                                     </div>
                                     <span v-if="sidebarExpandido" class="text-[14px]">Tokens acceso</span>
                                 </div>
-                                <div :class="[currentRoute === aplicacionesRoute ? focus : hover]"></div>
+                                <div :class="[currentRoute === dashboardRoute ? focus : hover]"></div>
                             </span>
                         </a>
                     </li>

@@ -8,8 +8,33 @@ const { NombreApp, bgClase, textoClase, focus, buttonLink, hover } = Colors();
 
 const props = defineProps({
     auth: { type: Object, required: true },
+    foto_base64: String,
 });
 
+
+const fotoBase64 = props.foto_base64;
+import axios from 'axios'
+
+const onFileChange = async (event) => {
+  const file = event.target.files[0]
+  if (!file) return
+
+  const formData = new FormData()
+  formData.append('foto', file)
+
+  try {
+    await axios.post(route('usuario.actualizar.foto'), formData)
+    console.log('Foto actualizada')
+
+    // 👇 Lógica para recargar los datos del usuario
+    await router.reload({
+      only: ['auth'], // o el nombre del prop que estés pasando desde el backend
+    })
+  } catch (error) {
+    console.error('Error al subir la foto:', error)
+  }
+
+}
 const page = usePage();
 const aplicacion = props.auth?.user?.tienda?.aplicacion?.nombre_app || 'Sin app';
 const rol = props.auth.user.rol?.tipo_rol || 'Sin rol'; // Obtén el tipo de rol
@@ -92,12 +117,19 @@ const diasRestantes = computed(() => props.auth.user?.tienda?.pagos_membresia?.d
             </a>
 
             <div class="flex gap-1" v-if="currentRoute != configuracionesRoute">
-                <div class="user h-[35px] w-[35px] rounded-full overflow-hidden flex items-center justify-center"
-                    :class="[bgClase]">
-                    <span class="text-[12px] font-bold">
-                        {{ initials }}
-                    </span>
-                </div>
+                
+                <template v-if="foto_base64">
+                        <img :src="foto_base64" class="rounded-[50px] w-[35px] h-[35px] object-cover" />
+                    </template>
+
+                    <template v-else>
+                        <div class="user h-[35px] w-[35px] rounded-full overflow-hidden flex items-center justify-center"
+                            :class="[bgClase]">
+                            <span class="text-[12px] font-bold">
+                                {{ initials }}
+                            </span>
+                        </div>
+                    </template>
                 <div class="usuario">
                     <div v-if="auth && auth.user">
                         <h3 class="font-semibold text-[13px]"> {{ auth.user.nombres_ct }} </h3>
@@ -110,7 +142,7 @@ const diasRestantes = computed(() => props.auth.user?.tienda?.pagos_membresia?.d
                     </div>
                 </div>
             </div>
-            
+
 
 
         </div>

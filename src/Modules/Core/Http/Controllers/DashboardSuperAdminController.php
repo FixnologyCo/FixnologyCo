@@ -56,6 +56,9 @@ class DashboardSuperAdminController extends Controller
             ->select('id', 'nombres_ct', 'apellidos_ct')
             ->get();
 
+            $fotoBase64 = $user->foto_binaria
+                ? 'data:image/jpeg;base64,' . $user->foto_binaria
+                : null;
 
         if ($user->tienda && $user->tienda->aplicacion->nombre_app === $aplicacion) {
 
@@ -66,6 +69,8 @@ class DashboardSuperAdminController extends Controller
                 'cantidadApps' => $cantidadApps,
                 'cantidadClientesRol1' => $cantidadClientesRol1,
                 'usuariosRol4' => $usuariosRol4,
+                'foto_base64' => $fotoBase64,
+
             ]);
         }
 
