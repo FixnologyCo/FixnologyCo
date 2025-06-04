@@ -35,7 +35,7 @@ class TuPerfilController extends Controller
 
         // Guardar como binario
         $cliente->foto_binaria = base64_encode(file_get_contents($foto->getRealPath()));
-        $cliente->save();
+        $cliente->save();   
 
 
         return redirect()->back()->with('success', 'Foto de perfil actualizada correctamente.');

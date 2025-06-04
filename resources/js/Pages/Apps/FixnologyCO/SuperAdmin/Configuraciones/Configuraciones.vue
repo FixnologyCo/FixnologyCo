@@ -2,10 +2,11 @@
 
 import { Head, usePage, router } from '@inertiajs/vue3';
 import { route } from 'ziggy-js';
-import { defineProps, computed, ref } from 'vue';
+import { defineProps, computed, ref, onUnmounted, onMounted } from 'vue';
 import SidebarSuperAdmin from '@/Components/Sidebar/FixnologyCO/Sidebar.vue';
 import Header from '@/Components/header/Header.vue';
 import dayjs from 'dayjs'
+import relativeTime from 'dayjs/plugin/relativeTime'
 import 'dayjs/locale/es' // ✅ Importa el idioma español
 import Colors from '@/Composables/ModularColores';
 import MensajesLayout from '@/Layouts/MensajesLayout.vue';
@@ -13,6 +14,7 @@ import MensajesLayout from '@/Layouts/MensajesLayout.vue';
 const { appName, bgClase, bgOpacity, focus, textoClase, buttonFocus, borderClase, hover } = Colors();
 
 dayjs.locale('es')
+dayjs.extend(relativeTime)
 
 const props = defineProps({
   auth: {
@@ -73,7 +75,71 @@ const formatFecha = (fecha) => {
   if (!fecha || !dayjs(fecha).isValid()) return 'Sin fecha';
   return dayjs(fecha).format('dddd D [de] MMMM [de] YYYY [a las] h:mm a');
 };
+
 const page = usePage();
+
+
+const tienda = page.props.tienda ?? {}
+const membresia = tienda.aplicacion?.membresia ?? {}
+
+const tiempoActivo = ref('')
+
+const calcularTiempo = () => {
+  if (!user.fecha_creacion || !dayjs(user.fecha_creacion).isValid()) {
+    tiempoActivo.value = 'Sin fecha'
+    return
+  }
+
+  const fechaCreacion = dayjs(user.fecha_creacion)
+  tiempoActivo.value = fechaCreacion.fromNow() // Ej: "hace 2 horas"
+}
+
+let intervaloRestante = null
+let intervalo = null
+
+onMounted(() => {
+  calcularTiempo()
+
+  // Recalcula cada 60 segundos
+  intervalo = setInterval(() => {
+    calcularTiempo()
+  }, 60000)
+
+  calcularDiasRestantes()
+  // actualiza cada 24h
+  intervaloRestante = setInterval(() => {
+    calcularDiasRestantes()
+  }, 86400000)
+})
+
+onUnmounted(() => {
+  clearInterval(intervalo),
+   clearInterval(intervaloRestante)
+})
+
+const diasRestantes = ref(0)
+
+const calcularDiasRestantes = () => {
+  const fechaActivacion = user.tienda?.pagos_membresia?.fecha_activacion
+  const duracion = user.tienda?.aplicacion?.membresia?.duracion
+
+  if (!fechaActivacion || !duracion) {
+    diasRestantes.value = 0
+    return
+  }
+
+  const activacion = dayjs(fechaActivacion)
+  const hoy = dayjs()
+  const diasTranscurridos = hoy.diff(activacion, 'day')
+  const restantes = duracion - diasTranscurridos
+
+  diasRestantes.value = restantes > 0 ? restantes : 0
+}
+
+
+
+
+
 
 const activeTab = ref(0)
 
@@ -105,7 +171,6 @@ const onFileChange = (event) => {
     preserveState: true,
   })
 }
-
 
 
 </script>
@@ -168,14 +233,14 @@ const onFileChange = (event) => {
 
             <div class="right-info">
 
-              <div class="datos-recurentes flex items-center gap-10">
-                <div class="dias-restante w-auto rounded-md">
-                  <h4 class="">Restantes</h4>
-                  <p class="text-[40px] font-semibold -mt-3">000 <span class="text-[14px]">Días</span></p>
+              <div class="datos-recurentes flex items-end flex-col gap-2">
+                <div class="dias-restante text-right w-auto rounded-md">
+                  <h4 class="">Tu membresía finaliza en:</h4>
+                  <p class="text-[35px] font-semibold -mt-3">{{ diasRestantes }}<span class="text-[14px]">Días</span></p>
                 </div>
                 <div class="dias-activo w-auto rounded-md">
-                  <h4 class="">Activo </h4>
-                  <p class="text-[40px] font-semibold -mt-3">000 <span class="text-[14px]">Días</span></p>
+                  <h4 class="text-right">Te uniste a la familia: </h4>
+                  <p class="text-[35px] font-semibold -mt-3">{{ tiempoActivo }} <span class="text-[14px]"></span></p>
                 </div>
               </div>
             </div>
@@ -465,11 +530,11 @@ const onFileChange = (event) => {
 
                   <div class="fecha-creacion-membresia">
                     <label for="fecha-creacion-membresia" class="text-[14px] text-secundary-light">Fecha de
-                      creación:</label>
+                      activación:</label>
                     <p id="fecha-creacion-membresia"
                       class="flex items-center gap-1.5 border px-2 py-1 rounded-md w-full">
                       <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">calendar_month</span>
-                      {{ formatFecha(user.tienda?.aplicacion?.membresia?.fecha_creacion) || 'Sin fecha' }}
+                      {{ formatFecha(user.tienda?.pagos_membresia?.fecha_activacion) || 'Sin fecha' }}
                     </p>
                   </div>
                 </div>

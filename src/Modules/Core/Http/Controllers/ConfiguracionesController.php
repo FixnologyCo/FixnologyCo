@@ -108,10 +108,6 @@ class ConfiguracionesController extends Controller
 
                 'foto_base64' => $fotoBase64,
             ]);
-
-
-
-
         }
 
         abort(404);
