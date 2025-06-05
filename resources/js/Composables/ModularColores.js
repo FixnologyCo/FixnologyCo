@@ -25,7 +25,12 @@ export default function useAppColors() {
     };
 
     const button = {
-        'FixnologyCO': 'bg-universal-naranja shadow-universal-naranja rounded-[8px] py-[5px] px-[15px] flex items-center justify-center gap-2',
+        'FixnologyCO': 'bg-universal-naranja shadow-universal-naranja rounded-md py-2 px-4 flex items-center justify-center gap-2 text-mono-blanco hover:-translate-y-2 hover:bg-orange-700 hover:shadow-orange-700',
+        'default': 'bg-gray-300 shadow-gray-300'
+    };
+
+    const buttonSecundary = {
+        'FixnologyCO': 'rounded-md py-2 px-4 flex items-center justify-center gap-2 text-mono-negro dark:text-mono-blanco  border border-secundary-light dark:hover:text-mono-negro hover:-translate-y-2 hover:bg-secundary-light',
         'default': 'bg-gray-300 shadow-gray-300'
     };
 
@@ -39,12 +44,12 @@ export default function useAppColors() {
         'default': 'border-gray-300'
     };
 
-    const hoverClass = {
-        'FixnologyCO': 'hover:text-universal-naranja',
-        'Essentials': 'hover:bg-essentials-primary',
-        'Machine': 'hover:bg-machine-primary',
-        'Shopper': 'hover:bg-shopper-primary',
-        'Smart': 'hover:bg-smart-primary hover:text-mono-negro',
+    const hoverText = {
+        'FixnologyCO': 'hover:text-universal-naranja dark:hover:text-universal-naranja',
+    }
+
+    const hoverBg = {
+        'FixnologyCO': 'hover:bg-universal-naranja hover:text-mono-blanco hover:shadow-universal-naranja',
     }
 
 
@@ -57,8 +62,11 @@ const bgOpacity = computed(() => bgFocusOpacity[appName.value] || bgFocusOpacity
 const textoClase = computed(() => coloresTexto[appName.value] || coloresTexto['default']);
 const focus = computed(() => bgFocus[appName.value] || bgFocus['default']);
 const buttonLink = computed(() => btn_link[appName.value] || btn_link['default']);
-const hover = computed(() => hoverClass[appName.value] || hoverClass['default'])
+const hoverTexto = computed(() => hoverText[appName.value] || hoverTexto['default'])
+const hoverClase = computed(() => hoverBg[appName.value] || hoverBg['default'])
 const borderClase = computed(() => border[appName.value] || border['default'])
+const buttonClase = computed(() => button[appName.value] || button['default']);
+const buttonSecundario = computed(() => buttonSecundary[appName.value] || buttonSecundary['default']);
 
 return {
     appName,
@@ -67,8 +75,11 @@ return {
     textoClase,
     focus,
     buttonLink,
-    hover,
-    borderClase
+    hoverTexto,
+    hoverClase,
+    borderClase,
+    buttonClase,
+    buttonSecundario
 };
 }
 

@@ -13,7 +13,7 @@ import { useTiempo } from '@/Composables/useTiempo';
 const page = usePage();
 const user = ref(page.props.auth.user)
 const { tiempoActivo, diasRestantes } = useTiempo(user)
-const { appName, bgClase, bgOpacity, focus, textoClase, borderClase, buttonFocus, hover } = Colors();
+const { appName, bgClase, bgOpacity, focus, textoClase, borderClase, buttonFocus, hoverClase, hoverTexto, buttonClase, buttonSecundario } = Colors();
 
 const props = defineProps({
   auth: {
@@ -115,11 +115,11 @@ const logout = () => {
 
                 <div class="botonesConfig my-3 flex gap-2 items-center">
                   <a :href="route('aplicacion.configuraciones.editarMiPerfil', { aplicacion, rol })">
-                    <button class="px-4 py-2 rounded-md" :class="bgClase">Editar perfil</button>
+                    <button class="" :class="buttonClase">Editar perfil</button>
                   </a>
                   <button @click="logout"
-                    class="opcion flex items-center gap-2 justify-center border border-secundary-light cursor-pointer py-2 px-4 rounded-md">
-                    <p class="text-mono-negro dark:text-mono-blanco">Cerrar sesión</p>
+                    class="" :class="[buttonSecundario]">
+                    <p >Cerrar sesión</p>
                   </button>
                 </div>
               </div>
@@ -151,7 +151,7 @@ const logout = () => {
                   'text-md font-medium px-4 py-2',
                   activeTab === index
                     ? textoClase + ' ' + borderClase
-                    : 'text-secundary-default dark:text-secundary-light ' + hover
+                    : 'text-secundary-default dark:text-secundary-light ' + hoverTexto
                 ]">
                   {{ tab.label }}
                 </button>

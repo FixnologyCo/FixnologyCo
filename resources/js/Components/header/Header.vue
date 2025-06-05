@@ -5,7 +5,7 @@ import { route } from 'ziggy-js';
 import Colors from '@/Composables/ModularColores';
 
 
-const { NombreApp, bgClase, textoClase, focus, buttonLink, hover } = Colors();
+const { NombreApp, bgClase, textoClase, focus, buttonLink, hoverTexto, hoverClase } = Colors();
 
 const props = defineProps({
     auth: { type: Object, required: true },
@@ -24,6 +24,7 @@ const historialRoute = computed(() => new URL(route('aplicacion.historial', { ap
 
 const iconosPorComponente = {
     Dashboard: 'dashboard',
+    MisApps: 'apps',
     Usuarios: 'group',
     Productos: 'inventory',
     Reportes: 'bar_chart',
@@ -145,7 +146,7 @@ onMounted(() => {
 
             <a :href="route('aplicacion.historial', { aplicacion, rol })">
                 <div class="user h-[30px] w-[30px] rounded-full overflow-hidden flex items-center justify-center cursor-pointer"
-                    :class="[currentRoute === historialRoute ? [bgClase] : 'bg-transparent']">
+                    :class="[currentRoute === historialRoute ? [bgClase] : 'bg-transparent' , hoverClase]">
                     <span class="material-symbols-rounded text-[20px] dark:text-mono-blanco">
                         history
                     </span>
@@ -153,8 +154,7 @@ onMounted(() => {
             </a>
 
 
-            <div class="user h-[30px] w-[30px] rounded-full overflow-hidden flex items-center justify-center cursor-pointer"
-                :class="[currentRoute === dashboardRoute ? [bgClase] : 'bg-transparent']">
+            <div class="user h-[30px] w-[30px] rounded-full overflow-hidden flex items-center justify-center cursor-pointer" :class="[hoverClase]">
                 <span class="material-symbols-rounded text-[20px] dark:text-mono-blanco">
                     help
                 </span>
@@ -163,7 +163,7 @@ onMounted(() => {
 
             <a :href="route('aplicacion.configuraciones', { aplicacion, rol })">
                 <div class="user h-[30px] w-[30px] rounded-full overflow-hidden flex items-center justify-center cursor-pointer"
-                    :class="[currentRoute === dashboardRoute ? [bgClase] : 'bg-transparent']">
+                   :class="[hoverClase]">
                     <span class="material-symbols-rounded text-[20px] dark:text-mono-blanco">
                         notifications
                     </span>
@@ -171,7 +171,7 @@ onMounted(() => {
             </a>
             <a :href="route('aplicacion.configuraciones', { aplicacion, rol })">
                 <div class="user h-[30px] w-[30px] rounded-full overflow-hidden flex items-center justify-center cursor-pointer"
-                    :class="[currentRoute === configuracionesRoute ? [bgClase] : 'bg-transparent']">
+                    :class="[currentRoute === configuracionesRoute ? [bgClase] : 'bg-transparent', hoverClase]">
                     <span class="material-symbols-rounded text-[20px] dark:text-mono-blanco">
                         settings
                     </span>

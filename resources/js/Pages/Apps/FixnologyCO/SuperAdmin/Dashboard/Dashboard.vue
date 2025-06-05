@@ -106,8 +106,7 @@ if (fecha.getHours() < 12) {
   <MensajesLayout />
 
   <div class="flex">
-    <SidebarSuperAdmin :auth="auth" :cantidad-apps="cantidadApps" :cantidad-clientes-rol1="cantidadClientesRol1"
-      :usuarios-rol4="usuariosRol4" />
+    <SidebarSuperAdmin :auth="auth" />
 
     <div class="w-full">
       <Header :auth="auth" :foto_base64="foto_base64" />

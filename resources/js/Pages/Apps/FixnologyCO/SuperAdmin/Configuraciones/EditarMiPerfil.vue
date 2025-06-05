@@ -2,20 +2,18 @@
 
 import { Head, usePage, router } from '@inertiajs/vue3';
 import { route } from 'ziggy-js';
-import { defineProps, computed, ref, onUnmounted, onMounted } from 'vue';
+import { defineProps, computed, ref } from 'vue';
 import SidebarSuperAdmin from '@/Components/Sidebar/FixnologyCO/Sidebar.vue';
 import Header from '@/Components/header/Header.vue';
 import Colors from '@/Composables/ModularColores';
 import MensajesLayout from '@/Layouts/MensajesLayout.vue';
-import { formatFecha } from '@/Utils/date';
 import { useTiempo } from '@/Composables/useTiempo';
 
 const page = usePage();
 const user = ref(page.props.auth.user)
 const { tiempoActivo, diasRestantes } = useTiempo(user)
 
-const { appName, bgClase, bgOpacity, focus, textoClase, borderClase, buttonFocus, hover } = Colors();
-
+const { appName, bgClase, bgOpacity, textoClase, borderClase, hoverClase, hoverTexto, buttonClase, buttonSecundario } = Colors();
 
 const props = defineProps({
   auth: {
@@ -213,13 +211,13 @@ const handleInput = (event, field) => {
 
 
                 <div class="botonesConfig my-3 flex gap-2 items-center">
-                  <button @click="submitForm" class="px-4 py-2 rounded-md" :class="[bgClase, buttonFocus]">
+                  <button @click="submitForm" :class="[buttonClase]">
                     Guardar cambios
                   </button>
                   <a :href="route('aplicacion.configuraciones', { aplicacion, rol })">
                     <button
-                      class="opcion flex items-center gap-2 justify-center border border-secundary-light cursor-pointer py-2 px-4 rounded-md">
-                      <p class="text-mono-negro dark:text-mono-blanco">Cancelar</p>
+                      class="" :class="[buttonSecundario]">
+                      <p >Cancelar</p>
                     </button>
                   </a>
                 </div>

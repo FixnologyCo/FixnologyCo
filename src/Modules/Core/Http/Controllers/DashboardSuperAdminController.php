@@ -66,9 +66,6 @@ class DashboardSuperAdminController extends Controller
                 'auth' => ['user' => $user],
                 'aplicacion' => $aplicacion,
                 'rol' => $rol,
-                'cantidadApps' => $cantidadApps,
-                'cantidadClientesRol1' => $cantidadClientesRol1,
-                'usuariosRol4' => $usuariosRol4,
                 'foto_base64' => $fotoBase64,
 
             ]);

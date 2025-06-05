@@ -1,31 +1,30 @@
-import { ref, watchEffect, onMounted } from 'vue'
+// resources/js/composables/useTema.js
+import { ref, watchEffect } from 'vue'
 
 const modoOscuro = ref(false)
+const sistemaOscuro = window.matchMedia('(prefers-color-scheme: dark)')
 
 const aplicarTema = (esOscuro) => {
   const html = document.documentElement
-
-  // Agrega clase para animar suavemente el cambio de tema
   html.classList.add('transicion-tema')
 
-  if (esOscuro) {
-    html.classList.add('dark')
-  } else {
-    html.classList.remove('dark')
-  }
+  html.classList.toggle('dark', esOscuro)
 
-  // Quitar la animación después de que se aplica
   setTimeout(() => {
     html.classList.remove('transicion-tema')
-  }, 500) // duración en ms (ajusta según tu tailwind)
+  }, 500)
 }
 
 const detectarTemaInicial = () => {
   const preferencia = localStorage.getItem('modoOscuro')
 
-  modoOscuro.value = preferencia !== null
-    ? preferencia === 'true'
-    : window.matchMedia('(prefers-color-scheme: dark)').matches
+  if (preferencia === null) {
+    // Sin preferencia: usar el sistema
+    modoOscuro.value = sistemaOscuro.matches
+  } else {
+    // Preferencia manual
+    modoOscuro.value = preferencia === 'true'
+  }
 
   aplicarTema(modoOscuro.value)
 }
@@ -36,21 +35,17 @@ const toggleTema = () => {
   aplicarTema(modoOscuro.value)
 }
 
-// Escucha cambios del sistema operativo
 const escucharCambiosSistema = () => {
-  const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
-  mediaQuery.addEventListener('change', e => {
-    modoOscuro.value = e.matches
-    localStorage.setItem('modoOscuro', modoOscuro.value)
-    aplicarTema(modoOscuro.value)
+  sistemaOscuro.addEventListener('change', (e) => {
+    const preferencia = localStorage.getItem('modoOscuro')
+
+    // Solo reaccionar si no hay preferencia manual
+    if (preferencia === null) {
+      modoOscuro.value = e.matches
+      aplicarTema(modoOscuro.value)
+    }
   })
 }
-
-// Se asegura de aplicar el tema al montar
-onMounted(() => {
-  detectarTemaInicial()
-  escucharCambiosSistema()
-})
 
 // Reacciona a cambios manuales en tiempo real
 watchEffect(() => {
@@ -61,5 +56,7 @@ export function useTema() {
   return {
     modoOscuro,
     toggleTema,
+    detectarTemaInicial,
+    escucharCambiosSistema
   }
 }

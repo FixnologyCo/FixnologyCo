@@ -16,14 +16,14 @@
   </script>
 
   <script setup>
-  onMounted(() => {
-  const userPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-  const savedTheme = localStorage.getItem('tema');
+import { onMounted } from 'vue'
+import { useTema } from '@/Composables/useTema'
 
-  if (savedTheme === 'oscuro' || (!savedTheme && userPrefersDark)) {
-    document.documentElement.classList.add('dark');
-  } else {
-    document.documentElement.classList.remove('dark');
-  }
+const { detectarTemaInicial, escucharCambiosSistema } = useTema()
+
+onMounted(() => {
+  detectarTemaInicial()
+  escucharCambiosSistema()
+})
 });
   </script>
