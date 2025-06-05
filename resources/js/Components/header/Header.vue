@@ -4,6 +4,7 @@ import { usePage } from '@inertiajs/vue3';
 import { route } from 'ziggy-js';
 import Colors from '@/Composables/ModularColores';
 
+
 const { NombreApp, bgClase, textoClase, focus, buttonLink, hover } = Colors();
 
 const props = defineProps({
@@ -21,13 +22,25 @@ const clientesFixRoute = computed(() => new URL(route('aplicacion.clientesFix', 
 const configuracionesRoute = computed(() => new URL(route('aplicacion.configuraciones', { aplicacion, rol }), window.location.origin).pathname);
 const historialRoute = computed(() => new URL(route('aplicacion.historial', { aplicacion, rol }), window.location.origin).pathname);
 
+const iconosPorComponente = {
+    Dashboard: 'dashboard',
+    Usuarios: 'group',
+    Productos: 'inventory',
+    Reportes: 'bar_chart',
+    Historial: 'history',
+    Configuraciones: 'settings',
+    EditarMiPerfil: 'account_circle',
+}
+
 const componente = usePage().component.split('/').pop();
 
 function separarCamelCase(texto) {
-    return texto.replace(/([a-z])([A-Z])/g, '$1 $2');
+    const conEspacios = texto.replace(/([a-z])([A-Z])/g, '$1 $2');
+    return conEspacios.charAt(0).toUpperCase() + conEspacios.slice(1).toLowerCase();
 }
 
 const ruta = separarCamelCase(componente);
+const icono = iconosPorComponente[componente] || 'description' // ícono por defecto
 
 
 const initials = computed(() => {
@@ -64,7 +77,7 @@ const animarCambioTema = () => {
     toggleTema()
     setTimeout(() => {
         animando.value = false
-    }, 600) // duración de la animación
+    }, 600)
 }
 
 onMounted(() => {
@@ -101,6 +114,9 @@ onMounted(() => {
             <div class="infoTienda flex items-center gap-2">
                 <div class="">
                     <div class="flex items-center" v-if="auth && auth.user">
+                        <span class="material-symbols-rounded align-middle mr-1 " :class="[textoClase]">
+                            {{ icono }}
+                        </span>
                         <h1 class="text-[25px] font-semibold text-mono-negro dark:text-mono-blanco">{{ ruta }}</h1>
                     </div>
                     <div v-else>
@@ -134,7 +150,7 @@ onMounted(() => {
                         history
                     </span>
                 </div>
-            </a>    
+            </a>
 
 
             <div class="user h-[30px] w-[30px] rounded-full overflow-hidden flex items-center justify-center cursor-pointer"
