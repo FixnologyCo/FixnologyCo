@@ -63,7 +63,7 @@ const sidebarExpandido = ref(false); // true = expandido, false = colapsado
 
 <template>
     <div :class="[sidebarExpandido ? 'w-[20%]' : 'w-[58px]']"
-        class="min-h-[100vh] bg-secundary-opacity p-3 transition-all duration-300 relative">
+        class="min-h-[100vh] bg-secundary-default dark:bg-secundary-opacity text-mono-blanco p-3 transition-all duration-300 relative">
         <aside class="relative h-full">
 
             <div class="infoTienda flex items-center justify-between gap-2 px-2">

@@ -75,9 +75,10 @@ const handleInput = (event, field) => {
             sm:bg-green-500 
             md:bg-yellow-500
             lg:bg-red-500 
-            xl:bg-mono-negro 
-            2xl:bg-mono-negro
+            xl:bg-mono-blanco xl:dark:bg-mono-negro
+            2xl:bg-mono-blanco 2xl:dark:bg-mono-negro
             flex justify-center items-center
+            text-secundary-default dark:text-mono-blanco
             
             ">
       <main class="
@@ -501,7 +502,7 @@ const handleInput = (event, field) => {
               text-right text-universal-azul 
               ">Contactanos para la activación</a>
 
-            <button type="submit" class="btn-taurus">Crear cuenta <span
+            <button type="submit" class="btn-taurus text-mono-blanco">Crear cuenta <span
                 class="material-symbols-rounded bg-transparent">bolt</span></button>
 
             <p class="

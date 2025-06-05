@@ -14,7 +14,7 @@
   @vite(['resources/css/app.css', 'resources/js/app.js'])
   <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
-<body class="bg-mono-negro scrollbar-custom">
+<body class="scrollbar-custom bg-mono-blanco dark:bg-mono-negro">
   @inertia
   
 </body>

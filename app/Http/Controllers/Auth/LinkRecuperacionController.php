@@ -31,6 +31,7 @@ class LinkRecuperacionController extends Controller
 
         $correo = $request->correo_vinculado;
         $cliente = ClienteFixgi::where('email_ct', $correo)->first();
+        
 
         if (!$cliente) {
             return back()->withErrors([
@@ -51,7 +52,7 @@ class LinkRecuperacionController extends Controller
         Mail::to($correo)->send(new RecuperarPassword($token, $correo, $cliente->nombres_ct));
 
 
-        return back()->with('success', 'Se ha enviado el enlace a tu correo.');
+        return redirect()->back()->with('success', 'Se ha enviado el enlace a tu correo.');
     }
 
     public function showResetForm($token, Request $request)
@@ -83,13 +84,13 @@ class LinkRecuperacionController extends Controller
             ->first();
 
         if (!$resetRecord) {
-            return back()->withErrors(['email' => 'Token inválido o expirado.']);
+            return redirect()->back()->withErrors(['email' => 'Token inválido o expirado.']);
         }
 
         $cliente = ClienteFixgi::where('email_ct', $request->email)->first();
 
         if (!$cliente) {
-            return back()->withErrors(['email' => 'Cliente no encontrado.']);
+            return redirect()->back()->withErrors(['email' => 'Cliente no encontrado.']);
         }
 
         // Actualizamos la contraseña

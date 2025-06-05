@@ -4,9 +4,9 @@ module.exports = {
       "./resources/**/*.js",
       "./resources/**/*.vue",
     ],
+    darkMode: 'class',
     theme: {
         extend: {
-            
             colors: {
                 mono: {
                   blanco: '#f3fafe',

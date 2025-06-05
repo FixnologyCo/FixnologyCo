@@ -2,6 +2,8 @@
 import { Head, useForm, usePage } from '@inertiajs/vue3';
 import { ref, onMounted } from 'vue'
 import { route } from 'ziggy-js';
+import MensajesLayout from '@/Layouts/MensajesLayout.vue';
+
 
 export default {
   name: 'Auth',
@@ -26,28 +28,6 @@ const props = defineProps({
   success: String
 })
 
-const mensajeNotificacion = ref('')
-const tipoNotificacion = ref(null)
-const mostrarNotificacion = ref(false)
-
-onMounted(() => {
-  if (usePage().props.flash && usePage().props.flash.success) {
-    mostrarMensaje(usePage().props.flash.success, 'success');
-  } else if (usePage().props.flash.error) {
-    mostrarMensaje(usePage().props.flash.error, 'error');
-  }
-});
-
-
-const mostrarMensaje = (mensaje, tipo) => {
-  mensajeNotificacion.value = mensaje
-  tipoNotificacion.value = tipo
-  mostrarNotificacion.value = true
-
-  setTimeout(() => {
-    mostrarNotificacion.value = false
-  }, 5000)
-}
 
 const form = useForm({
   correo_vinculado: ''
@@ -56,16 +36,11 @@ const form = useForm({
 
 
 const submit = () => {
-  form.post(route('validacionUsuario.post'), {
-    onSuccess: () => {
-      mostrarMensaje('Link enviado a tu correo', 'success')
-
-    },
-    onError: () => {
-      mostrarMensaje('Error al recuperar tu cuenta, verifica los datos.', 'error')
-    }
+  form.post(route('linkRecuperacion.auth'), {
+    onFinish: () => form.resetAll(),
   })
 }
+
 
 </script>
 
@@ -73,15 +48,17 @@ const submit = () => {
   <div>
 
     <Head title="Recupera tu cuenta FixnologyCO" />
+    <MensajesLayout />
 
     <div class="
     bg-mono-negro
             sm:bg-green-500 
             md:bg-yellow-500
             lg:bg-red-500 
-            xl:bg-mono-negro 
-            2xl:bg-mono-negro
+            xl:bg-mono-blanco  xl:dark:bg-mono-negro
+            2xl:bg-mono-blanco 2xl:dark:bg-mono-negro
             flex justify-center items-center
+            text-secundary-default dark:text-mono-blanco
     ">
       <main class="
        2xl:w-[100%] 2xl:p-[80px] 2xl:gap-16
@@ -145,7 +122,7 @@ const submit = () => {
                 :class="{ 'border-universal-naranja': form.errors.correo_vinculado }">
                 <span class="material-symbols-rounded text-universal-naranja text-[20px] pl-[5px]">email</span>
                 <input type="text" v-model="form.correo_vinculado"
-                  class="w-full focus:outline-none focus:border-none font-normal bg-mono-negro text-blanco"
+                  class="w-full focus:outline-none focus:border-none font-normal bg-transparent"
                   placeholder="Ingresa tu correo vinculado." />
               </div>
              
@@ -155,7 +132,7 @@ const submit = () => {
             </div>
 
             <!-- ✅ BOTÓN DE INICIAR SESIÓN -->
-            <button type="submit" class="btn-taurus">
+            <button type="submit" class="btn-taurus text-mono-blanco">
               Validar usuario
               <span class="material-symbols-rounded bg-transparent">bolt</span>
             </button>
@@ -178,31 +155,6 @@ const submit = () => {
 
 
       </main>
-      <div v-if="mostrarNotificacion && tipoNotificacion === 'success'"
-        class="notificacion translate-y-8 absolute w-[max-content] left-0 right-0 top-6 ml-auto mr-auto rounded-md bg-semaforo-verde_opacity text-mono-blanco shadow-semaforo-verde">
-        <div class="notificacion_body flex justify-center gap-3 items-center py-3 px-2">
-          <div class="flex gap-2 items-center">
-            <i class="material-symbols-rounded text-semaforo-verde">check_circle</i>
-            <p>{{ mensajeNotificacion }}</p>
-          </div>
-        </div>
-        <div
-          class="progreso_notificacion absolute left-1 bottom-1 h-1 scale-x-0 origin-left rounded-sm bg-semaforo-verde">
-        </div>
-      </div>
-      <!-- ✅ Notificación de error -->
-      <div v-if="mostrarNotificacion && tipoNotificacion === 'error'"
-        class="notificacion translate-y-8 absolute w-[max-content] left-0 right-0 top-6 ml-auto mr-auto rounded-md bg-semaforo-rojo_opacity text-mono-blanco shadow-semaforo-verde">
-        <div class="notificacion_body flex justify-center gap-3 items-center py-3 px-2">
-          <div class="flex gap-2 items-center">
-            <i class="material-symbols-rounded text-semaforo-rojo">cancel</i>
-            <p>{{ mensajeNotificacion }}</p>
-          </div>
-        </div>
-        <div
-          class="progreso_notificacion absolute left-1 bottom-1 h-1 scale-x-0 origin-left rounded-sm bg-semaforo-rojo">
-        </div>
-      </div>
     </div>
   </div>
 </template>

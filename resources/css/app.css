@@ -38,10 +38,15 @@
   transition: all ease-in-out .2s;
 }
 
-body {
+/* Animación para el cambio de tema */
+.transicion-tema {
+  transition: background-color 0.5s ease, color 0.5s ease;
+}
+
+/* body {
   background: var(--mono_negro);
   color: var(--mono_blanco);
-}
+} */
 
 /* Estilos generales del scrollbar */
 .scrollbar-custom::-webkit-scrollbar {

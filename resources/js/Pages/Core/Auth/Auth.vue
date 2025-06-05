@@ -41,12 +41,12 @@ const submit = () => {
 
 
     <div class="
-    bg-mono-negro
+    bg-mono-blanco dark:bg-mono-negro text-secundary-default dark:text-mono-blanco
             sm:bg-green-500 
             md:bg-yellow-500
             lg:bg-red-500 
-            xl:bg-mono-negro 
-            2xl:bg-mono-negro
+            xl:bg-mono-blanco xl:dark:bg-mono-negro 
+            2xl:bg-mono-blanco 2xl:dark:bg-mono-negro
             flex justify-center items-center
     ">
       <main class="
@@ -111,12 +111,10 @@ const submit = () => {
                 :class="{ 'border-universal-naranja': form.errors.numero_documento_ct }">
                 <span class="material-symbols-rounded text-universal-naranja text-[20px] pl-[5px]">people</span>
                 <input type="text" v-model="form.numero_documento_ct"
-                  class="w-full focus:outline-none focus:border-none font-normal bg-mono-negro text-blanco"
+                  class="w-full focus:outline-none focus:border-none font-normal bg-transparent"
                   placeholder="Ingresa tu usuario establecido." />
               </div>
-              <span v-if="form.errors.contrasenia_ct" class="text-universal-naranja text-sm">
-                {{ form.errors.contrasenia_ct }}
-              </span>
+             
               <span v-if="form.errors.numero_documento_ct" class="text-universal-naranja text-sm">
                 {{ form.errors.numero_documento_ct }}
               </span>
@@ -130,7 +128,7 @@ const submit = () => {
                 :class="{ 'border-universal-naranja': form.errors.contrasenia_ct }">
                 <span class="material-symbols-rounded text-universal-naranja text-[20px] pl-[5px]">password</span>
                 <input type="password" v-model="form.contrasenia_ct"
-                  class="w-full focus:outline-none focus:border-none font-normal bg-mono-negro text-blanco"
+                  class="w-full focus:outline-none focus:border-none font-normal bg-transparent"
                   placeholder="Ingresa tu contraseña." />
               </div>
               <span v-if="form.errors.contrasenia_ct" class="text-universal-naranja text-sm">
@@ -141,7 +139,7 @@ const submit = () => {
             <a :href="route('linkRecuperacion.auth')" class="text-universal-azul text-right">Olvidé mi contraseña</a>
 
             <!-- ✅ BOTÓN DE INICIAR SESIÓN -->
-            <button type="submit" class="btn-taurus">
+            <button type="submit" class="btn-taurus text-mono-blanco">
               Iniciar sesión
               <span class="material-symbols-rounded bg-transparent">bolt</span>
             </button>
@@ -161,8 +159,6 @@ const submit = () => {
             ">Versión Deimos 1.0.0</p>
           </form>
         </div>
-
-
       </main>
     </div>
   </div>

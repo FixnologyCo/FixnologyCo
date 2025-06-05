@@ -55,9 +55,10 @@ const submit = () => {
             sm:bg-green-500 
             md:bg-yellow-500
             lg:bg-red-500 
-            xl:bg-mono-negro 
-            2xl:bg-mono-negro
-            flex justify-center items-center
+            xl:bg-mono-blanco xl:dark:bg-mono-negro 
+            2xl:bg-mono-blanco 2xl:dark:bg-mono-negro
+            flex justify-center items-
+            text-secundary-default dark:text-mono-blanco
     ">
       <main class="
        2xl:w-[100%] 2xl:p-[80px] 2xl:gap-16
@@ -117,7 +118,7 @@ const submit = () => {
                 :class="{ 'border-universal-naranja': form.errors.password }">
                 <span class="material-symbols-rounded text-universal-naranja text-[20px] pl-[5px]">password</span>
                 <input type="password" v-model="form.password"
-                  class="w-full focus:outline-none focus:border-none font-normal bg-mono-negro text-blanco"
+                  class="w-full focus:outline-none focus:border-none font-normal bg-transparent"
                   placeholder="Ingresa tu nueva contraseña" />
               </div>
               
@@ -134,7 +135,7 @@ const submit = () => {
                 :class="{ 'border-universal-naranja': form.errors.correo_vinculado }">
                 <span class="material-symbols-rounded text-universal-naranja text-[20px] pl-[5px]">password</span>
                 <input type="password" v-model="form.password_confirmation"
-                  class="w-full focus:outline-none focus:border-none font-normal bg-mono-negro text-blanco"
+                  class="w-full focus:outline-none focus:border-none font-normal bg-transparent"
                   placeholder="Repite tu nueva contraseña" />
               </div>
               
@@ -147,7 +148,7 @@ const submit = () => {
             
 
             <!-- ✅ BOTÓN DE INICIAR SESIÓN -->
-            <button type="submit" class="btn-taurus">
+            <button type="submit" class="btn-taurus text-mono-blanco">
               Restablecer
               <span class="material-symbols-rounded bg-transparent">bolt</span>
             </button>

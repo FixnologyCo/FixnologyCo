@@ -6,7 +6,7 @@ import { route } from 'ziggy-js';
 
 <template>
 
-  <Head title="Bienvenido a Taurus Comunity" />
+  <Head title="Bienvenido a Fixnology CO" />
   <div>
 
     <header class="p-4 flex justify-between items-center">

@@ -11,30 +11,6 @@ const props = defineProps({
     foto_base64: String,
 });
 
-
-const fotoBase64 = props.foto_base64;
-import axios from 'axios'
-
-const onFileChange = async (event) => {
-  const file = event.target.files[0]
-  if (!file) return
-
-  const formData = new FormData()
-  formData.append('foto', file)
-
-  try {
-    await axios.post(route('usuario.actualizar.foto'), formData)
-    console.log('Foto actualizada')
-
-    // 👇 Lógica para recargar los datos del usuario
-    await router.reload({
-      only: ['auth'], // o el nombre del prop que estés pasando desde el backend
-    })
-  } catch (error) {
-    console.error('Error al subir la foto:', error)
-  }
-
-}
 const page = usePage();
 const aplicacion = props.auth?.user?.tienda?.aplicacion?.nombre_app || 'Sin app';
 const rol = props.auth.user.rol?.tipo_rol || 'Sin rol'; // Obtén el tipo de rol
@@ -64,45 +40,103 @@ const initials = computed(() => {
     return firstNameInitial + lastNameInitial;
 });
 
-const inicialesNombreTienda = computed(() => {
-    const nombreTienda = props.auth.user?.tienda?.nombre_tienda || '';
+const modoOscuro = ref(false)
+const animando = ref(false)
 
-    const inicialTienda = nombreTienda.split(' ')[0]?.charAt(0).toUpperCase() || '';
-    return inicialTienda;
-});
+const detectarPreferencia = () => {
+    const preferencia = localStorage.getItem('modoOscuro')
+    modoOscuro.value = preferencia !== null
+        ? preferencia === 'true'
+        : window.matchMedia('(prefers-color-scheme: dark)').matches
 
-const diasRestantes = computed(() => props.auth.user?.tienda?.pagos_membresia?.dias_restantes ?? 'sin días');
+    document.documentElement.classList.toggle('dark', modoOscuro.value)
+}
+
+const toggleTema = () => {
+    modoOscuro.value = !modoOscuro.value
+    document.documentElement.classList.toggle('dark', modoOscuro.value)
+    localStorage.setItem('modoOscuro', modoOscuro.value)
+}
+
+const animarCambioTema = () => {
+    animando.value = true
+    toggleTema()
+    setTimeout(() => {
+        animando.value = false
+    }, 600) // duración de la animación
+}
+
+onMounted(() => {
+    detectarPreferencia()
+})
 
 </script>
 
+<style scoped>
+/* Animación lenta de rotación para el ícono */
+@keyframes spin-slow {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.animate-spin-slow {
+    animation: spin-slow 0.6s ease-in-out;
+}
+
+.rotate-1 {
+    transform: rotate(3deg);
+}
+</style>
+
 <template>
-    <header class="header py-2 flex items-center justify-between gap-3">
+    <header class="header px-3 py-2 flex items-center justify-between gap-3 bg-mono-blanco shadow-md dark:bg-mono-negro">
         <div class="left w-[20%] rounded-md">
             <div class="infoTienda flex items-center gap-2">
                 <div class="">
                     <div class="flex items-center" v-if="auth && auth.user">
-                        <h1 class="text-[25px] font-semibold">{{ ruta }}</h1>
+                        <h1 class="text-[25px] font-semibold text-mono-negro dark:text-mono-blanco">{{ ruta }}</h1>
                     </div>
                     <div v-else>
-                        <p>Cargando información del usuario...</p>
+                        <p class="text-mono-negro dark:text-mono-blanco">Cargando información del usuario...</p>
                     </div>
                 </div>
             </div>
         </div>
 
         <div class="flex gap-2 items-center">
+            <button @click="animarCambioTema"
+                class="flex items-center justify-center gap-2 h-[35px] w-[35px] rounded-full  border border-secundary-light text-sm transition-all duration-500 ease-in-out relative overflow-hidden"
+                :class="[
+                    modoOscuro ? 'text-mono-blanco' : 'text-mono-negro',
+                    animando ? 'scale-105 shadow-lg rotate-1' : ''
+                ]">
+
+                <span class="material-symbols-rounded text-[20px] transition-transform duration-500"
+                    :class="{ 'animate-spin-slow': animando }">
+                    {{ modoOscuro ? 'light_mode' : 'dark_mode' }}
+                </span>
+                <!-- destello -->
+                <span v-if="animando"
+                    class="absolute inset-0 bg-white/10 backdrop-blur-sm animate-ping z-0 rounded-md"></span>
+            </button>
+
+            <div class="user h-[30px] w-[30px] rounded-full overflow-hidden flex items-center justify-center cursor-pointer"
+                :class="[currentRoute === configuracionesRoute ? [bgClase] : 'bg-transparent']">
+                <span class="material-symbols-rounded text-[20px] dark:text-mono-blanco">
+                    help
+                </span>
+            </div>
+
+
             <a :href="route('aplicacion.configuraciones', { aplicacion, rol })">
                 <div class="user h-[30px] w-[30px] rounded-full overflow-hidden flex items-center justify-center cursor-pointer"
                     :class="[currentRoute === configuracionesRoute ? [bgClase] : 'bg-transparent']">
-                    <span class="material-symbols-rounded text-[20px]">
-                        help
-                    </span>
-                </div>
-            </a>
-            <a :href="route('aplicacion.configuraciones', { aplicacion, rol })">
-                <div class="user h-[30px] w-[30px] rounded-full overflow-hidden flex items-center justify-center cursor-pointer"
-                    :class="[currentRoute === configuracionesRoute ? [bgClase] : 'bg-transparent']">
-                    <span class="material-symbols-rounded text-[20px]">
+                    <span class="material-symbols-rounded text-[20px] dark:text-mono-blanco">
                         notifications
                     </span>
                 </div>
@@ -110,35 +144,37 @@ const diasRestantes = computed(() => props.auth.user?.tienda?.pagos_membresia?.d
             <a :href="route('aplicacion.configuraciones', { aplicacion, rol })">
                 <div class="user h-[30px] w-[30px] rounded-full overflow-hidden flex items-center justify-center cursor-pointer"
                     :class="[currentRoute === configuracionesRoute ? [bgClase] : 'bg-transparent']">
-                    <span class="material-symbols-rounded text-[20px]">
+                    <span class="material-symbols-rounded text-[20px] dark:text-mono-blanco">
                         settings
                     </span>
                 </div>
             </a>
 
-            <div class="flex gap-1">
-                
-                <template v-if="foto_base64">
-                        <img :src="foto_base64" class="rounded-[50px] w-[35px] h-[35px] object-cover" />
-                    </template>
+            <div class="flex gap-1 items-center">
 
-                    <template v-else>
-                        <div class="user h-[35px] w-[35px] rounded-full overflow-hidden flex items-center justify-center"
-                            :class="[bgClase]">
-                            <span class="text-[12px] font-bold">
-                                {{ initials }}
-                            </span>
-                        </div>
-                    </template>
+                <template v-if="foto_base64">
+                    <img :src="foto_base64" class="border-2 rounded-[50px] w-[40px] h-[40px] object-cover" />
+                </template>
+
+                <template v-else>
+                    <div class="user h-[35px] w-[35px] rounded-full overflow-hidden flex items-center justify-center"
+                        :class="[bgClase]">
+                        <span class="text-[12px] font-bold">
+                            {{ initials }}
+                        </span>
+                    </div>
+                </template>
                 <div class="usuario">
                     <div v-if="auth && auth.user">
-                        <h3 class="font-semibold text-[13px]"> {{ auth.user.nombres_ct }} </h3>
-                        <p class="-mt-[5px] text-secundary-light text-[12px] font-medium">
+                        <h3 class="font-semibold text-[13px] text-mono-negro dark:text-mono-blanco"> {{
+                        auth.user.nombres_ct }}
+                        </h3>
+                        <p class="-mt-[5px] text-[12px] font-medium text-mono-negro dark:text-secundary-light">
                             {{ auth.user.rol?.tipo_rol || 'Sin rol' }}
                         </p>
                     </div>
                     <div v-else>
-                        <p>Cargando información del usuario...</p>
+                        <p class="text-mono-negro dark:text-mono-blanco">Cargando información del usuario...</p>
                     </div>
                 </div>
             </div>

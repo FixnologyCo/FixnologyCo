@@ -5,12 +5,12 @@ export default function useAppColors() {
     const auth = usePage().props.auth;
 
     const coloresBg = {
-        'FixnologyCO': 'bg-universal-naranja shadow-universal-naranja',
+        'FixnologyCO': 'bg-universal-naranja text-mono-blanco shadow-universal-naranja',
         'default': 'bg-gray-300 shadow-gray-300'
     };
 
     const bgFocus = {
-        'FixnologyCO': 'bg-universal-naranja shadow-universal-naranja w-[15px] h-[10px] mx-3 rounded-full',
+        'FixnologyCO': 'bg-universal-naranja text-mono-blanco shadow-universal-naranja w-[15px] h-[10px] mx-3 rounded-full',
         'default': 'bg-gray-300 shadow-gray-300'
     };
 
@@ -30,7 +30,7 @@ export default function useAppColors() {
     };
 
     const btn_link = {
-        'FixnologyCO': 'bg-universal-naranja shadow-universal-naranja rounded-full py-[5px] px-[5px] flex items-center justify-center gap-2',
+        'FixnologyCO': 'bg-universal-naranja text-mono-blanco shadow-universal-naranja rounded-full py-[5px] px-[5px] flex items-center justify-center gap-2',
         'default': 'bg-gray-300 shadow-gray-300'
     };
 
