@@ -5,7 +5,7 @@ import 'dayjs/locale/es';
 import { route } from 'ziggy-js';
 import dayjs from 'dayjs';
 import SaludoOpciones from '@/Components/header/Header.vue';
-
+import Sidebar from '@/Components/Sidebar/FixnologyCO/Sidebar.vue';
 
 const props = defineProps({
   auth: {

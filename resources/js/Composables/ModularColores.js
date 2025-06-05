@@ -39,22 +39,14 @@ export default function useAppColors() {
         'default': 'border-gray-300'
     };
 
-    const hoverClass = computed(() => {
-    switch (appName.value) {
-        case 'FixnologyCO':
-            return 'hover:text-universal-naranja';
-        case 'Essentials':
-            return 'hover:bg-essentials-primary';
-        case 'Machine':
-            return 'hover:bg-machine-primary';
-        case 'Shopper':
-            return 'hover:bg-shopper-primary';
-        case 'Smart':
-            return 'hover:bg-smart-primary hover:text-mono-negro';
-        default:
-            return 'hover:bg-gray-300';
+    const hoverClass = {
+        'FixnologyCO': 'hover:text-universal-naranja',
+        'Essentials': 'hover:bg-essentials-primary',
+        'Machine': 'hover:bg-machine-primary',
+        'Shopper': 'hover:bg-shopper-primary',
+        'Smart': 'hover:bg-smart-primary hover:text-mono-negro',
     }
-});
+
 
 const appName = computed(() =>
     auth?.user?.tienda?.aplicacion?.nombre_app || 'default'

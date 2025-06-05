@@ -19,6 +19,7 @@ const currentRoute = computed(() => new URL(page.url, window.location.origin).pa
 const dashboardRoute = computed(() => new URL(route('aplicacion.dashboard', { aplicacion, rol }), window.location.origin).pathname);
 const clientesFixRoute = computed(() => new URL(route('aplicacion.clientesFix', { aplicacion, rol }), window.location.origin).pathname);
 const configuracionesRoute = computed(() => new URL(route('aplicacion.configuraciones', { aplicacion, rol }), window.location.origin).pathname);
+const historialRoute = computed(() => new URL(route('aplicacion.historial', { aplicacion, rol }), window.location.origin).pathname);
 
 const componente = usePage().component.split('/').pop();
 
@@ -94,7 +95,8 @@ onMounted(() => {
 </style>
 
 <template>
-    <header class="header px-3 py-2 flex items-center justify-between gap-3 bg-mono-blanco shadow-md dark:bg-mono-negro">
+    <header
+        class="header px-3 py-2 flex items-center justify-between gap-3 bg-mono-blanco shadow-md dark:bg-mono-negro">
         <div class="left w-[20%] rounded-md">
             <div class="infoTienda flex items-center gap-2">
                 <div class="">
@@ -125,8 +127,18 @@ onMounted(() => {
                     class="absolute inset-0 bg-white/10 backdrop-blur-sm animate-ping z-0 rounded-md"></span>
             </button>
 
+            <a :href="route('aplicacion.historial', { aplicacion, rol })">
+                <div class="user h-[30px] w-[30px] rounded-full overflow-hidden flex items-center justify-center cursor-pointer"
+                    :class="[currentRoute === historialRoute ? [bgClase] : 'bg-transparent']">
+                    <span class="material-symbols-rounded text-[20px] dark:text-mono-blanco">
+                        history
+                    </span>
+                </div>
+            </a>    
+
+
             <div class="user h-[30px] w-[30px] rounded-full overflow-hidden flex items-center justify-center cursor-pointer"
-                :class="[currentRoute === configuracionesRoute ? [bgClase] : 'bg-transparent']">
+                :class="[currentRoute === dashboardRoute ? [bgClase] : 'bg-transparent']">
                 <span class="material-symbols-rounded text-[20px] dark:text-mono-blanco">
                     help
                 </span>
@@ -135,7 +147,7 @@ onMounted(() => {
 
             <a :href="route('aplicacion.configuraciones', { aplicacion, rol })">
                 <div class="user h-[30px] w-[30px] rounded-full overflow-hidden flex items-center justify-center cursor-pointer"
-                    :class="[currentRoute === configuracionesRoute ? [bgClase] : 'bg-transparent']">
+                    :class="[currentRoute === dashboardRoute ? [bgClase] : 'bg-transparent']">
                     <span class="material-symbols-rounded text-[20px] dark:text-mono-blanco">
                         notifications
                     </span>
@@ -167,7 +179,7 @@ onMounted(() => {
                 <div class="usuario">
                     <div v-if="auth && auth.user">
                         <h3 class="font-semibold text-[13px] text-mono-negro dark:text-mono-blanco"> {{
-                        auth.user.nombres_ct }}
+                            auth.user.nombres_ct }}
                         </h3>
                         <p class="-mt-[5px] text-[12px] font-medium text-mono-negro dark:text-secundary-light">
                             {{ auth.user.rol?.tipo_rol || 'Sin rol' }}

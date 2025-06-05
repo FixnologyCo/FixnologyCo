@@ -73,7 +73,7 @@ const logout = () => {
       <div class="w-full ">
         <Header :auth="auth" :foto_base64="foto_base64" />
 
-        <div class="contenido mx-3 max-h-[90vh] w-full overflow-auto scrollbar-custom">
+        <div class="contenido px-3 max-h-[90vh] w-full overflow-auto scrollbar-custom">
           <div class="banner w-full min-h-[150px] rounded-lg" :class="[bgOpacity]"></div>
           <div class="flex items-end justify-between encabezado-config h-[auto] py-10 mx-12">
             <div class="left-foto -mt-[120px] flex items-end gap-4">
@@ -507,14 +507,12 @@ const logout = () => {
 
 
 
-            <div v-else-if="activeTab === 4">
+            <div v-else-if="activeTab === 4" class="h-auto">
               <h2 class="text-2xl font-bold mb-4 text-secundary-default dark:text-mono-blanco">Configuraciones Avanzadas
               </h2>
-              <p class="text-secundary-default dark:text-mono-blanco">Esta sección está reservada para configuraciones
-                avanzadas
-                que no están disponibles en la interfaz
-                principal.</p>
-              <p class="text-secundary-default dark:text-mono-blanco">Próximamente...</p>
+              <a :href="route('aplicacion.historial', { aplicacion, rol })">
+                <button class="mb-10 text-mono-negro dark:text-mono-blanco rounded-md px-2 py-1" :class="[bgClase]">Revisar historial de mi app</button>
+              </a>
             </div>
           </div>
         </div>

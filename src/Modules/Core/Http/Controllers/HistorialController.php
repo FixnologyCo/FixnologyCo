@@ -72,11 +72,16 @@ class HistorialController extends Controller
                 });
 
 
+                $fotoBase64 = $user->foto_binaria
+                ? 'data:image/jpeg;base64,' . $user->foto_binaria
+                : null;
+                
             return Inertia::render('Apps/' . ucfirst($aplicacion) . '/' . ucfirst($rol) . '/Historial/Historial', [
                 'auth' => ['user' => $user],
                 'aplicacion' => $aplicacion,
                 'rol' => $rol,
                 'auditorias' => $auditorias,
+                'foto_base64' => $fotoBase64,
             ]);
 
 

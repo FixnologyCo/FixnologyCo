@@ -154,11 +154,11 @@ const handleInput = (event, field) => {
     <div class="flex">
       <SidebarSuperAdmin :auth="auth" />
 
-      <div class="w-full px-3">
+      <div class="w-full ">
         <Header :auth="auth" :foto_base64="foto_base64" />
 
 
-        <div class="contenido max-h-[90vh] w-full overflow-auto scrollbar-custom">
+        <div class="contenido px-3 max-h-[90vh] w-full overflow-auto scrollbar-custom">
           <div class="banner w-full min-h-[150px] rounded-lg" :class="[bgOpacity]"></div>
           <div class="flex items-end justify-between encabezado-config h-[auto] py-10 mx-12">
             <div class="left-foto -mt-[120px] flex items-end gap-4">
@@ -206,7 +206,7 @@ const handleInput = (event, field) => {
                     <span class="material-symbols-rounded text-[20px] text-universal-azul">local_police</span>
                     {{ user.rol?.tipo_rol || 'Sin rol' }}
                   </p>
-                  <div class="flex items-center gap-1 shadowM bg-universal-azul w-[auto] py-1 px-2 rounded-md">{{
+                  <div class="flex items-center gap-1 shadowM text-mono-blanco bg-universal-azul w-[auto] py-1 px-2 rounded-md">{{
                     user.tienda?.aplicacion?.membresia?.nombre_membresia }} <span
                       class="material-symbols-rounded text-[18px]">bolt</span></div>
                 </div>
