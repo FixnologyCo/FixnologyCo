@@ -17,6 +17,8 @@ return new class extends Migration {
             $table->unsignedBigInteger('id_membresia')->nullable(false);
             $table->string('nombre_app')->nullable(false);
             $table->string('descripcion')->nullable(false);
+            $table->string('color_fondo')->nullable();
+            $table->string('icono_app')->nullable();
             $table->timestamp('fecha_creacion')->default(DB::raw('CURRENT_TIMESTAMP'));
             $table->timestamp('fecha_modificacion')->default(DB::raw('CURRENT_TIMESTAMP'))->useCurrentOnUpdate();
 
@@ -34,31 +36,9 @@ return new class extends Migration {
                 'id_membresia' => '6',
                 'nombre_app' => 'FixnologyCO',
                 'descripcion' => 'Aplicación corporativa a escala Fixnology',
+                'color_fondo' => 'bg-universal-naranja',
+                'icono_App' => 'taunt',
             ],
-            [
-                'id_plan_aplicacion' => '1',
-                'id_membresia' => '1',
-                'nombre_app' => 'Control de votaciones',
-                'descripcion' => 'Aplicación de votaciones (Free)',
-            ],
-            [
-                'id_plan_aplicacion' => '2',
-                'id_membresia' => '2',
-                'nombre_app' => 'Control de votaciones',
-                'descripcion' => 'Aplicación de votaciones (Basic)',
-            ],
-            [
-                'id_plan_aplicacion' => '3',
-                'id_membresia' => '3',
-                'nombre_app' => 'Control de votaciones',
-                'descripcion' => 'Aplicación de votaciones (Pro+)',
-            ],
-            [
-                'id_plan_aplicacion' => '4',
-                'id_membresia' => '4',
-                'nombre_app' => 'Control de votaciones',
-                'descripcion' => 'Aplicación de votaciones (Estellar)',
-            ]
         ]);
     }
 

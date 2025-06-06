@@ -1,5 +1,6 @@
 <script setup>
-import { defineProps, defineEmits, watch, reactive } from 'vue'
+import { defineProps, defineEmits, watch, reactive, ref, onMounted, onBeforeUnmount } from 'vue'
+import { Head, usePage, useForm, router } from '@inertiajs/vue3';
 import 'dayjs/locale/es';
 import Colors from '@/Composables/ModularColores';
 import { handleBlur, handleInput, limitesCaracteres } from '@/Utils/formateoInputs'
@@ -7,6 +8,9 @@ import { handleBlur, handleInput, limitesCaracteres } from '@/Utils/formateoInpu
 const { appName, bgClase, bgOpacity, focus, textoClase, borderClase, buttonFocus, hoverClase, hoverTexto, buttonClase, buttonSecundario } = Colors();
 
 const props = defineProps({
+    auth: {
+        type: Object,
+    },
     mostrar: Boolean,
     estados: {
         type: Array,
@@ -25,19 +29,59 @@ const props = defineProps({
 const emit = defineEmits(['cerrar'])
 
 
-const form = reactive({
+const form = useForm({
     nombre_app: '',
     descripcion_app: '',
     id_estado: '',
     id_plan_aplicacion: '',
-    id_membresia: ''
+    id_membresia: '',
+    color_fondo: '',
+    icono_app: '',
 })
+
+const page = usePage();
+const user = ref(page.props.auth.user)
+const aplicacion = props.auth?.user?.tienda?.aplicacion?.nombre_app || 'Sin app';
+const rol = props.auth.user.rol?.tipo_rol || 'Sin rol'; // Obtén el tipo de rol
+
+
+
+const submitForm = () => {
+  form.post(route('registro.app', {
+    aplicacion: aplicacion,
+    rol: rol
+  }), {
+    onSuccess: () => {
+      form.reset();       
+      emit('cerrar');     
+    }
+  })
+}
+
+const mostrarSelector = ref(false)
+
+const iconosDisponibles = ['bolt', 'home', 'store', 'wifi', 'star', 'apartment'] // Puedes expandir
+const coloresDisponibles = ['bg-red-400', 'bg-blue-400', 'bg-green-400', 'bg-yellow-400', 'bg-orange-400', 'bg-gray-900', 'bg-lime-400']
+
+const seleccion = reactive({
+    color: 'bg-red-400',
+    icono: 'bolt'
+})
+
+const clickFuera = (e) => {
+    if (!e.target.closest('.iconoApp') && !e.target.closest('.material-symbols-rounded') && !e.target.closest('.cajaSelector')) {
+        mostrarSelector.value = false
+    }
+}
+
+onMounted(() => document.addEventListener('click', clickFuera))
+onBeforeUnmount(() => document.removeEventListener('click', clickFuera))
 </script>
 
 <template>
     <transition name="fade">
         <div v-if="props.mostrar" @click.self="emit('cerrar')"
-            class="fixed inset-0 bg-mono-negro bg-opacity-65 backdrop-blur-[2px] pr-5 flex items-center justify-end z-50">
+            class="fixed inset-0 bg- bg-mono-negro bg-opacity-65 backdrop-blur-[2px] pr-5 flex items-center justify-end z-50">
             <!-- Modal deslizante -->
             <transition name="slide">
                 <div
@@ -62,11 +106,49 @@ const form = reactive({
 
                         <div
                             class="flex items-center titulo-icono w-full rounded-lg p-5 border border-secundary-light my-4 gap-3">
-                            <div class="flex items-center gap-1">
-                                <div class="iconoApp bg-red-400 w-[50px] h-[50px] rounded-md grid place-content-center">
-                                    <span class="material-symbols-rounded text-[35px]">bolt</span>
+                            <div class="flex items-center gap-1 relative">
+                                <!-- Ícono principal -->
+                                <div class="iconoApp w-[50px] h-[50px] rounded-md grid place-content-center"
+                                    :class="seleccion.color" @click="mostrarSelector = !mostrarSelector">
+                                    <span class="material-symbols-rounded text-[35px]">{{ seleccion.icono }}</span>
                                 </div>
-                                <span class="material-symbols-rounded cursor-pointer">keyboard_arrow_down</span>
+
+                                <span class="material-symbols-rounded cursor-pointer"
+                                    @click="mostrarSelector = !mostrarSelector">
+                                    keyboard_arrow_down
+                                </span>
+
+                                <!-- Caja flotante -->
+                                <div v-if="mostrarSelector"
+                                    class="cajaSelector absolute top-[60px] left-0 bg-white dark:bg-secundary-default border border-gray-300 dark:border-secundary-light rounded-lg p-4 z-50 max-w-[350px] shadow-lg">
+                                    <!-- Selector de color -->
+                                    <div class="mb-3">
+                                        <p class="text-sm font-semibold text-mono-black dark:text-mono-blanco mb-1">
+                                            Color de fondo:</p>
+                                        <div class="flex gap-2">
+                                            <div v-for="color in coloresDisponibles" :key="color"
+                                                class="w-8 h-8 rounded-md cursor-pointer border border-white hover:ring-2"
+                                                :class="color" @click="() => {
+                                                    seleccion.color = color;
+                                                    form.color_fondo = color;
+                                                }"></div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Selector de ícono -->
+                                    <div>
+                                        <p class="text-sm font-semibold text-mono-black dark:text-mono-blanco mb-1">
+                                            Ícono:</p>
+                                        <div class="flex gap-2 flex-wrap">
+                                            <span v-for="icon in iconosDisponibles" :key="icon"
+                                                class="material-symbols-rounded cursor-pointer p-1 rounded hover:bg-gray-200 dark:hover:bg-secundary-light"
+                                                @click="() => {
+                                                    seleccion.icono = icon;
+                                                    form.icono_app = icon;
+                                                }">{{ icon }}</span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
 
                             <input type="text"
@@ -112,10 +194,11 @@ const form = reactive({
                                 </div>
                             </div>
 
-                             <div class="desplegar-plan w-[33.3%]">
+                            <div class="desplegar-plan w-[33.3%]">
                                 <div class="flex items-center justify-between">
                                     <label for="rol-usuario"
-                                        class="text-[14px] text-secundary-default dark:text-secundary-light">Plan aplicacion:</label>
+                                        class="text-[14px] text-secundary-default dark:text-secundary-light">Plan
+                                        aplicacion:</label>
                                 </div>
 
                                 <div class="custom-select">
@@ -130,7 +213,7 @@ const form = reactive({
                                 </div>
                             </div>
 
-                             <div class="desplegar-membresia w-[33.3%]">
+                            <div class="desplegar-membresia w-[33.3%]">
                                 <div class="flex items-center justify-between">
                                     <label for="rol-usuario"
                                         class="text-[14px] text-secundary-default dark:text-secundary-light">Membresía:</label>
@@ -140,7 +223,8 @@ const form = reactive({
                                     <select v-model="form.id_membresia"
                                         class="w-full 2xl:p-2 border border-secundary-light rounded-md">
                                         <option value="" disabled>Disponibles: {{ membresias.length }}</option>
-                                        <option v-for="membresia in membresias" :key="membresia.id" :value="membresia.id">
+                                        <option v-for="membresia in membresias" :key="membresia.id"
+                                            :value="membresia.id">
                                             {{ membresia.nombre_membresia }}
                                         </option>
                                     </select>
@@ -150,7 +234,8 @@ const form = reactive({
 
                         </div>
 
-                        <button class="w-full mt-10" :class="[buttonClase]">Crear aplicación <span class="material-symbols-rounded">send</span></button>
+                        <button @click="submitForm" class="w-full mt-10" :class="[buttonClase]">Crear aplicación <span
+                                class="material-symbols-rounded">send</span></button>
 
                     </div>
 

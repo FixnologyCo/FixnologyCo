@@ -18,30 +18,33 @@ class AplicacionWeb extends Model
         'id_plan_aplicacion',
         'id_membresia',
         'nombre_app',
+        'descripcion',
+        'color_fondo',
+        'icono_app',
     ];
 
-   // ✅ Relación con el plan de aplicación
-   public function plan()
-{
-    return $this->belongsTo(PlanAplicacion::class, 'id_plan_aplicacion')->with('detalles');
-}
+    // ✅ Relación con el plan de aplicación
+    public function plan()
+    {
+        return $this->belongsTo(PlanAplicacion::class, 'id_plan_aplicacion')->with('detalles');
+    }
 
-   // ✅ Relación con la membresía
-   public function membresia()
-   {
-       return $this->belongsTo(Membresia::class, 'id_membresia');
-   }
+    // ✅ Relación con la membresía
+    public function membresia()
+    {
+        return $this->belongsTo(Membresia::class, 'id_membresia');
+    }
 
-   // ✅ Relación con el estado
-   public function estado()
-   {
-       return $this->belongsTo(Estados::class, 'id_estado');
-   }
+    // ✅ Relación con el estado
+    public function estado()
+    {
+        return $this->belongsTo(Estados::class, 'id_estado');
+    }
 
-   public function tiendas()
-{
-    return $this->hasMany(TiendaSistematizada::class, 'id_aplicacion_web');
-}
+    public function tiendas()
+    {
+        return $this->hasMany(TiendaSistematizada::class, 'id_aplicacion_web');
+    }
 
-  
+
 }

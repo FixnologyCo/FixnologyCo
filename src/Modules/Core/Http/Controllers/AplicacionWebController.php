@@ -93,12 +93,57 @@ class AplicacionWebController extends Controller
                 'apps' => $aplicaciones,
                 'estados' => $estados,
                 'plan_aplicaciones' => $plan_aplicaciones,
-                'membresias'=> $membresias
+                'membresias' => $membresias
             ]);
 
         }
 
         abort(404);
+    }
+
+    public function createApp(Request $request)
+    {
+
+        // ✅ Validación de datos
+        $request->validate([
+            'nombre_app' => 'required|string|max:30|unique:aplicaciones_web,nombre_app',
+            'descripcion_app' => 'required|string|max:100',
+            'id_estado' => 'required|integer|exists:estados,id',
+            'id_plan_aplicacion' => 'required|integer|exists:planes_Aplicaciones,id',
+            'id_membresia' => 'required|integer|exists:membresias,id',
+            'color_fondo' => 'nullable|string|max:20',
+            'icono_app' => 'nullable|string|max:50',
+
+        ], [
+            'nombre_app.required' => 'El nombre de app es requerida.',
+            'descripcion_app.required' => 'La descripción es requerida',
+            'id_estado.required' => 'El estados de app es requerida.',
+            'id_plan_aplicacion.required' => 'El plan de la app es requerida.',
+            'id_membresia.required' => 'La membresía de la app es requerida.',
+            'nombre_app.unique' => 'Oh, oh, este nombre ya se usó.',
+            'id_estado.exists' => 'El estado seleccionado no es válido.',
+            'id_plan_aplicacion.exists' => 'El plan seleccionado no es válido.',
+            'id_membresia.exists' => 'La membresía seleccionada no es válida.',
+
+            'nombre_app.max' => 'El nombre no debe superar los 30 carácteres',
+            'descripcion_app.max' => 'La descripción no debe superar los 100 carácteres',
+        ]);
+
+        // ✅ Crear cliente
+        $app = AplicacionWeb::create([
+            'nombre_app' => $request->nombre_app,
+            'descripcion' => $request->descripcion_app,
+            'id_estado' => $request->id_estado,
+            'id_plan_aplicacion' => $request->id_plan_aplicacion,
+            'id_membresia' => $request->id_membresia,
+            'color_fondo' => $request->color_fondo,
+            'icono_app' => $request->icono_app,
+        ]);
+
+        $nombreAplicacion = $cliente->tienda->aplicacion->nombre_app ?? null;
+        $rol = $cliente->rol->tipo_rol ?? null;
+
+        return redirect()->back()->with('success', 'Creación éxitosa, ¡A vender!');
     }
 
     use AuthorizesRequests;

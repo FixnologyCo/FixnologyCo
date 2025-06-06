@@ -20,7 +20,7 @@ class RegisterController extends Controller
     public function show()
     {
         $tipoDocumentos = TipoDocumento::all();
-        $aplicaciones = AplicacionWeb::where('id_membresia', 1)->get();
+        $aplicaciones = AplicacionWeb::all();
 
         return Inertia::render('Core/Auth/Registro', [
             'tiposDocumento' => $tipoDocumentos,

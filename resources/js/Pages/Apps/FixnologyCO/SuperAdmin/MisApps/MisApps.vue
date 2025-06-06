@@ -37,11 +37,16 @@ const props = defineProps({
   membresias: {
     type: Array,
     required: true,
-  }
+  },
+  color_fondo: String,
+  icono_app: String
 })
 
 const auth = usePage().props.auth;
 const mostrarModal = ref(false)
+
+// Puedes mapear la clase color_fondo directamente
+const colorFondo = props.color_fondo || 'bg-gray-200'
 </script>
 
 <template>
@@ -83,7 +88,9 @@ const mostrarModal = ref(false)
             :class="[sidebarExpandido ? 'w-[32.5%]' : 'w-[24.5%]']">
             <div class="top flex justify-between">
               <div class="conjunto flex gap-3">
-                <div class="icono h-[50px] w-[50px] rounded-lg" :class="[bgClase]"></div>
+                <div class="icono grid place-content-center h-[50px] w-[50px] rounded-lg" :class="app.color_fondo">
+                  <i class="material-symbols-rounded text-mono-blanco">{{ app.icono_app || 'help' }}</i>
+                </div>
                 <div class="titulo-contador">
                   <h3 class="text-secundary-default dark:text-secundary-light font-semibold">
                     {{ app.nombre_app }}
@@ -112,6 +119,7 @@ const mostrarModal = ref(false)
         </div>
       </div>
     </div>
-    <ModalCrearApp :mostrar="mostrarModal" @cerrar="mostrarModal = false" :estados="estados" :plan_aplicaciones="plan_aplicaciones" :membresias="membresias" />
+    <ModalCrearApp :mostrar="mostrarModal" @cerrar="mostrarModal = false" :estados="estados"
+      :plan_aplicaciones="plan_aplicaciones" :membresias="membresias" :auth="auth" />
   </div>
 </template>
