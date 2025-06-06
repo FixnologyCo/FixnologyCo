@@ -19,7 +19,7 @@ class AplicacionWebController extends Controller
         ]);
     }
 
-   
+
     /**
      * Muestra el dashboard para la aplicación y rol especificados.
      *
@@ -60,12 +60,12 @@ class AplicacionWebController extends Controller
 
             // Obtener los IDs de los usuarios que pertenecen a esa tienda
             $userIds = ClienteFixgi::where('id_tienda', $idTienda)->pluck('id');
-            
 
-                $fotoBase64 = $user->foto_binaria
+
+            $fotoBase64 = $user->foto_binaria
                 ? 'data:image/jpeg;base64,' . $user->foto_binaria
                 : null;
-                
+
             return Inertia::render('Apps/' . ucfirst($aplicacion) . '/' . ucfirst($rol) . '/MisApps/MisApps', [
                 'auth' => ['user' => $user],
                 'aplicacion' => $aplicacion,
