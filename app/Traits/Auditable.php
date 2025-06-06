@@ -5,7 +5,7 @@
 namespace App\Traits;
 
 use Illuminate\Support\Facades\Auth;
-use App\Models\Auditoria;
+use Core\Models\Auditoria;
 
 trait Auditable
 {

@@ -4,8 +4,8 @@ namespace Core\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use App\Models\AplicacionWeb;
-use App\Models\ClienteFixgi;
+use Core\Models\AplicacionWeb;
+use Core\Models\ClienteFixgi;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class AplicacionWebController extends Controller
@@ -61,6 +61,17 @@ class AplicacionWebController extends Controller
             // Obtener los IDs de los usuarios que pertenecen a esa tienda
             $userIds = ClienteFixgi::where('id_tienda', $idTienda)->pluck('id');
 
+            $apps = AplicacionWeb::All();
+
+            $aplicaciones = AplicacionWeb::with(['tiendas.clientes'])->get();
+
+            foreach ($aplicaciones as $app) {
+                $usuariosTotales = 0;
+                foreach ($app->tiendas as $tienda) {
+                    $usuariosTotales += $tienda->clientes->count();
+                }
+                $app->usuarios_en_tiendas = $usuariosTotales;
+            }
 
             $fotoBase64 = $user->foto_binaria
                 ? 'data:image/jpeg;base64,' . $user->foto_binaria
@@ -71,6 +82,7 @@ class AplicacionWebController extends Controller
                 'aplicacion' => $aplicacion,
                 'rol' => $rol,
                 'foto_base64' => $fotoBase64,
+                'apps' => $aplicaciones,
             ]);
 
         }

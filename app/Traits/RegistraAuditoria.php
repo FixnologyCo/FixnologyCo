@@ -2,8 +2,8 @@
 
 namespace App\Traits;
 
-use App\Models\Auditoria;
-use App\Models\ClienteFixgi;
+use Core\Models\Auditoria;
+use Core\Models\ClienteFixgi;
 
 
 trait RegistraAuditoria

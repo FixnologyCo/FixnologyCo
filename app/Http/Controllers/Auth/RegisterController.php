@@ -3,12 +3,12 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Models\ClienteFixgi;
-use App\Models\TiendaSistematizada;
-use App\Models\TokenAcceso;
-use App\Models\TipoDocumento;
-use App\Models\AplicacionWeb;
-use App\Models\PagoMembresia;
+use Core\Models\ClienteFixgi;
+use Core\Models\TiendaSistematizada;
+use Core\Models\TokenAcceso;
+use Core\Models\TipoDocumento;
+use Core\Models\AplicacionWeb;
+use Core\Models\PagoMembresia;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;

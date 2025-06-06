@@ -11,7 +11,7 @@ class Controller
     {
         $user = auth()->user()->load([
             'rol',
-            'tienda.aplicacion.membresia.estado',
+            'tienda.aplicacion.membresia.estado',   
             'tienda.pagosMembresia',
         ]);
 

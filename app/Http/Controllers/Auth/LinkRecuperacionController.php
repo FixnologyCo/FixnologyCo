@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
 use Illuminate\Http\Request;
-use App\Models\ClienteFixgi;
+use Core\Models\ClienteFixgi;
 use App\Mail\RecuperarPassword;
 
 class LinkRecuperacionController extends Controller

@@ -2,7 +2,7 @@
 
 namespace Core\Http\Controllers;
 
-use App\Models\TipoDocumento;
+use Core\Models\TipoDocumento;
 use Inertia\Inertia;
 
 class TipoDocumentoController extends Controller

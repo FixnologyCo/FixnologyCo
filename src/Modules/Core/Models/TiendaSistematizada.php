@@ -12,6 +12,7 @@ class TiendaSistematizada extends Model
     public const UPDATED_AT = 'fecha_modificacion';
 
     protected $fillable = [
+        'id',
         'id_estado',
         'id_token',
         'id_aplicacion_web',
@@ -61,12 +62,10 @@ class TiendaSistematizada extends Model
             ->latestOfMany(); // O usa un scope si quieres solo los activos
     }
 
-    public function clientesFixgis()
+    public function clientes()
     {
         return $this->hasMany(ClienteFixgi::class, 'id_tienda');
     }
-
-
 
 
 

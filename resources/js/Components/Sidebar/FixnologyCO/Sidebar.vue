@@ -3,7 +3,9 @@ import { computed, ref } from 'vue';
 import { usePage } from '@inertiajs/vue3';
 import { route } from 'ziggy-js';
 import Colors from '@/Composables/ModularColores';
+import { useSidebar } from '@/Composables/useSidebar'
 
+const { sidebarExpandido, toggleSidebar } = useSidebar()
 const { NombreApp, bgClase, bgOpacity, textoClase, focus, buttonLink, hover } = Colors();
 
 const props = defineProps({
@@ -57,7 +59,6 @@ const inicialesNombreTienda = computed(() => {
 });
 
 
-const sidebarExpandido = ref(false); // true = expandido, false = colapsado
 
 </script>
 

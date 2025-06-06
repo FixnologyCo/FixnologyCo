@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use App\Models\ClienteFixgi; // Ajusta el modelo según tu tabla de clientes
+use Core\Models\ClienteFixgi; // Ajusta el modelo según tu tabla de clientes
 use Illuminate\Support\Facades\Hash;
 
 class EncryptPasswords extends Command

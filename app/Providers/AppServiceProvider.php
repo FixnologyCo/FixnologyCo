@@ -4,7 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia; // 👉 Asegúrate de que esta línea esté presente
-use App\Models\ClienteFixgi;
+use Core\Models\ClienteFixgi;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
 

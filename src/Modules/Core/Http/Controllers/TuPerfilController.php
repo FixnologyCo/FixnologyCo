@@ -6,13 +6,13 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
-use App\Models\ClienteFixgi;
-use App\Models\TiendaSistematizada;
-use App\Models\Membresia;
-use App\Models\Rol;
-use App\Models\TipoDocumento;
-use App\Models\Estados;
-use App\Models\AplicacionWeb;
+use Core\Models\ClienteFixgi;
+use Core\Models\TiendaSistematizada;
+use Core\Models\Membresia;
+use Core\Models\Rol;
+use Core\Models\TipoDocumento;
+use Core\Models\Estados;
+use Core\Models\AplicacionWeb;
 
 // use Core\Traits\RegistraAuditoria; // Asegúrate de que la ruta sea correcta
 

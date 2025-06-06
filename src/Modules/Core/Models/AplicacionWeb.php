@@ -38,5 +38,10 @@ class AplicacionWeb extends Model
        return $this->belongsTo(Estados::class, 'id_estado');
    }
 
+   public function tiendas()
+{
+    return $this->hasMany(TiendaSistematizada::class, 'id_aplicacion_web');
+}
+
   
 }

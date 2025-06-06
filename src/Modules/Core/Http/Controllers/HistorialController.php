@@ -2,9 +2,9 @@
 
 namespace Core\Http\Controllers;
 
-use App\Models\ClienteFixgi;
+use Core\Models\ClienteFixgi;
 use Illuminate\Http\Request;
-use App\Models\Auditoria;
+use Core\Models\Auditoria;
 use Inertia\Inertia;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 

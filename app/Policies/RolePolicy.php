@@ -2,7 +2,7 @@
 
 namespace App\Policies;
 
-use App\Models\ClienteFixgi;
+use Core\Models\ClienteFixgi;
 
 class RolePolicy
 {

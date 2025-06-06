@@ -2,7 +2,7 @@
 
 namespace Core\Http\Controllers;
 use App\Http\Controllers\Controller;
-use App\Models\ClienteFixgi;
+use Core\Models\ClienteFixgi;
 use Core\Models\AplicacionWeb;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
