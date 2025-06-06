@@ -4,8 +4,11 @@ namespace Core\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Core\Models\PlanAplicacion;
 use Core\Models\AplicacionWeb;
 use Core\Models\ClienteFixgi;
+use Core\Models\Estados;
+use Core\Models\Membresia;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class AplicacionWebController extends Controller
@@ -73,6 +76,11 @@ class AplicacionWebController extends Controller
                 $app->usuarios_en_tiendas = $usuariosTotales;
             }
 
+            $estados = Estados::all();
+            $plan_aplicaciones = PlanAplicacion::all();
+            $membresias = Membresia::all();
+
+
             $fotoBase64 = $user->foto_binaria
                 ? 'data:image/jpeg;base64,' . $user->foto_binaria
                 : null;
@@ -83,6 +91,9 @@ class AplicacionWebController extends Controller
                 'rol' => $rol,
                 'foto_base64' => $fotoBase64,
                 'apps' => $aplicaciones,
+                'estados' => $estados,
+                'plan_aplicaciones' => $plan_aplicaciones,
+                'membresias'=> $membresias
             ]);
 
         }

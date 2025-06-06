@@ -187,9 +187,28 @@ const handleInput = (event, field) => {
 
 
                 <template v-else>
-                  <div class="p-2 w-[220px] h-[220px] rounded-[50px] grid place-content-center bg-secundary-opacity dark:bg-mono-blanco" :class="[bgClase]">
+                  <div class="relative w-[220px] h-[220px] group">
+
+                    <div class="relative p-2 w-[220px] h-[220px] rounded-[50px] grid place-content-center bg-secundary-opacity"
+                    :class="[bgClase]">
                     <p class="text-[45px] font-semibold">{{ inicialesNombreUsuario }}</p>
                   </div>
+
+
+                    <div
+                      class="absolute inset-0 bg-black/40 rounded-[50px] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+
+                      <label for="fotoInput"
+                        class="cursor-pointer bg-white p-3 rounded-full shadow-md hover:bg-gray-200 transition"
+                        title="Cambiar foto">
+                        <span class="material-symbols-rounded text-2xl" :class="[textoClase]">edit</span>
+                      </label>
+                    </div>
+
+                    <!-- Input oculto -->
+                    <input id="fotoInput" type="file" accept="image/*" @change="onFileChange" class="hidden" />
+                  </div>
+                  
                 </template>
               </div>
 
@@ -204,8 +223,10 @@ const handleInput = (event, field) => {
                     <span class="material-symbols-rounded text-[20px] text-universal-azul">local_police</span>
                     {{ user.rol?.tipo_rol || 'Sin rol' }}
                   </p>
-                  <div class="flex items-center gap-1 shadowM text-mono-blanco bg-universal-azul w-[auto] py-1 px-2 rounded-md">{{
-                    user.tienda?.aplicacion?.membresia?.nombre_membresia }} <span
+                  <div
+                    class="flex items-center gap-1 shadowM text-mono-blanco bg-universal-azul w-[auto] py-1 px-2 rounded-md">
+                    {{
+                      user.tienda?.aplicacion?.membresia?.nombre_membresia }} <span
                       class="material-symbols-rounded text-[18px]">bolt</span></div>
                 </div>
 
@@ -215,9 +236,8 @@ const handleInput = (event, field) => {
                     Guardar cambios
                   </button>
                   <a :href="route('aplicacion.configuraciones', { aplicacion, rol })">
-                    <button
-                      class="" :class="[buttonSecundario]">
-                      <p >Cancelar</p>
+                    <button class="" :class="[buttonSecundario]">
+                      <p>Cancelar</p>
                     </button>
                   </a>
                 </div>
@@ -227,7 +247,7 @@ const handleInput = (event, field) => {
 
             <div class="right-info">
 
-             <div class="datos-recurentes flex items-end flex-col gap-2">
+              <div class="datos-recurentes flex items-end flex-col gap-2">
                 <div class="dias-restante text-right w-auto rounded-md">
                   <h4 class="text-secundary-default dark:text-mono-blanco">Tu membresía finaliza en:</h4>
                   <p class="text-[35px] font-semibold -mt-3 text-secundary-default dark:text-mono-blanco">{{
@@ -258,14 +278,17 @@ const handleInput = (event, field) => {
             </div>
 
             <div v-if="activeTab === 0">
-              <h2 class="text-2xl font-bold mb-4 text-secundary-default dark:text-mono-blanco">Editar mis datos personales</h2>
+              <h2 class="text-2xl font-bold mb-4 text-secundary-default dark:text-mono-blanco">Editar mis datos
+                personales</h2>
               <div class="flex w-full justify-between gap-10">
 
                 <div class="right-table w-[50%] flex flex-col gap-1">
                   <div class="nombre-usuario">
                     <div
                       class="contador-input flex items-center justify-between xl:flex xl:items-center xl:justify-between">
-                      <label for="nombre-usuario" class="text-[14px] text-secundary-default dark:text-secundary-light">Nombre usuario:</label>
+                      <label for="nombre-usuario"
+                        class="text-[14px] text-secundary-default dark:text-secundary-light">Nombre
+                        usuario:</label>
                       <p class="2xl:text-[10px] xl:text-[12px] text-[8px] text-right  text-secundary-light">
                         {{ form.nombres_ct.length }} / {{ limitesCaracteres.nombres_ct }}
                       </p>
@@ -277,7 +300,8 @@ const handleInput = (event, field) => {
                         :class="[textoClase]">format_italic</span>
 
 
-                      <input type="text" class="w-full focus:outline-none focus:border-none font-normal bg-transparent text-secundary-default dark:text-mono-blanco"
+                      <input type="text"
+                        class="w-full focus:outline-none focus:border-none font-normal bg-transparent text-secundary-default dark:text-mono-blanco"
                         placeholder="Ingresa tus nombres" v-model="form.nombres_ct"
                         @input="handleInput($event, 'nombres_ct')" @blur="handleBlur('nombres_ct')" />
                     </div>
@@ -286,7 +310,9 @@ const handleInput = (event, field) => {
                   <div class="email-usuario">
                     <div
                       class="contador-input flex items-center justify-between xl:flex xl:items-center xl:justify-between">
-                      <label for="email-usuario" class="text-[14px] text-secundary-default dark:text-secundary-light">Email usuario:</label>
+                      <label for="email-usuario"
+                        class="text-[14px] text-secundary-default dark:text-secundary-light">Email
+                        usuario:</label>
                       <p class="2xl:text-[10px] xl:text-[12px] text-[8px] text-right  text-secundary-light">
                         {{ form.email_ct.length }} / {{ limitesCaracteres.email_ct }}
                       </p>
@@ -297,7 +323,8 @@ const handleInput = (event, field) => {
                       <span class=" text-[20px] pl-[5px] material-symbols-rounded" :class="[textoClase]">email</span>
 
 
-                      <input type="text" class="w-full focus:outline-none focus:border-none font-normal bg-transparent text-secundary-default dark:text-mono-blanco"
+                      <input type="text"
+                        class="w-full focus:outline-none focus:border-none font-normal bg-transparent text-secundary-default dark:text-mono-blanco"
                         placeholder="Ingresa tus nombres" v-model="form.email_ct"
                         @input="handleInput($event, 'email_ct')" @blur="handleBlur('email_ct')" />
                     </div>
@@ -308,7 +335,8 @@ const handleInput = (event, field) => {
                   <div class="apellido-usuario">
                     <div
                       class="contador-input flex items-center justify-between xl:flex xl:items-center xl:justify-between">
-                      <label for="apellido-usuario" class="text-[14px] text-secundary-default dark:text-secundary-light">Apellidos
+                      <label for="apellido-usuario"
+                        class="text-[14px] text-secundary-default dark:text-secundary-light">Apellidos
                         usuario:</label>
                       <p class="2xl:text-[10px] xl:text-[12px] text-[8px] text-right  text-secundary-light">
                         {{ form.apellidos_ct.length }} / {{ limitesCaracteres.apellidos_ct }}
@@ -319,7 +347,8 @@ const handleInput = (event, field) => {
                       class="w-[100%] p-[3px] flex items-center gap-[8px] xl:w-[100%] xl:p-[3px] xl:flex xl:items-center xl:gap-[8px] transition-all rounded-[5px] border-[1px] border-secundary-light">
                       <span class="text-[20px] pl-[5px] material-symbols-rounded"
                         :class="[textoClase]">format_italic</span>
-                      <input type="text" class="w-full focus:outline-none focus:border-none font-normal bg-transparent text-secundary-default dark:text-mono-blanco"
+                      <input type="text"
+                        class="w-full focus:outline-none focus:border-none font-normal bg-transparent text-secundary-default dark:text-mono-blanco"
                         placeholder="Ingresa tus nombres" v-model="form.apellidos_ct"
                         @input="handleInput($event, 'apellidos_ct')" @blur="handleBlur('apellidos_ct')" />
                     </div>
@@ -328,7 +357,9 @@ const handleInput = (event, field) => {
                   <div class="telefono-usuario">
                     <div
                       class="contador-input flex items-center justify-between xl:flex xl:items-center xl:justify-between">
-                      <label for="telefono-usuario" class="text-[14px] text-secundary-default dark:text-secundary-light">Teléfono usuario:</label>
+                      <label for="telefono-usuario"
+                        class="text-[14px] text-secundary-default dark:text-secundary-light">Teléfono
+                        usuario:</label>
                       <p class="2xl:text-[10px] xl:text-[12px] text-[8px] text-right  text-secundary-light">
                         {{ form.telefono_ct.length }} / {{ limitesCaracteres.telefono_ct }}
                       </p>
@@ -337,7 +368,8 @@ const handleInput = (event, field) => {
                     <div
                       class="w-[100%] p-[3px] flex items-center gap-[8px] xl:w-[100%] xl:p-[3px] xl:flex xl:items-center xl:gap-[8px] transition-all rounded-[5px] border-[1px] border-secundary-light">
                       <span class="text-[20px] pl-[5px] material-symbols-rounded" :class="[textoClase]">phone</span>
-                      <input type="text" class="w-full focus:outline-none focus:border-none font-normal bg-transparent text-secundary-default dark:text-mono-blanco"
+                      <input type="text"
+                        class="w-full focus:outline-none focus:border-none font-normal bg-transparent text-secundary-default dark:text-mono-blanco"
                         placeholder="Ingresa tu teléfono" v-model="form.telefono_ct"
                         @input="handleInput($event, 'telefono_ct')" @blur="handleBlur('telefono_ct')" />
                     </div>
@@ -346,13 +378,16 @@ const handleInput = (event, field) => {
               </div>
             </div>
             <div v-else-if="activeTab === 1">
-              <h2 class="text-2xl font-bold mb-4 text-secundary-default dark:text-mono-blanco">Editar datos de mi tienda</h2>
+              <h2 class="text-2xl font-bold mb-4 text-secundary-default dark:text-mono-blanco">Editar datos de mi tienda
+              </h2>
               <div class="flex justify-between w-full gap-10">
                 <div class="left-table w-[50%] flex flex-col gap-1">
                   <div class="tienda-usuario">
                     <div
                       class="contador-input flex items-center justify-between xl:flex xl:items-center xl:justify-between">
-                      <label for="tienda-usuario" class="text-[14px] text-secundary-default dark:text-secundary-light">Nombre de mi tienda:</label>
+                      <label for="tienda-usuario"
+                        class="text-[14px] text-secundary-default dark:text-secundary-light">Nombre de
+                        mi tienda:</label>
                       <p class="2xl:text-[10px] xl:text-[12px] text-[8px] text-right  text-secundary-light">
                         {{ form.nombre_tienda.length }} / {{ limitesCaracteres.nombre_tienda }}
                       </p>
@@ -361,7 +396,8 @@ const handleInput = (event, field) => {
                     <div
                       class="w-[100%] p-[3px] flex items-center gap-[8px] xl:w-[100%] xl:p-[3px] xl:flex xl:items-center xl:gap-[8px] transition-all rounded-[5px] border-[1px] border-secundary-light">
                       <span class="text-[20px] pl-[5px] material-symbols-rounded" :class="[textoClase]">store</span>
-                      <input type="text" class="w-full focus:outline-none focus:border-none font-normal bg-transparent text-secundary-default dark:text-mono-blanco"
+                      <input type="text"
+                        class="w-full focus:outline-none focus:border-none font-normal bg-transparent text-secundary-default dark:text-mono-blanco"
                         placeholder="Ingresa el nombre de tu empresa" v-model="form.nombre_tienda"
                         @input="handleInput($event, 'nombre_tienda')" @blur="handleBlur('nombre_tienda')" />
                     </div>
@@ -370,7 +406,9 @@ const handleInput = (event, field) => {
                   <div class="direccion-tienda">
                     <div
                       class="contador-input flex items-center justify-between xl:flex xl:items-center xl:justify-between">
-                      <label for="tienda-usuario" class="text-[14px] text-secundary-default dark:text-secundary-light">Dirección de la tienda:</label>
+                      <label for="tienda-usuario"
+                        class="text-[14px] text-secundary-default dark:text-secundary-light">Dirección
+                        de la tienda:</label>
                       <p class="2xl:text-[10px] xl:text-[12px] text-[8px] text-right  text-secundary-light">
                         {{ form.direccion_tienda.length }} / {{ limitesCaracteres.direccion_tienda }}
                       </p>
@@ -379,7 +417,8 @@ const handleInput = (event, field) => {
                     <div
                       class="w-[100%] p-[3px] flex items-center gap-[8px] xl:w-[100%] xl:p-[3px] xl:flex xl:items-center xl:gap-[8px] transition-all rounded-[5px] border-[1px] border-secundary-light">
                       <span class="text-[20px] pl-[5px] material-symbols-rounded" :class="[textoClase]">pin_drop</span>
-                      <input type="text" class="w-full focus:outline-none focus:border-none font-normal bg-transparent text-secundary-default dark:text-mono-blanco"
+                      <input type="text"
+                        class="w-full focus:outline-none focus:border-none font-normal bg-transparent text-secundary-default dark:text-mono-blanco"
                         placeholder="Ingresa la direccion de la tienda" v-model="form.direccion_tienda"
                         @input="handleInput($event, 'direccion_tienda')" @blur="handleBlur('direccion_tienda')" />
                     </div>
@@ -388,7 +427,9 @@ const handleInput = (event, field) => {
                   <div class="barrio-tienda">
                     <div
                       class="contador-input flex items-center justify-between xl:flex xl:items-center xl:justify-between">
-                      <label for="tienda-usuario" class="text-[14px] text-secundary-default dark:text-secundary-light">Barrio de la tienda:</label>
+                      <label for="tienda-usuario"
+                        class="text-[14px] text-secundary-default dark:text-secundary-light">Barrio de
+                        la tienda:</label>
                       <p class="2xl:text-[10px] xl:text-[12px] text-[8px] text-right  text-secundary-light">
                         {{ form.barrio_tienda.length }} / {{ limitesCaracteres.barrio_tienda }}
                       </p>
@@ -397,19 +438,22 @@ const handleInput = (event, field) => {
                     <div
                       class="w-[100%] p-[3px] flex items-center gap-[8px] xl:w-[100%] xl:p-[3px] xl:flex xl:items-center xl:gap-[8px] transition-all rounded-[5px] border-[1px] border-secundary-light">
                       <span class="text-[20px] pl-[5px] material-symbols-rounded" :class="[textoClase]">pin_drop</span>
-                      <input type="text" class="w-full focus:outline-none focus:border-none font-normal bg-transparent text-secundary-default dark:text-mono-blanco"
+                      <input type="text"
+                        class="w-full focus:outline-none focus:border-none font-normal bg-transparent text-secundary-default dark:text-mono-blanco"
                         placeholder="Ingresa el departamento de la tienda" v-model="form.barrio_tienda"
                         @input="handleInput($event, 'barrio_tienda')" @blur="handleBlur('barrio_tienda')" />
                     </div>
                   </div>
 
-                  
+
                 </div>
                 <div class="right-table w-[50%] flex flex-col gap-1">
                   <div class="email-tienda">
                     <div
                       class="contador-input flex items-center justify-between xl:flex xl:items-center xl:justify-between">
-                      <label for="email-tienda" class="text-[14px] text-secundary-default dark:text-secundary-light">Email corporativo:</label>
+                      <label for="email-tienda"
+                        class="text-[14px] text-secundary-default dark:text-secundary-light">Email
+                        corporativo:</label>
                       <p class="2xl:text-[10px] xl:text-[12px] text-[8px] text-right  text-secundary-light">
                         {{ form.email_tienda.length }} / {{ limitesCaracteres.email_tienda }}
                       </p>
@@ -418,7 +462,8 @@ const handleInput = (event, field) => {
                     <div
                       class="w-[100%] p-[3px] flex items-center gap-[8px] xl:w-[100%] xl:p-[3px] xl:flex xl:items-center xl:gap-[8px] transition-all rounded-[5px] border-[1px] border-secundary-light">
                       <span class="text-[20px] pl-[5px] material-symbols-rounded" :class="[textoClase]">email</span>
-                      <input type="text" class="w-full focus:outline-none focus:border-none font-normal bg-transparent text-secundary-default dark:text-mono-blanco"
+                      <input type="text"
+                        class="w-full focus:outline-none focus:border-none font-normal bg-transparent text-secundary-default dark:text-mono-blanco"
                         placeholder="Ingresa el email de la tienda" v-model="form.email_tienda"
                         @input="handleInput($event, 'email_tienda')" @blur="handleBlur('email_tienda')" />
                     </div>
@@ -427,7 +472,9 @@ const handleInput = (event, field) => {
                   <div class="telefono-tienda">
                     <div
                       class="contador-input flex items-center justify-between xl:flex xl:items-center xl:justify-between">
-                      <label for="telefono-tienda" class="text-[14px] text-secundary-default dark:text-secundary-light">Teléfono corporativo:</label>
+                      <label for="telefono-tienda"
+                        class="text-[14px] text-secundary-default dark:text-secundary-light">Teléfono
+                        corporativo:</label>
                       <p class="2xl:text-[10px] xl:text-[12px] text-[8px] text-right  text-secundary-light">
                         {{ form.telefono_tienda.length }} / {{ limitesCaracteres.telefono_tienda }}
                       </p>
@@ -436,14 +483,15 @@ const handleInput = (event, field) => {
                     <div
                       class="w-[100%] p-[3px] flex items-center gap-[8px] xl:w-[100%] xl:p-[3px] xl:flex xl:items-center xl:gap-[8px] transition-all rounded-[5px] border-[1px] border-secundary-light">
                       <span class="text-[20px] pl-[5px] material-symbols-rounded" :class="[textoClase]">phone</span>
-                      <input type="text" class="w-full focus:outline-none focus:border-none font-normal bg-transparent text-secundary-default dark:text-mono-blanco"
+                      <input type="text"
+                        class="w-full focus:outline-none focus:border-none font-normal bg-transparent text-secundary-default dark:text-mono-blanco"
                         placeholder="Ingresa el teléfono de la tienda" v-model="form.telefono_tienda"
                         @input="handleInput($event, 'telefono_tienda')" @blur="handleBlur('telefono_tienda')" />
                     </div>
                   </div>
 
 
-                 
+
                 </div>
               </div>
 
@@ -451,8 +499,11 @@ const handleInput = (event, field) => {
             </div>
 
             <div v-else-if="activeTab === 2">
-              <h2 class="text-2xl font-bold mb-4 text-secundary-default dark:text-mono-blanco">Configuraciones Avanzadas</h2>
-              <p class="text-secundary-default dark:text-mono-blanco">Esta sección está reservada para configuraciones avanzadas que no están disponibles en la interfaz
+              <h2 class="text-2xl font-bold mb-4 text-secundary-default dark:text-mono-blanco">Configuraciones Avanzadas
+              </h2>
+              <p class="text-secundary-default dark:text-mono-blanco">Esta sección está reservada para configuraciones
+                avanzadas
+                que no están disponibles en la interfaz
                 principal.</p>
               <p class="text-secundary-default dark:text-mono-blanco">Próximamente...</p>
             </div>

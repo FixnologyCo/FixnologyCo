@@ -1,12 +1,14 @@
 <script setup>
 import { Head, usePage } from '@inertiajs/vue3';
-import { ref, onMounted, onUnmounted, computed } from 'vue';
+import { ref } from 'vue'
 import 'dayjs/locale/es';
 import Header from '@/Components/header/Header.vue';
 import SidebarSuperAdmin from '@/Components/Sidebar/FixnologyCO/Sidebar.vue'
 import Colors from '@/Composables/ModularColores';
 import MensajesLayout from '@/Layouts/MensajesLayout.vue';
 import { useSidebar } from '@/Composables/useSidebar'
+import ModalCrearApp from '@/Components/Modales/FixnologyCO/MisApps/ModalCrearApp.vue';
+
 
 const { sidebarExpandido } = useSidebar()
 const { appName, bgClase, bgOpacity, focus, textoClase, borderClase, buttonFocus, hoverClase, hoverTexto, buttonClase, buttonSecundario } = Colors();
@@ -16,31 +18,30 @@ const props = defineProps({
     type: Object,
     required: true
   },
-  clientes: {
-    type: Array,
-    default: () => [],
-  },
-  aplicacion: {
-    type: String,
-    default: ''
-  },
   apps: {
     type: Array,
     default: () => [],
   },
-  errors: {
-    type: Object,
-    required: true
-  },
   foto_base64: {
     type: String,
     default: ''
+  },
+  estados: {
+    type: Array,
+    required: true,
+  },
+  plan_aplicaciones: {
+    type: Array,
+    required: true,
+  },
+  membresias: {
+    type: Array,
+    required: true,
   }
 })
 
-const user = props.auth.user
 const auth = usePage().props.auth;
-
+const mostrarModal = ref(false)
 </script>
 
 <template>
@@ -63,7 +64,7 @@ const auth = usePage().props.auth;
               aplicaciones de FixnologyCO</p>
           </div>
           <div class="indiceRight ">
-            <button :class="[buttonClase]">Crear nueva app <span
+            <button :class="[buttonClase]" @click="mostrarModal = true">Crear nueva app <span
                 class="material-symbols-rounded">add_circle</span></button>
           </div>
         </div>
@@ -87,7 +88,8 @@ const auth = usePage().props.auth;
                   <h3 class="text-secundary-default dark:text-secundary-light font-semibold">
                     {{ app.nombre_app }}
                   </h3>
-                  <p class="text-secundary-default dark:text-mono-blanco -mt-2 text-[28px] font-bold"> {{ app.usuarios_en_tiendas }}</p>
+                  <p class="text-secundary-default dark:text-mono-blanco -mt-2 text-[28px] font-bold"> {{
+                    app.usuarios_en_tiendas }}</p>
                 </div>
               </div>
 
@@ -108,11 +110,8 @@ const auth = usePage().props.auth;
             </div>
           </div>
         </div>
-
-
-
-
       </div>
     </div>
+    <ModalCrearApp :mostrar="mostrarModal" @cerrar="mostrarModal = false" :estados="estados" :plan_aplicaciones="plan_aplicaciones" :membresias="membresias" />
   </div>
 </template>

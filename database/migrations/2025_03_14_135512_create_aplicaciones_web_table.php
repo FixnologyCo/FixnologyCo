@@ -16,6 +16,7 @@ return new class extends Migration {
             $table->unsignedBigInteger('id_plan_aplicacion')->nullable(false);
             $table->unsignedBigInteger('id_membresia')->nullable(false);
             $table->string('nombre_app')->nullable(false);
+            $table->string('descripcion')->nullable(false);
             $table->timestamp('fecha_creacion')->default(DB::raw('CURRENT_TIMESTAMP'));
             $table->timestamp('fecha_modificacion')->default(DB::raw('CURRENT_TIMESTAMP'))->useCurrentOnUpdate();
 
@@ -31,27 +32,32 @@ return new class extends Migration {
             [
                 'id_plan_aplicacion' => '4',
                 'id_membresia' => '6',
-                'nombre_app' => 'FixnologyCO'
+                'nombre_app' => 'FixnologyCO',
+                'descripcion' => 'Aplicación corporativa a escala Fixnology',
             ],
             [
                 'id_plan_aplicacion' => '1',
                 'id_membresia' => '1',
-                'nombre_app' => 'Control de votaciones'
+                'nombre_app' => 'Control de votaciones',
+                'descripcion' => 'Aplicación de votaciones (Free)',
             ],
             [
                 'id_plan_aplicacion' => '2',
                 'id_membresia' => '2',
-                'nombre_app' => 'Control de votaciones'
+                'nombre_app' => 'Control de votaciones',
+                'descripcion' => 'Aplicación de votaciones (Basic)',
             ],
             [
                 'id_plan_aplicacion' => '3',
                 'id_membresia' => '3',
-                'nombre_app' => 'Control de votaciones'
+                'nombre_app' => 'Control de votaciones',
+                'descripcion' => 'Aplicación de votaciones (Pro+)',
             ],
             [
                 'id_plan_aplicacion' => '4',
                 'id_membresia' => '4',
-                'nombre_app' => 'Control de votaciones'
+                'nombre_app' => 'Control de votaciones',
+                'descripcion' => 'Aplicación de votaciones (Estellar)',
             ]
         ]);
     }
