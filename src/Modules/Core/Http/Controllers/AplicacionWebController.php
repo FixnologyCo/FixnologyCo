@@ -152,7 +152,6 @@ class AplicacionWebController extends Controller
             'descripcion_app.max' => 'La descripción no debe superar los 100 carácteres',
         ]);
 
-        // ✅ Crear cliente
         $app = AplicacionWeb::create([
             'nombre_app' => $request->nombre_app,
             'descripcion' => $request->descripcion_app,
@@ -169,21 +168,48 @@ class AplicacionWebController extends Controller
         return redirect()->back()->with('success', 'Creación éxitosa, ¡A vender!');
     }
 
-public function cambiarEstado(Request $request, $id)
-{
-    $app = AplicacionWeb::findOrFail($id);
+    public function cambiarEstado(Request $request, $id)
+    {
+        $app = AplicacionWeb::findOrFail($id);
 
-    $estado = Estados::where('tipo_estado', strtolower($request->estado))->first();
+        $estado = Estados::where('tipo_estado', strtolower($request->estado))->first();
 
-    if (!$estado) {
-        return response()->json(['error' => 'Estado no válido.'], 422);
+        if (!$estado) {
+            return response()->json(['error' => 'Estado no válido.'], 422);
+        }
+
+        $app->id_estado = $estado->id;
+        $app->save();
+
+        return redirect()->back()->with('success', 'Cambio de estado éxitoso.');
     }
 
-    $app->id_estado = $estado->id;
-    $app->save();
+    public function updateApp(Request $request, $id)
+    {
+        $request->validate([
+            'nombre_app' => 'required|string|max:255',
+            'descripcion' => 'nullable|string',
+            'id_estado' => 'required|integer|exists:estados,id',
+            'id_plan_aplicacion' => 'required|integer|exists:planes_aplicaciones,id',
+            'id_membresia' => 'required|integer|exists:membresias,id',
+            'color_fondo' => 'nullable|string|max:100',
+            'icono_app' => 'nullable|string|max:100',
+        ]);
 
-    return redirect()->back()->with('success', 'Cambio de estado éxitoso.');
-}
+        $app = AplicacionWeb::findOrFail($id);
+        $app->update([
+             'nombre_app' => $request->nombre_app,
+            'descripcion' => $request->descripcion_app,
+            'id_estado' => $request->id_estado,
+            'id_plan_aplicacion' => $request->id_plan_aplicacion,
+            'id_membresia' => $request->id_membresia,
+            'color_fondo' => $request->color_fondo,
+            'icono_app' => $request->icono_app,
+        ]);
+
+        return redirect()->back()->with('success', 'Aplicación actualizada correctamente.');
+    }
+
 
 
     use AuthorizesRequests;

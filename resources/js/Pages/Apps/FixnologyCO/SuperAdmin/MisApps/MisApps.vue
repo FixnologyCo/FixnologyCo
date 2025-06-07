@@ -9,6 +9,7 @@ import MensajesLayout from '@/Layouts/MensajesLayout.vue';
 import { useSidebar } from '@/Composables/useSidebar'
 import ModalCrearApp from '@/Components/Modales/FixnologyCO/MisApps/ModalCrearApp.vue';
 import ModalAppDetalle from '@/Components/Modales/FixnologyCO/MisApps/ModalDetallesApp.vue'
+import ModalAppEditar from '@/Components/Modales/FixnologyCO/MisApps/ModalEditarApp.vue'
 
 
 const { sidebarExpandido } = useSidebar()
@@ -19,6 +20,7 @@ const props = defineProps({
     type: Object,
     required: true
   },
+  app: Object, 
   apps: {
     type: Array,
     default: () => [],
@@ -47,12 +49,19 @@ const auth = usePage().props.auth;
 const mostrarModal = ref(false)
 
 const opcionVisible = ref(null)
-const modalVisible = ref(false)
 const appSeleccionada = ref(null)
 
-const abrirModal = (app) => {
+const modalVisible = ref(false)
+const abrirModalDetalles = (app) => {
   appSeleccionada.value = app
   modalVisible.value = true
+  opcionVisible.value = false
+}
+
+const modalVisibleEditar = ref(false)
+const abrirModalEditar = (app) => {
+  appSeleccionada.value = app
+  modalVisibleEditar.value = true
   opcionVisible.value = false
 }
 
@@ -145,14 +154,14 @@ function alternarEstado(app) {
 
                   <button
                     class="optionApp text-[14px] w-full p-2 rounded-md flex items-center gap-2 text-mono-negro dark:text-mono-blanco"
-                    :class="[hoverClase]" @click="abrirModal(app)">
+                    :class="[hoverClase]" @click="abrirModalDetalles(app)">
                     <span class="material-symbols-rounded text-[16px]">info</span>
                     <p>Mostrar detalles</p>
                   </button>
 
                   <button
                     class="optionApp text-[14px] w-full p-2 rounded-md flex items-center gap-2  text-mono-negro dark:text-mono-blanco"
-                    :class="[hoverClase]">
+                    :class="[hoverClase]"  @click="abrirModalEditar(app)">
                     <span class="material-symbols-rounded text-[16px]">draw</span>
                     <p>Editar app</p>
 
@@ -193,5 +202,7 @@ function alternarEstado(app) {
       :plan_aplicaciones="plan_aplicaciones" :membresias="membresias" :auth="auth" />
 
     <ModalAppDetalle :visible="modalVisible" :app="appSeleccionada" @cerrar="modalVisible = false" />
+    <ModalAppEditar v-if="modalVisibleEditar" :visibleEditar="modalVisibleEditar" :app="appSeleccionada" :estados="estados"
+      :plan_aplicaciones="plan_aplicaciones" :membresias="membresias" :auth="auth" @cerrar="modalVisibleEditar = false" />
   </div>
 </template>
