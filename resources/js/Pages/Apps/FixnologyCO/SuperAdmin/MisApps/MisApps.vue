@@ -108,12 +108,20 @@ function alternarEstado(app) {
         </div>
 
         <div class="listado flex flex-wrap gap-2">
+
           <div v-for="app in apps" :key="app.id" class="tarjetaApp border border-secundary-light rounded-md p-4 mt-5"
-            :class="[sidebarExpandido ? 'w-[32.5%]' : 'w-[24.5%]']">
+            :class="[
+              sidebarExpandido ? 'w-[32.5%]' : 'w-[24.5%]',
+              app.estado.tipo_estado === 'Inactivo' ? 'border-semaforo-rojo' : 'border-secundary-light',
+              'border'
+            ]">
 
             <div class="top flex justify-between">
               <div class="conjunto flex gap-3">
-                <div class="icono grid place-content-center h-[50px] w-[50px] rounded-lg" :class="app.color_fondo">
+                <div v-if="app.estado.tipo_estado === 'Inactivo'" class="icono grid place-content-center h-[50px] w-[50px] rounded-lg bg-slate-500">
+                  <i class="material-symbols-rounded text-mono-blanco">nights_stay</i>
+                </div>
+                <div v-else class="icono grid place-content-center h-[50px] w-[50px] rounded-lg" :class="app.color_fondo">
                   <i class="material-symbols-rounded text-mono-blanco">{{ app.icono_app || 'help' }}</i>
                 </div>
                 <div class="titulo-contador">
