@@ -66,14 +66,37 @@ class AplicacionWebController extends Controller
 
             $apps = AplicacionWeb::All();
 
-            $aplicaciones = AplicacionWeb::with(['tiendas.clientes'])->get();
+            $aplicaciones = AplicacionWeb::with([
+                'estado',
+                'plan',
+                'membresia',
+                'tiendas',
+                'tiendas.clientes',
+                'tiendas.clientes.estado',
+                'tiendas.membresia',
+            ])->get();
 
             foreach ($aplicaciones as $app) {
                 $usuariosTotales = 0;
+                $detallesUsuarios = [];
+
                 foreach ($app->tiendas as $tienda) {
-                    $usuariosTotales += $tienda->clientes->count();
+                    foreach ($tienda->clientes as $users) {
+                        $usuariosTotales++;
+                        $detallesUsuarios[] = [
+                            'nombres' => $users->nombres_ct . ' ' . $users->apellidos_ct,
+                            'foto' => $users->foto_binaria
+                                ? 'data:image/jpeg;base64,' . $users->foto_binaria
+                                : null,
+                            'tienda' => $tienda->nombre_tienda ?? 'Desconocido',
+                        ];
+                    }
+
                 }
+
+
                 $app->usuarios_en_tiendas = $usuariosTotales;
+                $app->detalle_usuarios = $detallesUsuarios;
             }
 
             $estados = Estados::all();

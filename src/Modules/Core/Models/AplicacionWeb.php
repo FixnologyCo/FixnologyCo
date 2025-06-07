@@ -41,10 +41,29 @@ class AplicacionWeb extends Model
         return $this->belongsTo(Estados::class, 'id_estado');
     }
 
+     public function rol()
+    {
+        return $this->belongsTo(Rol::class, 'id_rol');
+    }
+
     public function tiendas()
     {
         return $this->hasMany(TiendaSistematizada::class, 'id_aplicacion_web');
     }
 
+    public function tienda()
+    {
+        return $this->belongsTo(TiendaSistematizada::class, 'id_tienda');
+    }
+
+    public function tipoDocumento()
+    {
+        return $this->belongsTo(TipoDocumento::class, 'id_tipo_documento', 'id');
+    }
+
+    public function pagos_membresia()
+{
+    return $this->hasMany(PagoMembresia::class, 'id_cliente');
+}
 
 }

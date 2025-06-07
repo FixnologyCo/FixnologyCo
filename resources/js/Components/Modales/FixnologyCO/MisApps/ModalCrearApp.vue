@@ -123,7 +123,7 @@ onBeforeUnmount(() => document.removeEventListener('click', clickFuera))
                                     class="cajaSelector absolute top-[60px] left-0 bg-white dark:bg-secundary-default border border-gray-300 dark:border-secundary-light rounded-lg p-4 z-50 max-w-[350px] shadow-lg">
                                     <!-- Selector de color -->
                                     <div class="mb-3">
-                                        <p class="text-sm font-semibold text-mono-black dark:text-mono-blanco mb-1">
+                                        <p class="text-sm font-semibold text-mono-blac  k dark:text-mono-blanco mb-1">
                                             Color de fondo:</p>
                                         <div class="flex gap-2">
                                             <div v-for="color in coloresDisponibles" :key="color"

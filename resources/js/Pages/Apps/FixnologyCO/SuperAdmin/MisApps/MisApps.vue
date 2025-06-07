@@ -8,6 +8,7 @@ import Colors from '@/Composables/ModularColores';
 import MensajesLayout from '@/Layouts/MensajesLayout.vue';
 import { useSidebar } from '@/Composables/useSidebar'
 import ModalCrearApp from '@/Components/Modales/FixnologyCO/MisApps/ModalCrearApp.vue';
+import ModalAppDetalle from '@/Components/Modales/FixnologyCO/MisApps/ModalDetallesApp.vue'
 
 
 const { sidebarExpandido } = useSidebar()
@@ -45,8 +46,16 @@ const props = defineProps({
 const auth = usePage().props.auth;
 const mostrarModal = ref(false)
 
-// Puedes mapear la clase color_fondo directamente
-const colorFondo = props.color_fondo || 'bg-gray-200'
+const opcionVisible = ref(null)
+const modalVisible = ref(false)
+const appSeleccionada = ref(null)
+
+const abrirModal = (app) => {
+  appSeleccionada.value = app
+  modalVisible.value = true
+  opcionVisible.value = false
+}
+
 </script>
 
 <template>
@@ -86,6 +95,7 @@ const colorFondo = props.color_fondo || 'bg-gray-200'
         <div class="listado flex flex-wrap gap-2">
           <div v-for="app in apps" :key="app.id" class="tarjetaApp border border-secundary-light rounded-md p-4 mt-5"
             :class="[sidebarExpandido ? 'w-[32.5%]' : 'w-[24.5%]']">
+
             <div class="top flex justify-between">
               <div class="conjunto flex gap-3">
                 <div class="icono grid place-content-center h-[50px] w-[50px] rounded-lg" :class="app.color_fondo">
@@ -95,25 +105,64 @@ const colorFondo = props.color_fondo || 'bg-gray-200'
                   <h3 class="text-secundary-default dark:text-secundary-light font-semibold">
                     {{ app.nombre_app }}
                   </h3>
-                  <p class="text-secundary-default dark:text-mono-blanco -mt-2 text-[28px] font-bold"> {{
-                    app.usuarios_en_tiendas }}</p>
+                  <p class="text-secundary-default dark:text-mono-blanco -mt-2 text-[28px] font-bold">
+                    {{ app.usuarios_en_tiendas }}
+                  </p>
                 </div>
               </div>
 
-              <div class="opciones">
-                <span class="material-symbols-rounded text-mono-negro dark:text-secundary-light">more_horiz</span>
+              <div class="opciones relative">
+                <span class="cursor-pointer material-symbols-rounded text-mono-negro dark:text-secundary-light"
+                  @click="opcionVisible = opcionVisible === app.id ? null : app.id">
+                  more_horiz
+                </span>
+
+                <div v-if="opcionVisible === app.id"
+                  class="cajaSelector absolute top-[20px] right-0 bg-white dark:bg-mono-negro border border-gray-300 dark:border-secundary-light rounded-lg p-2 z-50 w-[170px] shadow-lg">
+
+                  <button
+                    class="optionApp text-[14px] w-full p-2 rounded-md flex items-center gap-2 text-mono-negro dark:text-mono-blanco"
+                    :class="[hoverClase]" @click="abrirModal(app)">
+                    <span class="material-symbols-rounded text-[16px]">info</span>
+                    <p>Mostrar detalles</p>
+                  </button>
+
+                  <button
+                    class="optionApp text-[14px] w-full p-2 rounded-md flex items-center gap-2  text-mono-negro dark:text-mono-blanco"
+                    :class="[hoverClase]">
+                    <span class="material-symbols-rounded text-[16px]">draw</span>
+                    <p>Editar app</p>
+                  </button>
+
+                  <button
+                    class="optionApp text-[14px] w-full p-2 rounded-md flex items-center gap-2  text-mono-negro dark:text-mono-blanco"
+                    :class="[hoverClase]">
+                    <span class="material-symbols-rounded text-[16px]">nights_stay</span>
+                    <p>Inactivar app</p>
+                  </button>
+
+                  <button
+                    class="optionApp text-[14px] w-full p-2 rounded-md flex items-center gap-2  text-mono-negro dark:text-mono-blanco"
+                    :class="[hoverClase]">
+                    <span class="material-symbols-rounded text-[16px]">delete</span>
+                    <p>Eliminar app</p>
+                  </button>
+                </div>
               </div>
             </div>
 
             <div class="line h-[1.5px] rounded-full w-full bg-secundary-light my-3"></div>
 
             <div class="descripciones">
-              <p class="text-[14px] text-mono-negro dark:text-mono-blanco">{{ app.descripcion ?? 'Sin descripción' }}
+              <p class="text-[14px] text-mono-negro dark:text-mono-blanco">
+                {{ app.descripcion ?? 'Sin descripción' }}
               </p>
             </div>
 
             <div class="tags flex items-center justify-between mt-1">
-              <div class="plan rounded-[5px] bg-slate-500 px-1 text-mono-blanco text-[14px]">ID: {{ app.id }}</div>
+              <div class="plan rounded-[5px] bg-slate-500 px-1 text-mono-blanco text-[14px]">
+                ID: {{ app.id }}
+              </div>
             </div>
           </div>
         </div>
@@ -121,5 +170,7 @@ const colorFondo = props.color_fondo || 'bg-gray-200'
     </div>
     <ModalCrearApp :mostrar="mostrarModal" @cerrar="mostrarModal = false" :estados="estados"
       :plan_aplicaciones="plan_aplicaciones" :membresias="membresias" :auth="auth" />
+
+    <ModalAppDetalle :visible="modalVisible" :app="appSeleccionada" @cerrar="modalVisible = false" />
   </div>
 </template>
