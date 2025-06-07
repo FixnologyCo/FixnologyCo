@@ -169,6 +169,23 @@ class AplicacionWebController extends Controller
         return redirect()->back()->with('success', 'Creación éxitosa, ¡A vender!');
     }
 
+public function cambiarEstado(Request $request, $id)
+{
+    $app = AplicacionWeb::findOrFail($id);
+
+    $estado = Estados::where('tipo_estado', strtolower($request->estado))->first();
+
+    if (!$estado) {
+        return response()->json(['error' => 'Estado no válido.'], 422);
+    }
+
+    $app->id_estado = $estado->id;
+    $app->save();
+
+    return redirect()->back()->with('success', 'Cambio de estado éxitoso.');
+}
+
+
     use AuthorizesRequests;
 
 }

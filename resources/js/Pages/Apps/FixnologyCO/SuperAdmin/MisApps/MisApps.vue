@@ -1,5 +1,5 @@
 <script setup>
-import { Head, usePage } from '@inertiajs/vue3';
+import { Head, usePage, router } from '@inertiajs/vue3';
 import { ref } from 'vue'
 import 'dayjs/locale/es';
 import Header from '@/Components/header/Header.vue';
@@ -54,6 +54,21 @@ const abrirModal = (app) => {
   appSeleccionada.value = app
   modalVisible.value = true
   opcionVisible.value = false
+}
+
+function alternarEstado(app) {
+  const estadoActual = app.estado.tipo_estado.toLowerCase();
+  const nuevoEstado = estadoActual === 'activo' ? 'inactivo' : 'activo';
+
+  const mensaje = `¿Estás seguro de que deseas ${nuevoEstado === 'activo' ? 'activar' : 'desactivar'} esta aplicación?`;
+
+  if (confirm(mensaje)) {
+    router.put(route('aplicaciones.estado', app.id), {
+      estado: nuevoEstado
+    }, {
+      preserveScroll: true,
+    });
+  }
 }
 
 </script>
@@ -132,20 +147,18 @@ const abrirModal = (app) => {
                     :class="[hoverClase]">
                     <span class="material-symbols-rounded text-[16px]">draw</span>
                     <p>Editar app</p>
+
                   </button>
 
-                  <button
-                    class="optionApp text-[14px] w-full p-2 rounded-md flex items-center gap-2  text-mono-negro dark:text-mono-blanco"
-                    :class="[hoverClase]">
-                    <span class="material-symbols-rounded text-[16px]">nights_stay</span>
-                    <p>Inactivar app</p>
-                  </button>
-
-                  <button
-                    class="optionApp text-[14px] w-full p-2 rounded-md flex items-center gap-2  text-mono-negro dark:text-mono-blanco"
-                    :class="[hoverClase]">
-                    <span class="material-symbols-rounded text-[16px]">delete</span>
-                    <p>Eliminar app</p>
+                  <button @click="alternarEstado(app)"
+                    class="optionApp text-[14px] w-full p-2 rounded-md flex items-center gap-2"
+                    :class="[app.estado.tipo_estado === 'Activo' ? 'text-mono-negro dark:text-mono-blanco' : 'text-semaforo-rojo', hoverClase]">
+                    <span class="material-symbols-rounded text-[16px]">
+                      {{ app.estado.tipo_estado === 'Activo' ? 'nights_stay' : 'wb_sunny' }}
+                    </span>
+                    <p>
+                      {{ app.estado.tipo_estado === 'Activo' ? 'Inactivar app' : 'Activar app' }}
+                    </p>
                   </button>
                 </div>
               </div>

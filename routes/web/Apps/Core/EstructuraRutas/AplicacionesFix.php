@@ -11,6 +11,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/misAplicaciones', [AplicacionWebController::class, 'show'])
             ->name('aplicacion.misAplicaciones');
         });
-        
+        Route::put('/aplicaciones/{id}/estado', [AplicacionWebController::class, 'cambiarEstado'])->name('aplicaciones.estado');
+
+
         Route::post('{aplicacion}/{rol}/createApp', [AplicacionWebController::class, 'createApp'])->name('registro.app');
 });
