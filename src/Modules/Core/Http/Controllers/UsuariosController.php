@@ -5,7 +5,12 @@ namespace Core\Http\Controllers;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-
+use App\Http\Controllers\Controller;
+use Core\Models\ClienteFixgi;
+use Core\Models\AplicacionWeb;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\DB;
+use App\Traits\RegistraAuditoria;
 
 class UsuariosController extends Controller
 {
@@ -57,6 +62,59 @@ class UsuariosController extends Controller
         abort(404);
     }
 
+
+    public function show($aplicacion, $rol, Request $request)
+    {
+
+        if ($respuesta = $this->validarAcceso($aplicacion, $rol, $request, [4])) {
+            return $respuesta;
+        }
+
+        $user = auth()->user()->load([
+            'tienda.aplicacion.membresia.estado',
+            'tienda.pagosMembresia',
+        ]);
+
+
+
+        $cantidadApps = DB::table('aplicaciones_web')
+            ->select(DB::raw('COUNT(DISTINCT nombre_app) as totalApps'))
+            ->value('totalApps');
+
+        $cantidadClientesRol1 = DB::table('clientes_fixgis')
+            ->where('id_rol', 1)
+            ->count();
+
+        $usuariosRol4 = ClienteFixgi::where('id_rol', 4)
+            ->select('id', 'nombres_ct', 'apellidos_ct')
+            ->get();
+
+            $fotoBase64 = $user->foto_binaria
+                ? 'data:image/jpeg;base64,' . $user->foto_binaria
+                : null;
+
+        if ($user->tienda && $user->tienda->aplicacion->nombre_app === $aplicacion) {
+
+            return Inertia::render('Apps/' . ucfirst($aplicacion) . '/' . ucfirst($rol) . '/Usuarios/GestorUsuarios', [
+                'auth' => ['user' => $user],
+                'aplicacion' => $aplicacion,
+                'rol' => $rol,
+                'foto_base64' => $fotoBase64,
+
+            ]);
+        }
+
+        abort(404);
+    }
+
+
+    public function updateClienteFixgi(Request $request, $id)
+    {
+    }
+
+    public function destroyClienteFixgi(Request $request, $id)
+    {
+    }
     use AuthorizesRequests;
 
 }

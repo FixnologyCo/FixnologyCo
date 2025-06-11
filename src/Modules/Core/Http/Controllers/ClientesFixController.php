@@ -7,9 +7,9 @@ use Core\Models\AplicacionWeb;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\DB; // ✅ Importa la clase DB correctamente
+use Illuminate\Support\Facades\DB;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use App\Traits\RegistraAuditoria; // 👈 Importa el trait correctamente aquí
+use App\Traits\RegistraAuditoria; 
 
 
 
@@ -26,8 +26,6 @@ class ClientesFixController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Inertia\Response
      */
-
-
 
     use RegistraAuditoria;
     public function show($aplicacion, $rol, Request $request)
@@ -71,6 +69,12 @@ class ClientesFixController extends Controller
 
         abort(404);
     }
+
+    public function createClienteFixgi(Request $request){}
+
+    public function updateClienteFixgi(Request $request, $id){}
+
+    public function destroyClienteFixgi(Request $request, $id){}
 
 
 

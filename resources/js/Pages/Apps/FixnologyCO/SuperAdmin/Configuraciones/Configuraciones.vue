@@ -7,7 +7,7 @@ import SidebarSuperAdmin from '@/Components/Sidebar/FixnologyCO/Sidebar.vue';
 import Header from '@/Components/header/Header.vue';
 import Colors from '@/Composables/ModularColores';
 import MensajesLayout from '@/Layouts/MensajesLayout.vue';
-import { formatFecha } from '@/Utils/date';
+import { formatFecha } from '@/utils/date';
 import { useTiempo } from '@/Composables/useTiempo';
 
 const page = usePage();

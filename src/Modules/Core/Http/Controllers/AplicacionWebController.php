@@ -22,7 +22,6 @@ class AplicacionWebController extends Controller
         ]);
     }
 
-
     /**
      * Muestra el dashboard para la aplicación y rol especificados.
      *
@@ -198,7 +197,7 @@ class AplicacionWebController extends Controller
 
         $app = AplicacionWeb::findOrFail($id);
         $app->update([
-             'nombre_app' => $request->nombre_app,
+            'nombre_app' => $request->nombre_app,
             'descripcion' => $request->descripcion_app,
             'id_estado' => $request->id_estado,
             'id_plan_aplicacion' => $request->id_plan_aplicacion,
@@ -209,8 +208,6 @@ class AplicacionWebController extends Controller
 
         return redirect()->back()->with('success', 'Aplicación actualizada correctamente.');
     }
-
-
 
     use AuthorizesRequests;
 

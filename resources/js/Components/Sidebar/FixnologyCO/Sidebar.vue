@@ -36,6 +36,7 @@ const dashboardRoute = computed(() => new URL(route('aplicacion.dashboard', { ap
 const aplicacionesFixRoute = computed(() => new URL(route('aplicacion.misAplicaciones', { aplicacion, rol }), window.location.origin).pathname);
 const clientesFixRoute = computed(() => new URL(route('aplicacion.clientesFix', { aplicacion, rol }), window.location.origin).pathname);
 const configuracionesRoute = computed(() => new URL(route('aplicacion.configuraciones', { aplicacion, rol }), window.location.origin).pathname);
+const usuariosRoute = computed(() => new URL(route('aplicacion.GestorUsuarios', { aplicacion, rol }), window.location.origin).pathname);
 // const multisucursalRoute = computed(() => new URL(route('aplicacion.multisucursales', { aplicacion, rol }), window.location.origin).pathname);
 // const overviewRoute = computed(() => new URL(route('aplicacion.overviews', { aplicacion, rol }), window.location.origin).pathname);
 // const gastosRoute = computed(() => new URL(route('aplicacion.gastos', { aplicacion, rol }), window.location.origin).pathname);
@@ -136,9 +137,9 @@ const inicialesNombreTienda = computed(() => {
                             </span>
                         </a>
                     </li>
-                    <li :class="[currentRoute === dashboardRoute ? [bgOpacity] : 'bg-transparent']"
+                    <li :class="[currentRoute === usuariosRoute ? [bgOpacity] : 'bg-transparent']"
                         class=" px-2 py-1.5 rounded-[5px] cursor-pointer">
-                        <a :href="route('aplicacion.dashboard', { aplicacion, rol })">
+                        <a :href="route('aplicacion.GestorUsuarios', { aplicacion, rol })">
                             <span class="flex items-center justify-between">
                                 <div class="flex items-center gap-1">
                                     <div class="flex items-center">
@@ -147,7 +148,7 @@ const inicialesNombreTienda = computed(() => {
                                     </div>
                                     <span v-if="sidebarExpandido" class="text-[14px]">Gestor usuarios</span>
                                 </div>
-                                <div :class="[currentRoute === dashboardRoute ? focus : hover]"></div>
+                                <div :class="[currentRoute === usuariosRoute ? focus : hover]"></div>
                             </span>
                         </a>
                     </li>

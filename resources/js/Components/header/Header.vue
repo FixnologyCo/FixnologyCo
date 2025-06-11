@@ -25,7 +25,7 @@ const historialRoute = computed(() => new URL(route('aplicacion.historial', { ap
 const iconosPorComponente = {
     Dashboard: 'dashboard',
     MisApps: 'apps',
-    Usuarios: 'group',
+    GestorUsuarios: 'group',
     Productos: 'inventory',
     Reportes: 'bar_chart',
     Historial: 'history',
