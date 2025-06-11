@@ -82,6 +82,50 @@ function alternarEstado(app) {
 
 </script>
 
+<script>
+export default {
+  data() {
+    return {
+      mostrarAppsActivas: true, // Por defecto mostrar activas
+      mostrarAppsInactivas: false, // Por defecto ocultar inactivas
+      opcionVisible: null,
+      sidebarExpandido: true, // Ajusta según tu lógica
+    }
+  },
+  computed: {
+    appsActivas() {
+      return this.apps.filter(app => app.estado.tipo_estado === 'Activo')
+    },
+    appsInactivas() {
+      return this.apps.filter(app => app.estado.tipo_estado === 'Inactivo')
+    }
+  },
+  methods: {
+    toggleSeccionActivas() {
+      this.mostrarAppsActivas = !this.mostrarAppsActivas
+    },
+    toggleSeccionInactivas() {
+      this.mostrarAppsInactivas = !this.mostrarAppsInactivas
+    },
+    abrirModalDetalles(app) {
+      // Tu lógica para abrir modal de detalles
+      console.log('Mostrar detalles de:', app.nombre_app)
+      this.opcionVisible = null
+    },
+    abrirModalEditar(app) {
+      // Tu lógica para abrir modal de edición
+      console.log('Editar app:', app.nombre_app)
+      this.opcionVisible = null
+    },
+    alternarEstado(app) {
+      // Tu lógica para cambiar el estado de la app
+      console.log('Cambiar estado de:', app.nombre_app)
+      this.opcionVisible = null
+    }
+  }
+}
+</script>
+
 <template>
 
   <Head title="Mis aplicaciones" />
@@ -107,95 +151,185 @@ function alternarEstado(app) {
           </div>
         </div>
 
-        <div class="encabezadoOpciones mt-10 flex items-center gap-2 w-full">
-          <span class="text-secundary-default dark:text-secundary-light text-[17px] w-[120px]">Listas activas</span>
-          <div class="line h-[2px] rounded-full w-full bg-secundary-light"></div>
-          <div
-            class=" button flex justify-center items-center border-2 border-secundary-light rounded-full text-mono-negro dark:text-secundary-light">
-            <span class="material-symbols-rounded text-[20px]">keyboard_arrow_down</span>
-          </div>
-        </div>
+       <div>
+    <!-- Sección de Listas Activas -->
+    <div class="encabezadoOpciones mt-10 flex items-center gap-2 w-full">
+      <span class="text-secundary-default dark:text-secundary-light text-[17px] w-[120px]">Listas activas </span>
+      <div class="line h-[2px] rounded-full w-full bg-secundary-light"></div>
+      <div
+        class="button flex justify-center items-center border-2 border-secundary-light rounded-full text-mono-negro dark:text-secundary-light cursor-pointer hover:bg-secundary-light hover:bg-opacity-10 transition-all duration-200"
+        @click="toggleSeccionActivas">
+        <span class="material-symbols-rounded text-[20px] transition-transform duration-200"
+          :class="{ 'rotate-180': mostrarAppsActivas }">
+          keyboard_arrow_down
+        </span>
+      </div>
+    </div>
 
-        <div class="listado flex flex-wrap gap-2">
+    <!-- Contenedor desplegable para apps activas -->
+    <div class="overflow-hidden transition-all duration-300 ease-in-out"
+      :class="mostrarAppsActivas ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'">
+      <div class="listado flex flex-wrap gap-2">
+        <div v-for="app in appsActivas" :key="app.id" class="tarjetaApp border border-secundary-light rounded-md p-4 mt-5"
+          :class="[
+            sidebarExpandido ? 'w-[32.5%]' : 'w-[24.5%]',
+            'border'
+          ]">
 
-          <div v-for="app in apps" :key="app.id" class="tarjetaApp border border-secundary-light rounded-md p-4 mt-5"
-            :class="[
-              sidebarExpandido ? 'w-[32.5%]' : 'w-[24.5%]',
-              app.estado.tipo_estado === 'Inactivo' ? 'border-semaforo-rojo' : 'border-secundary-light',
-              'border'
-            ]">
-
-            <div class="top flex justify-between">
-              <div class="conjunto flex gap-3">
-                <div v-if="app.estado.tipo_estado === 'Inactivo'" class="icono grid place-content-center h-[50px] w-[50px] rounded-lg bg-slate-500">
-                  <i class="material-symbols-rounded text-mono-blanco">nights_stay</i>
-                </div>
-                <div v-else class="icono grid place-content-center h-[50px] w-[50px] rounded-lg" :class="app.color_fondo">
-                  <i class="material-symbols-rounded text-mono-blanco">{{ app.icono_app || 'help' }}</i>
-                </div>
-                <div class="titulo-contador">
-                  <h3 class="text-secundary-default dark:text-secundary-light font-semibold">
-                    {{ app.nombre_app }}
-                  </h3>
-                  <p class="text-secundary-default dark:text-mono-blanco -mt-2 text-[28px] font-bold">
-                    {{ app.usuarios_en_tiendas }}
-                  </p>
-                </div>
+          <div class="top flex justify-between">
+            <div class="conjunto flex gap-3">
+              <div class="icono grid place-content-center h-[50px] w-[50px] rounded-lg" :class="app.color_fondo">
+                <i class="material-symbols-rounded text-mono-blanco">{{ app.icono_app || 'help' }}</i>
               </div>
-
-              <div class="opciones relative">
-                <span class="cursor-pointer material-symbols-rounded text-mono-negro dark:text-secundary-light"
-                  @click="opcionVisible = opcionVisible === app.id ? null : app.id">
-                  more_horiz
-                </span>
-
-                <div v-if="opcionVisible === app.id"
-                  class="cajaSelector absolute top-[20px] right-0 bg-white dark:bg-mono-negro border border-gray-300 dark:border-secundary-light rounded-lg p-2 z-50 w-[170px] shadow-lg">
-
-                  <button
-                    class="optionApp text-[14px] w-full p-2 rounded-md flex items-center gap-2 text-mono-negro dark:text-mono-blanco"
-                    :class="[hoverClase]" @click="abrirModalDetalles(app)">
-                    <span class="material-symbols-rounded text-[16px]">info</span>
-                    <p>Mostrar detalles</p>
-                  </button>
-
-                  <button
-                    class="optionApp text-[14px] w-full p-2 rounded-md flex items-center gap-2  text-mono-negro dark:text-mono-blanco"
-                    :class="[hoverClase]"  @click="abrirModalEditar(app)">
-                    <span class="material-symbols-rounded text-[16px]">draw</span>
-                    <p>Editar app</p>
-
-                  </button>
-
-                  <button @click="alternarEstado(app)"
-                    class="optionApp text-[14px] w-full p-2 rounded-md flex items-center gap-2"
-                    :class="[app.estado.tipo_estado === 'Activo' ? 'text-mono-negro dark:text-mono-blanco' : 'text-semaforo-rojo', hoverClase]">
-                    <span class="material-symbols-rounded text-[16px]">
-                      {{ app.estado.tipo_estado === 'Activo' ? 'nights_stay' : 'wb_sunny' }}
-                    </span>
-                    <p>
-                      {{ app.estado.tipo_estado === 'Activo' ? 'Inactivar app' : 'Activar app' }}
-                    </p>
-                  </button>
-                </div>
+              <div class="titulo-contador">
+                <h3 class="text-secundary-default dark:text-secundary-light font-semibold">
+                  {{ app.nombre_app }}
+                </h3>
+                <p class="text-secundary-default dark:text-mono-blanco -mt-2 text-[28px] font-bold">
+                  {{ app.usuarios_en_tiendas }}
+                </p>
               </div>
             </div>
 
-            <div class="line h-[1.5px] rounded-full w-full bg-secundary-light my-3"></div>
+            <div class="opciones relative">
+              <span class="cursor-pointer material-symbols-rounded text-mono-negro dark:text-secundary-light"
+                @click="opcionVisible = opcionVisible === app.id ? null : app.id">
+                more_horiz
+              </span>
 
-            <div class="descripciones">
-              <p class="text-[14px] text-mono-negro dark:text-mono-blanco">
-                {{ app.descripcion ?? 'Sin descripción' }}
-              </p>
-            </div>
+              <div v-if="opcionVisible === app.id"
+                class="cajaSelector absolute top-[20px] right-0 bg-white dark:bg-mono-negro border border-gray-300 dark:border-secundary-light rounded-lg p-2 z-50 w-[170px] shadow-lg">
 
-            <div class="tags flex items-center justify-between mt-1">
-              <div class="plan rounded-[5px] bg-slate-500 px-1 text-mono-blanco text-[14px]">
-                ID: {{ app.id }}
+                <button
+                  class="optionApp text-[14px] w-full p-2 rounded-md flex items-center gap-2 text-mono-negro dark:text-mono-blanco"
+                  :class="[hoverClase]" @click="abrirModalDetalles(app)">
+                  <span class="material-symbols-rounded text-[16px]">info</span>
+                  <p>Mostrar detalles</p>
+                </button>
+
+                <button
+                  class="optionApp text-[14px] w-full p-2 rounded-md flex items-center gap-2 text-mono-negro dark:text-mono-blanco"
+                  :class="[hoverClase]" @click="abrirModalEditar(app)">
+                  <span class="material-symbols-rounded text-[16px]">draw</span>
+                  <p>Editar app</p>
+                </button>
+
+                <button @click="alternarEstado(app)"
+                  class="optionApp text-[14px] w-full p-2 rounded-md flex items-center gap-2 text-mono-negro dark:text-mono-blanco"
+                  :class="[hoverClase]">
+                  <span class="material-symbols-rounded text-[16px]">nights_stay</span>
+                  <p>Inactivar app</p>
+                </button>
               </div>
             </div>
           </div>
+
+          <div class="line h-[1.5px] rounded-full w-full bg-secundary-light my-3"></div>
+
+          <div class="descripciones">
+            <p class="text-[14px] text-mono-negro dark:text-mono-blanco">
+              {{ app.descripcion ?? 'Sin descripción' }}
+            </p>
+          </div>
+
+          <div class="tags flex items-center justify-between mt-1">
+            <div class="plan rounded-[5px] bg-slate-500 px-1 text-mono-blanco text-[14px]">
+              ID: {{ app.id }}
+            </div>
+          </div>
         </div>
+      </div>
+    </div>
+
+    <!-- Sección de Listas Inactivas -->
+    <div class="encabezadoOpciones mt-10 flex items-center gap-2 w-full">
+      <span class="text-secundary-default dark:text-secundary-light text-[17px] w-[140px]">Listas inactivas</span>
+      <div class="line h-[2px] rounded-full w-full bg-secundary-light"></div>
+      <div
+        class="button flex justify-center items-center border-2 border-secundary-light rounded-full text-mono-negro dark:text-secundary-light cursor-pointer hover:bg-secundary-light hover:bg-opacity-10 transition-all duration-200"
+        @click="toggleSeccionInactivas">
+        <span class="material-symbols-rounded text-[20px] transition-transform duration-200"
+          :class="{ 'rotate-180': mostrarAppsInactivas }">
+          keyboard_arrow_down
+        </span>
+      </div>
+    </div>
+
+    <!-- Contenedor desplegable para apps inactivas -->
+    <div class="overflow-hidden transition-all duration-300 ease-in-out"
+      :class="mostrarAppsInactivas ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'">
+      <div class="listado flex flex-wrap gap-2">
+        <div v-for="app in appsInactivas" :key="app.id" class="tarjetaApp border rounded-md p-4 mt-5 bg-gray-600"
+          :class="[
+            sidebarExpandido ? 'w-[32.5%]' : 'w-[24.5%]',
+            'border-gray-500'
+          ]">
+
+          <div class="top flex justify-between">
+            <div class="conjunto flex gap-3">
+              <div class="icono grid place-content-center h-[50px] w-[50px] rounded-lg bg-slate-500">
+                <i class="material-symbols-rounded text-mono-blanco">nights_stay</i>
+              </div>
+              <div class="titulo-contador">
+                <h3 class="text-gray-300 font-semibold">
+                  {{ app.nombre_app }}
+                </h3>
+                <p class="text-gray-400 -mt-2 text-[28px] font-bold">
+                  {{ app.usuarios_en_tiendas }}
+                </p>
+              </div>
+            </div>
+
+            <div class="opciones relative">
+              <span class="cursor-pointer material-symbols-rounded text-gray-400"
+                @click="opcionVisible = opcionVisible === app.id ? null : app.id">
+                more_horiz
+              </span>
+
+              <div v-if="opcionVisible === app.id"
+                class="cajaSelector absolute top-[20px] right-0 bg-white dark:bg-mono-negro border border-gray-300 dark:border-secundary-light rounded-lg p-2 z-50 w-[170px] shadow-lg">
+
+                <button
+                  class="optionApp text-[14px] w-full p-2 rounded-md flex items-center gap-2 text-mono-negro dark:text-mono-blanco"
+                  :class="[hoverClase]" @click="abrirModalDetalles(app)">
+                  <span class="material-symbols-rounded text-[16px]">info</span>
+                  <p>Mostrar detalles</p>
+                </button>
+
+                <button
+                  class="optionApp text-[14px] w-full p-2 rounded-md flex items-center gap-2 text-mono-negro dark:text-mono-blanco"
+                  :class="[hoverClase]" @click="abrirModalEditar(app)">
+                  <span class="material-symbols-rounded text-[16px]">draw</span>
+                  <p>Editar app</p>
+                </button>
+
+                <button @click="alternarEstado(app)"
+                  class="optionApp text-[14px] w-full p-2 rounded-md flex items-center gap-2 text-semaforo-rojo"
+                  :class="[hoverClase]">
+                  <span class="material-symbols-rounded text-[16px]">wb_sunny</span>
+                  <p>Activar app</p>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="line h-[1.5px] rounded-full w-full bg-gray-500 my-3"></div>
+
+          <div class="descripciones">
+            <p class="text-[14px] text-gray-400">
+              {{ app.descripcion ?? 'Sin descripción' }}
+            </p>
+          </div>
+
+          <div class="tags flex items-center justify-between mt-1">
+            <div class="plan rounded-[5px] bg-slate-500 px-1 text-mono-blanco text-[14px]">
+              ID: {{ app.id }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
       </div>
     </div>
     <ModalCrearApp :mostrar="mostrarModal" @cerrar="mostrarModal = false" :estados="estados"
