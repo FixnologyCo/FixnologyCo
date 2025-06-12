@@ -26,6 +26,7 @@ const iconosPorComponente = {
     Dashboard: 'dashboard',
     MisApps: 'apps',
     GestorUsuarios: 'group',
+    DetallesUsuario: 'digital_wellbeing',
     Productos: 'inventory',
     Reportes: 'bar_chart',
     Historial: 'history',

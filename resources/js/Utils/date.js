@@ -11,6 +11,11 @@ export const formatFecha = (fecha) => {
   return dayjs(fecha).format('dddd D [de] MMMM [de] YYYY [a las] h:mm a')
 }
 
+export const formatFechaShort = (fecha) => {
+  if (!fecha || !dayjs(fecha).isValid()) return 'Sin fecha'
+  return dayjs(fecha).format('MMMM D, YYYY | h:mm A')
+}
+
 export const fromNow = (fecha) => {
   if (!fecha || !dayjs(fecha).isValid()) return 'Sin fecha'
   return dayjs(fecha).fromNow()

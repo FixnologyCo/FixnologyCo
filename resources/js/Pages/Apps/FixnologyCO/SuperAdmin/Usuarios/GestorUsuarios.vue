@@ -1,5 +1,6 @@
 <script setup>
-import { Head, usePage } from "@inertiajs/vue3";
+import { Head, usePage, router } from "@inertiajs/vue3";
+import { route } from 'ziggy-js'
 import { ref, onMounted, onUnmounted, computed } from "vue";
 import "dayjs/locale/es";
 import Header from "@/Components/header/Header.vue";
@@ -21,21 +22,36 @@ const {
 } = Colors();
 
 import useEstadoClass from "@/Composables/useEstado";
-
 const { getEstadoClass } = useEstadoClass();
+
+import { formatFecha, formatFechaShort } from "@/utils/date";
+
+function obtenerIniciales(nombre, apellido) {
+  const inicial1 = nombre?.charAt(0) || "";
+  const inicial2 = apellido?.charAt(0) || "";
+  return (inicial1 + inicial2).toUpperCase();
+}
 
 const props = defineProps({
   auth: {
     type: Object,
     required: true,
   },
-  clientes: {
+  clientesFix: {
+    type: Array,
+    default: () => [],
+  },
+  empleadosFix: {
     type: Array,
     default: () => [],
   },
   aplicacion: {
     type: String,
     default: "",
+  },
+  rol: {
+   type: String,
+   default: "" 
   },
   errors: {
     type: Object,
@@ -47,11 +63,19 @@ const props = defineProps({
   },
 });
 
-const user = props.auth.user;
+const seleccionado = ref(false);
 const auth = usePage().props.auth;
 
 const activeTab = ref(0);
 const tabs = [{ label: "Clientes Fix" }, { label: "Empleados" }];
+
+function irADetalle(id) {
+  router.get(route('aplicacion.detallesUsuarios.id', {
+    aplicacion: props.aplicacion,
+    rol: props.rol,
+    id: id
+  }))
+}
 </script>
 
 <template>
@@ -92,7 +116,8 @@ const tabs = [{ label: "Clientes Fix" }, { label: "Empleados" }];
                 <span class="material-symbols-rounded">diversity_1</span>
               </div>
               <p class="text-[30px] font-semibold text-mono-blanco">
-                0 <span class="text-secundary-light text-[14px]">Total clientes</span>
+                {{ clientesFix.length }}
+                <span class="text-secundary-light text-[14px]">Total clientes</span>
               </p>
             </div>
 
@@ -111,10 +136,151 @@ const tabs = [{ label: "Clientes Fix" }, { label: "Empleados" }];
               </button>
             </div>
           </div>
+          <!-- formulario -->
+          <div class="div text-mono-blanco mt-5">
+            <div class="overflow-x-auto">
+              <table class="w-full border-collapse" id="tabla">
+                 <thead class="rounded-x">
+                  <tr class="border border-secundary-light">
+                    <th class="p-2 text-left">
+                      <label class="inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          v-model="seleccionado"
+                          class="sr-only peer"
+                        />
+                        <div
+                          class="w-4 h-4 border border-secundary-light rounded-full transition-all duration-200"
+                          :class="[
+                            'peer-checked:border-gray-700',
+                            seleccionado ? bgClase : 'bg-mono-negro',
+                          ]"
+                        ></div>
+                      </label>
+                    </th>
+
+                    <th class="p-2 text-left">
+                     <div class="flex items-center gap-1">
+                        <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">format_italic</span>
+                        <span>Nombres</span>
+                      </div>
+                    </th>
+                    <th class="p-2 text-left">
+                      <div class="flex items-center gap-1">
+                        <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">phone</span>
+                        <span>Teléfono</span>
+                      </div>
+                    </th>
+                    <th class="p-2 text-left">
+                      <div class="flex items-center gap-1">
+                        <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">email</span>
+                        <span>Correo email</span>
+                      </div>
+                    </th>
+                    <th class="p-2 text-left">
+                     <div class="flex items-center gap-1">
+                        <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">store</span>
+                        <span>Tienda</span>
+                      </div>
+                    </th>
+                    <th class="p-2 text-left">
+                     <div class="flex items-center gap-1">
+                        <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">android</span>
+                        <span>Aplicación</span>
+                      </div>
+                    </th>
+                    <th class="p-2 text-left">
+                     <div class="flex items-center gap-1">
+                        <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">event</span>
+                        <span>Fecha registro</span>
+                      </div>
+                    </th>
+                    <th class="p-2 text-left">
+                     <div class="flex items-center gap-1">
+                        <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">hdr_weak</span>
+                        <span>Estado</span>
+                      </div>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody
+                  class=""
+                  v-for="clienteFix in clientesFix"
+                  :key="clienteFix.id"
+                >
+                  <tr class="hover:bg-secundary-opacity cursor-pointer" @click="irADetalle(clienteFix.id)">
+                    <th class="p-2 text-left">
+                      <label class="inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          v-model="seleccionado"
+                          class="sr-only peer"
+                        />
+                        <div
+                          class="w-4 h-4 border border-secundary-light rounded-full transition-all duration-200"
+                          :class="[
+                            'peer-checked:border-gray-700',
+                            seleccionado ? bgClase : 'bg-mono-negro',
+                          ]"
+                        ></div>
+                      </label>
+                    </th>
+                    <td class="text-[14px] flex items-center gap-2 p-2">
+                      <div
+                        class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm"
+                        :class="clienteFix.foto_cliente ? '' : bgClase"
+                      >
+                        <img
+                          v-if="clienteFix.foto_cliente"
+                          :src="clienteFix.foto_cliente"
+                          alt="Foto"
+                          class="w-10 h-10 rounded-full object-cover border"
+                        />
+                        <span v-else>
+                          {{
+                            obtenerIniciales(
+                              clienteFix.nombres_ct,
+                              clienteFix.apellidos_ct
+                            )
+                          }}
+                        </span>
+                      </div>
+                      <p>
+                        {{ clienteFix.nombres_ct || "No encontrado" }}
+                        {{ clienteFix.apellidos_ct }}
+                      </p>
+                    </td>
+                    <td class="text-[14px] p-2">{{ clienteFix.telefono_ct }}</td>
+                    <td class="text-[14px] p-2">{{ clienteFix.email_ct }}</td>
+                    <td class="text-[14px] p-2">{{ clienteFix.nombre_tienda }}</td>
+                    <td class="text-[14px] p-2">{{ clienteFix.nombre_app }}</td>
+                    <td class="text-[14px] p-2">
+                      <span class="p-2 rounded-lg font-semibold">{{
+                        formatFechaShort(clienteFix.fecha_creacion)
+                      }}</span>
+                    </td>
+                    <td class="text-[14px] p-2">
+                      <span
+                        class="p-2 rounded-lg font-semibold"
+                        :class="[getEstadoClass(clienteFix.estado_token)]"
+                        >{{ clienteFix.estado_token }}</span
+                      >
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <div
+                id="mensaje-no-resultados"
+                class="hidden text-center mt-10 font-bold text-[35px] text-secundary-light fade-in"
+              >
+                No hay coincidencias.
+              </div>
+            </div>
+          </div>
         </div>
 
         <div v-else-if="activeTab === 1">
-           <div class="headerEmpledos flex items-center justify-between">
+          <div class="headerEmpledos flex items-center justify-between">
             <div class="total flex items-center gap-2">
               <div
                 class="icon bg-secundary-light p-2 rounded-md grid place-content-center text-mono-negro"
@@ -122,7 +288,8 @@ const tabs = [{ label: "Clientes Fix" }, { label: "Empleados" }];
                 <span class="material-symbols-rounded">engineering</span>
               </div>
               <p class="text-[30px] font-semibold text-mono-blanco">
-                0 <span class="text-secundary-light text-[14px]">Total empleados</span>
+                {{ empleadosFix.length }}
+                <span class="text-secundary-light text-[14px]">Total empleados</span>
               </p>
             </div>
 
@@ -139,6 +306,149 @@ const tabs = [{ label: "Clientes Fix" }, { label: "Empleados" }];
               <button class="text-[14px]" :class="buttonClase">
                 <span class="material-symbols-rounded">add_circle</span> Agregar empleado
               </button>
+            </div>
+          </div>
+
+          <!-- formulario -->
+          <div class="div text-mono-blanco mt-5">
+            <div class="overflow-x-auto">
+              <table class="w-full border-collapse" id="tabla">
+                <thead class="rounded-x">
+                  <tr class="border border-secundary-light">
+                    <th class="p-2 text-left">
+                      <label class="inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          v-model="seleccionado"
+                          class="sr-only peer"
+                        />
+                        <div
+                          class="w-4 h-4 border border-secundary-light rounded-full transition-all duration-200"
+                          :class="[
+                            'peer-checked:border-gray-700',
+                            seleccionado ? bgClase : 'bg-mono-negro',
+                          ]"
+                        ></div>
+                      </label>
+                    </th>
+
+                    <th class="p-2 text-left">
+                     <div class="flex items-center gap-1">
+                        <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">format_italic</span>
+                        <span>Nombres</span>
+                      </div>
+                    </th>
+                    <th class="p-2 text-left">
+                      <div class="flex items-center gap-1">
+                        <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">phone</span>
+                        <span>Teléfono</span>
+                      </div>
+                    </th>
+                    <th class="p-2 text-left">
+                      <div class="flex items-center gap-1">
+                        <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">email</span>
+                        <span>Correo email</span>
+                      </div>
+                    </th>
+                    <th class="p-2 text-left">
+                     <div class="flex items-center gap-1">
+                        <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">store</span>
+                        <span>Tienda</span>
+                      </div>
+                    </th>
+                    <th class="p-2 text-left">
+                     <div class="flex items-center gap-1">
+                        <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">android</span>
+                        <span>Aplicación</span>
+                      </div>
+                    </th>
+                    <th class="p-2 text-left">
+                     <div class="flex items-center gap-1">
+                        <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">event</span>
+                        <span>Fecha registro</span>
+                      </div>
+                    </th>
+                    <th class="p-2 text-left">
+                     <div class="flex items-center gap-1">
+                        <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">hdr_weak</span>
+                        <span>Estado</span>
+                      </div>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody
+                  class=""
+                  v-for="empleadoFix in empleadosFix"
+                  :title="empleadoFix.id"
+                  :key="empleadoFix.id"
+                >
+                  <tr class="hover:bg-secundary-opacity cursor-pointer"  @click="irADetalle(empleadoFix.id)">
+                    <th class="p-2 text-left">
+                      <label class="inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          v-model="seleccionado"
+                          class="sr-only peer"
+                        />
+                        <div
+                          class="w-4 h-4 border border-secundary-light rounded-full transition-all duration-200"
+                          :class="[
+                            'peer-checked:border-gray-700',
+                            seleccionado ? bgClase : 'bg-mono-negro',
+                          ]"
+                        ></div>
+                      </label>
+                    </th>
+                    <td class="text-[14px] flex items-center gap-2 p-2">
+                      <div
+                        class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm"
+                        :class="empleadoFix.foto_cliente ? '' : bgClase"
+                      >
+                        <img
+                          v-if="empleadoFix.foto_cliente"
+                          :src="empleadoFix.foto_cliente"
+                          alt="Foto"
+                          class="w-10 h-10 rounded-full object-cover border-2"
+                        />
+                        <span v-else>
+                          {{
+                            obtenerIniciales(
+                              empleadoFix.nombres_ct,
+                              empleadoFix.apellidos_ct
+                            )
+                          }}
+                        </span>
+                      </div>
+                      <p>
+                        {{ empleadoFix.nombres_ct || "No encontrado" }}
+                        {{ empleadoFix.apellidos_ct }}
+                      </p>
+                    </td>
+                    <td class="text-[14px] p-2">{{ empleadoFix.telefono_ct }}</td>
+                    <td class="text-[14px] p-2">{{ empleadoFix.email_ct }}</td>
+                    <td class="text-[14px] p-2">{{ empleadoFix.nombre_tienda }}</td>
+                    <td class="text-[14px] p-2">{{ empleadoFix.nombre_app }}</td>
+                    <td class="text-[14px] p-2">
+                      <span class="p-2 rounded-lg font-semibold">{{
+                        formatFechaShort(empleadoFix.fecha_creacion)
+                      }}</span>
+                    </td>
+                    <td class="text-[14px] p-2">
+                      <span
+                        class="p-2 rounded-lg font-semibold"
+                        :class="[getEstadoClass(empleadoFix.estado_token)]"
+                        >{{ empleadoFix.estado_token }}</span
+                      >
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <div
+                id="mensaje-no-resultados"
+                class="hidden text-center mt-10 font-bold text-[35px] text-secundary-light fade-in"
+              >
+                No hay coincidencias.
+              </div>
             </div>
           </div>
         </div>
