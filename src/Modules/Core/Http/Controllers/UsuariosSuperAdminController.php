@@ -137,12 +137,17 @@ class UsuariosSuperAdminController extends Controller
         $detallesCliente = ClienteFixgi::with('tienda', 'estado') // Ajusta según tus relaciones
             ->findOrFail($id);
 
+            $fotoUser = $detallesCliente->foto_binaria
+            ? 'data:image/jpeg;base64,' . $detallesCliente->foto_binaria
+            : null;
+
             return Inertia::render('Apps/' . ucfirst($aplicacion) . '/' . ucfirst($rol) . '/Usuarios/DetallesUsuario', [
                 'auth' => ['user' => $user],
                 'aplicacion' => $aplicacion,
                 'rol' => $rol,
                 'foto_base64' => $fotoBase64,
                 'detallesCliente' => $detallesCliente,
+                'foto_binaria' => $fotoUser
 
             ]);
         }

@@ -160,43 +160,43 @@ function irADetalle(id) {
                     </th>
 
                     <th class="p-2 text-left">
-                     <div class="flex items-center gap-1">
+                     <div class="flex items-center gap-1 text-[13px]">
                         <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">format_italic</span>
                         <span>Nombres</span>
                       </div>
                     </th>
                     <th class="p-2 text-left">
-                      <div class="flex items-center gap-1">
+                      <div class="flex items-center gap-1 text-[13px]">
                         <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">phone</span>
                         <span>Teléfono</span>
                       </div>
                     </th>
                     <th class="p-2 text-left">
-                      <div class="flex items-center gap-1">
+                      <div class="flex items-center gap-1 text-[13px]">
                         <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">email</span>
                         <span>Correo email</span>
                       </div>
                     </th>
                     <th class="p-2 text-left">
-                     <div class="flex items-center gap-1">
+                     <div class="flex items-center gap-1 text-[13px]">
                         <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">store</span>
                         <span>Tienda</span>
                       </div>
                     </th>
                     <th class="p-2 text-left">
-                     <div class="flex items-center gap-1">
+                     <div class="flex items-center gap-1 text-[13px]">
                         <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">android</span>
                         <span>Aplicación</span>
                       </div>
                     </th>
                     <th class="p-2 text-left">
-                     <div class="flex items-center gap-1">
+                     <div class="flex items-center gap-1 text-[13px]">
                         <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">event</span>
                         <span>Fecha registro</span>
                       </div>
                     </th>
                     <th class="p-2 text-left">
-                     <div class="flex items-center gap-1">
+                     <div class="flex items-center gap-1 text-[13px]">
                         <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">hdr_weak</span>
                         <span>Estado</span>
                       </div>
@@ -333,43 +333,43 @@ function irADetalle(id) {
                     </th>
 
                     <th class="p-2 text-left">
-                     <div class="flex items-center gap-1">
+                     <div class="flex items-center gap-1 text-[13px]">
                         <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">format_italic</span>
                         <span>Nombres</span>
                       </div>
                     </th>
                     <th class="p-2 text-left">
-                      <div class="flex items-center gap-1">
+                      <div class="flex items-center gap-1 text-[13px]">
                         <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">phone</span>
                         <span>Teléfono</span>
                       </div>
                     </th>
                     <th class="p-2 text-left">
-                      <div class="flex items-center gap-1">
+                      <div class="flex items-center gap-1 text-[13px]">
                         <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">email</span>
                         <span>Correo email</span>
                       </div>
                     </th>
                     <th class="p-2 text-left">
-                     <div class="flex items-center gap-1">
+                     <div class="flex items-center gap-1 text-[13px]">
                         <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">store</span>
                         <span>Tienda</span>
                       </div>
                     </th>
                     <th class="p-2 text-left">
-                     <div class="flex items-center gap-1">
+                     <div class="flex items-center gap-1 text-[13px]">
                         <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">android</span>
                         <span>Aplicación</span>
                       </div>
                     </th>
                     <th class="p-2 text-left">
-                     <div class="flex items-center gap-1">
+                     <div class="flex items-center gap-1 text-[13px]">
                         <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">event</span>
                         <span>Fecha registro</span>
                       </div>
                     </th>
                     <th class="p-2 text-left">
-                     <div class="flex items-center gap-1">
+                     <div class="flex items-center gap-1 text-[13px]">
                         <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">hdr_weak</span>
                         <span>Estado</span>
                       </div>
