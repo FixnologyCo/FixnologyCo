@@ -147,7 +147,7 @@ class UsuariosSuperAdminController extends Controller
                 'rol' => $rol,
                 'foto_base64' => $fotoBase64,
                 'detallesCliente' => $detallesCliente,
-                'foto_binaria' => $fotoUser
+                'fotoUser' => $fotoUser
 
             ]);
         }

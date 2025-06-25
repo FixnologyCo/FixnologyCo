@@ -62,9 +62,20 @@ function obtenerIniciales(nombre, apellido) {
   const inicial2 = apellido?.charAt(0) || "";
   return (inicial1 + inicial2).toUpperCase();
 }
+
+const activeTab = ref(0);
+const tabs = [
+{ label: "Información personal" }, 
+{ label: "Información tienda" },
+{ label: "Información membresía" },
+{ label: "Información del plan" },
+{ label: "Ajustes avanzados" }
+
+];
 </script>
 
 <template>
+
   <Head :title="`${detallesCliente.nombres_ct || 'No encontrado'}`" />
 
   <MensajesLayout />
@@ -78,35 +89,24 @@ function obtenerIniciales(nombre, apellido) {
       <div class="contenido p-3">
         <!-- navegable -->
         <div class="options flex gap-1 items-center text-[14px]">
-          <a
-            :href="route('aplicacion.GestorUsuarios', { aplicacion, rol })"
-            class="text-mono-negro dark:text-mono-blanco dark:hover:text-universal-azul"
-            :class="hover"
-          >
+          <a :href="route('aplicacion.GestorUsuarios', { aplicacion, rol })"
+            class="text-mono-negro dark:text-mono-blanco dark:hover:text-universal-azul" :class="hoverTexto">
+
             <p>Usuarios</p>
           </a>
-          <span
-            class="material-symbols-rounded text-[18px] text-mono-negro dark:text-mono-blanco"
-            >chevron_right</span
-          >
+          <span class="material-symbols-rounded text-[18px] text-mono-negro dark:text-mono-blanco">chevron_right</span>
           <p class="font-bold text-mono-negro dark:text-mono-blanco">
             {{ detallesCliente.nombres_ct }} {{ detallesCliente.apellidos_ct }}
           </p>
         </div>
 
-        <div class="encabezadoDetalle flex justify-between items-center mt-3">
+        <div class="encabezadoDetalle flex justify-between items-center mt-5">
           <div class="leftDetalle">
             <div class="fotoNombreOpciones flex gap-3 items-center">
-              <div
-                class="w-[70px] h-[70px] rounded-full flex items-center justify-center text-white font-bold text-sm"
-                :class="detallesCliente.foto_binaria ? '' : bgClase"
-              >
-                <img
-                  v-if="detallesCliente.fotoUser"
-                  :src="detallesCliente.fotoUser"
-                  alt="Foto de usuario"
-                  class="w-[70px] h-[70px] rounded-full object-cover border-2 shadowM"
-                />
+              <div class="w-[70px] h-[70px] rounded-full flex items-center justify-center text-white font-bold text-sm"
+                :class="fotoUser ? '' : bgClase">
+                <img v-if="fotoUser" :src="fotoUser" alt="Foto de usuario"
+                  class="w-[70px] h-[70px] rounded-full object-cover border-2 shadowM" />
                 <span v-else>
                   {{
                     obtenerIniciales(
@@ -121,23 +121,17 @@ function obtenerIniciales(nombre, apellido) {
                   {{ detallesCliente.nombres_ct }} {{ detallesCliente.apellidos_ct }}
                 </p>
 
-                <div
-                  class="membresiaId flex justify-between items-center my-1 text-mono-blanco"
-                >
-                <div class="app flex items-center gap-1">
-                <div
-                    class="p-1 font-semibold flex items-center rounded-[5px] text-mono-blanco"
-                    :class="detallesCliente.tienda.aplicacion.color_fondo"
-                  >
-                    <span class="material-symbols-rounded text-[20px]">{{
-                      detallesCliente.tienda.aplicacion.icono_app
-                    }}</span
-                    >
-                    
+                <div class="membresiaId flex justify-between items-center my-1 text-mono-blanco">
+                  <div class="app flex items-center gap-1">
+                    <div class="p-1 font-semibold flex items-center rounded-[5px] text-mono-blanco"
+                      :class="detallesCliente.tienda.aplicacion.color_fondo">
+                      <span class="material-symbols-rounded text-[20px]">{{
+                        detallesCliente.tienda.aplicacion.icono_app
+                        }}</span>
+                    </div>
+                    <span>{{ detallesCliente.tienda.aplicacion.nombre_app }}</span>
                   </div>
-                  <span>{{ detallesCliente.tienda.aplicacion.nombre_app }}</span>
-                </div>
-                  
+
                   <p class="text-[14px]">
                     {{ detallesCliente.tienda.aplicacion.membresia.nombre_membresia }}
                   </p>
@@ -147,11 +141,60 @@ function obtenerIniciales(nombre, apellido) {
           </div>
           <div class="rightDetalle">
             <button class="text-[14px]" :class="buttonClase">
-              <span class="material-symbols-rounded">add_circle</span> Editar cliente
+              <span class="material-symbols-rounded text-[20px]">edit</span> Editar
+              cliente
             </button>
           </div>
         </div>
-        
+
+        <div class="my-6">
+          <nav class="-mb-px flex space-x-4">
+            <button
+              v-for="(tab, index) in tabs"
+              :key="index"
+              @click="activeTab = index"
+              :class="[
+                'text-[14px] font-medium px-4 py-2',
+                activeTab === index
+                  ? textoClase + ' ' + borderClase
+                  : 'text-secundary-default dark:text-secundary-light ' + hoverTexto,
+              ]"
+            >
+              {{ tab.label }}
+            </button>
+          </nav>
+        </div>
+
+        <div v-if="activeTab === 0" class="text-mono-blanco text-[20px]">
+        <h1>Información personal</h1>
+
+        <p>{{ detallesCliente }}</p>
+        </div>
+
+        <div v-if="activeTab === 1" class="text-mono-blanco text-[20px]">
+        <h1>Información tienda</h1>
+
+        <p>{{ detallesCliente.tienda }}</p>
+
+        </div>
+
+        <div v-if="activeTab === 2" class="text-mono-blanco text-[20px]">
+        <h1>Información membresía</h1>
+
+        <p>{{ detallesCliente.tienda.aplicacion.membresia }}</p>
+
+        </div>
+
+        <div v-if="activeTab === 3" class="text-mono-blanco text-[20px]">
+        <h1>Información plan</h1>
+
+        <p>{{ detallesCliente.tienda.aplicacion.plan }}</p>
+
+        </div>
+
+        <div v-if="activeTab === 4" class="text-mono-blanco text-[20px]">
+        <h1>Ajustes avanzados</h1>
+        </div>
       </div>
     </div>
   </div>
