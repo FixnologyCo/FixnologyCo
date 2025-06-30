@@ -1,6 +1,6 @@
 <script setup>
 import { Head, usePage, router } from "@inertiajs/vue3";
-import { route } from 'ziggy-js'
+import { route } from "ziggy-js";
 import { ref, onMounted, onUnmounted, computed } from "vue";
 import "dayjs/locale/es";
 import Header from "@/Components/header/Header.vue";
@@ -50,8 +50,8 @@ const props = defineProps({
     default: "",
   },
   rol: {
-   type: String,
-   default: "" 
+    type: String,
+    default: "",
   },
   errors: {
     type: Object,
@@ -70,11 +70,13 @@ const activeTab = ref(0);
 const tabs = [{ label: "Clientes Fix" }, { label: "Empleados" }];
 
 function irADetalle(id) {
-  router.get(route('aplicacion.detallesUsuarios.id', {
-    aplicacion: props.aplicacion,
-    rol: props.rol,
-    id: id
-  }))
+  router.get(
+    route("aplicacion.detallesUsuarios.id", {
+      aplicacion: props.aplicacion,
+      rol: props.rol,
+      id: id,
+    })
+  );
 }
 </script>
 
@@ -140,7 +142,7 @@ function irADetalle(id) {
           <div class="div text-mono-blanco mt-5">
             <div class="overflow-x-auto">
               <table class="w-full border-collapse" id="tabla">
-                 <thead class="rounded-x">
+                <thead class="rounded-x">
                   <tr class="border border-secundary-light">
                     <th class="p-2 text-left">
                       <label class="inline-flex items-center cursor-pointer">
@@ -160,55 +162,82 @@ function irADetalle(id) {
                     </th>
 
                     <th class="p-2 text-left">
-                     <div class="flex items-center gap-1 text-[13px]">
-                        <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">format_italic</span>
+                      <div class="flex items-center gap-1 text-[13px]">
+                        <span
+                          class="material-symbols-rounded text-[20px]"
+                          :class="[textoClase]"
+                          >format_italic</span
+                        >
                         <span>Nombres</span>
                       </div>
                     </th>
                     <th class="p-2 text-left">
                       <div class="flex items-center gap-1 text-[13px]">
-                        <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">phone</span>
+                        <span
+                          class="material-symbols-rounded text-[20px]"
+                          :class="[textoClase]"
+                          >phone</span
+                        >
                         <span>Teléfono</span>
                       </div>
                     </th>
                     <th class="p-2 text-left">
                       <div class="flex items-center gap-1 text-[13px]">
-                        <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">email</span>
+                        <span
+                          class="material-symbols-rounded text-[20px]"
+                          :class="[textoClase]"
+                          >email</span
+                        >
                         <span>Correo email</span>
                       </div>
                     </th>
                     <th class="p-2 text-left">
-                     <div class="flex items-center gap-1 text-[13px]">
-                        <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">store</span>
+                      <div class="flex items-center gap-1 text-[13px]">
+                        <span
+                          class="material-symbols-rounded text-[20px]"
+                          :class="[textoClase]"
+                          >store</span
+                        >
                         <span>Tienda</span>
                       </div>
                     </th>
                     <th class="p-2 text-left">
-                     <div class="flex items-center gap-1 text-[13px]">
-                        <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">android</span>
+                      <div class="flex items-center gap-1 text-[13px]">
+                        <span
+                          class="material-symbols-rounded text-[20px]"
+                          :class="[textoClase]"
+                          >android</span
+                        >
                         <span>Aplicación</span>
                       </div>
                     </th>
                     <th class="p-2 text-left">
-                     <div class="flex items-center gap-1 text-[13px]">
-                        <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">event</span>
+                      <div class="flex items-center gap-1 text-[13px]">
+                        <span
+                          class="material-symbols-rounded text-[20px]"
+                          :class="[textoClase]"
+                          >event</span
+                        >
                         <span>Fecha registro</span>
                       </div>
                     </th>
                     <th class="p-2 text-left">
-                     <div class="flex items-center gap-1 text-[13px]">
-                        <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">hdr_weak</span>
+                      <div class="flex items-center gap-1 text-[13px]">
+                        <span
+                          class="material-symbols-rounded text-[20px]"
+                          :class="[textoClase]"
+                          >hdr_weak</span
+                        >
                         <span>Estado</span>
                       </div>
                     </th>
                   </tr>
                 </thead>
-                <tbody
-                  class=""
-                  v-for="clienteFix in clientesFix"
-                  :key="clienteFix.id"
-                >
-                  <tr class="hover:bg-secundary-opacity cursor-pointer" @click="irADetalle(clienteFix.id)">
+                <tbody class="" v-for="clienteFix in clientesFix" :key="clienteFix.id">
+                  <tr
+                    class="hover:bg-secundary-opacity cursor-pointer"
+                    @click="irADetalle(clienteFix.id)"
+                  >
                     <th class="p-2 text-left">
                       <label class="inline-flex items-center cursor-pointer">
                         <input
@@ -333,44 +362,72 @@ function irADetalle(id) {
                     </th>
 
                     <th class="p-2 text-left">
-                     <div class="flex items-center gap-1 text-[13px]">
-                        <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">format_italic</span>
+                      <div class="flex items-center gap-1 text-[13px]">
+                        <span
+                          class="material-symbols-rounded text-[20px]"
+                          :class="[textoClase]"
+                          >format_italic</span
+                        >
                         <span>Nombres</span>
                       </div>
                     </th>
                     <th class="p-2 text-left">
                       <div class="flex items-center gap-1 text-[13px]">
-                        <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">phone</span>
+                        <span
+                          class="material-symbols-rounded text-[20px]"
+                          :class="[textoClase]"
+                          >phone</span
+                        >
                         <span>Teléfono</span>
                       </div>
                     </th>
                     <th class="p-2 text-left">
                       <div class="flex items-center gap-1 text-[13px]">
-                        <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">email</span>
+                        <span
+                          class="material-symbols-rounded text-[20px]"
+                          :class="[textoClase]"
+                          >email</span
+                        >
                         <span>Correo email</span>
                       </div>
                     </th>
                     <th class="p-2 text-left">
-                     <div class="flex items-center gap-1 text-[13px]">
-                        <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">store</span>
+                      <div class="flex items-center gap-1 text-[13px]">
+                        <span
+                          class="material-symbols-rounded text-[20px]"
+                          :class="[textoClase]"
+                          >store</span
+                        >
                         <span>Tienda</span>
                       </div>
                     </th>
                     <th class="p-2 text-left">
-                     <div class="flex items-center gap-1 text-[13px]">
-                        <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">android</span>
+                      <div class="flex items-center gap-1 text-[13px]">
+                        <span
+                          class="material-symbols-rounded text-[20px]"
+                          :class="[textoClase]"
+                          >android</span
+                        >
                         <span>Aplicación</span>
                       </div>
                     </th>
                     <th class="p-2 text-left">
-                     <div class="flex items-center gap-1 text-[13px]">
-                        <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">event</span>
+                      <div class="flex items-center gap-1 text-[13px]">
+                        <span
+                          class="material-symbols-rounded text-[20px]"
+                          :class="[textoClase]"
+                          >event</span
+                        >
                         <span>Fecha registro</span>
                       </div>
                     </th>
                     <th class="p-2 text-left">
-                     <div class="flex items-center gap-1 text-[13px]">
-                        <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">hdr_weak</span>
+                      <div class="flex items-center gap-1 text-[13px]">
+                        <span
+                          class="material-symbols-rounded text-[20px]"
+                          :class="[textoClase]"
+                          >hdr_weak</span
+                        >
                         <span>Estado</span>
                       </div>
                     </th>
@@ -382,7 +439,10 @@ function irADetalle(id) {
                   :title="empleadoFix.id"
                   :key="empleadoFix.id"
                 >
-                  <tr class="hover:bg-secundary-opacity cursor-pointer"  @click="irADetalle(empleadoFix.id)">
+                  <tr
+                    class="hover:bg-secundary-opacity cursor-pointer"
+                    @click="irADetalle(empleadoFix.id)"
+                  >
                     <th class="p-2 text-left">
                       <label class="inline-flex items-center cursor-pointer">
                         <input

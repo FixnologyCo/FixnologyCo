@@ -60,6 +60,10 @@ const form = ref({
   id_plan_aplicacion: "",
   id_membresia: "",
   color_fondo: "",
+  color_texto: "",
+  color_shadow: "",
+  color_border: "",
+  color_hover: "",
   icono_app: "",
 });
 
@@ -74,6 +78,10 @@ watch(
         id_plan_aplicacion: props.app.id_plan_aplicacion || "",
         id_membresia: props.app.id_membresia || "",
         color_fondo: props.app.color_fondo || "",
+        color_texto: props.app.color_texto || "",
+        color_shadow: props.app.color_shadow || "",
+        color_border: props.app.color_border || "",
+        color_hover: props.app.color_hover || "",
         icono_app: props.app.icono_app || "",
       };
     }
@@ -81,13 +89,10 @@ watch(
   { immediate: true }
 );
 
-const aplicacion = props.auth?.user?.tienda?.aplicacion?.nombre_app || "Sin app";
-const rol = props.auth.user.rol?.tipo_rol || "Sin rol"; // Obtén el tipo de rol
-
 const actualizarApp = () => {
   router.put(route("aplicaciones.update", props.app.id), form.value, {
     onSuccess: () => {
-      emit("cerrar"); // Usas el emit definido
+      emit("cerrar");
     },
   });
 };
@@ -96,7 +101,7 @@ const mostrarSelector = ref(false);
 
 const coloresDisponibles = [
   "bg-red-400",
-  "bg-blue-400", 
+  "bg-blue-400",
   "bg-green-400",
   "bg-yellow-400",
   "bg-orange-400",
@@ -109,7 +114,7 @@ const coloresDisponibles = [
   "bg-cyan-400",
   "bg-emerald-400",
   "bg-amber-400",
-  "bg-violet-400"
+  "bg-violet-400",
 ];
 
 const seleccion = reactive({
@@ -127,6 +132,14 @@ watch(
   },
   { immediate: true }
 );
+
+function seleccionarColor(color) {
+  seleccion.color = color;
+  form.color_fondo = color;
+  form.color_texto = color.replace("bg-", "text-");
+  form.color_border = color.replace("bg-", "border-b-2 border-");
+  form.color_hover = color.replace("bg-", "hover:text-");
+}
 
 const clickFuera = (e) => {
   if (
@@ -226,12 +239,7 @@ const iconosFiltrados = computed(() =>
                           :key="color"
                           class="w-6 h-6 rounded-md cursor-pointer border border-white hover:ring-2"
                           :class="color"
-                          @click="
-                            () => {
-                              seleccion.color = color;
-                              form.color_fondo = color;
-                            }
-                          "
+                          @click="seleccionarColor(color)"
                         ></div>
                       </div>
                     </div>
@@ -252,11 +260,13 @@ const iconosFiltrados = computed(() =>
                       />
 
                       <!-- Íconos filtrados -->
-                      <div class="flex gap-1.5 flex-wrap max-h-48 overflow-auto scrollbar-custom">
+                      <div
+                        class="flex gap-1.5 flex-wrap max-h-48 overflow-auto scrollbar-custom"
+                      >
                         <span
                           v-for="icon in iconosFiltrados"
                           :key="icon"
-                        :title="icon"
+                          :title="icon"
                           class="material-symbols-rounded cursor-pointer p-2 rounded hover:bg-gray-200 dark:hover:bg-secundary-light"
                           @click="
                             () => {

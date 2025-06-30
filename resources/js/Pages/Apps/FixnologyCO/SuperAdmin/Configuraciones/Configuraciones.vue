@@ -13,7 +13,19 @@ import { useTiempo } from '@/Composables/useTiempo';
 const page = usePage();
 const user = ref(page.props.auth.user)
 const { tiempoActivo, diasRestantes } = useTiempo(user)
-const { appName, bgClase, bgOpacity, focus, textoClase, borderClase, buttonFocus, hoverClase, hoverTexto, buttonClase, buttonSecundario } = Colors();
+const {
+  appName,
+  bgClase,
+  bgOpacity,
+  focus,
+  textoClase,
+  borderClase,
+  buttonFocus,
+  hoverClase,
+  hoverTexto,
+  buttonClase,
+  buttonSecundario,
+} = Colors();
 
 const props = defineProps({
   auth: {

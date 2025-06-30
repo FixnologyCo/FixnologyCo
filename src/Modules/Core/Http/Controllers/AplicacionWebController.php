@@ -134,6 +134,7 @@ class AplicacionWebController extends Controller
             'id_plan_aplicacion' => 'required|integer|exists:planes_Aplicaciones,id',
             'id_membresia' => 'required|integer|exists:membresias,id',
             'color_fondo' => 'nullable|string|max:20',
+            'color_texto' => 'nullable|string|max:20',
             'icono_app' => 'nullable|string|max:50',
 
         ], [
@@ -146,6 +147,9 @@ class AplicacionWebController extends Controller
             'id_estado.exists' => 'El estado seleccionado no es válido.',
             'id_plan_aplicacion.exists' => 'El plan seleccionado no es válido.',
             'id_membresia.exists' => 'La membresía seleccionada no es válida.',
+            'color_fondo.nullable' => 'El color de fondo no debe quedar vacío.',
+            'color_texto.nullable' => 'El color de texto no debe quedar vacío.',
+            'icono_app.nullable' => 'El icono de la app no debe quedar vacío.',
 
             'nombre_app.max' => 'El nombre no debe superar los 30 carácteres',
             'descripcion_app.max' => 'La descripción no debe superar los 100 carácteres',
@@ -158,6 +162,10 @@ class AplicacionWebController extends Controller
             'id_plan_aplicacion' => $request->id_plan_aplicacion,
             'id_membresia' => $request->id_membresia,
             'color_fondo' => $request->color_fondo,
+            'color_texto' => $request->color_texto,
+            'color_shadow' => $request->color_shadow,
+            'color_border' => $request->color_border,
+            'color_hover' => $request->color_hover,
             'icono_app' => $request->icono_app,
         ]);
 
@@ -192,6 +200,9 @@ class AplicacionWebController extends Controller
             'id_plan_aplicacion' => 'required|integer|exists:planes_aplicaciones,id',
             'id_membresia' => 'required|integer|exists:membresias,id',
             'color_fondo' => 'nullable|string|max:100',
+            'color_texto' => 'nullable|string|max:100',
+            'color_hover' => 'nullable|string|max:100',
+            'color_border' => 'nullable|string|max:100',
             'icono_app' => 'nullable|string|max:100',
         ]);
 
@@ -203,6 +214,9 @@ class AplicacionWebController extends Controller
             'id_plan_aplicacion' => $request->id_plan_aplicacion,
             'id_membresia' => $request->id_membresia,
             'color_fondo' => $request->color_fondo,
+            'color_texto' => $request->color_texto, 
+            'color_border' => $request->color_border,
+            'color_hover' => $request->color_hover,
             'icono_app' => $request->icono_app,
         ]);
 

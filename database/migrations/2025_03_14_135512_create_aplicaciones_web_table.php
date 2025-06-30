@@ -18,6 +18,10 @@ return new class extends Migration {
             $table->string('nombre_app')->nullable(false);
             $table->string('descripcion')->nullable(false);
             $table->string('color_fondo')->nullable();
+            $table->string('color_texto')->nullable();
+            $table->string('color_shadow')->nullable();
+            $table->string('color_border')->nullable();
+            $table->string('color_hover')->nullable();
             $table->string('icono_app')->nullable();
             $table->timestamp('fecha_creacion')->default(DB::raw('CURRENT_TIMESTAMP'));
             $table->timestamp('fecha_modificacion')->default(DB::raw('CURRENT_TIMESTAMP'))->useCurrentOnUpdate();
@@ -37,6 +41,10 @@ return new class extends Migration {
                 'nombre_app' => 'FixnologyCO',
                 'descripcion' => 'Aplicación corporativa a escala Fixnology',
                 'color_fondo' => 'bg-universal-naranja',
+                'color_texto' => 'text-universal-naranja',
+                'color_shadow' => 'shadow-universal-naranja',
+                'color_border' => 'border-b-2 border-universal-naranja',
+                'color_hover' => 'hover:text-universal-naranja',
                 'icono_App' => 'taunt',
             ],
         ]);

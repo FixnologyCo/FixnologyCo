@@ -20,6 +20,10 @@ class AplicacionWeb extends Model
         'nombre_app',
         'descripcion',
         'color_fondo',
+        'color_texto',
+        'color_shadow',
+        'color_border',
+        'color_hover',
         'icono_app',
     ];
 

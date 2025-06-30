@@ -52,10 +52,14 @@ export default function useAppColors() {
         'FixnologyCO': 'hover:bg-universal-naranja hover:text-mono-blanco hover:shadow-universal-naranja',
     }
 
-
 const appName = computed(() =>
     auth?.user?.tienda?.aplicacion?.nombre_app || 'default'
 );
+
+const colorFondo = computed(() => {
+  return auth?.user?.tienda?.aplicacion?.color_fondo || '#CCCCCC'; // color por defecto si no hay
+});
+
 
 const bgClase = computed(() => coloresBg[appName.value] || coloresBg['default']);
 const bgOpacity = computed(() => bgFocusOpacity[appName.value] || bgFocusOpacity['default']);
@@ -79,7 +83,8 @@ return {
     hoverClase,
     borderClase,
     buttonClase,
-    buttonSecundario
+    buttonSecundario,
+    colorFondo
 };
 }
 

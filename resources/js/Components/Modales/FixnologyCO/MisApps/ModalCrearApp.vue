@@ -7,7 +7,8 @@ import {
   ref,
   onMounted,
   onBeforeUnmount,
-  computed
+  computed,
+  watchEffect,
 } from "vue";
 import { Head, usePage, useForm, router } from "@inertiajs/vue3";
 import "dayjs/locale/es";
@@ -53,11 +54,15 @@ const emit = defineEmits(["cerrar"]);
 const form = useForm({
   nombre_app: "",
   descripcion_app: "",
-  id_estado: "",
+  id_estado: 1,
   id_plan_aplicacion: "",
   id_membresia: "",
-  color_fondo: "",
-  icono_app: "",
+  color_fondo: "bg-red-400",
+  color_texto: "bg-red-400",
+  color_shadow: "shadow-0px 8px 20px red-400",
+  color_border: "border-red-400",
+  color_hover: "hover:text-red-400",
+  icono_app: "bolt",
 });
 
 const page = usePage();
@@ -84,7 +89,7 @@ const mostrarSelector = ref(false);
 
 const coloresDisponibles = [
   "bg-red-400",
-  "bg-blue-400", 
+  "bg-blue-400",
   "bg-green-400",
   "bg-yellow-400",
   "bg-orange-400",
@@ -97,7 +102,7 @@ const coloresDisponibles = [
   "bg-cyan-400",
   "bg-emerald-400",
   "bg-amber-400",
-  "bg-violet-400"
+  "bg-violet-400",
 ];
 
 const seleccion = reactive({
@@ -105,6 +110,17 @@ const seleccion = reactive({
   icono: "bolt",
 });
 
+function seleccionarColor(color) {
+  seleccion.color = color;
+  form.color_fondo = color;
+  form.color_texto = color.replace("bg-", "text-");
+  form.color_shadow = color.replace(
+    "bg-",
+    "shadow-[0px 8px 20px ".concat(color.replace("bg-", "")) + "]"
+  );
+  form.color_border = color.replace("bg-", "border-b-2 border-");
+  form.color_hover = color.replace("bg-", "hover:text-");
+}
 const clickFuera = (e) => {
   if (
     !e.target.closest(".iconoApp") &&
@@ -186,68 +202,65 @@ const iconosFiltrados = computed(() =>
                 </span>
 
                 <!-- Caja flotante -->
-                  <div
-                    v-if="mostrarSelector"
-                    class="cajaSelector absolute top-[55px] left-5 bg-white dark:bg-secundary-default border border-gray-300 dark:border-secundary-light rounded-lg p-4 z-50 w-[360px] max-w-[380px] shadow-lg ..."
-                  >
-                    <!-- Selector de color -->
-                    <div class="mb-3">
-                      <p
-                        class="text-sm font-semibold text-mono-blac k dark:text-mono-blanco mb-1"
-                      >
-                        Color de fondo:
-                      </p>
-                      <div class="flex gap-2 flex-wrap">
-                        <div
-                          v-for="color in coloresDisponibles"
-                          :key="color"
-                          class="w-6 h-6 rounded-md cursor-pointer border border-white hover:ring-2"
-                          :class="color"
-                          @click="
-                            () => {
-                              seleccion.color = color;
-                              form.color_fondo = color;
-                            }
-                          "
-                        ></div>
-                      </div>
-                    </div>
-
-                    <!-- Selector de ícono -->
-                    <div class="">
-                      <p
-                        class="text-sm font-semibold text-mono-black dark:text-mono-blanco mb-1"
-                      >
-                        Ícono:
-                      </p>
-                      <!-- Buscador de íconos -->
-                      <input
-                        v-model="filtroIcono"
-                        type="text"
-                        placeholder="Buscar ícono..."
-                        class="mb-2 px-2 py-1 border rounded w-full dark:bg-secundary-default"
-                      />
-
-                      <!-- Íconos filtrados -->
-                      <div class="flex gap-1.5 flex-wrap max-h-48 overflow-auto scrollbar-custom">
-                        <span
-                          v-for="icon in iconosFiltrados"
-                          :key="icon"
-                        :title="icon"
-                          class="material-symbols-rounded cursor-pointer p-2 rounded hover:bg-gray-200 dark:hover:bg-secundary-light"
-                          @click="
-                            () => {
-                              seleccion.icono = icon;
-                              form.icono_app = icon;
-                              mostrarSelector = false;
-                            }
-                          "
-                        >
-                          {{ icon }}
-                        </span>
-                      </div>
+                <div
+                  v-if="mostrarSelector"
+                  class="cajaSelector absolute top-[55px] left-5 bg-white dark:bg-secundary-default border border-gray-300 dark:border-secundary-light rounded-lg p-4 z-50 w-[360px] max-w-[380px] shadow-lg ..."
+                >
+                  <!-- Selector de color -->
+                  <div class="mb-3">
+                    <p
+                      class="text-sm font-semibold text-mono-blac k dark:text-mono-blanco mb-1"
+                    >
+                      Color de fondo:
+                    </p>
+                    <div class="flex gap-2 flex-wrap">
+                      <div
+                        v-for="color in coloresDisponibles"
+                        :key="color"
+                        class="w-6 h-6 rounded-md cursor-pointer border border-white hover:ring-2"
+                        :class="color"
+                        @click="seleccionarColor(color)"
+                      ></div>
                     </div>
                   </div>
+
+                  <!-- Selector de ícono -->
+                  <div class="">
+                    <p
+                      class="text-sm font-semibold text-mono-black dark:text-mono-blanco mb-1"
+                    >
+                      Ícono:
+                    </p>
+                    <!-- Buscador de íconos -->
+                    <input
+                      v-model="filtroIcono"
+                      type="text"
+                      placeholder="Buscar ícono..."
+                      class="mb-2 px-2 py-1 border rounded w-full dark:bg-secundary-default"
+                    />
+
+                    <!-- Íconos filtrados -->
+                    <div
+                      class="flex gap-1.5 flex-wrap max-h-48 overflow-auto scrollbar-custom"
+                    >
+                      <span
+                        v-for="icon in iconosFiltrados"
+                        :key="icon"
+                        :title="icon"
+                        class="material-symbols-rounded cursor-pointer p-2 rounded hover:bg-gray-200 dark:hover:bg-secundary-light"
+                        @click="
+                          () => {
+                            seleccion.icono = icon;
+                            form.icono_app = icon;
+                            mostrarSelector = false;
+                          }
+                        "
+                      >
+                        {{ icon }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               <input
