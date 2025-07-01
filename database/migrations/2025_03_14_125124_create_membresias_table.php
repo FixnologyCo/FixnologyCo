@@ -12,66 +12,71 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('membresias', function (Blueprint $table) {
-            $table->id(); // ID autoincremental (clave primaria)
-            $table->unsignedBigInteger('id_estado')->default(1); // Relación con la tabla estados
+            $table->id('id_membresia'); 
+            $table->unsignedBigInteger('id_estilo');
+            $table->unsignedBigInteger('id_estado')->default(1); 
         
-            $table->string('nombre_membresia'); // Nombre de la membresía
-            $table->string('precio'); // Precio de la membresía
-            $table->string('periodo'); // Periodo (ejemplo: mensual, anual)
-            $table->integer('duracion'); // Duración en días, meses, o años
-            $table->text('descripcion')->nullable(); // Descripción opcional de la membresía
+            $table->string('nombre_membresia'); 
+            $table->string('precio_membresia'); 
+            $table->string('periodo_duracion'); 
+            $table->integer('duracion_membresia'); 
+            $table->text('descripcion_corta')->nullable(); 
         
-            // Fechas de creación y modificación
             $table->timestamp('fecha_creacion')->default(DB::raw('CURRENT_TIMESTAMP'));
             $table->timestamp('fecha_modificacion')->default(DB::raw('CURRENT_TIMESTAMP'))->useCurrentOnUpdate();
-        
-            // Relaciones
+    
             $table->foreign('id_estado')->references('id')->on('estados')->onDelete('cascade');
         });
         
 
         DB::table('membresias')->insert([
             [
+                'estilo_id' => '1',
                 'nombre_membresia' => 'Free',
-                'precio' => '0',
-                'periodo'=> 'Semanal',
-                'duracion' => '7',
-                'descripcion' => 'Plan de prueba totalmente gratuito.',
+                'precio_membresia' => '0',
+                'periodo_duracion'=> 'Semanal',
+                'duracion_membresia' => '7',
+                'descripcion_corta' => 'Plan de prueba totalmente gratuito.',
             ],
             [
+                'estilo_id' => '1',
                 'nombre_membresia' => 'Platino',
-                'precio' => '75800',
-                'periodo'=> 'Mensual',
-                'duracion' => '30',
-                'descripcion' => 'Plan de modalidad mensual, con previo aviso 5 dias antes.',
+                'precio_membresia' => '75800',
+                'periodo_duracion'=> 'Mensual',
+                'duracion_membresia' => '30',
+                'descripcion_corta' => 'Plan de modalidad mensual, con previo aviso 5 dias antes.',
             ],
             [
+                'estilo_id' => '1',
                 'nombre_membresia' => 'Diamante',
-                'precio' => '210400',
-                'periodo'=> 'Trimestral',
-                'duracion' => '90',
-                'descripcion' => 'Plan de modalidad cada 3 meses, con previo aviso 5 dias antes',
+                'precio_membresia' => '210400',
+                'periodo_duracion'=> 'Trimestral',
+                'duracion_membresia' => '90',
+                'descripcion_corta' => 'Plan de modalidad cada 3 meses, con previo aviso 5 dias antes',
             ],
             [
+                'estilo_id' => '1',
                 'nombre_membresia' => 'Esmeralda',
-                'precio' => '435000',
-                'periodo'=> 'Semestral',
-                'duracion' => '180',
-                'descripcion' => 'Plan de modalidad cada 6 meses, con previo aviso 5 dias antes',
+                'precio_membresia' => '435000',
+                'periodo_duracion'=> 'Semestral',
+                'duracion_membresia' => '180',
+                'descripcion_corta' => 'Plan de modalidad cada 6 meses, con previo aviso 5 dias antes',
             ],
             [
+                'estilo_id' => '1',
                 'nombre_membresia' => 'Ruby',
-                'precio' => '1285000',
-                'periodo'=> 'Anual',
-                'duracion' => '365',
-                'descripcion' => 'Plan de modalidad cada 12 meses, con previo aviso 5 dias antes',
+                'precio_membresia' => '1285000',
+                'periodo_duracion'=> 'Anual',
+                'duracion_membresia' => '365',
+                'descripcion_corta' => 'Plan de modalidad cada 12 meses, con previo aviso 5 dias antes',
             ],
             [
+                'estilo_id' => '1',
                 'nombre_membresia' => 'All star',
-                'precio' => '9200000',
-                'periodo'=> 'Infinito',
-                'duracion' => '999999',
-                'descripcion' => 'Plan sin terminación.',
+                'precio_membresia' => '9200000',
+                'periodo_duracion'=> 'Infinito',
+                'duracion_membresia' => '999999',
+                'descripcion_corta' => 'Plan sin terminación.',
             ],
 
         ]);
