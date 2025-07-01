@@ -14,40 +14,45 @@ class CreateEstadosTable extends Migration
     {
         Schema::create('estados', function (Blueprint $table) {
             $table->id();
-            $table->enum('tipo_estado', [
-                'Activo',
-                'Inactivo',
-                'En curso',
-                'Finalizado',
-                'En espera',
-                'Cancelado',
-                'Reservado',
-                'Pagada',
-                'Pendiente',
-                'Estable',
-                'Peligro',
-                'Revisión',
-                'Suspendida'
-            ])->nullable(false);
+            $table->string('tipo_estado', 255)->nullable(false);
+            $table->string('categoria_estado', 255)->nullable();
             $table->timestamp('fecha_creacion')->useCurrent();
             $table->timestamp('fecha_modificacion')->useCurrent()->useCurrentOnUpdate();
         });
 
         // Insertar datos iniciales
         DB::table('estados')->insert([
-            ['tipo_estado' => 'Activo'],
-            ['tipo_estado' => 'Inactivo'],
-            ['tipo_estado' => 'En curso'],
-            ['tipo_estado' => 'Finalizado'],
-            ['tipo_estado' => 'En espera'],
-            ['tipo_estado' => 'Cancelado'],
-            ['tipo_estado' => 'Reservado'],
-            ['tipo_estado' => 'Pagada'],
-            ['tipo_estado' => 'Pendiente'],
-            ['tipo_estado' => 'Estable'],
-            ['tipo_estado' => 'Peligro'],
-            ['tipo_estado' => 'Revisión'],
-            ['tipo_estado' => 'Suspendida'],
+
+            // --- Categoría: General / Ciclo de Vida ---
+            ['id' => 1, 'tipo_estado' => 'Activo', 'categoria_estado' => 'General'],
+            ['id' => 2, 'tipo_estado' => 'Inactivo', 'categoria_estado' => 'General'],
+            ['id' => 3, 'tipo_estado' => 'Suspendido', 'categoria_estado' => 'General'],
+            ['id' => 4, 'tipo_estado' => 'Archivado', 'categoria_estado' => 'General'],
+            ['id' => 5, 'tipo_estado' => 'Eliminado', 'categoria_estado' => 'General'],
+
+            // --- Categoría: Contenido ---
+            ['id' => 6, 'tipo_estado' => 'Borrador', 'categoria_estado' => 'Contenido'],
+            ['id' => 7, 'tipo_estado' => 'Publicado', 'categoria_estado' => 'Contenido'],
+
+            // --- Categoría: Proceso / Flujo de Trabajo ---
+            ['id' => 8, 'tipo_estado' => 'Pendiente', 'categoria_estado' => 'Proceso'],
+            ['id' => 9, 'tipo_estado' => 'En progreso', 'categoria_estado' => 'Proceso'],
+            ['id' => 10, 'tipo_estado' => 'En espera', 'categoria_estado' => 'Proceso'],
+            ['id' => 11, 'tipo_estado' => 'En revisión', 'categoria_estado' => 'Proceso'],
+            ['id' => 12, 'tipo_estado' => 'Aprobado', 'categoria_estado' => 'Proceso'],
+            ['id' => 13, 'tipo_estado' => 'Rechazado', 'categoria_estado' => 'Proceso'],
+            ['id' => 14, 'tipo_estado' => 'Cancelado', 'categoria_estado' => 'Proceso'],
+            ['id' => 15, 'tipo_estado' => 'Finalizado', 'categoria_estado' => 'Proceso'],
+
+            // --- Categoría: Pagos ---
+            ['tipo_estado' => 'Pendiente', 'categoria_estado' => 'Pagos'],
+            ['tipo_estado' => 'Procesando', 'categoria_estado' => 'Pagos'],
+            ['tipo_estado' => 'Pagado', 'categoria_estado' => 'Pagos'],
+            ['tipo_estado' => 'Rechazado', 'categoria_estado' => 'Pagos'],
+            ['tipo_estado' => 'Cancelado', 'categoria_estado' => 'Pagos'],
+            ['tipo_estado' => 'Reembolsado', 'categoria_estado' => 'Pagos'],
+            ['tipo_estado' => 'Vencido', 'categoria_estado' => 'Pagos'],
+            ['tipo_estado' => 'En Disputa', 'categoria_estado' => 'Pagos'],
         ]);
     }
 
