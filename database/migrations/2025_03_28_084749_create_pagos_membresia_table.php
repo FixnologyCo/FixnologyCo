@@ -11,45 +11,44 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('pagos_membresia', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('id_cliente');
-            $table->unsignedBigInteger('id_tienda');
-            $table->unsignedBigInteger('id_medio_pago');
+        Schema::create('facturacion_membresias', function (Blueprint $table) {
+            $table->id('id_factura_membresia'); // ID autoincremental
+            $table->unsignedBigInteger('id_cliente_fx');
+            $table->unsignedBigInteger('id_establecimiento_fx');
+            $table->unsignedBigInteger('id_aplicacion_web');
             $table->unsignedBigInteger('id_estado');
             $table->string('monto_total')->default(0);
-        
-            $table->timestamp('fecha_creacion')->default(DB::raw('CURRENT_TIMESTAMP'));
-            $table->timestamp('fecha_pago')->default(DB::raw('CURRENT_TIMESTAMP'))->useCurrentOnUpdate();
-            $table->timestamp('fecha_activacion')->nullable();
+            $table->string('medio_pago')->default('NA');
             $table->integer('dias_restantes')->nullable();
         
-            $table->foreign('id_cliente')->references('id')->on('clientes_fixgis');
-            $table->foreign('id_tienda')->references('id')->on('tiendas_sistematizadas');
-            $table->foreign('id_medio_pago')->references('id')->on('medios_pago');
-            $table->foreign('id_estado')->references('id')->on('estados');
+            $table->timestamp('fecha_pago')->default(DB::raw('CURRENT_TIMESTAMP'))->useCurrentOnUpdate();
+
+            $table->foreign('id_cliente_fx')->references('id_cliente_fixgi')->on('clientes_fixgis');
+            $table->foreign('id_establecimiento_fx')->references('id_establecimiento')->on('establecimientos');
+            $table->foreign('id_aplicacion_web')->references('id_aplicacion_web')->on('aplicaciones_web');
+            $table->foreign('id_estado')->references('id_estado')->on('estados');
         });
 
-        DB::table('pagos_membresia')->insert([
+        DB::table('facturacion_membresias')->insert([
             [
-                'id_cliente' => '1',
-                'id_tienda' => '1',
+                'id_cliente_fx' => '1',
+                'id_establecimiento_fx' => '1',
+                'id_aplicacion_web' => '1',
                 'monto_total' => '9200000',
-                'id_medio_pago' => '1',
                 'id_estado' => '8',
+                'dias_restantes' => '999999',
                 'fecha_pago'       => now(),
                 'fecha_activacion' => now(),
-                'dias_restantes' => '999999',
             ],
             [
-                'id_cliente' => '2',
-                'id_tienda' => '1',
+                'id_cliente_fx' => '2',
+                'id_establecimiento_fx' => '1',
+                'id_aplicacion_web' => '1',
                 'monto_total' => '9200000',
-                'id_medio_pago' => '1',
                 'id_estado' => '8',
+                'dias_restantes' => '999999',
                 'fecha_pago'       => now(),
                 'fecha_activacion' => now(),
-                'dias_restantes' => '999999',
             ],
 
         ]);
