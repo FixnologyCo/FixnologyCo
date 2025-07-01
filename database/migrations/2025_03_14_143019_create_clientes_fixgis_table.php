@@ -4,63 +4,74 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
     public function up(): void
-{
-    Schema::create('clientes_fixgis', function (Blueprint $table) {
-        $table->id(); 
-        $table->unsignedBigInteger('id_estado')->default(1);
-        $table->unsignedBigInteger('id_rol')->default(1);
-        $table->unsignedBigInteger('id_tienda')->nullable();
+    {
+        Schema::create('clientes_fixgis', function (Blueprint $table) {
+            $table->id('id_cliente_fixgi'); // ID autoincremental (equivalente a INT PRIMARY KEY AUTO_INCREMENT)
+            $table->unsignedBigInteger('id_estado')->default(1);
+            $table->unsignedBigInteger('id_rol')->default(1);
+            $table->unsignedBigInteger('id_establecimiento')->nullable();
+            $table->unsignedBigInteger('id_indicativo')->nullable();
+            $table->unsignedBigInteger('id_tipo_documento')->default(1);
+            $table->unsignedBigInteger('id_medio_pago')->default(1);
 
-        $table->string('nombres_ct');
-        $table->string('apellidos_ct');
-        $table->unsignedBigInteger('id_tipo_documento');
-        $table->string('numero_documento_ct')->unique();
-        $table->string('contrasenia_ct');
-        $table->string('email_ct')->unique();
-        $table->string('telefono_ct')->unique();
+            $table->string('primer_nombre_fx')->nullable();
+            $table->string('segundo_nombre_fx')->nullable();
+            $table->string('primer_apellido_fx')->nullable();
+            $table->string('segundo_apellido_fx')->nullable();
 
-        $table->longText('foto_binaria')->nullable(); // Imagen en binario
+            $table->string('numero_documento_fx')->unique();
+            $table->string('contrasenia_fx')->nullable();
+            $table->string('email_fx')->unique();
+            $table->string('telefono_fx')->unique();
+            $table->longText('foto_binaria_fx')->nullable();
 
-        $table->timestamp('fecha_creacion')->default(DB::raw('CURRENT_TIMESTAMP'));
-        $table->timestamp('fecha_modificacion')->default(DB::raw('CURRENT_TIMESTAMP'))->useCurrentOnUpdate();
+            $table->timestamp('fecha_registro')->default(DB::raw('CURRENT_TIMESTAMP'));
+            $table->timestamp('fecha_modificacion')->default(DB::raw('CURRENT_TIMESTAMP'))->useCurrentOnUpdate();
 
-        $table->foreign('id_estado')->references('id')->on('estados')->onDelete('cascade');
-        $table->foreign('id_rol')->references('id')->on('roles_administrativos')->onDelete('cascade');
-        $table->foreign('id_tienda')->references('id')->on('tiendas_sistematizadas')->onDelete('cascade');
-        $table->foreign('id_tipo_documento')->references('id')->on('tipo_documentos')->onDelete('cascade');
-    });
+            $table->foreign('id_estado')->references('id_estado')->on('estados')->onDelete('cascade');
+            $table->foreign('id_rol')->references('id_rol_administrativo')->on('roles_administrativos')->onDelete('cascade');
+            $table->foreign('id_establecimiento')->references('id_establecimiento')->on('establecimientos')->onDelete('cascade');
+            $table->foreign('id_medio_pago')->references('id_medio_pago')->on('medios_pago')->onDelete('cascade');
+            $table->foreign('id_indicativo')->references('id_indicativo')->on('indicativos')->onDelete('cascade');
+            $table->foreign('id_tipo_documento')->references('id_tipo_documento')->on('tipo_documentos')->onDelete('cascade');
+        });
 
-    DB::table('clientes_fixgis')->insert([
-        [
-            'id_rol' => '4',
-            'id_tienda' => '1',
-            'nombres_ct'=> 'Jhoann Sebastián',
-            'apellidos_ct' => 'Zamudio',
-            'id_tipo_documento' => '1',
-            'numero_documento_ct' => '1013580753',
-            'contrasenia_ct' => '123456',
-            'email_ct' => 'sebastianzamudio2004@gmail.com',
-            'telefono_ct' => '3165114410',
-        ],
-        [
-            'id_rol' => '4',
-            'id_tienda' => '1',
-            'nombres_ct'=> 'Erik Manuel',
-            'apellidos_ct' => 'Guevara',
-            'id_tipo_documento' => '1',
-            'numero_documento_ct' => '777',
-            'contrasenia_ct' => '123456',
-            'email_ct' => 'emgladino@gmail.com',
-            'telefono_ct' => '3212820011',
-        ],
-    ]);
-}
+        DB::table('clientes_fixgis')->insert([
+            [
+                'id_rol' => '4',
+                'id_establecimiento' => '1',
+                'id_tipo_documento' => '1',
+                'id_indicativo' => '1',
+                'primer_nombre_fx' => 'Jhoann',
+                'segundo_nombre_fx' => 'Sebastián',
+                'primer_apellido_fx' => 'Zamudio',
+                'segundo_apellido_fx' => 'Marulanda',
+                'numero_documento_fx' => '1013580753',
+                'contrasenia_fx' => '123456',
+                'email_fx' => 'sebastianzamudio2004@gmail.com',
+                'telefono_fx' => '3165114410',
+            ],
+            [
+                'id_rol' => '4',
+                'id_establecimiento' => '1',
+                'id_tipo_documento' => '1',
+                'id_indicativo' => '1',
+                'primer_nombre_fx' => 'Erik',
+                'segundo_nombre_fx' => 'Manuel',
+                'primer_apellido_fx' => 'Guevara',
+                'segundo_apellido_fx' => 'Ladino',
+                'numero_documento_fx' => '123',
+                'contrasenia_fx' => '123456',
+                'email_fx' => 'emgladino@gmail.com',
+                'telefono_fx' => '0000000000',
+            ],
+        ]);
+    }
 
 
     /**
