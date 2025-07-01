@@ -1,5 +1,5 @@
 <script setup>
-import { Head, usePage } from "@inertiajs/vue3";
+import { Head, usePage, router } from "@inertiajs/vue3";
 import { route } from "ziggy-js";
 import { ref, onMounted, onUnmounted, computed } from "vue";
 import "dayjs/locale/es";
@@ -9,7 +9,10 @@ import Colors from "@/Composables/ModularColores";
 import MensajesLayout from "@/Layouts/MensajesLayout.vue";
 import useEstadoClass from "@/Composables/useEstado";
 const { getEstadoClass } = useEstadoClass();  
-import { formatFecha, formatFechaShort } from "@/utils/date";
+import { formatFecha, formatFechaShort } from "@/Utils/date";
+import { useTiempo } from '@/Composables/useTiempoDetallesClientes';
+import { formatCOP } from "@/Utils/formateoMoneda";
+
 const {
   appName,
   bgClase,
@@ -37,6 +40,10 @@ const props = defineProps({
     type: String,
     default: "",
   },
+  rol: {
+    type: String,
+    default: "",
+  },
   errors: {
     type: Object,
     required: true,
@@ -50,8 +57,10 @@ const props = defineProps({
     default: "",
   },
 });
-
 const page = usePage();
+const detallesCliente = ref(page.props.detallesCliente);
+const { tiempoActivo, diasRestantes } = useTiempo(detallesCliente)
+
 
 const aplicacion = props.auth?.user?.tienda?.aplicacion?.nombre_app || "Sin app";
 const rol = props.auth.user.rol?.tipo_rol || "Sin rol"; // Obtén el tipo de rol
@@ -65,9 +74,9 @@ function obtenerIniciales(nombre, apellido) {
 const activeTab = ref(0);
 const tabs = [
   { label: "Información personal" },
-  { label: "Información tienda" },
-  { label: "Información membresía" },
+  { label: "Información de la tienda" },
   { label: "Información del plan" },
+  { label: "Información de membresía" },
   { label: "Ajustes avanzados" },
 ];
 
@@ -76,6 +85,25 @@ const bgColor = props.detallesCliente.tienda.aplicacion.color_fondo || "bg-secun
 const textColor = props.detallesCliente.tienda.aplicacion.color_texto || "text-mono-blanco";
 const shadowColor = props.detallesCliente.tienda.aplicacion.color_shadow || "shadowM";
 const borderColor = props.detallesCliente.tienda.aplicacion.color_border;
+
+function activarToken() {
+  router.post(
+    route('aplicacion.activarToken', {
+      aplicacion: props.aplicacion,
+      rol: props.rol,
+      id: props.detallesCliente.id,
+    }),
+    {},
+    {
+      onSuccess: () => {
+       console.log('Token activado con éxito');
+      },
+      onError: () => {
+        console.error('Error al activar el token');
+      },
+    }
+  )
+}
 </script>
 
 <template>
@@ -161,12 +189,24 @@ const borderColor = props.detallesCliente.tienda.aplicacion.color_border;
                 </div>
 
 
-                <div class="botonesConfig my-3 flex gap-2 items-center">
+                <div v-if='detallesCliente.tienda?.token.estado.tipo_estado === "Inactivo"'>
+                   <div class="botonesConfig my-3 flex gap-2 items-center">
+                  <a >
+                    <button class="rounded-md py-2 px-4 flex items-center justify-center gap-2 text-gray-700 shadowM" :class="[bgColor]"  @click="activarToken">Activar token</button>
+                  </a>
+                  
+                </div>
+                </div>
+                <div v-else-if='detallesCliente.tienda?.token.estado.tipo_estado === "Activo"'>
+                   <div class="botonesConfig my-3 flex gap-2 items-center">
                   <a :href="route('aplicacion.configuraciones.editarMiPerfil', { aplicacion, rol })">
                     <button class="rounded-md py-2 px-4 flex items-center justify-center gap-2 text-mono-negro" :class="[bgColor]">Editar perfil</button>
                   </a>
                   
                 </div>
+                </div>
+
+               
               </div>
 
             </div>
@@ -176,8 +216,7 @@ const borderColor = props.detallesCliente.tienda.aplicacion.color_border;
               <div class="datos-recurentes flex items-end flex-col gap-2">
                 <div class="dias-restante text-right w-auto rounded-md">
                   <h4 class="text-secundary-default dark:text-mono-blanco ">La membresía finaliza en:</h4>
-                  <p class="text-[35px] font-semibold -mt-3 text-secundary-default dark:text-mono-blanco">{{
-                    diasRestantes }}<span class="text-[14px] text-secundary-default dark:text-mono-blanco">Días</span>
+                  <p class="text-[35px] font-semibold -mt-3 text-secundary-default dark:text-mono-blanco">{{ diasRestantes }}<span class="text-[14px] text-secundary-default dark:text-mono-blanco">Días</span>
                   </p>
                 </div>
                 <div class="dias-activo w-auto rounded-md ">
@@ -193,7 +232,7 @@ const borderColor = props.detallesCliente.tienda.aplicacion.color_border;
             <div class="mb-6">
               <nav class="-mb-px flex space-x-4">
                 <button v-for="(tab, index) in tabs" :key="index" @click="activeTab = index" :class="[
-                  'text-md font-medium px-4 py-2',
+                  'text-[14px] font-medium px-4 py-2',
                   activeTab === index
                     ? textColor + ' ' + borderColor
                     : 'text-secundary-default dark:text-secundary-light ' + ' dark:' + hoverColor + ' ' + hoverColor
@@ -212,7 +251,7 @@ const borderColor = props.detallesCliente.tienda.aplicacion.color_border;
                       usuario:</label>
                     <p id="id-usuario"
                       class="flex items-center gap-1.5 text-secundary-default dark:text-mono-blanco border border-secundary-light secundary-light px-2 py-1 rounded-md w-full">
-                      <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">badge</span>
+                      <span class="material-symbols-rounded text-[20px]" :class="[textColor]">badge</span>
                       {{ detallesCliente.id || 'Sin Id' }}
                     </p>
                   </div>
@@ -233,7 +272,7 @@ const borderColor = props.detallesCliente.tienda.aplicacion.color_border;
                       usuario:</label>
                     <p id="rol-usuario"
                       class="flex items-center gap-1.5 text-secundary-default dark:text-mono-blanco border border-secundary-light px-2 py-1 rounded-md w-full">
-                      <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">local_police</span>
+                      <span class="material-symbols-rounded text-[20px]" :class="[textColor]">local_police</span>
                       {{ detallesCliente.rol?.tipo_rol || 'Sin rol' }}
                     </p>
                   </div>
@@ -244,7 +283,7 @@ const borderColor = props.detallesCliente.tienda.aplicacion.color_border;
                       asignada:</label>
                     <p id="tienda-usuario"
                       class="flex items-center gap-1.5 text-secundary-default dark:text-mono-blanco border border-secundary-light px-2 py-1 rounded-md w-full">
-                      <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">store</span>
+                      <span class="material-symbols-rounded text-[20px]" :class="[textColor]">store</span>
                       {{ detallesCliente.tienda?.nombre_tienda || 'Sin tienda' }}
                     </p>
                   </div>
@@ -256,7 +295,7 @@ const borderColor = props.detallesCliente.tienda.aplicacion.color_border;
                       creación:</label>
                     <p id="fecha-creacion-usuario"
                       class="flex items-center gap-1.5 text-secundary-default dark:text-mono-blanco border border-secundary-light px-2 py-1 rounded-md w-full">
-                      <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">calendar_month</span>
+                      <span class="material-symbols-rounded text-[20px]" :class="[textColor]">calendar_month</span>
                       {{ formatFecha(detallesCliente.fecha_creacion) || 'Sin fecha' }}
                     </p>
                   </div>
@@ -269,7 +308,7 @@ const borderColor = props.detallesCliente.tienda.aplicacion.color_border;
                       usuario:</label>
                     <p id="nombre-usuario"
                       class="flex items-center gap-1.5 text-secundary-default dark:text-mono-blanco border border-secundary-light px-2 py-1 rounded-md w-full">
-                      <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">person</span>
+                      <span class="material-symbols-rounded text-[20px]" :class="[textColor]">person</span>
                       {{ detallesCliente.nombres_ct || 'Sin nombre' }} {{ detallesCliente.apellidos_ct || 'Sin apellido' }}
                     </p>
                   </div>
@@ -280,7 +319,7 @@ const borderColor = props.detallesCliente.tienda.aplicacion.color_border;
                       usuario:</label>
                     <p id="documento-usuario"
                       class="flex items-center gap-1.5 text-secundary-default dark:text-mono-blanco border border-secundary-light px-2 py-1 rounded-md w-full">
-                      <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">description</span>
+                      <span class="material-symbols-rounded text-[20px]" :class="[textColor]">description</span>
                       {{ detallesCliente.tipo_documento?.documento_legal || 'Sin documento' }} - {{
                         detallesCliente.numero_documento_ct || 'Sin número' }}
                     </p>
@@ -292,7 +331,7 @@ const borderColor = props.detallesCliente.tienda.aplicacion.color_border;
                       usuario:</label>
                     <p id="email-usuario"
                       class="flex items-center gap-1.5 text-secundary-default dark:text-mono-blanco border border-secundary-light px-2 py-1 rounded-md w-full">
-                      <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">email</span>
+                      <span class="material-symbols-rounded text-[20px]" :class="[textColor]">email</span>
                       {{ detallesCliente.email_ct || 'Sin email' }}
                     </p>
                   </div>
@@ -303,7 +342,7 @@ const borderColor = props.detallesCliente.tienda.aplicacion.color_border;
                       usuario:</label>
                     <p id="telefono-usuario"
                       class="flex items-center gap-1.5 text-secundary-default dark:text-mono-blanco border border-secundary-light px-2 py-1 rounded-md w-full">
-                      <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">phone</span>
+                      <span class="material-symbols-rounded text-[20px]" :class="[textColor]">phone</span>
                       {{ detallesCliente.telefono_ct || 'Sin teléfono' }}
                     </p>
                   </div>
@@ -314,7 +353,7 @@ const borderColor = props.detallesCliente.tienda.aplicacion.color_border;
                       modificación:</label>
                     <p id="fecha-modificacion-usuario"
                       class="flex items-center gap-1.5 text-secundary-default dark:text-mono-blanco border border-secundary-light px-2 py-1 rounded-md w-full">
-                      <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">update</span>
+                      <span class="material-symbols-rounded text-[20px]" :class="[textColor]">update</span>
                       {{ formatFecha(detallesCliente.fecha_modificacion) || 'Sin fecha' }}
                     </p>
                   </div>
@@ -323,7 +362,7 @@ const borderColor = props.detallesCliente.tienda.aplicacion.color_border;
             </div>
 
             <div v-else-if="activeTab === 1">
-              <h2 class="text-2xl font-bold mb-4 text-secundary-default dark:text-mono-blanco">Datos mi tienda</h2>
+              <h2 class="text-2xl font-bold mb-4 text-secundary-default dark:text-mono-blanco">Datos de su tienda</h2>
               <div class="flex justify-between w-full gap-10">
                 <div class="left-table w-[50%] flex flex-col gap-1">
                   <div class="id-tienda">
@@ -331,7 +370,7 @@ const borderColor = props.detallesCliente.tienda.aplicacion.color_border;
                       tienda:</label>
                     <p id="id-tienda"
                       class="flex items-center gap-1.5 text-secundary-default dark:text-mono-blanco border border-secundary-light px-2 py-1 rounded-md w-full">
-                      <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">store</span>
+                      <span class="material-symbols-rounded text-[20px]" :class="[textColor]">store</span>
                       {{ detallesCliente.tienda?.id || 'Sin ID' }}
                     </p>
                   </div>
@@ -352,8 +391,8 @@ const borderColor = props.detallesCliente.tienda.aplicacion.color_border;
                       asignado:</label>
                     <p id="id-tienda"
                       class="flex items-center gap-1.5 text-secundary-default dark:text-mono-blanco border border-secundary-light px-2 py-1 rounded-md w-full">
-                      <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">key</span>
-                      {{ detallesCliente.tienda?.token?.token_activacion || 'Sin ID' }}
+                      <span class="material-symbols-rounded text-[20px]" :class="[textColor]">key</span>
+                      <span>{{ detallesCliente.tienda.token.token_activacion || 'Sin ID' }}</span> 
                     </p>
                   </div>
                   <div class="fecha-creacion">
@@ -363,7 +402,7 @@ const borderColor = props.detallesCliente.tienda.aplicacion.color_border;
                       creación:</label>
                     <p id="fecha-creacion-tienda"
                       class="flex items-center gap-1.5 text-secundary-default dark:text-mono-blanco border border-secundary-light px-2 py-1 rounded-md w-full">
-                      <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">calendar_month</span>
+                      <span class="material-symbols-rounded text-[20px]" :class="[textColor]">calendar_month</span>
                       {{ formatFecha(detallesCliente.tienda?.fecha_creacion) || 'Sin fecha' }}
                     </p>
                   </div>
@@ -374,7 +413,7 @@ const borderColor = props.detallesCliente.tienda.aplicacion.color_border;
                       modificación:</label>
                     <p id="fecha-modificacion-tienda"
                       class="flex items-center gap-1.5 text-secundary-default dark:text-mono-blanco border border-secundary-light px-2 py-1 rounded-md w-full">
-                      <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">update</span>
+                      <span class="material-symbols-rounded text-[20px]" :class="[textColor]">update</span>
                       {{ formatFecha(detallesCliente.tienda?.fecha_modificacion) || 'Sin fecha' }}
                     </p>
                   </div>
@@ -387,7 +426,7 @@ const borderColor = props.detallesCliente.tienda.aplicacion.color_border;
                       tienda:</label>
                     <p id="nombre-tienda"
                       class="flex items-center gap-1.5 text-secundary-default dark:text-mono-blanco border border-secundary-light px-2 py-1 rounded-md w-full">
-                      <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">store</span>
+                      <span class="material-symbols-rounded text-[20px]" :class="[textColor]">store</span>
                       {{ detallesCliente.tienda?.nombre_tienda || 'Sin nombre' }}
                     </p>
                   </div>
@@ -398,7 +437,7 @@ const borderColor = props.detallesCliente.tienda.aplicacion.color_border;
                       tienda:</label>
                     <p id="ciudad-tienda"
                       class="flex items-center gap-1.5 text-secundary-default dark:text-mono-blanco border border-secundary-light px-2 py-1 rounded-md w-full">
-                      <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">location_city</span>
+                      <span class="material-symbols-rounded text-[20px]" :class="[textColor]">location_city</span>
                       {{ detallesCliente.tienda?.barrio_tienda }}, {{ detallesCliente.tienda?.direccion_tienda }}
                     </p>
                   </div>
@@ -408,7 +447,7 @@ const borderColor = props.detallesCliente.tienda.aplicacion.color_border;
                       tienda:</label>
                     <p id="email-tienda"
                       class="flex items-center gap-1.5 text-secundary-default dark:text-mono-blanco border border-secundary-light px-2 py-1 rounded-md w-full">
-                      <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">email</span>
+                      <span class="material-symbols-rounded text-[20px]" :class="[textColor]">email</span>
                       {{ detallesCliente.tienda?.email_tienda || 'Sin email' }}
                     </p>
                   </div>
@@ -419,7 +458,7 @@ const borderColor = props.detallesCliente.tienda.aplicacion.color_border;
                       tienda:</label>
                     <p id="telefono-tienda"
                       class="flex items-center gap-1.5 text-secundary-default dark:text-mono-blanco border border-secundary-light px-2 py-1 rounded-md w-full">
-                      <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">phone</span>
+                      <span class="material-symbols-rounded text-[20px]" :class="[textColor]">phone</span>
                       {{ detallesCliente.tienda?.telefono_tienda || 'Sin teléfono' }}
                     </p>
                   </div>
@@ -461,7 +500,7 @@ const borderColor = props.detallesCliente.tienda.aplicacion.color_border;
                       membresía:</label>
                     <p id="id-membresia"
                       class="flex items-center gap-1.5 text-secundary-default dark:text-mono-blanco border border-secundary-light px-2 py-1 rounded-md w-full">
-                      <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">card_membership</span>
+                      <span class="material-symbols-rounded text-[20px]" :class="[textColor]">card_membership</span>
                       {{ detallesCliente.tienda?.aplicacion?.membresia?.id || 'Sin ID' }}
                     </p>
                   </div>
@@ -470,11 +509,11 @@ const borderColor = props.detallesCliente.tienda.aplicacion.color_border;
                     <div class="estado-tienda">
                       <label for="estado-tienda"
                         class="text-[14px] text-secundary-default dark:text-secundary-light">Estado
-                        tienda:</label>
+                        token:</label>
                       <p id="estado-tienda"
                         class="flex items-center gap-1.5 text-secundary-default dark:text-mono-blanco border border-secundary-light px-2 py-1 rounded-md w-full">
-                      <div class="h-3 w-4 rounded-full" :class="getEstadoClass(detallesCliente.tienda?.estado?.tipo_estado)"></div>
-                      {{ detallesCliente.tienda?.aplicacion?.membresia?.estado?.tipo_estado || 'Sin estado' }}
+                      <div class="h-3 w-4 rounded-full" :class="getEstadoClass(detallesCliente.tienda?.token.estado?.tipo_estado)"></div>
+                      {{ detallesCliente.tienda?.token.estado.tipo_estado || 'Sin estado' }}
                       </p>
                     </div>
                   </div>
@@ -485,8 +524,8 @@ const borderColor = props.detallesCliente.tienda.aplicacion.color_border;
                       membresía:</label>
                     <p id="precio-membresia"
                       class="flex items-center gap-1.5 text-secundary-default dark:text-mono-blanco border border-secundary-light px-2 py-1 rounded-md w-full">
-                      <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">attach_money</span>
-                      {{ formatFecha(detallesCliente.tienda?.aplicacion?.membresia?.precio) || 'Sin precio' }}
+                      <span class="material-symbols-rounded text-[20px]" :class="[textColor]">attach_money</span>
+                      {{ formatCOP(detallesCliente.tienda?.aplicacion?.membresia?.precio) || 'Sin precio' }}
                     </p>
                   </div>
 
@@ -496,7 +535,7 @@ const borderColor = props.detallesCliente.tienda.aplicacion.color_border;
                       membresía:</label>
                     <p id="duracion-membresia"
                       class="flex items-center gap-1.5 text-secundary-default dark:text-mono-blanco border border-secundary-light px-2 py-1 rounded-md w-full">
-                      <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">timer</span>
+                      <span class="material-symbols-rounded text-[20px]" :class="[textColor]">timer</span>
                       {{ detallesCliente.tienda?.aplicacion?.membresia?.duracion || 'Sin duración' }} días
                     </p>
                   </div>
@@ -508,7 +547,7 @@ const borderColor = props.detallesCliente.tienda.aplicacion.color_border;
                     </label>
                     <p id="nombre-membresia"
                       class="flex items-center gap-1.5 text-secundary-default dark:text-mono-blanco border border-secundary-light px-2 py-1 rounded-md w-full">
-                      <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">card_membership</span>
+                      <span class="material-symbols-rounded text-[20px]" :class="[textColor]">card_membership</span>
                       {{ detallesCliente.tienda?.aplicacion?.membresia?.nombre_membresia || 'Sin nombre' }}
                     </p>
                   </div>
@@ -519,7 +558,7 @@ const borderColor = props.detallesCliente.tienda.aplicacion.color_border;
                       membresía:</label>
                     <p id="periodo-membresia"
                       class="flex items-center gap-1.5 text-secundary-default dark:text-mono-blanco border border-secundary-light px-2 py-1 rounded-md w-full">
-                      <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">date_range</span>
+                      <span class="material-symbols-rounded text-[20px]" :class="[textColor]">date_range</span>
                       {{ detallesCliente.tienda?.aplicacion?.membresia?.periodo || 'Sin periodo' }}
                     </p>
                   </div>
@@ -530,7 +569,7 @@ const borderColor = props.detallesCliente.tienda.aplicacion.color_border;
                       membresía:</label>
                     <p id="descripcion-membresia"
                       class="flex items-center gap-1.5 text-secundary-default dark:text-mono-blanco border border-secundary-light px-2 py-1 rounded-md w-full">
-                      <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">description</span>
+                      <span class="material-symbols-rounded text-[20px]" :class="[textColor]">description</span>
                       {{ detallesCliente.tienda?.aplicacion?.membresia?.descripcion || 'Sin descripción' }}
                     </p>
                   </div>
@@ -541,7 +580,7 @@ const borderColor = props.detallesCliente.tienda.aplicacion.color_border;
                       activación:</label>
                     <p id="fecha-creacion-membresia"
                       class="flex items-center gap-1.5 text-secundary-default dark:text-mono-blanco border border-secundary-light px-2 py-1 rounded-md w-full">
-                      <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">calendar_month</span>
+                      <span class="material-symbols-rounded text-[20px]" :class="[textColor]">calendar_month</span>
                       {{ formatFecha(detallesCliente.tienda?.pagos_membresia?.fecha_activacion) || 'Sin fecha' }}
                     </p>
                   </div>
@@ -555,9 +594,7 @@ const borderColor = props.detallesCliente.tienda.aplicacion.color_border;
             <div v-else-if="activeTab === 4" class="h-auto">
               <h2 class="text-2xl font-bold mb-4 text-secundary-default dark:text-mono-blanco">Configuraciones Avanzadas
               </h2>
-              <a :href="route('aplicacion.historial', { aplicacion, rol })">
-                <button class="mb-10 text-mono-negro dark:text-mono-blanco rounded-md px-2 py-1" :class="[bgClase]">Revisar historial de mi app</button>
-              </a>
+              <pre class="text-mono-blanco" >{{ detallesCliente.tienda }}</pre>
             </div>
           </div>
         </div>

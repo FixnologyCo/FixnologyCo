@@ -3,7 +3,7 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import dayjs from 'dayjs'
 import { fromNow, calcularRestantes } from '@/Utils/date'
 
-export function useTiempo(user) {
+export function useTiempo(detallesCliente) {
   const tiempoActivo = ref('')
   const diasRestantes = ref(0)
 
@@ -11,17 +11,17 @@ export function useTiempo(user) {
   let intervaloRestante = null
 
   const calcularTiempo = () => {
-    if (!user.value?.fecha_creacion || !dayjs(user.value.fecha_creacion).isValid()) {
+    if (!detallesCliente.value?.fecha_creacion || !dayjs(detallesCliente.value.fecha_creacion).isValid()) {
       tiempoActivo.value = 'Sin fecha'
       return
     }
 
-    tiempoActivo.value = fromNow(user.value.fecha_creacion)
+    tiempoActivo.value = fromNow(detallesCliente.value.fecha_creacion)
   }
 
   const calcularDiasRestantes = () => {
-    const fechaActivacion = user.value?.tienda?.pagos_membresia?.fecha_activacion
-    const duracion = user.value?.tienda?.aplicacion?.membresia?.duracion
+    const fechaActivacion = detallesCliente.value?.tienda?.pagos_membresia?.fecha_activacion
+    const duracion = detallesCliente.value?.tienda?.aplicacion?.membresia?.duracion
     diasRestantes.value = calcularRestantes(fechaActivacion, duracion)
   }
 

@@ -7,8 +7,9 @@ import SidebarSuperAdmin from '@/Components/Sidebar/FixnologyCO/Sidebar.vue';
 import Header from '@/Components/header/Header.vue';
 import Colors from '@/Composables/ModularColores';
 import MensajesLayout from '@/Layouts/MensajesLayout.vue';
-import { formatFecha } from '@/utils/date';
+import { formatFecha } from '@/Utils/date';
 import { useTiempo } from '@/Composables/useTiempo';
+import { formatCOP } from '@/Utils/formateoMoneda';
 
 const page = usePage();
 const user = ref(page.props.auth.user)
@@ -453,7 +454,7 @@ const logout = () => {
                     <p id="precio-membresia"
                       class="flex items-center gap-1.5 text-secundary-default dark:text-mono-blanco border border-secundary-light px-2 py-1 rounded-md w-full">
                       <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">attach_money</span>
-                      {{ formatFecha(user.tienda?.aplicacion?.membresia?.precio) || 'Sin precio' }}
+                      {{ formatCOP(user.tienda?.aplicacion?.membresia?.precio) || 'Sin precio' }}
                     </p>
                   </div>
 
