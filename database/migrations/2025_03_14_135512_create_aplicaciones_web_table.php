@@ -13,6 +13,7 @@ return new class extends Migration {
         Schema::create('aplicaciones_web', function (Blueprint $table) {
             $table->id('id_aplicacion_web'); // ID autoincremental (equivalente a INT PRIMARY KEY AUTO_INCREMENT)
             $table->unsignedBigInteger('id_estado')->default(1);
+            $table->unsignedBigInteger('id_estilo')->default(1);
             $table->unsignedBigInteger('id_membresia')->nullable(false);
             $table->string('nombre_app')->nullable(false);
             $table->string('categoria_app')->nullable(false);
@@ -22,6 +23,7 @@ return new class extends Migration {
             $table->timestamp('fecha_modificacion')->default(DB::raw('CURRENT_TIMESTAMP'))->useCurrentOnUpdate();
 
             // Si necesitas una relación con otra tabla, por ejemplo, estados:
+            $table->foreign('id_estilo')->references('id_estilo')->on('estilos_app')->onDelete('cascade');
             $table->foreign('id_estado')->references('id_estado')->on('estados')->onDelete('cascade');
             $table->foreign('id_membresia')->references('id_membresia')->on('membresias')->onDelete('cascade');
         });
