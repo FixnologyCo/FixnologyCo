@@ -23,7 +23,7 @@ class CreateMediosPagoTable extends Migration
                 $table->timestamp('fecha_modificacion')->default(DB::raw('CURRENT_TIMESTAMP'))->useCurrentOnUpdate();
                 
                 // Si necesitas una relación con otra tabla, por ejemplo, estados:
-                $table->foreign('id_estado')->references('id')->on('estados')->onDelete('cascade');
+                $table->foreign('id_estado')->references('id_estado')->on('estados')->onDelete('cascade');
             });
 
             // Insertar datos iniciales

@@ -25,7 +25,8 @@ return new class extends Migration
             $table->timestamp('fecha_creacion')->default(DB::raw('CURRENT_TIMESTAMP'));
             $table->timestamp('fecha_modificacion')->default(DB::raw('CURRENT_TIMESTAMP'))->useCurrentOnUpdate();
     
-            $table->foreign('id_estado')->references('id')->on('estados')->onDelete('cascade');
+            $table->foreign('id_estado')->references('id_estado')->on('estados')->onDelete('cascade');
+            $table->foreign('id_estilo')->references('id_estilo')->on('estilos')->onDelete('cascade');
         });
         
 
