@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('token_accesos', function (Blueprint $table) {
-            $table->id('id_token_acceso');
+            $table->id();
             $table->unsignedBigInteger('id_estado')->default(1);
             $table->unsignedBigInteger('id_establecimiento')->nullable();
             $table->string('token_activacion')->unique();
@@ -20,7 +20,7 @@ return new class extends Migration
             $table->timestamp('fecha_creacion')->default(DB::raw('CURRENT_TIMESTAMP'));
             $table->timestamp('fecha_modificacion')->default(DB::raw('CURRENT_TIMESTAMP'))->useCurrentOnUpdate();
 
-            $table->foreign('id_estado')->references('id_estado')->on('estados')->onDelete('cascade');
+            $table->foreign('id_estado')->references('id')->on('estados')->onDelete('cascade');
         });
 
         DB::table('token_accesos')->insert([

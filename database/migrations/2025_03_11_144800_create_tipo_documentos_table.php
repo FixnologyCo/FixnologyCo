@@ -13,7 +13,7 @@ class CreateTipoDocumentosTable extends Migration
     public function up(): void
     {
         Schema::create('tipo_documentos', function (Blueprint $table) {
-            $table->id('id_tipo_documento');
+            $table->id();
             $table->enum('documento_legal', [
                 'Cedula ciudadania',
                 'Tarjeta identidad',

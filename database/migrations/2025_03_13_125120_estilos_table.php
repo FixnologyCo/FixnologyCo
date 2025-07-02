@@ -12,14 +12,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('estilos_app', function (Blueprint $table) {
-            $table->id('id_estilo_app'); 
+            $table->id(); 
     
             $table->string('color_fondo'); 
             $table->string('color_texto'); 
             $table->string('color_hover_texto'); 
-            $table->integer('color_border'); 
-            $table->integer('color_shadow')->default('shadow-xl');  
-            $table->integer('icono')->default('function');  
+            $table->string('color_border'); 
+            $table->string('color_shadow')->default('shadow-xl');  
+            $table->string('icono')->default('function');  
         
             $table->timestamp('fecha_creacion')->default(DB::raw('CURRENT_TIMESTAMP'));
             $table->timestamp('fecha_modificacion')->default(DB::raw('CURRENT_TIMESTAMP'))->useCurrentOnUpdate();
@@ -27,9 +27,9 @@ return new class extends Migration
         });
         
 
-        DB::table('membresias')->insert([
+        DB::table('estilos_app')->insert([
             [
-                'estilo_id' => '1',
+                'id' => '1',
                 'color_fondo' => 'bg-universal-naranja',
                 'color_texto' => 'text-universal-naranja',
                 'color_hover_texto' => 'hover:text-universal-naranja',
@@ -47,6 +47,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('membresias');
+        Schema::dropIfExists('estilos_app');
     }
 };

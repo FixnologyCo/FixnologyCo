@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('roles_administrativos', function (Blueprint $table) {
-            $table->id('id_rol_administrativo'); 
+            $table->id(); 
             $table->unsignedBigInteger('id_estado')->default(1);
             $table->enum('tipo_rol', ["Administrador", "Empleado", "Cliente", "SuperAdmin"])->nullable(false);
             $table->boolean('editar')->nullable(false);
@@ -25,7 +25,7 @@ return new class extends Migration
             $table->timestamp('fecha_modificacion')->default(DB::raw('CURRENT_TIMESTAMP'))->useCurrentOnUpdate();
             
             // Si necesitas una relación con otra tabla, por ejemplo, estados:
-            $table->foreign('id_estado')->references('id_estado')->on('estados')->onDelete('cascade');
+            $table->foreign('id_estado')->references('id')->on('estados')->onDelete('cascade');
             
         });
 

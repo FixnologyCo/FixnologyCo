@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('establecimientos', function (Blueprint $table) {
-            $table->id('id_establecimiento'); // ID autoincremental (equivalente a INT PRIMARY KEY AUTO_INCREMENT)
+            $table->id(); // ID autoincremental (equivalente a INT PRIMARY KEY AUTO_INCREMENT)
             $table->unsignedBigInteger('id_estado')->default(1);
             $table->unsignedBigInteger('id_token')->nullable();
             $table->unsignedBigInteger('id_aplicacion_web')->nullable();
@@ -28,9 +28,10 @@ return new class extends Migration
             $table->timestamp('fecha_creacion')->default(DB::raw('CURRENT_TIMESTAMP'));
             $table->timestamp('fecha_modificacion')->default(DB::raw('CURRENT_TIMESTAMP'))->useCurrentOnUpdate();
 
-            $table->foreign('id_estado')->references('id_estado')->on('estados')->onDelete('cascade');
-            $table->foreign('id_aplicacion_web')->references('id_aplicacion_web')->on('aplicaciones_web')->onDelete('cascade');
-            $table->foreign('id_propietario')->references('id_cliente_fixgi')->on('clientes_fixnology')->onDelete('cascade');
+            $table->foreign('id_token')->references('id')->on('token_accesos')->onDelete('cascade');
+            $table->foreign('id_estado')->references('id')->on('estados')->onDelete('cascade');
+            $table->foreign('id_aplicacion_web')->references('id')->on('aplicaciones_web')->onDelete('cascade');
+            $table->foreign('id_propietario')->references('id')->on('clientes_fixnology')->onDelete('cascade');
         });
 
         DB::table('establecimientos')->insert([

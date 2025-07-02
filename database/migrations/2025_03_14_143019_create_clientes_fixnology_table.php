@@ -10,11 +10,11 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('clientes_fixgis', function (Blueprint $table) {
-            $table->id('id_cliente_fixgi'); // ID autoincremental (equivalente a INT PRIMARY KEY AUTO_INCREMENT)
+        Schema::create('clientes_fixnology', function (Blueprint $table) {
+            $table->id(); // ID autoincremental (equivalente a INT PRIMARY KEY AUTO_INCREMENT)
             $table->unsignedBigInteger('id_estado')->default(1);
             $table->unsignedBigInteger('id_rol')->default(1);
-            $table->unsignedBigInteger('id_establecimiento')->nullable();
+            
             $table->unsignedBigInteger('id_indicativo')->nullable();
             $table->unsignedBigInteger('id_tipo_documento')->default(1);
             $table->unsignedBigInteger('id_medio_pago')->default(1);
@@ -33,18 +33,18 @@ return new class extends Migration {
             $table->timestamp('fecha_registro')->default(DB::raw('CURRENT_TIMESTAMP'));
             $table->timestamp('fecha_modificacion')->default(DB::raw('CURRENT_TIMESTAMP'))->useCurrentOnUpdate();
 
-            $table->foreign('id_estado')->references('id_estado')->on('estados')->onDelete('cascade');
-            $table->foreign('id_rol')->references('id_rol_administrativo')->on('roles_administrativos')->onDelete('cascade');
-            $table->foreign('id_establecimiento')->references('id_establecimiento')->on('establecimientos')->onDelete('cascade');
-            $table->foreign('id_medio_pago')->references('id_medio_pago')->on('medios_pago')->onDelete('cascade');
-            $table->foreign('id_indicativo')->references('id_indicativo')->on('indicativos')->onDelete('cascade');
-            $table->foreign('id_tipo_documento')->references('id_tipo_documento')->on('tipo_documentos')->onDelete('cascade');
+            $table->foreign('id_estado')->references('id')->on('estados')->onDelete('cascade');
+            $table->foreign('id_rol')->references('id')->on('roles_administrativos')->onDelete('cascade');
+           
+            $table->foreign('id_medio_pago')->references('id')->on('medios_pago')->onDelete('cascade');
+            $table->foreign('id_indicativo')->references('id')->on('indicativos')->onDelete('cascade');
+            $table->foreign('id_tipo_documento')->references('id')->on('tipo_documentos')->onDelete('cascade');
         });
 
-        DB::table('clientes_fixgis')->insert([
+        DB::table('clientes_fixnology')->insert([
             [
                 'id_rol' => '4',
-                'id_establecimiento' => '1',
+                
                 'id_tipo_documento' => '1',
                 'id_indicativo' => '1',
                 'primer_nombre_fx' => 'Jhoann',
@@ -58,7 +58,7 @@ return new class extends Migration {
             ],
             [
                 'id_rol' => '4',
-                'id_establecimiento' => '1',
+                
                 'id_tipo_documento' => '1',
                 'id_indicativo' => '1',
                 'primer_nombre_fx' => 'Erik',
@@ -79,6 +79,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('clientes_fixgis');
+        Schema::dropIfExists('clientes_fixnology');
     }
 };

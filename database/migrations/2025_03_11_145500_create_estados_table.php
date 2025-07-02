@@ -13,7 +13,7 @@ class CreateEstadosTable extends Migration
     public function up(): void
     {
         Schema::create('estados', function (Blueprint $table) {
-            $table->id('id_estado');
+            $table->id();
             $table->string('tipo_estado', 255)->nullable(false);
             $table->string('categoria_estado', 255)->nullable();
             $table->timestamp('fecha_creacion')->useCurrent();
@@ -45,14 +45,14 @@ class CreateEstadosTable extends Migration
             ['id' => 15, 'tipo_estado' => 'Finalizado', 'categoria_estado' => 'Proceso'],
 
             // --- Categoría: Pagos ---
-            ['tipo_estado' => 'Pendiente', 'categoria_estado' => 'Pagos'],
-            ['tipo_estado' => 'Procesando', 'categoria_estado' => 'Pagos'],
-            ['tipo_estado' => 'Pagado', 'categoria_estado' => 'Pagos'],
-            ['tipo_estado' => 'Rechazado', 'categoria_estado' => 'Pagos'],
-            ['tipo_estado' => 'Cancelado', 'categoria_estado' => 'Pagos'],
-            ['tipo_estado' => 'Reembolsado', 'categoria_estado' => 'Pagos'],
-            ['tipo_estado' => 'Vencido', 'categoria_estado' => 'Pagos'],
-            ['tipo_estado' => 'En Disputa', 'categoria_estado' => 'Pagos'],
+            ['id' => 16, 'tipo_estado' => 'Pendiente', 'categoria_estado' => 'Pagos'],
+            ['id' => 17, 'tipo_estado' => 'Procesando', 'categoria_estado' => 'Pagos'],
+            ['id' => 18, 'tipo_estado' => 'Pagado', 'categoria_estado' => 'Pagos'],
+            ['id' => 19, 'tipo_estado' => 'Rechazado', 'categoria_estado' => 'Pagos'],
+            ['id' => 20, 'tipo_estado' => 'Cancelado', 'categoria_estado' => 'Pagos'],
+            ['id' => 21, 'tipo_estado' => 'Reembolsado', 'categoria_estado' => 'Pagos'],
+            ['id' => 22, 'tipo_estado' => 'Vencido', 'categoria_estado' => 'Pagos'],
+            ['id' => 23, 'tipo_estado' => 'En Disputa', 'categoria_estado' => 'Pagos'],
         ]);
     }
 

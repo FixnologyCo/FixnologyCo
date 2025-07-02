@@ -10,7 +10,7 @@ class CreateMediosPagoTable extends Migration
     {
         
             Schema::create('medios_pago', function (Blueprint $table) {
-                $table->id('id_medio_pago'); 
+                $table->id(); 
                 $table->unsignedBigInteger('id_estado')->default(1);
                 $table->enum('forma_pago', [
                     "Efectivo", 
@@ -23,16 +23,16 @@ class CreateMediosPagoTable extends Migration
                 $table->timestamp('fecha_modificacion')->default(DB::raw('CURRENT_TIMESTAMP'))->useCurrentOnUpdate();
                 
                 // Si necesitas una relación con otra tabla, por ejemplo, estados:
-                $table->foreign('id_estado')->references('id_estado')->on('estados')->onDelete('cascade');
+                $table->foreign('id_estado')->references('id')->on('estados')->onDelete('cascade');
             });
 
             // Insertar datos iniciales
             DB::table('medios_pago')->insert([
-            ['tipo_pago' => 'Efectivo'],
-            ['tipo_pago' => 'Nequi'],
-            ['tipo_pago' => 'Daviplata'],
-            ['tipo_pago' => 'Tarjeta'],
-            ['tipo_pago' => 'Otro medio de pago'],
+            ['forma_pago' => 'Efectivo'],
+            ['forma_pago' => 'Nequi'],
+            ['forma_pago' => 'Daviplata'],
+            ['forma_pago' => 'Tarjeta'],
+            ['forma_pago' => 'Otro medio de pago'],
         ]);
     }
 
