@@ -11,7 +11,7 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('clientes_fixnology', function (Blueprint $table) {
-            $table->id(); // ID autoincremental (equivalente a INT PRIMARY KEY AUTO_INCREMENT)
+            $table->id(); 
             $table->unsignedBigInteger('id_estado')->default(1);
             $table->unsignedBigInteger('id_rol')->default(1);
             
