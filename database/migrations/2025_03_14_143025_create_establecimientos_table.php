@@ -13,10 +13,12 @@ return new class extends Migration
     {
         Schema::create('establecimientos', function (Blueprint $table) {
             $table->id(); // ID autoincremental (equivalente a INT PRIMARY KEY AUTO_INCREMENT)
-            $table->unsignedBigInteger('id_estado')->default(1);
-            $table->unsignedBigInteger('id_token')->nullable();
-            $table->unsignedBigInteger('id_aplicacion_web')->nullable();
-            $table->unsignedBigInteger('id_propietario')->nullable();
+            $table->unsignedBigInteger('estado_id')->default(1);
+            $table->unsignedBigInteger('token_id')->nullable();
+            $table->unsignedBigInteger('aplicacion_web_id')->nullable();
+            $table->unsignedBigInteger('propietario_id')->nullable();
+
+            $table->string('ruta_foto_establecimiento');
             $table->string('tipo_establecimiento');
             $table->string('nombre_establecimiento');
             $table->string('email_establecimiento')->unique();
@@ -24,22 +26,25 @@ return new class extends Migration
             $table->string('direccion_establecimiento');
             $table->string('barrio_establecimiento');
             $table->string('ciudad_establecimiento');
-            $table->longText('foto_establecimiento');
 
             $table->timestamp('fecha_creacion')->default(DB::raw('CURRENT_TIMESTAMP'));
             $table->timestamp('fecha_modificacion')->default(DB::raw('CURRENT_TIMESTAMP'))->useCurrentOnUpdate();
 
-            $table->foreign('id_token')->references('id')->on('token_accesos')->onDelete('cascade');
-            $table->foreign('id_estado')->references('id')->on('estados')->onDelete('cascade');
-            $table->foreign('id_aplicacion_web')->references('id')->on('aplicaciones_web')->onDelete('cascade');
-            $table->foreign('id_propietario')->references('id')->on('clientes_fixnology')->onDelete('cascade');
+            $table->foreign('token_id')->references('id')->on('token_accesos')->onDelete('cascade');
+            $table->foreign('estado_id')->references('id')->on('estados')->onDelete('cascade');
+            $table->foreign('aplicacion_web_id')->references('id')->on('aplicaciones_web')->onDelete('cascade');
+            $table->foreign('propietario_id')->references('id')->on('usuarios')->onDelete('cascade');
+        });
+
+         Schema::table('usuarios', function (Blueprint $table) {
+            $table->foreignId('establecimiento_id')->nullable()->constrained('establecimientos')->onDelete('set null');
         });
 
         DB::table('establecimientos')->insert([
             [
-                'id_token' => '1',
-                'id_aplicacion_web' => '1',
-                'id_propietario' => '1',
+                'token_id' => '1',
+                'aplicacion_web_id' => '1',
+                'propietario_id' => '1',
                 'tipo_establecimiento'=> 'Desarrollo de TI',
                 'nombre_establecimiento'=> 'Fixnology CO',
                 'email_establecimiento' => 'fixnologyco@gmail.com',
@@ -47,7 +52,7 @@ return new class extends Migration
                 'direccion_establecimiento' => 'Conjunto Naranjo',
                 'barrio_establecimiento' => 'NA',
                 'ciudad_establecimiento' => 'Bogotá',
-                'foto_establecimiento' => 'https://fixnology.co/img/logo.png',
+                'ruta_foto_establecimiento' => 'https://fixnology.co/img/logo.png',
             ],
         ]);     
     }
@@ -58,5 +63,6 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('tiendas_sistematizadas');
+        Schema::dropIfExists('usuarios');
     }
 };

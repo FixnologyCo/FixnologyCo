@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('roles_administrativos', function (Blueprint $table) {
+        Schema::create('roles', function (Blueprint $table) {
             $table->id(); 
-            $table->unsignedBigInteger('id_estado')->default(1);
+            $table->unsignedBigInteger('estado_id')->default(1);
             $table->enum('tipo_rol', ["Administrador", "Empleado", "Cliente", "SuperAdmin"])->nullable(false);
             $table->boolean('editar')->nullable(false);
             $table->boolean('eliminar')->nullable(false);
@@ -25,11 +25,11 @@ return new class extends Migration
             $table->timestamp('fecha_modificacion')->default(DB::raw('CURRENT_TIMESTAMP'))->useCurrentOnUpdate();
             
             // Si necesitas una relación con otra tabla, por ejemplo, estados:
-            $table->foreign('id_estado')->references('id')->on('estados')->onDelete('cascade');
-            
+            $table->foreign('estado_id')->references('id')->on('estados')->onDelete('cascade');
+
         });
 
-        DB::table('roles_administrativos')->insert([
+        DB::table('roles')->insert([
             ['tipo_rol' => 'Administrador' , 'editar' => true, 'eliminar' => true, 'crear' => true, 'ver' => true],
             ['tipo_rol' => 'Empleado', 'editar' => true, 'eliminar' => false, 'crear' => true, 'ver' => true],
             ['tipo_rol' => 'Cliente', 'editar' => false, 'eliminar' => false, 'crear' => false, 'ver' => true],

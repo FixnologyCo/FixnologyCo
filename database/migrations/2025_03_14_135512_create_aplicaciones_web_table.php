@@ -12,9 +12,9 @@ return new class extends Migration {
     {
         Schema::create('aplicaciones_web', function (Blueprint $table) {
             $table->id(); // ID autoincremental (equivalente a INT PRIMARY KEY AUTO_INCREMENT)
-            $table->unsignedBigInteger('id_estado')->default(1);
-            $table->unsignedBigInteger('id_estilo')->default(1);
-            $table->unsignedBigInteger('id_membresia')->nullable(false);
+            $table->unsignedBigInteger('estado_id')->default(1);
+            $table->unsignedBigInteger('estilo_id')->default(1);
+            $table->unsignedBigInteger('membresia_id')->nullable(false);
             $table->string('nombre_app')->nullable(false);
             $table->string('categoria_app')->nullable(false);
             $table->string('descripcion_app')->nullable(false);
@@ -23,17 +23,17 @@ return new class extends Migration {
             $table->timestamp('fecha_modificacion')->default(DB::raw('CURRENT_TIMESTAMP'))->useCurrentOnUpdate();
 
             // Si necesitas una relación con otra tabla, por ejemplo, estados:
-            $table->foreign('id_estilo')->references('id')->on('estilos_app')->onDelete('cascade');
-            $table->foreign('id_estado')->references('id')->on('estados')->onDelete('cascade');
-            $table->foreign('id_membresia')->references('id')->on('membresias')->onDelete('cascade');
+            $table->foreign('estilo_id')->references('id')->on('estilos_app')->onDelete('cascade');
+            $table->foreign('estado_id')->references('id')->on('estados')->onDelete('cascade');
+            $table->foreign('membresia_id')->references('id')->on('membresias')->onDelete('cascade');
         });
 
         // Insertar datos iniciales
         DB::table('aplicaciones_web')->insert([
 
             [
-                'id_estado' => '1',
-                'id_membresia' => '6',
+                'estado_id' => '1',
+                'membresia_id' => '6',
                 'nombre_app' => 'FixnologyCO',
                 'categoria_app' => 'Aplicación Web',
                 'descripcion_app' => 'Aplicación corporativa a escala Fixnology',

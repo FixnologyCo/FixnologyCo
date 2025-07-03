@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('membresias', function (Blueprint $table) {
             $table->id(); 
-            $table->unsignedBigInteger('id_estilo');
-            $table->unsignedBigInteger('id_estado')->default(1); 
+            $table->unsignedBigInteger('estilo_id');
+            $table->unsignedBigInteger('estado_id')->default(1); 
         
             $table->string('nombre_membresia'); 
             $table->decimal('precio_membresia',10,2); 
@@ -25,14 +25,14 @@ return new class extends Migration
             $table->timestamp('fecha_creacion')->default(DB::raw('CURRENT_TIMESTAMP'));
             $table->timestamp('fecha_modificacion')->default(DB::raw('CURRENT_TIMESTAMP'))->useCurrentOnUpdate();
     
-            $table->foreign('id_estado')->references('id')->on('estados')->onDelete('cascade');
-            $table->foreign('id_estilo')->references('id')->on('estilos_app')->onDelete('cascade');
+            $table->foreign('estado_id')->references('id')->on('estados')->onDelete('cascade');
+            $table->foreign('estilo_id')->references('id')->on('estilos_app')->onDelete('cascade');
         });
         
 
         DB::table('membresias')->insert([
             [
-                'id_estilo' => '1',
+                'estilo_id' => '1',
                 'nombre_membresia' => 'Free',
                 'precio_membresia' => '0',
                 'periodo_duracion'=> 'Semanal',
