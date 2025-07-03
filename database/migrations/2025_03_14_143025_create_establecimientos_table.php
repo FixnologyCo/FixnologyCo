@@ -17,6 +17,7 @@ return new class extends Migration
             $table->unsignedBigInteger('id_token')->nullable();
             $table->unsignedBigInteger('id_aplicacion_web')->nullable();
             $table->unsignedBigInteger('id_propietario')->nullable();
+            $table->string('tipo_establecimiento');
             $table->string('nombre_establecimiento');
             $table->string('email_establecimiento')->unique();
             $table->string('telefono_establecimiento')->unique();
@@ -38,6 +39,8 @@ return new class extends Migration
             [
                 'id_token' => '1',
                 'id_aplicacion_web' => '1',
+                'id_propietario' => '1',
+                'tipo_establecimiento'=> 'Desarrollo de TI',
                 'nombre_establecimiento'=> 'Fixnology CO',
                 'email_establecimiento' => 'fixnologyco@gmail.com',
                 'telefono_establecimiento' => '3219631459',
