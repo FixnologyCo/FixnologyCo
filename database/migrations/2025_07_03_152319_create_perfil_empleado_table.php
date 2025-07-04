@@ -16,10 +16,10 @@ return new class extends Migration {
             $table->unsignedBigInteger('usuario_id');
             $table->unsignedBigInteger('establecimiento_id')->nullable();
             $table->unsignedBigInteger('rol_id')->default(1);
+            $table->unsignedBigInteger('medio_pago_id')->default(1);
 
             $table->string('cargo')->nullable();
             $table->decimal('salario_base', 10, 2)->nullable();
-            $table->string('medio_pago')->nullable();
             $table->string('cuenta_ahorros')->nullable();
             $table->string('banco')->nullable();
             $table->string('horario')->nullable();
@@ -36,7 +36,7 @@ return new class extends Migration {
             $table->foreign('establecimiento_id')->references('id')->on('establecimientos')->onDelete('cascade');
             $table->foreign('rol_id')->references('id')->on('roles')->onDelete('cascade');
             $table->foreign('usuario_id')->references('id')->on('usuarios')->onDelete('cascade');
-
+            $table->foreign('medio_pago_id')->references('id')->on('medios_pago')->onDelete('cascade');
         });
 
         DB::table('perfil_empleado')->insert([
@@ -46,12 +46,15 @@ return new class extends Migration {
                 'rol_id' => 4,
                 'cargo' => 'Gerente',
                 'salario_base' => 3000000.00,
-                'medio_pago' => 'Transferencia',
+                'medio_pago_id' => 1,
                 'cuenta_ahorros' => '3165114410',
                 'banco' => 'Nu',
                 'horario' => 'Lunes a Viernes 8:00 AM - 5:00 PM',
                 'tipo_contrato' => 'Indefinido',
                 'documentos_zip' => 'documentos.zip',
+                'fecha_ingreso' => now(),
+                'fecha_egreso' => null,
+                'fecha_modificacion' => now(),
             ],
         ]);
     }

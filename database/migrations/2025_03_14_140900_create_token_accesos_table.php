@@ -26,6 +26,8 @@ return new class extends Migration
             [
                 'establecimiento_id' => '1',
                 'token_activacion' => '3e1dce5b-cdc0-4487-9cb9-ecef60ae1a8b',
+                'created_at' => now(),
+                'updated_at' => now()
             ],
 
         ]);

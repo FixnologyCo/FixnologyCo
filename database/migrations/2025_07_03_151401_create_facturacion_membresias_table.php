@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -17,11 +16,11 @@ return new class extends Migration
             $table->unsignedBigInteger('establecimiento_id');
             $table->unsignedBigInteger('aplicacion_web_id');
             $table->unsignedBigInteger('estado_id');
-            $table->unsignedBigInteger('medio_pago_id')->default(1); 
+            $table->unsignedBigInteger('medio_pago_id')->default(1);
 
             $table->decimal('monto_total', 10, 2)->default(0);
             $table->integer('dias_restantes')->nullable();
-        
+
             $table->timestamp('fecha_pago')->default(DB::raw('CURRENT_TIMESTAMP'))->useCurrentOnUpdate();
             $table->timestamps();
 
@@ -44,12 +43,14 @@ return new class extends Migration
                 'monto_total' => '9200000',
                 'estado_id' => '8',
                 'dias_restantes' => '999999',
-                'fecha_pago'       => now(),
-               
+                'fecha_pago' => now(),
+                'created_at' => now(),
+                'updated_at' => now()
+
             ]
 
         ]);
-        
+
     }
 
     /**

@@ -34,6 +34,8 @@ return new class extends Migration {
                 'color_border' => 'border-b-2 border-universal-naranja',
                 'color_shadow' => 'shadow-xl',
                 'icono' => 'function',
+                'created_at' => now(),
+                'updated_at' => now()
             ]
 
         ]);

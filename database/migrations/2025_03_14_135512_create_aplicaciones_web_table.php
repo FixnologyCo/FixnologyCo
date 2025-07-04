@@ -37,6 +37,8 @@ return new class extends Migration {
                 'nombre_app' => 'FixnologyCO',
                 'categoria_app' => 'Aplicación Web',
                 'descripcion_app' => 'Aplicación corporativa a escala Fixnology',
+                'created_at' => now(),
+                'updated_at' => now()
             ],
         ]);
     }

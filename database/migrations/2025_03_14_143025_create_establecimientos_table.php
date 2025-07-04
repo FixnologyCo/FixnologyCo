@@ -37,15 +37,6 @@ return new class extends Migration {
             $table->foreign('aplicacion_web_id')->references('id')->on('aplicaciones_web')->onDelete('cascade');
             $table->foreign('propietario_id')->references('id')->on('usuarios')->onDelete('cascade');
         });
-
-        Schema::table('usuarios', function (Blueprint $table) {
-           $table->foreignId('establecimiento_id')
-          ->nullable()
-          ->after('estado_id')
-          ->constrained('establecimientos')
-          ->onDelete('set null');
-        });
-
         
         DB::table('establecimientos')->insert([
             [
@@ -60,6 +51,8 @@ return new class extends Migration {
                 'barrio_establecimiento' => 'NA',
                 'ciudad_establecimiento' => 'Bogotá',
                 'ruta_foto_establecimiento' => 'https://fixnology.co/img/logo.png',
+                'created_at' => now(),
+                'updated_at' => now()
             ],
         ]);
     }

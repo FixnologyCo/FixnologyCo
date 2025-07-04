@@ -37,6 +37,8 @@ return new class extends Migration
                 'periodo_duracion'=> 'Semanal',
                 'duracion_membresia' => '7',
                 'descripcion_corta' => 'Plan de prueba totalmente gratuito.',
+                'created_at' => now(),
+                'updated_at' => now()
             ],
             [
                 'id_estilo' => '1',
@@ -45,6 +47,8 @@ return new class extends Migration
                 'periodo_duracion'=> 'Mensual',
                 'duracion_membresia' => '30',
                 'descripcion_corta' => 'Plan de modalidad mensual, con previo aviso 5 dias antes.',
+                'created_at' => now(),
+                'updated_at' => now()
             ],
             [
                 'id_estilo' => '1',
@@ -53,6 +57,8 @@ return new class extends Migration
                 'periodo_duracion'=> 'Trimestral',
                 'duracion_membresia' => '90',
                 'descripcion_corta' => 'Plan de modalidad cada 3 meses, con previo aviso 5 dias antes',
+                'created_at' => now(),
+                'updated_at' => now()
             ],
             [
                 'id_estilo' => '1',
@@ -61,6 +67,8 @@ return new class extends Migration
                 'periodo_duracion'=> 'Semestral',
                 'duracion_membresia' => '180',
                 'descripcion_corta' => 'Plan de modalidad cada 6 meses, con previo aviso 5 dias antes',
+                'created_at' => now(),
+                'updated_at' => now()
             ],
             [
                 'id_estilo' => '1',
@@ -69,6 +77,8 @@ return new class extends Migration
                 'periodo_duracion'=> 'Anual',
                 'duracion_membresia' => '365',
                 'descripcion_corta' => 'Plan de modalidad cada 12 meses, con previo aviso 5 dias antes',
+                'created_at' => now(),
+                'updated_at' => now()
             ],
             [
                 'id_estilo' => '1',
@@ -77,6 +87,8 @@ return new class extends Migration
                 'periodo_duracion'=> 'Infinito',
                 'duracion_membresia' => '999999',
                 'descripcion_corta' => 'Plan sin terminación.',
+                'created_at' => now(),
+                'updated_at' => now()
             ],
 
         ]);
