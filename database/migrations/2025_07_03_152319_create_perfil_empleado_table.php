@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -13,8 +12,8 @@ return new class extends Migration
     {
         Schema::create('perfil_empleado', function (Blueprint $table) {
             $table->id();
-             $table->unsignedBigInteger('estado_id')->default(1); 
-             $table->unsignedBigInteger('usuario_id'); 
+            $table->unsignedBigInteger('estado_id')->default(1);
+            $table->unsignedBigInteger('usuario_id');
             $table->unsignedBigInteger('establecimiento_id')->nullable();
             $table->unsignedBigInteger('rol_id')->default(1);
 
@@ -26,8 +25,14 @@ return new class extends Migration
             $table->string('horario')->nullable();
             $table->string('tipo_contrato')->nullable();
             $table->string('documentos_zip')->nullable();
+            $table->timestamp('fecha_ingreso')->default(DB::raw('CURRENT_TIMESTAMP'));
+            $table->timestamp('fecha_egreso')->nullable();
+            $table->timestamp('fecha_modificacion')->default(DB::raw('CURRENT_TIMESTAMP'))->useCurrentOnUpdate();
 
-             $table->foreign('estado_id')->references('id')->on('estados')->onDelete('cascade');
+            $table->foreignId('created_by')->nullable()->constrained('usuarios')->onDelete('set null');
+            $table->foreignId('updated_by')->nullable()->constrained('usuarios')->onDelete('set null');
+
+            $table->foreign('estado_id')->references('id')->on('estados')->onDelete('cascade');
             $table->foreign('establecimiento_id')->references('id')->on('establecimientos')->onDelete('cascade');
             $table->foreign('rol_id')->references('id')->on('roles')->onDelete('cascade');
             $table->foreign('usuario_id')->references('id')->on('usuarios')->onDelete('cascade');

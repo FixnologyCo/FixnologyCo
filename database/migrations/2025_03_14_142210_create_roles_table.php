@@ -14,17 +14,15 @@ return new class extends Migration
         Schema::create('roles', function (Blueprint $table) {
             $table->id(); 
             $table->unsignedBigInteger('estado_id')->default(1);
-            $table->enum('tipo_rol', ["Administrador", "Empleado", "Cliente", "SuperAdmin"])->nullable(false);
+            $table->string('tipo_rol')->nullable(false);
             $table->boolean('editar')->nullable(false);
             $table->boolean('eliminar')->nullable(false);
             $table->boolean('crear')->nullable(false);
             $table->boolean('ver')->nullable(false);
 
-
-            $table->timestamp('fecha_creacion')->default(DB::raw('CURRENT_TIMESTAMP'));
-            $table->timestamp('fecha_modificacion')->default(DB::raw('CURRENT_TIMESTAMP'))->useCurrentOnUpdate();
+            $table->timestamps(); 
             
-            // Si necesitas una relación con otra tabla, por ejemplo, estados:
+            
             $table->foreign('estado_id')->references('id')->on('estados')->onDelete('cascade');
 
         });

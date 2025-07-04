@@ -17,8 +17,7 @@ return new class extends Migration
             $table->unsignedBigInteger('establecimiento_id')->nullable();
             $table->string('token_activacion')->unique();
         
-            $table->timestamp('fecha_creacion')->default(DB::raw('CURRENT_TIMESTAMP'));
-            $table->timestamp('fecha_modificacion')->default(DB::raw('CURRENT_TIMESTAMP'))->useCurrentOnUpdate();
+            $table->timestamps(); 
 
             $table->foreign('estado_id')->references('id')->on('estados')->onDelete('cascade');
         });

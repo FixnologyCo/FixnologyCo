@@ -23,6 +23,11 @@ return new class extends Migration
             $table->integer('dias_restantes')->nullable();
         
             $table->timestamp('fecha_pago')->default(DB::raw('CURRENT_TIMESTAMP'))->useCurrentOnUpdate();
+            $table->timestamps();
+
+            $table->foreignId('created_by')->nullable()->constrained('usuarios')->onDelete('set null');
+            $table->foreignId('updated_by')->nullable()->constrained('usuarios')->onDelete('set null');
+
 
             $table->foreign('cliente_id')->references('id')->on('usuarios');
             $table->foreign('establecimiento_id')->references('id')->on('establecimientos');

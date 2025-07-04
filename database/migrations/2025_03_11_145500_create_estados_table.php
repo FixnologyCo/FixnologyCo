@@ -16,8 +16,7 @@ class CreateEstadosTable extends Migration
             $table->id();
             $table->string('tipo_estado', 255)->nullable(false);
             $table->string('categoria_estado', 255)->nullable();
-            $table->timestamp('fecha_creacion')->useCurrent();
-            $table->timestamp('fecha_modificacion')->useCurrent()->useCurrentOnUpdate();
+            $table->timestamps(); 
         });
 
         // Insertar datos iniciales

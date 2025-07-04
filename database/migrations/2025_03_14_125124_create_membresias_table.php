@@ -22,8 +22,7 @@ return new class extends Migration
             $table->integer('duracion_membresia'); 
             $table->text('descripcion_corta')->nullable(); 
         
-            $table->timestamp('fecha_creacion')->default(DB::raw('CURRENT_TIMESTAMP'));
-            $table->timestamp('fecha_modificacion')->default(DB::raw('CURRENT_TIMESTAMP'))->useCurrentOnUpdate();
+            $table->timestamps(); 
     
             $table->foreign('estado_id')->references('id')->on('estados')->onDelete('cascade');
             $table->foreign('estilo_id')->references('id')->on('estilos_app')->onDelete('cascade');

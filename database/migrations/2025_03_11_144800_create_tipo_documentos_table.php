@@ -20,8 +20,8 @@ class CreateTipoDocumentosTable extends Migration
                 'Cedula extranjeria',
                 'Pasaporte'
             ])->nullable(false);
-            $table->timestamp('fecha_creacion')->useCurrent();
-            $table->timestamp('fecha_modificacion')->useCurrent()->useCurrentOnUpdate();
+            $table->timestamps();
+
         });
 
         // Insertar datos iniciales
@@ -58,7 +58,7 @@ class CreateTipoDocumentosTable extends Migration
 //     Schema::create('clientes', function (Blueprint $table) {
 //         // Columna primary key auto incremental
 //         $table->id();
-        
+
 //         // Claves foráneas (se asume que las tablas 'estados' y 'tipo_documentos' existen)
 //         $table->unsignedBigInteger('id_estado')->default(1);
 //         $table->unsignedBigInteger('id_tipo_documento');
