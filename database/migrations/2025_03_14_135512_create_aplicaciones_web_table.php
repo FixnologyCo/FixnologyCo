@@ -19,8 +19,8 @@ return new class extends Migration {
             $table->string('categoria_app')->nullable(false);
             $table->string('descripcion_app')->nullable(false);
            
-            $table->timestamp('fecha_creacion')->default(DB::raw('CURRENT_TIMESTAMP'));
-            $table->timestamp('fecha_modificacion')->default(DB::raw('CURRENT_TIMESTAMP'))->useCurrentOnUpdate();
+            $table->timestamps(); 
+            $table->softDeletes();
 
             // Si necesitas una relación con otra tabla, por ejemplo, estados:
             $table->foreign('estilo_id')->references('id')->on('estilos_app')->onDelete('cascade');

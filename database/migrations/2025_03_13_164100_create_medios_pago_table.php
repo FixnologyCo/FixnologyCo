@@ -12,17 +12,10 @@ class CreateMediosPagoTable extends Migration
             Schema::create('medios_pago', function (Blueprint $table) {
                 $table->id(); 
                 $table->unsignedBigInteger('estado_id')->default(1);
-                $table->enum('forma_pago', [
-                    "Efectivo", 
-                    "Nequi", 
-                    "Daviplata", 
-                    "Tarjeta", 
-                    "Otro medio de pago"
-                    ])->nullable(false);
-                $table->timestamp('fecha_creacion')->default(DB::raw(value: 'CURRENT_TIMESTAMP'));
-                $table->timestamp('fecha_modificacion')->default(DB::raw('CURRENT_TIMESTAMP'))->useCurrentOnUpdate();
+                $table->string('forma_pago')->nullable(false);
+                $table->timestamps();
+
                 
-                // Si necesitas una relación con otra tabla, por ejemplo, estados:
                 $table->foreign('estado_id')->references('id')->on('estados')->onDelete('cascade');
             });
 

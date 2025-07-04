@@ -4,28 +4,26 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
     public function up(): void
     {
         Schema::create('estilos_app', function (Blueprint $table) {
-            $table->id(); 
-    
-            $table->string('color_fondo'); 
-            $table->string('color_texto'); 
-            $table->string('color_hover_texto'); 
-            $table->string('color_border'); 
-            $table->string('color_shadow')->default('shadow-xl');  
-            $table->string('icono')->default('function');  
-        
-            $table->timestamp('fecha_creacion')->default(DB::raw('CURRENT_TIMESTAMP'));
-            $table->timestamp('fecha_modificacion')->default(DB::raw('CURRENT_TIMESTAMP'))->useCurrentOnUpdate();
-    
+            $table->id();
+
+            $table->string('color_fondo');
+            $table->string('color_texto');
+            $table->string('color_hover_texto');
+            $table->string('color_border');
+            $table->string('color_shadow')->default('shadow-xl');
+            $table->string('icono')->default('function');
+
+            $table->timestamps();
+
         });
-        
+
 
         DB::table('estilos_app')->insert([
             [
@@ -39,7 +37,7 @@ return new class extends Migration
             ]
 
         ]);
-        
+
     }
 
     /**

@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -17,18 +16,21 @@ return new class extends Migration
             $table->unsignedBigInteger('token_id')->nullable();
             $table->unsignedBigInteger('aplicacion_web_id')->nullable();
             $table->unsignedBigInteger('propietario_id')->nullable();
+            $table->unsignedBigInteger('usuario_id')->default(1);
 
             $table->string('ruta_foto_establecimiento');
             $table->string('tipo_establecimiento');
             $table->string('nombre_establecimiento');
-            $table->string('email_establecimiento')->unique();
-            $table->string('telefono_establecimiento')->unique();
+            $table->string('email_establecimiento');
+            $table->string('telefono_establecimiento');
             $table->string('direccion_establecimiento');
             $table->string('barrio_establecimiento');
             $table->string('ciudad_establecimiento');
 
-            $table->timestamp('fecha_creacion')->default(DB::raw('CURRENT_TIMESTAMP'));
-            $table->timestamp('fecha_modificacion')->default(DB::raw('CURRENT_TIMESTAMP'))->useCurrentOnUpdate();
+            $table->timestamps();
+            $table->softDeletes();
+            $table->foreignId('created_by')->nullable()->constrained('usuarios')->onDelete('set null');
+            $table->foreignId('updated_by')->nullable()->constrained('usuarios')->onDelete('set null');
 
             $table->foreign('token_id')->references('id')->on('token_accesos')->onDelete('cascade');
             $table->foreign('estado_id')->references('id')->on('estados')->onDelete('cascade');
@@ -36,17 +38,22 @@ return new class extends Migration
             $table->foreign('propietario_id')->references('id')->on('usuarios')->onDelete('cascade');
         });
 
-         Schema::table('usuarios', function (Blueprint $table) {
-            $table->foreignId('establecimiento_id')->nullable()->constrained('establecimientos')->onDelete('set null');
+        Schema::table('usuarios', function (Blueprint $table) {
+           $table->foreignId('establecimiento_id')
+          ->nullable()
+          ->after('estado_id')
+          ->constrained('establecimientos')
+          ->onDelete('set null');
         });
 
+        
         DB::table('establecimientos')->insert([
             [
-                'token_id' => '1',
-                'aplicacion_web_id' => '1',
-                'propietario_id' => '1',
-                'tipo_establecimiento'=> 'Desarrollo de TI',
-                'nombre_establecimiento'=> 'Fixnology CO',
+                'token_id' => 1,
+                'aplicacion_web_id' => 1,
+                'propietario_id' => 1,
+                'tipo_establecimiento' => 'Desarrollo de TI',
+                'nombre_establecimiento' => 'Fixnology CO',
                 'email_establecimiento' => 'fixnologyco@gmail.com',
                 'telefono_establecimiento' => '3219631459',
                 'direccion_establecimiento' => 'Conjunto Naranjo',
@@ -54,7 +61,7 @@ return new class extends Migration
                 'ciudad_establecimiento' => 'Bogotá',
                 'ruta_foto_establecimiento' => 'https://fixnology.co/img/logo.png',
             ],
-        ]);     
+        ]);
     }
 
     /**

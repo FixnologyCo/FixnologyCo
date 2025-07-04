@@ -17,10 +17,8 @@ return new class extends Migration
             $table->string('ciudad_principal');
             $table->string('codigo_pais');
             $table->string('zona_horaria');
-            $table->timestamp('fecha_creacion')->default(DB::raw('CURRENT_TIMESTAMP'));
-            $table->timestamp('fecha_modificacion')->default(DB::raw('CURRENT_TIMESTAMP'))->useCurrentOnUpdate();
-        
-    
+            $table->timestamps(); 
+
         });
         
 
