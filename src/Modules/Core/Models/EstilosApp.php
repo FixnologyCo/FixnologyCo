@@ -5,9 +5,9 @@ namespace Core\Models;
 use Illuminate\Database\Eloquent\Model;
 
 
-class AplicacionWeb extends Model
+class EstilosApp extends Model
 {
-    protected $table = 'aplicaciones_web';
+    protected $table = 'estilos_app';
 
     protected $fillable = [
         'estado_id',
@@ -25,12 +25,12 @@ class AplicacionWeb extends Model
 
     public function estilo()
     {
-        return $this->belongsTo(EstilosApp::class);
+        return $this->belongsTo(Estilos::class, 'estilo_id');
     }
 
     public function membresia()
     {
-        return $this->belongsTo(Membresias::class);
+        return $this->belongsTo(Membresias::class, 'membresia_id');
     }
 
 }

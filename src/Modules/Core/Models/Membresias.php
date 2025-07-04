@@ -4,7 +4,7 @@ namespace Core\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Membresia extends Model
+class Membresias extends Model
 {
     protected $table = 'membresias';
 

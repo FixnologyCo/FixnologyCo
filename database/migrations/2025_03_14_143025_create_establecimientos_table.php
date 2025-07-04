@@ -16,7 +16,6 @@ return new class extends Migration {
             $table->unsignedBigInteger('token_id')->nullable();
             $table->unsignedBigInteger('aplicacion_web_id')->nullable();
             $table->unsignedBigInteger('propietario_id')->nullable();
-            $table->unsignedBigInteger('usuario_id')->default(1);
 
             $table->string('ruta_foto_establecimiento');
             $table->string('tipo_establecimiento');

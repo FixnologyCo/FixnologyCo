@@ -5,7 +5,7 @@ namespace Core\Models;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-class ClienteFixgi extends Authenticatable
+class Usuarios extends Authenticatable
 {
     use Notifiable;
 
