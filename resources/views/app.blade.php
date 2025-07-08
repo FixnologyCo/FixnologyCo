@@ -6,7 +6,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" rel="stylesheet" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <title inertia>{{ config('app.name', 'Laravel') }}</title>
-    @vite('resources/js/app.js') <!-- Esto incluye tu archivo JS generado por Vite -->
+    @vite('resources/js/app.js')
+      @livewireStyles
   <link rel="shortcut icon" href="{{ Vite::asset('resources/images/logoTC.svg') }}" type="image/x-icon">
 
 
@@ -16,6 +17,8 @@
 </head>
 <body class="scrollbar-custom bg-mono-blanco dark:bg-mono-negro">
   @inertia
+
+  @livewireScripts
   
 </body>
 </html>

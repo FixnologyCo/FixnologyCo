@@ -15,3 +15,10 @@ Route::get('/login', function () {
 Route::get('/ping', function () {
     return response()->json(['status' => 'ok']);
 });
+
+use App\Events\EstadoActualizado;
+
+Route::get('/test-broadcast', function () {
+    broadcast(new EstadoActualizado('¡El estado de algo ha cambiado!'))->toOthers();
+    return "¡Evento enviado!";
+})->name('test-broadcast'); // <-- ¡Añade ->name(...)!
