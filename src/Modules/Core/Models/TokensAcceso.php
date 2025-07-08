@@ -17,12 +17,11 @@ class TokensAcceso extends Model
 
     public function estado()
     {
-        return $this->belongsTo(Estados::class, 'id_estado');
+        return $this->belongsTo(Estados::class);
     }
 
-     // Relación con TiendaSistematizada (cada token pertenece a una tienda)
      public function establecimiento()
      {
-         return $this->belongsTo(Establecimientos::class, 'establecimiento_id');
+         return $this->belongsTo(Establecimientos::class);
      }
 }
