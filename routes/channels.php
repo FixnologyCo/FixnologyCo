@@ -1,7 +1,6 @@
-use Illuminate\Support\Facades\Broadcast;
 
 <?php
-
+use Illuminate\Support\Facades\Broadcast;
 
 /*
 |--------------------------------------------------------------------------
