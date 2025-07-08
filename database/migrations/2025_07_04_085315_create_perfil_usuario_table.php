@@ -12,6 +12,7 @@ return new class extends Migration {
     {
         Schema::create('perfil_usuario', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('estado_id')->default(1);
             $table->unsignedBigInteger('usuario_id')->nullable();
             $table->unsignedBigInteger('rol_id')->default(1);
             $table->unsignedBigInteger('indicativo_id')->nullable();
@@ -29,6 +30,7 @@ return new class extends Migration {
             $table->string('ciudad_residencia')->nullable();
             $table->string('barrio_residencia')->nullable();
 
+            $table->foreign('estado_id')->references('id')->on('estados')->onDelete('cascade');
             $table->foreign('usuario_id')->references('id')->on('usuarios')->onDelete('cascade');
             $table->foreign('rol_id')->references('id')->on('roles')->onDelete('cascade');
             $table->foreign('indicativo_id')->references('id')->on('indicativos')->onDelete('cascade');

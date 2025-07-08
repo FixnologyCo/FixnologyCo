@@ -30,22 +30,22 @@ class Establecimientos extends Model
 
     public function estado()
     {
-        return $this->belongsTo(Estados::class, 'estado_id');
+        return $this->belongsTo(Estados::class);
     }
 
     public function token()
     {
-        return $this->belongsTo(TokenAcceso::class, 'token_id');
+        return $this->belongsTo(TokenAcceso::class);
     }
     
 
     public function aplicacion()
     {
-        return $this->belongsTo(AplicacionWeb::class, 'aplicacion_web_id', 'id');
+        return $this->belongsTo(AplicacionWeb::class);
     }
 
     public function propietario()
     {
-        return $this->belongsTo(Usuarios::class, 'propietario_id');
+        return $this->belongsTo(Usuarios::class);
     }
 }
