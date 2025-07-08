@@ -10,27 +10,22 @@ class EstilosApp extends Model
     protected $table = 'estilos_app';
 
     protected $fillable = [
-        'estado_id',
-        'estilo_id',
-        'membresia_id',
-        'nombre_app',
-        'categoria_app',
-        'descripcion_app',
+        'color_fondo',
+        'color_texto',
+        'color_hover_texto',
+        'color_border',
+        'color_shadow',
+        'icono',
     ];
-
-    public function estado()
-    {
-        return $this->belongsTo(Estados::class);
-    }
-
-    public function estilo()
-    {
-        return $this->belongsTo(Estilos::class, 'estilo_id');
-    }
 
     public function membresia()
     {
-        return $this->belongsTo(Membresias::class, 'membresia_id');
+        return $this->hasMany(Membresias::class);
+    }
+
+    public function aplicacionWeb()
+    {
+        return $this->hasMany(AplicacionesWeb::class);
     }
 
 }

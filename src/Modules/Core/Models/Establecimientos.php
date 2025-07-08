@@ -35,13 +35,13 @@ class Establecimientos extends Model
 
     public function token()
     {
-        return $this->belongsTo(TokenAcceso::class);
+        return $this->belongsTo(TokensAcceso::class);
     }
     
 
     public function aplicacion()
     {
-        return $this->belongsTo(AplicacionWeb::class);
+        return $this->belongsTo(AplicacionesWeb::class);
     }
 
     public function propietario()

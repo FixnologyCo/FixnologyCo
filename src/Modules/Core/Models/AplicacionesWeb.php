@@ -5,7 +5,7 @@ namespace Core\Models;
 use Illuminate\Database\Eloquent\Model;
 
 
-class AplicacionWeb extends Model
+class AplicacionesWeb extends Model
 {
     protected $table = 'aplicaciones_web';
 

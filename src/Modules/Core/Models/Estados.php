@@ -15,7 +15,7 @@ class Estados extends Model
 
     public function facturacionMembresias()
     {
-        return $this->hasMany(FaturacionMembresias::class);
+        return $this->hasMany(FacturacionMembresias::class);
     }
 
     public function mediosPago(){
@@ -29,7 +29,7 @@ class Estados extends Model
 
     public function aplicacionesWeb()
     {
-        return $this->hasMany(AplicacionWeb::class);
+        return $this->hasMany(AplicacionesWeb::class);
     }
 
     public function establecimientos()

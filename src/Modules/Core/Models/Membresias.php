@@ -9,30 +9,24 @@ class Membresias extends Model
     protected $table = 'membresias';
 
     protected $fillable = [
-        'id_aplicacion_web',
-        'id_estado',
+        'estado_id',
+        'estilo_id',
         'nombre_membresia',
-        'precio',
-        'periodo',
-        'duracion',
-        'descripcion'
+        'precio_membresia',
+        'periodo_duracion',
+        'duracion_membresia',
+        'descripcion_corta',
     ];
 
     // ✅ Relación con estado
     public function estado()
     {
-        return $this->belongsTo(Estados::class, 'id_estado');
+        return $this->belongsTo(Estados::class);
     }
 
-    // ✅ Relación con aplicación web
-    public function aplicacion()
+    public function estilo()
     {
-        return $this->belongsTo(AplicacionWeb::class, 'id_aplicacion_web');
+        return $this->belongsTo(EstilosApp::class);
     }
-
-    public function pagosMembresias()
-{
-    return $this->hasMany(PagoMembresia::class);
-}
 
 }

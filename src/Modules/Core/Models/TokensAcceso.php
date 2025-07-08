@@ -4,17 +4,15 @@ namespace Core\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class TokenAcceso extends Model
+class TokensAcceso extends Model
 {
     protected $table = 'token_accesos';
 
-    public const CREATED_AT = 'fecha_creacion';
-    public const UPDATED_AT = 'fecha_modificacion';
 
     protected $fillable = [
+        'estado_id',
+        'establecimiento_id',
         'token_activacion',
-        'id_estado',
-        'id_tienda_sistematizada'
     ];
 
     public function estado()
@@ -23,8 +21,8 @@ class TokenAcceso extends Model
     }
 
      // Relación con TiendaSistematizada (cada token pertenece a una tienda)
-     public function tienda()
+     public function establecimiento()
      {
-         return $this->belongsTo(TiendaSistematizada::class, 'id_tienda_sistematizada');
+         return $this->belongsTo(Establecimientos::class, 'establecimiento_id');
      }
 }

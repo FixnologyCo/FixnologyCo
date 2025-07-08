@@ -4,16 +4,21 @@ namespace Core\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class TipoDocumento extends Model
+
+class Indicativos extends Model
 {
-    protected $table = 'tipo_documentos';
+    protected $table = 'indicativos';
 
     protected $fillable = [
-        'documento_legal',
+        'pais',
+        'ciudad_principal',
+        'codigo_pais',
+        'zona_horaria',
     ];
 
     public function perfilUsuario()
     {
         return $this->hasMany(PerfilUsuario::class);
     }
+
 }
