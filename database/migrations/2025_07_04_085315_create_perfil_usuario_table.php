@@ -56,8 +56,10 @@ return new class extends Migration {
                 'correo' => 'sebastianzamudio2004@gmail.com',
                 'genero' => 'Masculino',
                 'direccion_residencia' => 'Carrera 31 #17-224',
-                'ciudad_residencia' => 'Bogotá D.C.',
+                'ciudad_residencia' => 'Cundinamarca',
                 'barrio_residencia' => 'Soacha',
+                'created_at' => now(),
+                'updated_at' => now()
             ],
         ]);
     }
