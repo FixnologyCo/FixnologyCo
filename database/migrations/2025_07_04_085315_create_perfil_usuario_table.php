@@ -62,7 +62,9 @@ return new class extends Migration {
                 'ciudad_residencia' => 'Cundinamarca',
                 'barrio_residencia' => 'Soacha',
                 'created_at' => now(),
-                'updated_at' => now()
+                'updated_at' => now(),
+                'created_by' => 1,
+                'updated_by' => 1,
             ],
         ]);
     }
