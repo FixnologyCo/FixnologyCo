@@ -9,29 +9,31 @@ module.exports = {
         extend: {
             colors: {
                 mono: {
-                  blanco: '#f3fafe',
-                  negro: '#141414',
+                  blanco: '#F5F7F8',
+                  negro: '#0B192C',
                 },
                 bg: {
-                  empty: '#1F1D2B',
+                  empty: '#1A2130',
                 },
                 universal:{
                   naranja: '#f05235',
                   naranja_opacity: '#fe502d36',
-                  azul: '#4F959D',
-                  azul_opacity: '#4f959d3a',
-                  azul_secundaria: '#1c1b53'
+                  azul: '#3652AD',
+                  azul_opacity: '#3652AD3A',
+                  azul_secundaria: '#83B4FF'
                 },
                 semaforo: {
                   verde: '#1BCC75',
                   amarillo: '#FFA823',
                   rojo: '#FF3131',
                   verde_opacity: '#1bcc763f',
-                  rojo_opacity : '#ff31312d'
+                  rojo_opacity : '#ff31312d',
+                  amarillo_opacity: '#ffa8233f'
+
                 },
                 secundary: {
-                  default: '#1A2130',
-                  light: '#A5B8D4',
+                  default: '#030637',
+                  light: '#BFCFE7',
                   opacity: 'rgba(26, 33, 48, 0.479)'
                 }
             },

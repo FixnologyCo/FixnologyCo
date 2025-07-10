@@ -2,28 +2,26 @@
 import { Head } from "@inertiajs/vue3";
 import { route } from "ziggy-js";
 
-
-import { onMounted } from 'vue';
+import { onMounted } from "vue";
 
 onMounted(() => {
   // Escucha en el canal privado 'actualizaciones' el evento 'Estado.Actualizado'
-  window.Echo.private('actualizaciones')
-    .listen('.Estado.Actualizado', (e) => {
-      console.log('¡Evento recibido en tiempo real!');
-      console.log(e.mensaje); // "¡El estado de algo ha cambiado!"
-      alert('Mensaje del servidor: ' + e.mensaje);
-    });
+  window.Echo.private("actualizaciones").listen(".Estado.Actualizado", (e) => {
+    console.log("¡Evento recibido en tiempo real!");
+    console.log(e.mensaje); // "¡El estado de algo ha cambiado!"
+    alert("Mensaje del servidor: " + e.mensaje);
+  });
 });
 
 const testBroadcast = () => {
   // Envía un evento de prueba al servidor
-  fetch(route('test-broadcast'))
-    .then(response => response.text())
-    .then(data => {
+  fetch(route("test-broadcast"))
+    .then((response) => response.text())
+    .then((data) => {
       console.log(data); // "¡Evento enviado!"
       alert(data);
     })
-    .catch(error => console.error('Error al enviar el evento:', error));
+    .catch((error) => console.error("Error al enviar el evento:", error));
 };
 </script>
 
@@ -54,10 +52,81 @@ const testBroadcast = () => {
       </div>
     </header>
 
-   <div>
-    <h1>Dashboard</h1>
-    <p>Escuchando eventos del servidor en tiempo real...</p>
-    <a href="#" @click.prevent="testBroadcast">Enviar Evento</a>
-  </div>
+    <div class="flex w-full">
+    <div class="mx-5 bg-mono-blanco p-2" >
+      <h1>Dashboard White:</h1>
+
+      <h1>Monocromaticos:</h1>
+      <div class="paleta flex gap-2 flex-wrap">
+        <div class="w-[200px] h-[200px] rounded-xl bg-mono-negro"></div>
+        <div class="w-[200px] h-[200px] rounded-xl bg-mono-blanco border"></div>
+      </div>
+
+      <h1>Universales:</h1>
+      <div class="paleta flex gap-2 flex-wrap">
+        <div class="w-[200px] h-[200px] rounded-xl bg-bg-empty"></div>
+        <div class="w-[200px] h-[200px] rounded-xl bg-universal-naranja"></div>
+        <div class="w-[200px] h-[200px] rounded-xl bg-universal-naranja_opacity"></div>
+        <div class="w-[200px] h-[200px] rounded-xl bg-universal-azul"></div>
+        <div class="w-[200px] h-[200px] rounded-xl bg-universal-azul_opacity"></div>
+        <div class="w-[200px] h-[200px] rounded-xl bg-universal-azul_secundaria"></div>
+      </div>
+
+      <h1>Semaforos</h1>
+      <div class="paleta flex gap-2 flex-wrap">
+       <div class="w-[200px] h-[200px] rounded-xl bg-semaforo-verde"></div>
+        <div class="w-[200px] h-[200px] rounded-xl bg-semaforo-verde_opacity"></div>
+        <div class="w-[200px] h-[200px] rounded-xl bg-semaforo-amarillo"></div>
+        <div class="w-[200px] h-[200px] rounded-xl bg-semaforo-amarillo_opacity"></div>
+        <div class="w-[200px] h-[200px] rounded-xl bg-semaforo-rojo"></div>
+        <div class="w-[200px] h-[200px] rounded-xl bg-semaforo-rojo_opacity"></div>
+      </div>
+
+      <h1>Secundarios</h1>
+      <div class="paleta flex gap-2 flex-wrap">
+        <div class="w-[200px] h-[200px] rounded-xl bg-secundary-default"></div>
+        <div class="w-[200px] h-[200px] rounded-xl bg-secundary-light"></div>
+        <div class="w-[200px] h-[200px] rounded-xl bg-secundary-opacity"></div>
+      </div>
+
+    </div>
+     <div class="mx-5 bg-mono-negro text-mono-blanco p-2" >
+      <h1 class="">Dashboard Black:</h1>
+
+      <h1>Monocromaticos:</h1>
+      <div class="paleta flex gap-2 flex-wrap">
+        <div class="w-[200px] h-[200px] rounded-xl bg-mono-negro"></div>
+        <div class="w-[200px] h-[200px] rounded-xl bg-mono-blanco border"></div>
+      </div>
+
+      <h1>Universales:</h1>
+      <div class="paleta flex gap-2 flex-wrap">
+        <div class="w-[200px] h-[200px] rounded-xl bg-bg-empty"></div>
+        <div class="w-[200px] h-[200px] rounded-xl bg-universal-naranja"></div>
+        <div class="w-[200px] h-[200px] rounded-xl bg-universal-naranja_opacity"></div>
+        <div class="w-[200px] h-[200px] rounded-xl bg-universal-azul"></div>
+        <div class="w-[200px] h-[200px] rounded-xl bg-universal-azul_opacity"></div>
+        <div class="w-[200px] h-[200px] rounded-xl bg-universal-azul_secundaria"></div>
+      </div>
+
+      <h1>Semaforos</h1>
+      <div class="paleta flex gap-2 flex-wrap">
+       <div class="w-[200px] h-[200px] rounded-xl bg-semaforo-verde"></div>
+        <div class="w-[200px] h-[200px] rounded-xl bg-semaforo-verde_opacity"></div>
+        <div class="w-[200px] h-[200px] rounded-xl bg-semaforo-amarillo"></div>
+        <div class="w-[200px] h-[200px] rounded-xl bg-semaforo-amarillo_opacity"></div>
+        <div class="w-[200px] h-[200px] rounded-xl bg-semaforo-rojo"></div>
+        <div class="w-[200px] h-[200px] rounded-xl bg-semaforo-rojo_opacity"></div>
+      </div>
+
+      <h1>Secundarios</h1>
+      <div class="paleta flex gap-2 flex-wrap">
+        <div class="w-[200px] h-[200px] rounded-xl bg-secundary-default"></div>
+        <div class="w-[200px] h-[200px] rounded-xl bg-secundary-light"></div>
+        <div class="w-[200px] h-[200px] rounded-xl bg-secundary-opacity"></div>
+      </div>
+
+    </div>
+    </div>
   </div>
 </template>
