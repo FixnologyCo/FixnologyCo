@@ -17,7 +17,7 @@ export default {
 <script setup>
 import { Head, useForm } from "@inertiajs/vue3";
 import { handleBlur, handleInput, limitesCaracteres } from "@/Utils/formateoInputs";
-import { useTema } from '@/Composables/useTema';
+import { useTema } from "@/Composables/useTema";
 import { route } from "ziggy-js";
 import MensajesLayout from "@/Layouts/MensajesLayout.vue";
 import logoGoogle from "/resources/images/LogoGoogle.png";
@@ -26,7 +26,7 @@ defineProps({});
 
 const form = useForm({
   primer_nombre: "",
-  primer_apellido: ""
+  primer_apellido: "",
 });
 
 const submit = () => {
@@ -84,23 +84,29 @@ const { modoOscuro, animando, animarCambioTema } = useTema();
     </header>
 
     <div class="flex justify-center items-center">
-      <div class="bg-mono-blanco shadow-lg dark:shadow-sm dark:bg-bg-empty w-[800px] rounded-lg py-2 px-10">
-        <h2 class="text-[35px] font-bold text-center dark:text-mono-blanco">Únete a la familia Fix</h2>
+      <div
+        class="bg-mono-blanco shadow-lg dark:shadow-sm dark:bg-bg-empty w-[800px] rounded-lg py-2 px-10"
+      >
+        <h2 class="text-[35px] font-bold text-center dark:text-mono-blanco">
+          Únete a la familia Fix
+        </h2>
         <p class="text-[18px] text-universal-naranja -mt-2 text-center">
           Simplifique su negocio en línea, software profesional y avanzado
         </p>
 
         <div class="btn-inicio flex justify-center gap-2 mt-5">
           <button
-            class="border border-secundary-light rounded-md py-2 gap-3 w-[70%] flex items-center justify-center"
+            class="border border-secundary-light rounded-md py-2 gap-3 w-[70%] flex items-center justify-center hover:-translate-y-1 hover:bg-secundary-default"
           >
-            <img width="20px" height="20px" :src="logoGoogle" alt="Logo google" /> 
-            <span class="dark:text-mono-blanco">Inicia sesión con tu cuenta de Google</span>
+            <img width="20px" height="20px" :src="logoGoogle" alt="Logo google" />
+            <span class="dark:text-mono-blanco"
+              >Inicia sesión con tu cuenta de Google</span
+            >
           </button>
           <button
-            class="border border-secundary-light rounded-md py-2 gap-3 w-[10%] flex items-center justify-center"
+            class="border border-secundary-light rounded-md py-2 gap-3 w-[10%] flex items-center justify-center hover:-translate-y-1 hover:bg-secundary-default"
           >
-           <img width="20px" height="20px" :src="logoGoogle" alt="Logo google" /> 
+            <img width="20px" height="20px" :src="logoGoogle" alt="Logo google" />
           </button>
         </div>
 
@@ -120,9 +126,7 @@ const { modoOscuro, animando, animarCambioTema } = useTema();
             <div class="2xl:w-[50%] xl:w-[50%] w-full">
               <div class="contador-label flex items-center justify-between">
                 <p class="my-[5px] text-[14px] dark:text-mono-blanco">Primer nombre:</p>
-                <p
-                  class="2xl:text-[10px] xl:text-[12px] text-[8px] text-secundary-light"
-                >
+                <p class="2xl:text-[10px] xl:text-[12px] text-[8px] text-secundary-light">
                   {{ form.primer_nombre.length }} /
                   {{ limitesCaracteres.primer_nombre }}
                 </p>
@@ -139,8 +143,8 @@ const { modoOscuro, animando, animarCambioTema } = useTema();
                 >
 
                 <input
-                  type="password"
-                  class="2xl:w-full focus:outline-none focus:border-none font-normal bg-transparent"
+                  type="text"
+                  class="2xl:w-full focus:outline-none focus:border-none font-normal bg-transparent dark:text-mono-blanco"
                   placeholder="Ej: Juan"
                   v-model="form.primer_nombre"
                 />
@@ -156,9 +160,7 @@ const { modoOscuro, animando, animarCambioTema } = useTema();
             <div class="2xl:w-[50%] xl:w-[50%] w-full">
               <div class="contador-label flex items-center justify-between">
                 <p class="my-[5px] text-[14px] dark:text-mono-blanco">Primer apellido:</p>
-                <p
-                  class="2xl:text-[10px] xl:text-[12px] text-[8px] text-secundary-light"
-                >
+                <p class="2xl:text-[10px] xl:text-[12px] text-[8px] text-secundary-light">
                   {{ form.primer_apellido.length }} /
                   {{ limitesCaracteres.primer_apellido }}
                 </p>
@@ -175,8 +177,8 @@ const { modoOscuro, animando, animarCambioTema } = useTema();
                 >
 
                 <input
-                  type="password"
-                  class="2xl:w-full focus:outline-none focus:border-none font-normal bg-transparent"
+                  type="text"
+                  class="2xl:w-full focus:outline-none focus:border-none font-normal bg-transparent dark:text-mono-blanco"
                   placeholder="Ej: Guarnizo"
                   v-model="form.primer_apellido"
                 />
@@ -190,19 +192,61 @@ const { modoOscuro, animando, animarCambioTema } = useTema();
             </div>
           </div>
 
-       
+           <div
+            class="2xl:flex 2xl:flex-row 2xl:justify-between 2xl:items-center 2xl:gap-2 xl:flex xl:flex-row xl:justify-between xl:items-center xl:gap-2 gap-3 flex flex-col items-center"
+          >
+            <div class="2xl:w-[100%] xl:w-[100%] w-full">
+              <div class="contador-label flex items-center justify-between">
+                <p class="my-[5px] text-[14px] dark:text-mono-blanco">Número de identificación:</p>
+                <p class="2xl:text-[10px] xl:text-[12px] text-[8px] text-secundary-light">
+                  {{ form.primer_nombre.length }} /
+                  {{ limitesCaracteres.primer_nombre }}
+                </p>
+              </div>
 
+              <div
+                class="w-[100%] p-[3px] flex items-center gap-[8px] transition-all rounded-[5px] border-[1px] border-secundary-ligh"
+                t
+                :class="{ 'border-universal-naranja': form.errors.primer_nombre }"
+              >
+                <span
+                  class="material-symbols-rounded text-universal-naranja text-[20px] pl-[5px]"
+                  >format_italic</span
+                >
+
+                <input
+                  type="text"
+                  class="2xl:w-full focus:outline-none focus:border-none font-normal bg-transparent dark:text-mono-blanco"
+                  placeholder="Ej: Juan"
+                  v-model="form.primer_nombre"
+                />
+              </div>
+              <span
+                v-if="form.errors.primer_nombre"
+                class="2xl:text-sm text-universal-naranja"
+              >
+                {{ form.errors.primer_nombre }}
+              </span>
+            </div>
+
+          
+          </div>
           <a
             href="https://api.whatsapp.com/send/?phone=573219631459&text=Vengo+desde+la+app%2C+quiero+activar+mi+token+por+favor.&type=phone_number&app_absent=0"
             class="2xl:my-3 text-[14px] text-right text-universal-azul_secundaria"
             >Contactanos para la activación</a
           >
 
-          <button type="submit" class=" flex items-center bg-universal-azul_secundaria  px-4 py-2 rounded-md justify-center text-mono-blanco font-semibold shadowM">
+          <button
+            type="submit"
+            class="flex items-center bg-universal-azul_secundaria px-4 py-2 rounded-md justify-center text-mono-blanco font-semibold shadowM"
+          >
             Crear cuenta <span class="material-symbols-rounded bg-transparent">bolt</span>
           </button>
 
-          <p class="text-[12px] text-universal-naranja text-center">Versión Deimos 1.0.0</p>
+          <p class="text-[12px] mt-3 text-universal-naranja text-center">
+            Versión Deimos 1.0.0
+          </p>
         </form>
       </div>
     </div>
@@ -310,7 +354,6 @@ const { modoOscuro, animando, animarCambioTema } = useTema();
               >Olvidé mi contraseña</a
             >
 
-            <!-- ✅ BOTÓN DE INICIAR SESIÓN -->
             <button type="submit" class="btn-taurus text-mono-blanco">
               Iniciar sesión
               <span class="material-symbols-rounded bg-transparent">bolt</span>
