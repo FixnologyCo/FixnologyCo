@@ -2,6 +2,8 @@
 export const limitesCaracteres = {
   descripcion_app:100,
   nombre_app: 30,
+  primer_nombre: 25,
+  primer_apellido: 25,
 
 }
 

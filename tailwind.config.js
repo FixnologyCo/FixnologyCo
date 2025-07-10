@@ -39,6 +39,7 @@ module.exports = {
             },
             boxShadow: {
               'universal-naranja': '0px 8px 20px #FE4F2D;',
+              'blanco': '0px 2px 16px #BFCFE7'
             }
         },
     },

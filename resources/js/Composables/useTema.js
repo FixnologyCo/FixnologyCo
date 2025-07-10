@@ -1,62 +1,47 @@
-// resources/js/composables/useTema.js
-import { ref, watchEffect } from 'vue'
+// /utils/useTheme.js
 
-const modoOscuro = ref(false)
-const sistemaOscuro = window.matchMedia('(prefers-color-scheme: dark)')
+import { ref, onMounted } from 'vue';
 
-const aplicarTema = (esOscuro) => {
-  const html = document.documentElement
-  html.classList.add('transicion-tema')
-
-  html.classList.toggle('dark', esOscuro)
-
-  setTimeout(() => {
-    html.classList.remove('transicion-tema')
-  }, 500)
-}
-
-const detectarTemaInicial = () => {
-  const preferencia = localStorage.getItem('modoOscuro')
-
-  if (preferencia === null) {
-    // Sin preferencia: usar el sistema
-    modoOscuro.value = sistemaOscuro.matches
-  } else {
-    // Preferencia manual
-    modoOscuro.value = preferencia === 'true'
-  }
-
-  aplicarTema(modoOscuro.value)
-}
-
-const toggleTema = () => {
-  modoOscuro.value = !modoOscuro.value
-  localStorage.setItem('modoOscuro', modoOscuro.value)
-  aplicarTema(modoOscuro.value)
-}
-
-const escucharCambiosSistema = () => {
-  sistemaOscuro.addEventListener('change', (e) => {
-    const preferencia = localStorage.getItem('modoOscuro')
-
-    // Solo reaccionar si no hay preferencia manual
-    if (preferencia === null) {
-      modoOscuro.value = e.matches
-      aplicarTema(modoOscuro.value)
-    }
-  })
-}
-
-// Reacciona a cambios manuales en tiempo real
-watchEffect(() => {
-  aplicarTema(modoOscuro.value)
-})
-
+// La función composable
 export function useTema() {
+  // El estado y la lógica se encapsulan aquí dentro
+  const modoOscuro = ref(false);
+  const animando = ref(false);
+
+  const detectarPreferencia = () => {
+    const preferencia = localStorage.getItem("modoOscuro");
+    modoOscuro.value =
+      preferencia !== null
+        ? preferencia === "true"
+        : window.matchMedia("(prefers-color-scheme: dark)").matches;
+
+    document.documentElement.classList.toggle("dark", modoOscuro.value);
+  };
+
+  const toggleTema = () => {
+    modoOscuro.value = !modoOscuro.value;
+    document.documentElement.classList.toggle("dark", modoOscuro.value);
+    localStorage.setItem("modoOscuro", modoOscuro.value);
+  };
+
+  const animarCambioTema = () => {
+    if (animando.value) return; // Evita doble clic
+    animando.value = true;
+    toggleTema();
+    setTimeout(() => {
+      animando.value = false;
+    }, 600);
+  };
+
+  // El ciclo de vida se conecta al componente que usa el composable
+  onMounted(() => {
+    detectarPreferencia();
+  });
+
+  // Retornamos solo lo que el componente necesita usar
   return {
     modoOscuro,
-    toggleTema,
-    detectarTemaInicial,
-    escucharCambiosSistema
-  }
+    animando,
+    animarCambioTema,
+  };
 }
