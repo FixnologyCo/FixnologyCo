@@ -51,7 +51,9 @@ return new class extends Migration {
                 'ciudad_establecimiento' => 'Bogotá',
                 'ruta_foto_establecimiento' => 'https://fixnology.co/img/logo.png',
                 'created_at' => now(),
-                'updated_at' => now()
+                'updated_at' => now(),
+                'created_by' => 1,
+                'updated_by' => 1,
             ],
         ]);
     }

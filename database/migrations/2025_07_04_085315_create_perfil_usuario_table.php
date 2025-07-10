@@ -39,6 +39,9 @@ return new class extends Migration {
             $table->softDeletes();
 
             $table->timestamps();
+            $table->foreignId('created_by')->nullable()->constrained('usuarios')->onDelete('set null');
+            $table->foreignId('updated_by')->nullable()->constrained('usuarios')->onDelete('set null');
+
         });
 
         DB::table('perfil_usuario')->insert([
@@ -58,6 +61,10 @@ return new class extends Migration {
                 'direccion_residencia' => 'Carrera 31 #17-224',
                 'ciudad_residencia' => 'Bogotá D.C.',
                 'barrio_residencia' => 'Soacha',
+                'created_at' => now(),
+                'updated_at' => now(),
+                'created_by' => 1,
+                'updated_by' => 1,
             ],
         ]);
     }

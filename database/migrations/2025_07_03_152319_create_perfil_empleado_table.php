@@ -55,6 +55,8 @@ return new class extends Migration {
                 'fecha_ingreso' => now(),
                 'fecha_egreso' => null,
                 'fecha_modificacion' => now(),
+                'created_by' => 1,
+                'updated_by' => 1,
             ],
         ]);
     }

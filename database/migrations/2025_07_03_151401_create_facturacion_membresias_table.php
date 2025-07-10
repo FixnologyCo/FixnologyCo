@@ -45,7 +45,9 @@ return new class extends Migration {
                 'dias_restantes' => '999999',
                 'fecha_pago' => now(),
                 'created_at' => now(),
-                'updated_at' => now()
+                'updated_at' => now(),
+                'created_by' => 1,
+                'updated_by' => 1,
 
             ]
 
