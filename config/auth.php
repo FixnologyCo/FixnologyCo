@@ -62,7 +62,7 @@ return [
    'providers' => [
     'users' => [
         'driver' => 'eloquent',
-        'model' => Core\Models\ClienteFixgi::class,
+        'model' => App\Models\User::class,
     ],
 ],
 

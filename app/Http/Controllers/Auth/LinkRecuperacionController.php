@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
 use Illuminate\Http\Request;
-use Core\Models\ClienteFixgi;
+use App\Models\User;
 use App\Mail\RecuperarPassword;
 
 class LinkRecuperacionController extends Controller
@@ -30,7 +30,7 @@ class LinkRecuperacionController extends Controller
         ]);
 
         $correo = $request->correo_vinculado;
-        $cliente = ClienteFixgi::where('email_ct', $correo)->first();
+        $cliente = User::where('email_ct', $correo)->first();
         
 
         if (!$cliente) {
@@ -87,7 +87,7 @@ class LinkRecuperacionController extends Controller
             return redirect()->back()->withErrors(['email' => 'Token inválido o expirado.']);
         }
 
-        $cliente = ClienteFixgi::where('email_ct', $request->email)->first();
+        $cliente = User::where('email_ct', $request->email)->first();
 
         if (!$cliente) {
             return redirect()->back()->withErrors(['email' => 'Cliente no encontrado.']);

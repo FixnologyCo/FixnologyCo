@@ -2,7 +2,7 @@
 
 namespace Core\Http\Controllers;
 
-use Core\Models\ClienteFixgi;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\DB;
@@ -52,7 +52,7 @@ class ConfiguracionesController extends Controller
         if ($user->tienda && $user->tienda->aplicacion->nombre_app === $aplicacion) {
 
             // Consulta principal con joins (alias renombrados para evitar conflictos con relaciones cargadas)
-            $clientes = ClienteFixgi::select(
+            $clientes = User::select(
                 'clientes_fixgis.id',
                 \DB::raw("CONCAT(clientes_fixgis.nombres_ct, ' ', clientes_fixgis.apellidos_ct) AS nombre_completo"),
                 'clientes_fixgis.telefono_ct as telefono',
@@ -93,7 +93,7 @@ class ConfiguracionesController extends Controller
                 ->where('id_rol', 1)
                 ->count();
 
-            $usuariosRol4 = ClienteFixgi::where('id_rol', 4)
+            $usuariosRol4 = User::where('id_rol', 4)
                 ->select('id', 'nombres_ct', 'apellidos_ct') // puedes agregar 'apellidos' si necesitas
                 ->get();
 

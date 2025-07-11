@@ -3,12 +3,12 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use Core\Models\ClienteFixgi;
-use Core\Models\TiendaSistematizada;
-use Core\Models\TokenAcceso;
+use App\Models\User;
+use Core\Models\Establecimientos;
+use Core\Models\FacturacionMembresias;
+use Core\Models\TokensAcceso;
 use Core\Models\TipoDocumento;
-use Core\Models\AplicacionWeb;
-use Core\Models\PagoMembresia;
+use Core\Models\AplicacionesWeb;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -20,7 +20,7 @@ class RegisterController extends Controller
     public function show()
     {
         $tipoDocumentos = TipoDocumento::all();
-        $aplicaciones = AplicacionWeb::where('id_membresia', 1)
+        $aplicaciones = AplicacionesWeb::where('id_membresia', 1)
             ->select('id', 'nombre_app')
             ->get();
 
@@ -67,7 +67,7 @@ class RegisterController extends Controller
         ]);
 
         // ✅ Crear cliente
-        $cliente = ClienteFixgi::create([
+        $cliente = User::create([
             'nombres_ct' => $request->nombres_ct,
             'apellidos_ct' => $request->apellidos_ct,
             'id_tipo_documento' => $request->id_tipo_documento,
@@ -80,7 +80,7 @@ class RegisterController extends Controller
         ]);
 
         // ✅ Crear tienda vinculada al cliente
-        $tienda = TiendaSistematizada::create([
+        $tienda = Establecimientos::create([
             'id_estado' => 1,
             'id_aplicacion_web' => $request->id_aplicacion,
             'nombre_tienda' => 'Tienda de ' . $cliente->nombres_ct,
@@ -94,7 +94,7 @@ class RegisterController extends Controller
         $cliente->update(['id_tienda' => $tienda->id]);
 
         // ✅ Crear token automáticamente
-        $token = TokenAcceso::create([
+        $token = TokensAcceso::create([
             'id_cliente_ct' => $cliente->id,
             'id_estado' => 2, 
             'token_activacion' => Str::uuid(),
@@ -103,7 +103,7 @@ class RegisterController extends Controller
 
         // ✅ Actualizar el id_token en la tienda para que quede vinculado
         $tienda->update(['id_token' => $token->id]);
-        $montoTotal = AplicacionWeb::where('id', $request->id_aplicacion)
+        $montoTotal = AplicacionesWeb::where('id', $request->id_aplicacion)
             ->with('membresia')
             ->first()
             ->membresia
@@ -111,7 +111,7 @@ class RegisterController extends Controller
 
         // ✅ Crear registro de pago de membresía
         // ✅ Registrar el pago en la tabla `pagos_membresia`
-        PagoMembresia::create([
+        FacturacionMembresias::create([
             'id_cliente' => $cliente->id,
             'id_tienda' => $tienda->id,
             'id_medio_pago' => 1, //

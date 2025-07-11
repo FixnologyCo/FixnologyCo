@@ -2,14 +2,14 @@
 
 namespace App\Policies;
 
-use Core\Models\ClienteFixgi;
+use App\Models\User;
 
 class RolePolicy
 {
     /**
      * Permite el acceso si el rol coincide
      */
-    public function accessRole(ClienteFixgi $user, $role)
+    public function accessRole(User $user, $role)
     {
         return $user->id_rol == $role;
     }

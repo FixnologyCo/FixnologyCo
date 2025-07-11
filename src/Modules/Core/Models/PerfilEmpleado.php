@@ -2,6 +2,7 @@
 
 namespace Core\Models;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 
 class PerfilEmpleado extends Model
@@ -32,13 +33,13 @@ class PerfilEmpleado extends Model
 
     public function usuario()
     {
-        return $this->belongsTo(Usuarios::class);
+        return $this->belongsTo(User::class);
     }
 
     public function establecimiento()
-    {
-        return $this->belongsTo(Establecimientos::class);
-    }
+{
+    return $this->belongsTo(Establecimientos::class, 'establecimiento_id');
+}
 
     public function rol()
     {
@@ -49,4 +50,6 @@ class PerfilEmpleado extends Model
     {
         return $this->belongsTo(MediosPago::class);
     }
+
+    
 }

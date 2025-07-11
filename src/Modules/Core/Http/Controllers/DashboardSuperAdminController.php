@@ -2,7 +2,7 @@
 
 namespace Core\Http\Controllers;
 use App\Http\Controllers\Controller;
-use Core\Models\ClienteFixgi;
+use App\Models\User;
 use Core\Models\AplicacionWeb;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -52,7 +52,7 @@ class DashboardSuperAdminController extends Controller
             ->where('id_rol', 1)
             ->count();
 
-        $usuariosRol4 = ClienteFixgi::where('id_rol', 4)
+        $usuariosRol4 = User::where('id_rol', 4)
             ->select('id', 'nombres_ct', 'apellidos_ct')
             ->get();
 

@@ -3,139 +3,111 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use Core\Models\ClienteFixgi;
+use App\Models\User; // ✅ Es una buena práctica usar el modelo estándar de Laravel
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
-use Hash;
-use App\Traits\RegistraAuditoria;
 
 class LoginController extends Controller
 {
-    use RegistraAuditoria; // 👈 Usa el trait aquí a nivel de clase
-
-    // ✅ Mostrar formulario de login
+    /**
+     * Muestra el formulario de login.
+     */
     public function show()
     {
         return Inertia::render('Core/Auth/Auth');
     }
 
-    // ✅ Procesar el login
+    /**
+     * Procesa el intento de login.
+     */
     public function login(Request $request)
     {
-        $request->validate([
-            'numero_documento_ct' => 'required|integer',
-            'contrasenia_ct' => 'required|string',
+        // 1. Validación de los datos de entrada
+        $credenciales = $request->validate([
+            'numero_documento' => 'required|string',
+            'password' => 'required|string',
         ], [
-            'numero_documento_ct.required' => 'El usuario es requerido.',
-            'numero_documento_ct.integer' => 'Verifica que tipo de usuario te asignaron',
-            'contrasenia_ct.required' => 'La contraseña es requerida.',
+            'numero_documento.required' => 'El número de documento es requerido.',
+            'password.required' => 'La contraseña es requerida.',
         ]);
 
-        $cliente = Clientefixgi::with([
-            'rol',
-            'tienda.aplicacion',
-            'tienda.token',
-            'tienda.membresia.pagos_membresia',
-            'pagosMembresia'
-        ])
-            ->where('numero_documento_ct', $request->numero_documento_ct)
-            ->first();
+        // 2. Intento de Autenticación Automático con el método de Laravel
+        if (Auth::attempt($credenciales)) {
+            $request->session()->regenerate();
+            $usuario = Auth::user(); // Obtenemos la instancia del usuario autenticado
 
-        if (!$cliente) {
-            return back()
-                ->withErrors([
-                    'numero_documento_ct' => 'No encontramos un usuario relacionado.',
-                ])
-                ->with('error', 'No reconocemos ese usuario :(');
-        }
+            // 3. Validaciones de Negocio sobre el usuario y su contexto
 
-        if (!Hash::check($request->contrasenia_ct, $cliente->contrasenia_ct)) {
-            return back()->with('error', 'Usuario o contraseña incorrectos');
-        }
-
-        // Validación de pago
-        $pagos = $cliente->pagosMembresia;
-        if ($pagos && $pagos->isNotEmpty()) {
-            $ultimoPago = $pagos->sortByDesc('fecha_pago')->first();
-
-            $estadoInvalido = $ultimoPago->id_estado === 9;
-
-            if ($estadoInvalido) {
+            // ✅ Valida que la cuenta del usuario esté activa
+            if ($usuario->estado_id !== 1) { // Suponiendo que 1 = 'Activo'
                 Auth::logout();
-                return back()->with('error', 'Ponte al día con tu pago para seguir disfrutando de la app.');
-                
+                return back()->withErrors(['numero_documento' => 'Tu cuenta está inactiva o suspendida.']);
             }
+
+            // Obtenemos el primer perfil de empleado para saber a qué establecimiento pertenece
+            $perfilEmpleado = $usuario->perfilesEmpleado()->with([
+                'establecimiento.token',
+                'establecimiento.aplicacionWeb.membresia',
+                'establecimiento.facturas'
+            ])->first();
+
+            // Si es un rol que requiere estar en un establecimiento (Admin, Empleado, etc.)
+            // y no tiene un perfil, no puede continuar.
+            // (Ajusta los IDs de los roles según tu tabla `roles`)
+            if (in_array($usuario->perfilUsuario->rol_id, [1, 2, 4]) && !$perfilEmpleado) {
+                Auth::logout();
+                return back()->withErrors(['numero_documento' => 'No tienes un rol asignado en ningún establecimiento.']);
+            }
+
+            // Si tiene un perfil, validamos el establecimiento
+            if ($perfilEmpleado) {
+                $establecimiento = $perfilEmpleado->establecimiento;
+
+                // Valida que el establecimiento esté activo
+                if ($establecimiento->estado_id !== 1) {
+                    Auth::logout();
+                    return back()->withErrors(['numero_documento' => 'El establecimiento al que perteneces está inactivo.']);
+                }
+
+                // Valida que el token del establecimiento esté activo
+                if ($establecimiento->token?->estado_id !== 1) {
+                    Auth::logout();
+                    return back()->withErrors(['numero_documento' => 'El token de tu establecimiento está inactivo o no existe.']);
+                }
+
+                // Valida el estado del último pago de la membresía del establecimiento
+                $ultimaFactura = $establecimiento->facturas()->latest('fecha_pago')->first();
+
+                // Si existe una factura y su estado es 8 (Pendiente, según tu descripción)
+                if ($ultimaFactura && $ultimaFactura->estado_id === 16) {
+                    Auth::logout();
+                    return back()->with('error', 'Tu establecimiento tiene un pago pendiente. Por favor, ponte al día.');
+                }
+            }
+
+            // 4. Redirección Exitosa
+            return redirect()->route('aplicacion.dashboard', [
+
+                
+
+            ])->with('success', 'Bienvenido por aquí, ' . ($cliente->nombres_ct ?? 'Usuario'));
         }
 
-        Auth::login($cliente);
-
-        // ✅ Tienda inactiva o eliminada
-        if (
-            !$cliente->tienda ||
-            $cliente->tienda->id_estado === 2
-        ) {
-            Auth::logout();
-            return back()->with('error', 'Tu tienda está inactiva o eliminada, contáctanos.');
-        }
-
-        // ✅ Token inactivo
-        if (
-            !$cliente->tienda->token ||
-            !$cliente->tienda->token->token_activacion ||
-            $cliente->tienda->token->id_estado === 2
-        ) {
-            Auth::logout();
-             return back()->with('error', 'Token inactivo, contáctanos para activarlo.');
-        }
-
-        $this->registrarAuditoria(
-            'Iniciado sesión',
-            'Clientefixgi',
-            $cliente->numero_documento_ct,
-            'Ingreso al sistema',
-            ['evento' => 'inicio de sesion']
-        );
-
-        $nombreAplicacion = $cliente->tienda->aplicacion->nombre_app ?? null;
-        $rol = $cliente->rol->tipo_rol ?? null;
-
-        if (!$nombreAplicacion || !$rol) {
-            Auth::logout();
-            return back()->withErrors([
-                'numero_documento_ct' => 'Error al obtener aplicación o rol.',
-            ]);
-        }
-
-
-        return redirect()->route('aplicacion.dashboard', [
-            'aplicacion' => ucfirst($nombreAplicacion),
-            'rol' => ucfirst($rol),
-        ])->with('success', 'Bienvenido por aquí, ' . ($cliente->nombres_ct ?? 'Usuario'));
-
-
+        // Si Auth::attempt() falla, las credenciales son incorrectas
+        return back()->withErrors([
+            'numero_documento' => 'Las credenciales proporcionadas no coinciden con nuestros registros.',
+        ])->onlyInput('numero_documento');
     }
 
-
-    // ✅ Cerrar sesión
+    /**
+     * Cierra la sesión del usuario.
+     */
     public function logout(Request $request)
     {
-        $clienteId = auth()->id(); // Guardamos el ID antes de cerrar sesión
-
-        $this->registrarAuditoria(
-            'Cerrado sesión',
-            'Clientefixgi',
-            $clienteId,
-            'Cierre de sesion',
-            ['evento' => 'cierre de sesion']
-        );
-
         Auth::logout();
-
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-
-        return redirect()->route('login.auth')->with('success', 'Gracias por usar la App, cuídate.');
+        return redirect('/')->with('success', 'Has cerrado sesión correctamente.');
     }
-
 }

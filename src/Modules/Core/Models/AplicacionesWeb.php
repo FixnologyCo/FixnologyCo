@@ -29,8 +29,8 @@ class AplicacionesWeb extends Model
     }
 
     public function membresia()
-    {
-        return $this->belongsTo(Membresias::class);
-    }
+{
+    return $this->belongsTo(FacturacionMembresias::class, 'membresia_id');
+}
 
 }

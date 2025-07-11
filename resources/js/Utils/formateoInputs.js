@@ -1,9 +1,12 @@
 // ✅ Límites de caracteres para cada campo
 export const limitesCaracteres = {
-  descripcion_app:100,
+  descripcion_app: 100,
   nombre_app: 30,
   primer_nombre: 25,
   primer_apellido: 25,
+  numero_identificacion: 20,
+  password: 30,
+  password_confirm: 30
 
 }
 
