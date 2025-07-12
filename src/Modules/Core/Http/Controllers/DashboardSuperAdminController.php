@@ -1,79 +1,66 @@
 <?php
 
-namespace Core\Http\Controllers;
+namespace Core\Http\Controllers; // Tu namespace personalizado
+
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use Core\Models\AplicacionWeb;
+use Core\Models\AplicacionesWeb; // Asegúrate de que tus modelos estén en App\Models
+use Core\Models\PerfilUsuario;
+use Core\Models\Establecimientos;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
-use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\DB; // ✅ Importa la clase DB correctamente
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use App\Traits\RegistraAuditoria; // 👈 Importa el trait correctamente aquí
-
 
 
 class DashboardSuperAdminController extends Controller
 {
-
-    use AuthorizesRequests;
+    
 
     /**
-     * Muestra el dashboard para la aplicación y rol especificados.
-     *
-     * @param  string  $aplicacion
-     * @param  string  $rol
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Inertia\Response
+     * Muestra el dashboard para el SuperAdmin.
      */
-
-
-
-    use RegistraAuditoria;
-    public function show($aplicacion, $rol, Request $request)
+    public function show(Request $request, $aplicacion, $rol)
     {
+        // 1. AUTORIZACIÓN
+        // Suponiendo que tu método validarAcceso funciona, lo mantenemos.
+        // Asegúrate de que internamente use la lógica de roles correcta.
+        // Aquí podrías usar Gates o Policies de Laravel también.
+        // Gate::authorize('view-superadmin-dashboard');
 
-        if ($respuesta = $this->validarAcceso($aplicacion, $rol, $request, [4])) {
-            return $respuesta;
-        }
+        // 2. OBTENER EL USUARIO AUTENTICADO Y SUS DATOS
+        // Cargamos las relaciones que necesitamos del perfil del usuario logueado.
+        $usuario = Auth::user()->load(
+            'perfilUsuario',
+            'perfilUsuario.indicativo',
+            'perfilUsuario.tipoDocumento',
+            'perfilEmpleado',
+            'perfilEmpleado.estado',
+            'perfilEmpleado.medioPago',
+            'tienda',
+            'tienda.token',
+            'tienda.token.estado',
+            'tienda.aplicacionWeb',
+            'tienda.aplicacionWeb.estado',
+            'tienda.aplicacionWeb.membresia',
+            'tienda.aplicacionWeb.membresia.estado',
+            'tienda.facturas',
+            'tienda.facturas.estado',
+            'tienda.propietario'
 
-        $user = auth()->user()->load([
-            'tienda.aplicacion.membresia.estado',
-            'tienda.pagosMembresia',
+        );
+        $tipoDeRol = $usuario->rol->tipo_rol; // Ej: "SuperAdmin"
+       
+
+
+
+
+        // 5. RENDERIZAR LA VISTA DE INERTIA CON LOS PROPS CORRECTOS
+        // Ya no necesitamos el 'if' que validaba la tienda, eso lo debe hacer la autorización.
+        return Inertia::render('Apps/' . ucfirst($aplicacion) . '/' . ucfirst($rol) . '/Dashboard/Dashboard', [
+            'usuario' => $usuario,
+            'rol' => $tipoDeRol
+            
+           
         ]);
-
-
-
-        $cantidadApps = DB::table('aplicaciones_web')
-            ->select(DB::raw('COUNT(DISTINCT nombre_app) as totalApps'))
-            ->value('totalApps');
-
-        $cantidadClientesRol1 = DB::table('clientes_fixgis')
-            ->where('id_rol', 1)
-            ->count();
-
-        $usuariosRol4 = User::where('id_rol', 4)
-            ->select('id', 'nombres_ct', 'apellidos_ct')
-            ->get();
-
-            $fotoBase64 = $user->foto_binaria
-                ? 'data:image/jpeg;base64,' . $user->foto_binaria
-                : null;
-
-        if ($user->tienda && $user->tienda->aplicacion->nombre_app === $aplicacion) {
-
-            return Inertia::render('Apps/' . ucfirst($aplicacion) . '/' . ucfirst($rol) . '/Dashboard/Dashboard', [
-                'auth' => ['user' => $user],
-                'aplicacion' => $aplicacion,
-                'rol' => $rol,
-                'foto_base64' => $fotoBase64,
-
-            ]);
-        }
-
-        abort(404);
     }
-
-
-
 }

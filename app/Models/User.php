@@ -17,7 +17,7 @@ use Illuminate\Notifications\Notifiable;
 class User extends Authenticatable // El nombre de la clase DEBE ser 'User' para coincidir con 'User.php'
 {
     // Aquí puedes añadir todos los traits que necesites
-    use HasFactory, Notifiable; 
+    use HasFactory, Notifiable;
 
     /**
      * Esta línea es PERFECTA. Le dice a este modelo 'User'
@@ -57,8 +57,7 @@ class User extends Authenticatable // El nombre de la clase DEBE ser 'User' para
     }
 
 
-
-    public function perfilesEmpleado()
+    public function perfilEmpleado()
     {
         return $this->hasMany(PerfilEmpleado::class, 'usuario_id');
     }
@@ -73,8 +72,19 @@ class User extends Authenticatable // El nombre de la clase DEBE ser 'User' para
         return $this->belongsTo(Estados::class, 'estado_id');
     }
 
+  
+
     public function rol()
     {
-        return $this->belongsTo(Roles::class, 'rol_id');
+        return $this->hasOneThrough(
+            Roles::class,           // 1. El modelo final al que queremos llegar.
+            PerfilUsuario::class, // 2. El modelo intermedio que debemos atravesar.
+            'usuario_id',         // 3. La llave foránea en la tabla intermedia (`perfil_usuario`).
+            'id',                 // 4. La llave foránea en la tabla final (`roles`).
+            'id',                 // 5. La llave local en este modelo (`usuarios`).
+            'rol_id'              // 6. La llave local en la tabla intermedia (`perfil_usuario`).
+        );
     }
+
+
 }

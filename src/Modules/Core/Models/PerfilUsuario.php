@@ -2,6 +2,7 @@
 
 namespace Core\Models;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 
 class PerfilUsuario extends Model
@@ -34,7 +35,7 @@ class PerfilUsuario extends Model
 
     public function usuario()
     {
-        return $this->belongsTo(Usuarios::class);
+        return $this->belongsTo(User::class);
     }
 
     public function indicativo()
@@ -45,6 +46,11 @@ class PerfilUsuario extends Model
     public function rol()
     {
         return $this->belongsTo(Roles::class);
+    }
+
+    public function tipoDocumento()
+    {
+        return $this->belongsTo(TipoDocumento::class);
     }
 
 }

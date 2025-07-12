@@ -41,7 +41,7 @@ return new class extends Migration {
                 'establecimiento_id' => '1',
                 'aplicacion_web_id' => '1',
                 'monto_total' => '9200000',
-                'estado_id' => '8',
+                'estado_id' => '18',
                 'dias_restantes' => '999999',
                 'fecha_pago' => now(),
                 'created_at' => now(),

@@ -30,7 +30,7 @@ class AplicacionesWeb extends Model
 
     public function membresia()
 {
-    return $this->belongsTo(FacturacionMembresias::class, 'membresia_id');
+    return $this->belongsTo(Membresias::class, 'membresia_id');
 }
 
 }

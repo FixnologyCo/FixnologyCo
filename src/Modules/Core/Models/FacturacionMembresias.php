@@ -2,6 +2,7 @@
 
 namespace Core\Models;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 
 class FacturacionMembresias extends Model
@@ -22,7 +23,7 @@ class FacturacionMembresias extends Model
 
     public function cliente()
     {
-        return $this->belongsTo(Usuarios::class, 'cliente_id');
+        return $this->belongsTo(User::class, 'cliente_id');
     }
 
     public function establecimiento()

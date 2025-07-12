@@ -34,7 +34,7 @@ const props = defineProps({
   }
 })
 
-const user = props.auth.user
+const usuario = props.auth
 const auth = usePage().props.auth;
 
 const nombreDia = ref('');
@@ -102,18 +102,21 @@ if (fecha.getHours() < 12) {
 
 <template>
 
-  <Head :title="`Bienvenido ${user.nombres_ct || 'Dashboard'}`" />
+  <Head :title="`Bienvenido  || 'Dashboard'}`" />
   <MensajesLayout />
 
-  <div class="flex">
+
+<pre class="text-mono-blanco">{{ usuario }}</pre>
+  <!-- <div class="flex">
     <SidebarSuperAdmin :auth="auth" />
+
 
     <div class="w-full">
       <Header :auth="auth" :foto_base64="foto_base64" />
 
       <div class="contenido p-3">
         <div class="" >
-          <p class="text-[20px] text-mono-negro dark:text-mono-blanco">{{ saludo }}, {{ user.nombres_ct }}</p>
+          <p class="text-[20px] text-mono-negro dark:text-mono-blanco">{{ saludo }}, {{ usuario.nombres_ct }}</p>
           <p class="text-[14px] -mt-[5px] text-mono-negro dark:text-mono-blanco">{{ nombreDia }} {{ dia }} de {{ mes }} {{ anio }}, {{ hora }}</p>
         </div>
 
@@ -121,5 +124,5 @@ if (fecha.getHours() < 12) {
 
       </div>
     </div>
-  </div>
+  </div> -->
 </template>

@@ -14,9 +14,9 @@ const props = defineProps({
 
 const page = usePage();
 
-const aplicacion = props.auth?.user?.tienda?.aplicacion?.nombre_app || "Sin app";
-const nombre_tienda = props.auth?.user?.tienda?.nombre_tienda || "Sin tienda";
-const rol = props.auth.user.rol?.tipo_rol || "Sin rol"; // Obtén el tipo de rol
+const aplicacion = props.auth?.usuario?.establecimiento?.aplicacionWeb?.nombre_app || "Sin app";
+const nombre_tienda = props.auth?.usuario?.establecimiento?.nombre_tienda || "Sin tienda";
+const rol = props.auth.usuario.rol?.tipo_rol || "Sin rol"; // Obtén el tipo de rol
 
 // Normaliza las rutas para que la comparación funcione
 const currentRoute = computed(() => new URL(page.url, window.location.origin).pathname);
