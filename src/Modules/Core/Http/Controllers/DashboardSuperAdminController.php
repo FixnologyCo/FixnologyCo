@@ -27,6 +27,7 @@ class  DashboardSuperAdminController extends Controller
             'perfilUsuario',
             'perfilUsuario.indicativo',
             'perfilUsuario.tipoDocumento',
+            'perfilUsuario.estado',
             'perfilEmpleado',
             'perfilEmpleado.estado',
             'perfilEmpleado.medioPago',
@@ -39,6 +40,7 @@ class  DashboardSuperAdminController extends Controller
             'tienda.aplicacionWeb.membresia.estado',
             'tienda.facturas',
             'tienda.facturas.estado',
+            'tienda.facturas.medioPago',
             'tienda.propietario'
 
         );

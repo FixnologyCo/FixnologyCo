@@ -11,7 +11,9 @@ import { useAuthStore } from "@/stores/auth";
 const authStore = useAuthStore();
 defineOptions({
   layout: AuthenticatedLayout,
+  inheritAttrs: false
 });
+
 
 const {
   appName,
@@ -130,10 +132,8 @@ const logout = () => {
         <button @click="logout" class="" :class="[buttonSecundario]">
           <p>Cerrar sesión</p>
         </button>
-        <hr />
-        <br />
-
-        <pre class="text-mono-blanco">{{ authStore }}</pre>
+       
+     
       </div>
     </div>
   </div>

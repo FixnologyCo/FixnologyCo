@@ -59,7 +59,7 @@ class User extends Authenticatable // El nombre de la clase DEBE ser 'User' para
 
     public function perfilEmpleado()
     {
-        return $this->hasMany(PerfilEmpleado::class, 'usuario_id');
+        return $this->hasOne(PerfilEmpleado::class, 'usuario_id');
     }
 
     public function tienda()

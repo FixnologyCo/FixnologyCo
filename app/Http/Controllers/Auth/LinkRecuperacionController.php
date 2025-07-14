@@ -23,7 +23,7 @@ class LinkRecuperacionController extends Controller
     public function LinkRecuperacion(Request $request)
     {
         $request->validate([
-            'correo_vinculado' => 'required|email|exists:clientes_fixgis,email_ct',
+            'correo_vinculado' => 'required|email|exists:usuario,email_ct',
         ], [
             'correo_vinculado.exists' => 'Verifica, ese usuario no existe.',
             'correo_vinculado.required' => 'El correo es requerido.',
