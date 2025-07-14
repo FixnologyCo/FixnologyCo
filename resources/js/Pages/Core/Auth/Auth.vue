@@ -77,9 +77,13 @@ const { modoOscuro, animando, animarCambioTema } = useTema();
           ></span>
         </button>
 
-        <button class="dark:bg-mono-blanco py-4 px-6 rounded-full shadowM font-semibold">
-          <a :href="route('register.auth')" class="">Registrarme</a>
-        </button>
+        <a :href="route('register.auth')" class="">
+          <button
+            class="dark:bg-mono-blanco py-4 px-6 rounded-full shadowM font-semibold"
+          >
+            Registrarme
+          </button>
+        </a>
       </div>
     </header>
 

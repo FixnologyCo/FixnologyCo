@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use Core\Models\PerfilUsuario;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -23,14 +24,14 @@ class LinkRecuperacionController extends Controller
     public function LinkRecuperacion(Request $request)
     {
         $request->validate([
-            'correo_vinculado' => 'required|email|exists:usuario,email_ct',
+            'correo_vinculado' => 'required|email|exists:perfil_usuario,correo',
         ], [
             'correo_vinculado.exists' => 'Verifica, ese usuario no existe.',
             'correo_vinculado.required' => 'El correo es requerido.',
         ]);
 
         $correo = $request->correo_vinculado;
-        $cliente = User::where('email_ct', $correo)->first();
+        $cliente = PerfilUsuario::where('correo', $correo)->first();
         
 
         if (!$cliente) {
@@ -42,44 +43,44 @@ class LinkRecuperacionController extends Controller
         $token = Str::random(64);
 
         DB::table('password_reset_table')->updateOrInsert(
-            ['email' => $correo],
+            ['correo' => $correo],
             [
                 'token' => $token,
                 'created_at' => Carbon::now(),
             ]
         );
 
-        Mail::to($correo)->send(new RecuperarPassword($token, $correo, $cliente->nombres_ct));
+        Mail::to($correo)->send(new RecuperarPassword($token, $correo, $cliente));
 
 
-        return redirect()->back()->with('success', 'Se ha enviado el enlace a tu correo.');
+        return redirect()->back()->with('success', $cliente->primer_nombre .', se ha enviado el enlace a tu correo.'  );
     }
 
     public function showResetForm($token, Request $request)
     {
-        $email = $request->query('email');
+        $email = $request->query('correo');
 
         return Inertia::render('Core/Auth/ResetPassword', [
             'token' => $token,
-            'email' => $email,
+            'correo' => $email,
         ]);
     }
 
     public function reset(Request $request)
     {
         $request->validate([
-            'email' => 'required|email|exists:clientes_fixgis,email_ct',
+            'correo' => 'required|email|exists:perfil_usuario,correo',
             'password' => 'required|string|min:6|confirmed',
             'token' => 'required'
         ], [
-            'email.exists' => 'Este correo no está registrado.',
+            'correo.exists' => 'Este correo no está registrado.',
             'password.confirmed' => 'Las contraseñas no coinciden.',
             'password.required' => 'La contraseña no puede quedar vacia.',
             'password.min' => 'La contraseña debe tener al menos 6 caracteres.',
         ]);
 
         $resetRecord = DB::table('password_reset_table')
-            ->where('email', $request->email)
+            ->where('correo', $request->email)
             ->where('token', $request->token)
             ->first();
 
@@ -87,19 +88,20 @@ class LinkRecuperacionController extends Controller
             return redirect()->back()->withErrors(['email' => 'Token inválido o expirado.']);
         }
 
-        $cliente = User::where('email_ct', $request->email)->first();
+        $cliente = PerfilUsuario::where('correo', $request->email)->first();
+        $usuario = User::first();
 
         if (!$cliente) {
             return redirect()->back()->withErrors(['email' => 'Cliente no encontrado.']);
         }
 
         // Actualizamos la contraseña
-        $cliente->contrasenia_ct = Hash::make($request->password);
-        $cliente->save();
+        $usuario->password = Hash::make($request->password);
+        $usuario->save();
 
 
         // Actualizamos la contraseña
-        $cliente->contrasenia_ct = Hash::make($request->password);
+        $cliente->password = Hash::make($request->password);
         $cliente->save();
 
         // Borramos el token de recuperación

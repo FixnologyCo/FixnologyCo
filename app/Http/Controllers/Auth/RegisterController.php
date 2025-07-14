@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use Carbon\Carbon;
 use Core\Models\Establecimientos;
 use Core\Models\FacturacionMembresias;
+use Core\Models\PerfilUsuario;
 use Core\Models\TokensAcceso;
 use Core\Models\TipoDocumento;
 use Core\Models\AplicacionesWeb;
@@ -19,105 +21,82 @@ class RegisterController extends Controller
     // ✅ Mostrar formulario de registro
     public function show()
     {
-        $tipoDocumentos = TipoDocumento::all();
-        $aplicaciones = AplicacionesWeb::where('id_membresia', 1)
-            ->select('id', 'nombre_app')
-            ->get();
+
 
         return Inertia::render('Core/Auth/Registro', [
-            'tiposDocumento' => $tipoDocumentos,
-            'aplicaciones' => $aplicaciones
+
         ]);
     }
 
     // ✅ Lógica de registro
     public function register(Request $request)
     {
-        $request->merge([
-            'id_aplicacion' => $request->id_aplicacion ? (int) $request->id_aplicacion : null
-        ]);
+
         // ✅ Validación de datos
         $request->validate([
-            'nombres_ct' => 'required|string|max:25',
-            'apellidos_ct' => 'required|string|max:25',
-            'id_tipo_documento' => 'required|integer|exists:tipo_documentos,id',
-            'numero_documento_ct' => 'required|string|max:15|unique:clientes_fixgis,numero_documento_ct',
-            'email_ct' => 'required|string|email|max:60|unique:clientes_fixgis,email_ct',
-            'telefono_ct' => 'required|string|max:10|min:10|unique:clientes_fixgis,telefono_ct',
-            'contrasenia_ct' => 'required|string|min:6|confirmed',
-            'id_aplicacion' => 'required|nullable|integer|exists:aplicaciones_web,id',
+            'primer_nombre' => 'required|string|max:25',
+            'primer_apellido' => 'required|string|max:25',
+            'numero_documento' => 'required|string|max:15|unique:usuarios,numero_documento',
+            'password' => 'required|string|min:4',
+
 
         ], [
-            'nombres_ct.required' => 'Los nombres son requeridos.',
-            'apellidos_ct.required' => 'Los apellidos son requeridos.',
-            'id_tipo_documento.required' => 'El tipo de documento es requerido.',
-            'numero_documento_ct.required' => 'El número de documento es requerido.',
-            'numero_documento_ct.unique' => 'Oh, oh. Este documento ya existe',
-            'email_ct.required' => 'El email es requerido.',
-            'email_ct.unique' => 'Oh, oh, este correo ya se encuentra vinculado.',
-            'telefono_ct.required' => 'El teléfono es requerido.',
-            'telefono_ct.max' => 'El teléfono debe ser de maximo 10 digitos.',
-            'telefono_ct.min' => 'El teléfono debe ser de minimo 10 digitos.',
-            'telefono_ct.unique' => 'Oh, oh, este telefono ya se encuentra vinculado.',
-            'contrasenia_ct.required' => 'La contraseña es requerida.',
-            'contrasenia_ct.min' => 'La contraseña debe ser minimo de 6 caracteres.',
-            'contrasenia_ct.confirmed' => 'Las contraseñas no coinciden.',
-            'id_aplicacion.required' => 'La app de interés es requerida.',
-            'id_aplicacion.exists' => 'La app seleccionada no es válida.',
+            'primer_nombre.required' => 'El nombre es requeridos.',
+            'primer_apellido.required' => 'El apellido es requeridos.',
+            'numero_documento.required' => 'El número de documento es requerido.',
+            'numero_documento.unique' => 'Oh, oh. Este documento ya existe',
+            'password.required' => 'La contraseña es requerida.',
+            'password.min' => 'La contraseña debe ser minimo de 4 caracteres.',
+            'password.confirmed' => 'Las contraseñas no coinciden.',
+
         ]);
 
         // ✅ Crear cliente
-        $cliente = User::create([
-            'nombres_ct' => $request->nombres_ct,
-            'apellidos_ct' => $request->apellidos_ct,
-            'id_tipo_documento' => $request->id_tipo_documento,
-            'numero_documento_ct' => $request->numero_documento_ct,
-            'email_ct' => $request->email_ct,
-            'telefono_ct' => $request->telefono_ct,
-            'contrasenia_ct' => Hash::make($request->contrasenia_ct),
-            'id_estado' => 1,
-            'id_rol' => 1,
+        $usuario = User::create([
+            'numero_documento' => $request->numero_documento,
+            'password' => Hash::make($request->password),
+            'estado_id' => 1,
+            'created_at' => now(),
+            'updated_at' => now(),
         ]);
 
-        // ✅ Crear tienda vinculada al cliente
-        $tienda = Establecimientos::create([
-            'id_estado' => 1,
-            'id_aplicacion_web' => $request->id_aplicacion,
-            'nombre_tienda' => 'Tienda de ' . $cliente->nombres_ct,
-            'email_tienda' => $cliente->email_ct,
-            'telefono_tienda' => $cliente->telefono_ct,
-            'direccion_tienda' => 'Dirección por defecto',
-            'barrio_tienda' => 'Barrio por defecto',
+        $perfil_usuario = PerfilUsuario::create([
+            'primer_nombre' => $request->primer_nombre,
+            'primer_apellido' => $request->primer_apellido,
+            'usuario_id' => $usuario->id
         ]);
 
-        // ✅ Asignar la tienda creada al cliente
-        $cliente->update(['id_tienda' => $tienda->id]);
+        $establecimiento = Establecimientos::create([
+            'estado_id' => 1,
+            'aplicacion_web_id' => 1,
+            'propietario_id' => $usuario->id,
+            'nombre_establecimiento' => 'Tienda de ' . $perfil_usuario->primer_nombre,
+            'ruta_foto_establecimiento' => 'https://imgmedia.larepublica.pe/640x959/larepublica/original/2025/01/07/677d743f33031862432cca4d.webp'
 
-        // ✅ Crear token automáticamente
+        ]);
+
+        $usuario->update(['id_propietario' => $establecimiento->id]);
+
         $token = TokensAcceso::create([
-            'id_cliente_ct' => $cliente->id,
-            'id_estado' => 2, 
+            'estado_id' => 2,
             'token_activacion' => Str::uuid(),
-            'id_tienda_sistematizada' => $tienda->id,
+            'establecimiento_id' => $establecimiento->id,
         ]);
 
         // ✅ Actualizar el id_token en la tienda para que quede vinculado
-        $tienda->update(['id_token' => $token->id]);
-        $montoTotal = AplicacionesWeb::where('id', $request->id_aplicacion)
-            ->with('membresia')
-            ->first()
-            ->membresia
-            ->precio;
+        $establecimiento->update(['token_id' => $token->id]);
 
-        // ✅ Crear registro de pago de membresía
-        // ✅ Registrar el pago en la tabla `pagos_membresia`
         FacturacionMembresias::create([
-            'id_cliente' => $cliente->id,
-            'id_tienda' => $tienda->id,
-            'id_medio_pago' => 1, //
-            'id_estado' => 8, // 
-            'monto_total' => $montoTotal,
-            'fecha_pago' => now(),
+            'cliente_id' => $usuario->id,
+            'establecimiento_id' => $establecimiento->id,
+            'aplicacion_id' => $establecimiento->aplicacion_web_id,
+            'estado_id' => 16,
+            'medio_pago_id' => 8,
+            'monto_total' => 50000,
+            'dias_restantes' => 5,
+            'created_at' => now(),
+            'updated_at' => now(),
+
         ]);
 
         // ✅ Guarda el mensaje en la sesión y redirige a login con Inertia
