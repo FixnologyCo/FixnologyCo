@@ -101,7 +101,7 @@ class LoginController extends Controller
 
             // Pasamos las variables a la ruta del dashboard
             return redirect()->route('aplicacion.dashboard', [
-                'aplicacionWeb' => $nombreAplicacion,
+                'aplicacion' => $nombreAplicacion,
                 'rol' => $rol,
             ])->with('success', '¡Bienvenido nuevamente, '. $nombreCompletoUsuario. '!');
         }
@@ -117,6 +117,6 @@ class LoginController extends Controller
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        return redirect('/')->with('success', 'Has cerrado sesión correctamente.');
+        return redirect()->route('login.auth')->with('success',  'Has cerrado sesión correctamente.');
     }
 }

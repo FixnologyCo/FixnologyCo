@@ -1,5 +1,5 @@
 <script setup>
-import { Head, usePage } from '@inertiajs/vue3';
+import { Head, usePage , router} from '@inertiajs/vue3';
 import { ref, onMounted, onUnmounted, computed } from 'vue';
 import 'dayjs/locale/es';
 import Header from '@/Components/header/Header.vue';
@@ -9,7 +9,7 @@ import MensajesLayout from '@/Layouts/MensajesLayout.vue';
 import { useTema } from '@/Composables/useTema';
 const { modoOscuro } = useTema();
 
-const { appName, bgClase, bgOpacity, textoClase, buttonFocus } = Colors();
+const { appName, bgClase, bgOpacity, textoClase, buttonFocus , buttonSecundario} = Colors();
 
 const props = defineProps({
   auth: {
@@ -34,7 +34,6 @@ const props = defineProps({
   }
 })
 
-const usuario = props.auth
 
 
 const nombreDia = ref('');
@@ -97,8 +96,17 @@ if (fecha.getHours() < 12) {
 } else {
   saludo.value = "¡Buenas noches!";
 }
+
+const usuario = props.auth
 const nombreCompleto = usuario?.user?.perfil_usuario?.primer_nombre
 const usuarioAuth = usuario?.user?.perfil_usuario
+
+const logout = () => {
+  router.visit(route('logout'), {
+    method: 'post',
+    preserveScroll: true,
+  });
+};
 </script>
 
 <template>
@@ -119,6 +127,10 @@ const usuarioAuth = usuario?.user?.perfil_usuario
           <p class="text-[14px] -mt-[5px] text-mono-negro dark:text-mono-blanco">{{ nombreDia }} {{ dia }} de {{ mes }} {{ anio }}, {{ hora }}</p>
         </div>
 <br>
+ <button @click="logout"
+                    class="" :class="[buttonSecundario]">
+                    <p >Cerrar sesión</p>
+                  </button>
 <hr>
 <br>
         <p class="text-mono-blanco">Pruebas</p>
