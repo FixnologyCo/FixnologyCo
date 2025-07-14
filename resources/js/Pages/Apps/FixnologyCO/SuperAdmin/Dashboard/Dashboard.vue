@@ -1,58 +1,60 @@
 <script setup>
-import { Head, usePage , router} from '@inertiajs/vue3';
-import { ref, onMounted, onUnmounted, computed } from 'vue';
-import 'dayjs/locale/es';
-import Header from '@/Components/header/Header.vue';
-import SidebarSuperAdmin from '@/Components/Sidebar/FixnologyCO/Sidebar.vue'
-import Colors from '@/Composables/ModularColores';
-import MensajesLayout from '@/Layouts/MensajesLayout.vue';
-import { useTema } from '@/Composables/useTema';
-const { modoOscuro } = useTema();
+import { Head, usePage, router } from "@inertiajs/vue3";
+import { ref, onMounted, onUnmounted, computed } from "vue";
+import "dayjs/locale/es";
+import Header from "@/Components/header/Header.vue";
+import SidebarSuperAdmin from "@/Components/Sidebar/FixnologyCO/Sidebar.vue";
+import Colors from "@/Composables/ModularColores";
+import MensajesLayout from "@/Layouts/MensajesLayout.vue";
+import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
+import { useAuthStore } from "@/stores/auth";
+const authStore = useAuthStore();
+defineOptions({
+  layout: AuthenticatedLayout,
+});
 
-const { appName, bgClase, bgOpacity, textoClase, buttonFocus , buttonSecundario} = Colors();
+const {
+  appName,
+  bgClase,
+  bgOpacity,
+  textoClase,
+  buttonFocus,
+  buttonSecundario,
+} = Colors();
 
-const props = defineProps({
-  auth: {
-    type: Object,
-    required: true
-  },
-  clientes: {
-    type: Array,
-    default: () => [],
-  },
-  aplicacion: {
-    type: String,
-    default: ''
-  },
-  errors: {
-    type: Object,
-    required: true
-  },
-  foto_base64: {
-    type: String,
-    default: ''
-  }
-})
-
-
-
-const nombreDia = ref('');
-const dia = ref('');
-const mes = ref('');
-const anio = ref('');
-const hora = ref('');
-const saludo = ref('');
+const nombreDia = ref("");
+const dia = ref("");
+const mes = ref("");
+const anio = ref("");
+const hora = ref("");
+const saludo = ref("");
 
 function actualizarFechaHora() {
   const fecha = new Date();
   dia.value = fecha.getDate();
 
   const nombreDias = [
-    "Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"
+    "Domingo",
+    "Lunes",
+    "Martes",
+    "Miércoles",
+    "Jueves",
+    "Viernes",
+    "Sábado",
   ];
   const monthNamesClock = [
-    "enero", "febrero", "marzo", "abril", "mayo", "junio",
-    "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"
+    "enero",
+    "febrero",
+    "marzo",
+    "abril",
+    "mayo",
+    "junio",
+    "julio",
+    "agosto",
+    "septiembre",
+    "octubre",
+    "noviembre",
+    "diciembre",
   ];
   mes.value = monthNamesClock[fecha.getMonth()];
   nombreDia.value = nombreDias[fecha.getDay()];
@@ -97,57 +99,42 @@ if (fecha.getHours() < 12) {
   saludo.value = "¡Buenas noches!";
 }
 
-const usuario = props.auth
-const nombreCompleto = usuario?.user?.perfil_usuario?.primer_nombre
-const usuarioAuth = usuario?.user?.perfil_usuario
-
 const logout = () => {
-  router.visit(route('logout'), {
-    method: 'post',
+  router.visit(route("logout"), {
+    method: "post",
     preserveScroll: true,
   });
 };
 </script>
 
 <template>
-
-  <Head :title="`Bienvenido ${nombreCompleto}` || 'Dashboard'"  />
+  <Head :title="`Bienvenido ${authStore.nombreCompleto} ` || 'Dashboard'" />
   <MensajesLayout />
 
-    <div class="flex">
-    <SidebarSuperAdmin :auth="auth" />
-
+  <div class="flex">
+    <SidebarSuperAdmin :auth="authStore" />
 
     <div class="w-full">
-      <Header :auth="auth" :foto_base64="foto_base64" />
+      <Header :auth="authStore" />
 
       <div class="contenido p-3">
-        <div class="" >
-          <p class="text-[20px] text-mono-negro dark:text-mono-blanco">{{ saludo }}, {{ usuarioAuth.primer_nombre }} {{ usuarioAuth.primer_apellido }}</p>
-          <p class="text-[14px] -mt-[5px] text-mono-negro dark:text-mono-blanco">{{ nombreDia }} {{ dia }} de {{ mes }} {{ anio }}, {{ hora }}</p>
+        <div class="">
+          <p class="text-[20px] text-mono-negro dark:text-mono-blanco">
+            {{ saludo }}, {{ authStore.nombreCompleto }}
+          </p>
+          <p class="text-[14px] -mt-[5px] text-mono-negro dark:text-mono-blanco">
+            {{ nombreDia }} {{ dia }} de {{ mes }} {{ anio }}, {{ hora }}
+          </p>
         </div>
-<br>
- <button @click="logout"
-                    class="" :class="[buttonSecundario]">
-                    <p >Cerrar sesión</p>
-                  </button>
-<hr>
-<br>
-        <p class="text-mono-blanco">Pruebas</p>
-        <h1 class="text-mono-blanco text-[20px]">Datos del perfil usuario</h1>
-        <h1 class="text-mono-blanco text-[20px]">Datos de la tienda</h1>
-        <h1 class="text-mono-blanco text-[20px]">Datos del token</h1>
-        <h1 class="text-mono-blanco text-[20px]">Datos de la app</h1>
-        <h1 class="text-mono-blanco text-[20px]">Datos de la membresia</h1>
-          <pre class="text-mono-blanco">membresia: {{ usuario.user.tienda[0].aplicacion_web.membresia.nombre_membresia }}</pre>
-        <h1 class="text-mono-blanco text-[20px]">Datos de facturacion</h1>
-        <h1 class="text-mono-blanco text-[20px]">Datos del perfil empleado</h1>
+        <br />
+        <button @click="logout" class="" :class="[buttonSecundario]">
+          <p>Cerrar sesión</p>
+        </button>
+        <hr />
+        <br />
 
-
-        <pre class="text-mono-blanco">{{ usuario }}</pre> 
-
-
+        <pre class="text-mono-blanco">{{ authStore }}</pre>
       </div>
     </div>
-  </div> 
+  </div>
 </template>

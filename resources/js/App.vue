@@ -1,29 +1,31 @@
 <template>
-    <div>
-      <notifications />
-      <slot />
-    </div>
-  </template>
-  
-  <script>
-  import Notifications from './Components/DeteccionInternet/Notifications.vue';
-  
-  export default {
-    components: {
-      Notifications, 
-    }
-  }
-  </script>
+  <div>
+    <notifications />
+    <slot />
+  </div>
+</template>
 
-  <script setup>
+<script>
+import Notifications from "./Components/DeteccionInternet/Notifications.vue";
+
+export default {
+  components: {
+    Notifications,
+  },
+};
+</script>
+
+<script setup>
 import { onMounted } from 'vue'
-import { useTema } from '@/Composables/useTema'
+
+import { useTema } from '@/Composables/useTema';
+
 
 const { detectarTemaInicial, escucharCambiosSistema } = useTema()
 
 onMounted(() => {
-  detectarTemaInicial()
-  escucharCambiosSistema()
+  detectarTemaInicial();
+  escucharCambiosSistema();
 })
 });
-  </script>
+</script>

@@ -4,26 +4,20 @@ import { usePage } from "@inertiajs/vue3";
 import { route } from "ziggy-js";
 import Colors from "@/Composables/ModularColores";
 import { useSidebar } from "@/Composables/useSidebar";
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import { useAuthStore } from "@/stores/auth"; 
+const authStore = useAuthStore();
+defineOptions({
+  layout: AuthenticatedLayout
+});
 
 const { sidebarExpandido, toggleSidebar } = useSidebar();
 const { NombreApp, bgClase, bgOpacity, textoClase, focus, buttonLink, hover } = Colors();
 
-const props = defineProps({
-  auth: Object,
-});
-
 const page = usePage();
 
-const usuario = props.auth
-const usuarioAuth = usuario?.user?.perfil_usuario
-
-const rolUsuario = usuario.user.rol.tipo_rol 
-const aplicacionUsuario = usuario.user.tienda[0].aplicacion_web.nombre_app
-const nombreTiendaUsuario = usuario.user.tienda[0].nombre_establecimiento 
-
-const aplicacion = aplicacionUsuario || "Sin app";
-const nombre_tienda = nombreTiendaUsuario || "Sin tienda";
-const rol = rolUsuario  || "Sin rol";
+const aplicacion = authStore.aplicacion || "Sin app";
+const rol = authStore.rol  || "Sin rol";
 
 // Normaliza las rutas para que la comparación funcione
 const currentRoute = computed(() => new URL(page.url, window.location.origin).pathname);
@@ -72,11 +66,11 @@ const dashboardRoute = computed(
 // const generadorQrsRoute = computed(() => new URL(route('aplicacion.generadorQrs', { aplicacion, rol }), window.location.origin).pathname);
 // const ordenTrabajoRoute = computed(() => new URL(route('aplicacion.ordenTrabajos', { aplicacion, rol }), window.location.origin).pathname);
 // const resenasRoute = computed(() => new URL(route('aplicacion.resenas', { aplicacion, rol }), window.location.origin).pathname);
-const diasRestantes = computed(
-  () => props.auth.user?.tienda?.pagos_membresia?.dias_restantes ?? "sin días"
-);
+
+
+
 const inicialesNombreTienda = computed(() => {
-  const nombreTienda = nombreTiendaUsuario || "";
+  const nombreTienda = authStore.nombreTienda || "";
 
   const inicialTienda = nombreTienda.split(" ")[0]?.charAt(0).toUpperCase() || "";
   return inicialTienda;
@@ -99,7 +93,7 @@ const inicialesNombreTienda = computed(() => {
             </span>
           </div>
           <div class="logo">
-            <h1 class="font-semibold text-[14px]">{{ nombreTiendaUsuario }}</h1>
+            <h1 class="font-semibold text-[14px]">{{ authStore.aplicacion }}</h1>
           </div>
         </div>
 
@@ -116,8 +110,8 @@ const inicialesNombreTienda = computed(() => {
           :class="[bgClase]"
         ></div>
         <div v-if="sidebarExpandido" class="nombreApp">
-          <h2 class="text-[14px]">{{ nombreTiendaUsuario }}</h2>
-          <p class="text-[12px] -mt-[3px]">{{ diasRestantes }} días restantes</p>
+          <h2 class="text-[14px]">{{ authStore.nombreTienda }}</h2>
+          <p class="text-[12px] -mt-[3px]">{{ authStore.membresia }}</p>
         </div>
       </div>
 

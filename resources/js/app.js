@@ -5,11 +5,12 @@ import { InertiaProgress } from '@inertiajs/progress';
 
 import { ZiggyVue } from 'ziggy-js';
 import { Ziggy } from './ziggy';
+import { createPinia } from 'pinia';
 
 import Notifications from './Components/DeteccionInternet/Notifications.vue';
 
 const pages = import.meta.glob('./Pages/**/*.vue');
-
+const pinia = createPinia();
 
 const resolvePageComponent = (name) => {
     const path = `./Pages/${name}.vue`;
@@ -20,7 +21,7 @@ const resolvePageComponent = (name) => {
 };
 
 createInertiaApp({
-    title: (title) => `${title} | Fixnology CO`,
+    title: (title) => `${title} | FixnologyCO`,
     resolve: (name) => resolvePageComponent(name),
     setup({ el, App, props, plugin }) {
         const app = createApp({
@@ -30,7 +31,7 @@ createInertiaApp({
             ])
         });
 
-        app.use(plugin).use(ZiggyVue, Ziggy);
+        app.use(plugin).use(ZiggyVue, Ziggy).use(pinia);
 
         app.config.globalProperties.$notify = (type) => {
             window.dispatchEvent(new CustomEvent('show-notification', { detail: type }));
