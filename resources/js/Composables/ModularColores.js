@@ -52,9 +52,10 @@ export default function useAppColors() {
         'FixnologyCO': 'hover:bg-universal-naranja hover:text-mono-blanco hover:shadow-universal-naranja',
     }
 
-const appName = computed(() =>
-    auth?.user?.tienda?.aplicacion?.nombre_app || 'default'
-);
+const appName = computed(() => {
+    return auth?.user?.tienda[0]?.aplicacion_web?.nombre_app || 'default'
+    
+});
 
 const colorFondo = computed(() => {
   return auth?.user?.tienda?.aplicacion?.color_fondo || '#CCCCCC'; // color por defecto si no hay

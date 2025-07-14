@@ -14,9 +14,16 @@ const props = defineProps({
 
 const page = usePage();
 
-const aplicacion = props.auth?.usuario?.establecimiento?.aplicacionWeb?.nombre_app || "Sin app";
-const nombre_tienda = props.auth?.usuario?.establecimiento?.nombre_tienda || "Sin tienda";
-const rol = props.auth.usuario.rol?.tipo_rol || "Sin rol"; // Obtén el tipo de rol
+const usuario = props.auth
+const usuarioAuth = usuario?.user?.perfil_usuario
+
+const rolUsuario = usuario.user.rol.tipo_rol 
+const aplicacionUsuario = usuario.user.tienda[0].aplicacion_web.nombre_app
+const nombreTiendaUsuario = usuario.user.tienda[0].nombre_establecimiento 
+
+const aplicacion = aplicacionUsuario || "Sin app";
+const nombre_tienda = nombreTiendaUsuario || "Sin tienda";
+const rol = rolUsuario  || "Sin rol";
 
 // Normaliza las rutas para que la comparación funcione
 const currentRoute = computed(() => new URL(page.url, window.location.origin).pathname);
@@ -25,32 +32,32 @@ const dashboardRoute = computed(
     new URL(route("aplicacion.dashboard", { aplicacion, rol }), window.location.origin)
       .pathname
 );
-const aplicacionesFixRoute = computed(
-  () =>
-    new URL(
-      route("aplicacion.misAplicaciones", { aplicacion, rol }),
-      window.location.origin
-    ).pathname
-);
-const clientesFixRoute = computed(
-  () =>
-    new URL(route("aplicacion.clientesFix", { aplicacion, rol }), window.location.origin)
-      .pathname
-);
-const configuracionesRoute = computed(
-  () =>
-    new URL(
-      route("aplicacion.configuraciones", { aplicacion, rol }),
-      window.location.origin
-    ).pathname
-);
-const usuariosRoute = computed(
-  () =>
-    new URL(
-      route("aplicacion.GestorUsuarios", { aplicacion, rol }),
-      window.location.origin
-    ).pathname
-);
+// const aplicacionesFixRoute = computed(
+//   () =>
+//     new URL(
+//       route("aplicacion.misAplicaciones", { aplicacion, rol }),
+//       window.location.origin
+//     ).pathname
+// );
+// const clientesFixRoute = computed(
+//   () =>
+//     new URL(route("aplicacion.clientesFix", { aplicacion, rol }), window.location.origin)
+//       .pathname
+// );
+// const configuracionesRoute = computed(
+//   () =>
+//     new URL(
+//       route("aplicacion.configuraciones", { aplicacion, rol }),
+//       window.location.origin
+//     ).pathname
+// );
+// const usuariosRoute = computed(
+//   () =>
+//     new URL(
+//       route("aplicacion.GestorUsuarios", { aplicacion, rol }),
+//       window.location.origin
+//     ).pathname
+// );
 // const multisucursalRoute = computed(() => new URL(route('aplicacion.multisucursales', { aplicacion, rol }), window.location.origin).pathname);
 // const overviewRoute = computed(() => new URL(route('aplicacion.overviews', { aplicacion, rol }), window.location.origin).pathname);
 // const gastosRoute = computed(() => new URL(route('aplicacion.gastos', { aplicacion, rol }), window.location.origin).pathname);
@@ -69,7 +76,7 @@ const diasRestantes = computed(
   () => props.auth.user?.tienda?.pagos_membresia?.dias_restantes ?? "sin días"
 );
 const inicialesNombreTienda = computed(() => {
-  const nombreTienda = props.auth.user?.tienda?.nombre_tienda || "";
+  const nombreTienda = nombreTiendaUsuario || "";
 
   const inicialTienda = nombreTienda.split(" ")[0]?.charAt(0).toUpperCase() || "";
   return inicialTienda;
@@ -79,7 +86,7 @@ const inicialesNombreTienda = computed(() => {
 <template>
   <div
     :class="[sidebarExpandido ? 'w-[20%]' : 'w-[58px]']"
-    class="min-h-[100vh] bg-secundary-default dark:bg-secundary-opacity text-mono-blanco p-3 transition-all duration-300 relative"
+    class="min-h-[100vh] bg-bg-empty dark:bg-secundary-opacity text-mono-blanco p-3 transition-all duration-300 relative"
   >
     <aside class="relative h-full">
       <div class="infoTienda flex items-center justify-between gap-2 px-2">
@@ -92,7 +99,7 @@ const inicialesNombreTienda = computed(() => {
             </span>
           </div>
           <div class="logo">
-            <h1 class="font-semibold text-[14px]">FixnologyCO</h1>
+            <h1 class="font-semibold text-[14px]">{{ nombreTiendaUsuario }}</h1>
           </div>
         </div>
 
@@ -109,7 +116,7 @@ const inicialesNombreTienda = computed(() => {
           :class="[bgClase]"
         ></div>
         <div v-if="sidebarExpandido" class="nombreApp">
-          <h2 class="text-[14px]">{{ nombre_tienda }}</h2>
+          <h2 class="text-[14px]">{{ nombreTiendaUsuario }}</h2>
           <p class="text-[12px] -mt-[3px]">{{ diasRestantes }} días restantes</p>
         </div>
       </div>
@@ -146,7 +153,7 @@ const inicialesNombreTienda = computed(() => {
             Gestión
           </p>
 
-          <li
+          <!-- <li
             :class="[
               currentRoute === aplicacionesFixRoute ? [bgOpacity] : 'bg-transparent',
             ]"
@@ -189,7 +196,7 @@ const inicialesNombreTienda = computed(() => {
                 <div :class="[currentRoute === usuariosRoute ? focus : hover]"></div>
               </span>
             </a>
-          </li>
+          </li> -->
 
           <div
             v-if="!sidebarExpandido"

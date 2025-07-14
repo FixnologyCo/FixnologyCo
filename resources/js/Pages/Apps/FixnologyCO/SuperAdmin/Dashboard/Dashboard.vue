@@ -35,7 +35,7 @@ const props = defineProps({
 })
 
 const usuario = props.auth
-const auth = usePage().props.auth;
+
 
 const nombreDia = ref('');
 const dia = ref('');
@@ -97,17 +97,16 @@ if (fecha.getHours() < 12) {
 } else {
   saludo.value = "¡Buenas noches!";
 }
-
+const nombreCompleto = usuario?.user?.perfil_usuario?.primer_nombre
+const usuarioAuth = usuario?.user?.perfil_usuario
 </script>
 
 <template>
 
-  <Head :title="`Bienvenido  || 'Dashboard'}`" />
+  <Head :title="`Bienvenido ${nombreCompleto}` || 'Dashboard'"  />
   <MensajesLayout />
 
-
-<pre class="text-mono-blanco">{{ usuario }}</pre>
-  <!-- <div class="flex">
+    <div class="flex">
     <SidebarSuperAdmin :auth="auth" />
 
 
@@ -116,7 +115,7 @@ if (fecha.getHours() < 12) {
 
       <div class="contenido p-3">
         <div class="" >
-          <p class="text-[20px] text-mono-negro dark:text-mono-blanco">{{ saludo }}, {{ usuario.nombres_ct }}</p>
+          <p class="text-[20px] text-mono-negro dark:text-mono-blanco">{{ saludo }}, {{ usuarioAuth.primer_nombre }} {{ usuarioAuth.primer_apellido }}</p>
           <p class="text-[14px] -mt-[5px] text-mono-negro dark:text-mono-blanco">{{ nombreDia }} {{ dia }} de {{ mes }} {{ anio }}, {{ hora }}</p>
         </div>
 
@@ -124,5 +123,5 @@ if (fecha.getHours() < 12) {
 
       </div>
     </div>
-  </div> -->
+  </div> 
 </template>

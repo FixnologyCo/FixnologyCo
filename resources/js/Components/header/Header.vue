@@ -3,6 +3,9 @@ import { ref, onMounted, onUnmounted, computed, } from 'vue';
 import { usePage } from '@inertiajs/vue3';
 import { route } from 'ziggy-js';
 import Colors from '@/Composables/ModularColores';
+import { useTema } from "@/Composables/useTema";
+const { modoOscuro, animando, animarCambioTema } = useTema();
+
 
 
 const { NombreApp, bgClase, textoClase, focus, buttonLink, hoverTexto, hoverClase } = Colors();
@@ -13,14 +16,23 @@ const props = defineProps({
 });
 
 const page = usePage();
-const aplicacion = props.auth?.user?.tienda?.aplicacion?.nombre_app || 'Sin app';
-const rol = props.auth.user.rol?.tipo_rol || 'Sin rol'; // Obtén el tipo de rol
-// Normaliza las rutas para que la comparación funcione
+
+const usuario = props.auth
+const usuarioAuth = usuario?.user?.perfil_usuario
+
+const rolUsuario = usuario.user.rol.tipo_rol 
+const aplicacionUsuario = usuario.user.tienda[0].aplicacion_web.nombre_app
+const nombreTiendaUsuario = usuario.user.tienda[0].nombre_establecimiento 
+
+const aplicacion = aplicacionUsuario || "Sin app";
+const nombre_tienda = nombreTiendaUsuario || "Sin tienda";
+const rol = rolUsuario  || "Sin rol";
+
 const currentRoute = computed(() => new URL(page.url, window.location.origin).pathname);
 const dashboardRoute = computed(() => new URL(route('aplicacion.dashboard', { aplicacion, rol }), window.location.origin).pathname);
 const clientesFixRoute = computed(() => new URL(route('aplicacion.clientesFix', { aplicacion, rol }), window.location.origin).pathname);
 const configuracionesRoute = computed(() => new URL(route('aplicacion.configuraciones', { aplicacion, rol }), window.location.origin).pathname);
-const historialRoute = computed(() => new URL(route('aplicacion.historial', { aplicacion, rol }), window.location.origin).pathname);
+// const historialRoute = computed(() => new URL(route('aplicacion.historial', { aplicacion, rol }), window.location.origin).pathname);
 
 const iconosPorComponente = {
     Dashboard: 'dashboard',
@@ -42,12 +54,12 @@ function separarCamelCase(texto) {
 }
 
 const ruta = separarCamelCase(componente);
-const icono = iconosPorComponente[componente] || 'description' // ícono por defecto
+const icono = iconosPorComponente[componente] || 'description'
 
 
 const initials = computed(() => {
-    const nombres = props.auth.user?.nombres_ct || '';
-    const apellidos = props.auth.user?.apellidos_ct || '';
+    const nombres = usuarioAuth.primer_nombre || '';
+    const apellidos = usuarioAuth.primer_apellido || '';
 
 
     const firstNameInitial = nombres.split(' ')[0]?.charAt(0).toUpperCase() || '';
@@ -56,58 +68,8 @@ const initials = computed(() => {
     return firstNameInitial + lastNameInitial;
 });
 
-const modoOscuro = ref(false)
-const animando = ref(false)
-
-const detectarPreferencia = () => {
-    const preferencia = localStorage.getItem('modoOscuro')
-    modoOscuro.value = preferencia !== null
-        ? preferencia === 'true'
-        : window.matchMedia('(prefers-color-scheme: dark)').matches
-
-    document.documentElement.classList.toggle('dark', modoOscuro.value)
-}
-
-const toggleTema = () => {
-    modoOscuro.value = !modoOscuro.value
-    document.documentElement.classList.toggle('dark', modoOscuro.value)
-    localStorage.setItem('modoOscuro', modoOscuro.value)
-}
-
-const animarCambioTema = () => {
-    animando.value = true
-    toggleTema()
-    setTimeout(() => {
-        animando.value = false
-    }, 600)
-}
-
-onMounted(() => {
-    detectarPreferencia()
-})
-
 </script>
 
-<style scoped>
-/* Animación lenta de rotación para el ícono */
-@keyframes spin-slow {
-    from {
-        transform: rotate(0deg);
-    }
-
-    to {
-        transform: rotate(360deg);
-    }
-}
-
-.animate-spin-slow {
-    animation: spin-slow 0.6s ease-in-out;
-}
-
-.rotate-1 {
-    transform: rotate(3deg);
-}
-</style>
 
 <template>
     <header
@@ -145,14 +107,14 @@ onMounted(() => {
                     class="absolute inset-0 bg-white/10 backdrop-blur-sm animate-ping z-0 rounded-md"></span>
             </button>
 
-            <a :href="route('aplicacion.historial', { aplicacion, rol })">
+            <!-- <a :href="route('aplicacion.historial', { aplicacion, rol })">
                 <div class="user h-[30px] w-[30px] rounded-full overflow-hidden flex items-center justify-center cursor-pointer"
                     :class="[currentRoute === historialRoute ? [bgClase] : 'bg-transparent' , hoverClase]">
                     <span class="material-symbols-rounded text-[20px] dark:text-mono-blanco">
                         history
                     </span>
                 </div>
-            </a>
+            </a> -->
 
 
             <div class="user h-[30px] w-[30px] rounded-full overflow-hidden flex items-center justify-center cursor-pointer" :class="[hoverClase]">
@@ -186,7 +148,7 @@ onMounted(() => {
                 </template>
 
                 <template v-else>
-                    <div class="user h-[35px] w-[35px] rounded-full overflow-hidden flex items-center justify-center"
+                    <div class="user bg-universal-naranja shadow shadow-universal-naranja text-mono-blanco h-[35px] w-[35px] rounded-full overflow-hidden flex items-center justify-center"
                         :class="[bgClase]">
                         <span class="text-[12px] font-bold">
                             {{ initials }}
@@ -194,12 +156,12 @@ onMounted(() => {
                     </div>
                 </template>
                 <div class="usuario">
-                    <div v-if="auth && auth.user">
+                    <div v-if="usuario && usuario">
                         <h3 class="font-semibold text-[13px] text-mono-negro dark:text-mono-blanco"> {{
-                            auth.user.nombres_ct }}
+                            usuarioAuth.primer_nombre }} {{ usuarioAuth.primer_apellido }}
                         </h3>
                         <p class="-mt-[5px] text-[12px] font-medium text-mono-negro dark:text-secundary-light">
-                            {{ auth.user.rol?.tipo_rol || 'Sin rol' }}
+                            {{ rolUsuario || 'Sin rol' }}
                         </p>
                     </div>
                     <div v-else>

@@ -43,7 +43,7 @@ class LoginController extends Controller
             // Si es un rol que trabaja en un establecimiento (IDs 1, 2, 4 son Admin, Empleado, SuperAdmin)
             if (in_array($usuario->perfilUsuario->rol_id, [1, 2, 4])) {
                 
-                $perfilEmpleado = $usuario->perfilesEmpleado()->with('establecimiento.aplicacionWeb')->first();
+                $perfilEmpleado = $usuario->perfilEmpleado()->with('establecimiento.aplicacionWeb')->first();
 
                 if (!$perfilEmpleado || !$perfilEmpleado->establecimiento) {
                     Auth::logout();
@@ -72,7 +72,7 @@ class LoginController extends Controller
                 $nombreAplicacion = $establecimiento->aplicacionWeb?->nombre_app;
 
             } elseif ($usuario->perfilUsuario->rol_id === 3) { // 3 = Cliente
-                
+    
                 // Para un cliente, quizás no necesitemos validar un establecimiento.
                 // Tal vez solo usan una aplicación general.
                 // Aquí podrías poner validaciones específicas para clientes si las tuvieras.
@@ -95,11 +95,15 @@ class LoginController extends Controller
 
             // --- REDIRECCIÓN FINAL ---
             
+            $primerNombreUsuario = $usuario->perfilUsuario->primer_nombre;
+            $primerApellidoUsuario = $usuario->perfilUsuario->primer_apellido;
+            $nombreCompletoUsuario = $primerNombreUsuario . ' ' . $primerApellidoUsuario;
+
             // Pasamos las variables a la ruta del dashboard
             return redirect()->route('aplicacion.dashboard', [
                 'aplicacionWeb' => $nombreAplicacion,
                 'rol' => $rol,
-            ])->with('success', '¡Bienvenido de nuevo!');
+            ])->with('success', '¡Bienvenido nuevamente, '. $nombreCompletoUsuario. '!');
         }
 
        

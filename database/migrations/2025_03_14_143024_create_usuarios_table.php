@@ -30,7 +30,9 @@ return new class extends Migration {
                 'numero_documento' => '1013580753',
                 'password' => bcrypt('123456'),
                 'created_at' => now(),
-                'updated_at' => now()
+                'updated_at' => now(),
+                'created_by' =>1,
+                'update_by' =>1
             ],
         ]);
     }

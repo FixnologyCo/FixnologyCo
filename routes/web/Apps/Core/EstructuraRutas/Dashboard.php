@@ -10,7 +10,7 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/status', [DashboardSuperAdminController::class, 'status']);
 
-    Route::prefix('{aplicacionWeb}/{rol}')->group(function () {
+    Route::prefix('{aplicacion}/{rol}')->group(function () {
         Route::get('/dashboard', [DashboardSuperAdminController::class, 'show'])
             ->name('aplicacion.dashboard');
 
