@@ -118,7 +118,21 @@ const usuarioAuth = usuario?.user?.perfil_usuario
           <p class="text-[20px] text-mono-negro dark:text-mono-blanco">{{ saludo }}, {{ usuarioAuth.primer_nombre }} {{ usuarioAuth.primer_apellido }}</p>
           <p class="text-[14px] -mt-[5px] text-mono-negro dark:text-mono-blanco">{{ nombreDia }} {{ dia }} de {{ mes }} {{ anio }}, {{ hora }}</p>
         </div>
+<br>
+<hr>
+<br>
+        <p class="text-mono-blanco">Pruebas</p>
+        <h1 class="text-mono-blanco text-[20px]">Datos del perfil usuario</h1>
+        <h1 class="text-mono-blanco text-[20px]">Datos de la tienda</h1>
+        <h1 class="text-mono-blanco text-[20px]">Datos del token</h1>
+        <h1 class="text-mono-blanco text-[20px]">Datos de la app</h1>
+        <h1 class="text-mono-blanco text-[20px]">Datos de la membresia</h1>
+          <pre class="text-mono-blanco">membresia: {{ usuario.user.tienda[0].aplicacion_web.membresia.nombre_membresia }}</pre>
+        <h1 class="text-mono-blanco text-[20px]">Datos de facturacion</h1>
+        <h1 class="text-mono-blanco text-[20px]">Datos del perfil empleado</h1>
 
+
+        <pre class="text-mono-blanco">{{ usuario }}</pre> 
 
 
       </div>

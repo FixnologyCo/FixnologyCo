@@ -12,8 +12,9 @@ import { useTiempo } from '@/Composables/useTiempo';
 import { formatCOP } from '@/Utils/formateoMoneda';
 
 const page = usePage();
-const user = ref(page.props.auth.user)
-const { tiempoActivo, diasRestantes } = useTiempo(user)
+
+
+
 const {
   appName,
   bgClase,
@@ -38,17 +39,26 @@ const props = defineProps({
     required: true
   }
 })
+const usuario = props.auth
+const usuarioAuth = usuario?.user?.perfil_usuario
+
+const { tiempoActivo, diasRestantes } = useTiempo(usuario)
 
 const inicialesNombreUsuario = computed(() => {
-  const nombres = props.auth.user?.nombres_ct || '';
-  const apellidos = props.auth.user?.apellidos_ct || '';
+  const nombres = usuarioAuth.primer_nombre || '';
+  const apellidos = usuarioAuth.primer_apellido || '';
   const firstNameInitial = nombres.split(' ')[0]?.charAt(0).toUpperCase() || '';
   const lastNameInitial = apellidos.split(' ')[0]?.charAt(0).toUpperCase() || '';
   return firstNameInitial + lastNameInitial;
 });
 
-const aplicacion = props.auth?.user?.tienda?.aplicacion?.nombre_app || 'Sin app';
-const rol = props.auth.user.rol?.tipo_rol || 'Sin rol';
+const rolUsuario = usuario.user.rol.tipo_rol 
+const aplicacionUsuario = usuario.user.tienda[0].aplicacion_web.nombre_app
+const nombreTiendaUsuario = usuario.user.tienda[0].nombre_establecimiento 
+
+const aplicacion = aplicacionUsuario || "Sin app";
+const nombre_tienda = nombreTiendaUsuario || "Sin tienda";
+const rol = rolUsuario  || "Sin rol";
 
 const activeTab = ref(0)
 const tabs = [
@@ -109,19 +119,17 @@ const logout = () => {
 
 
               <div class="nombre">
-                <h3 class="font-semibold text-[30px] text-mono-negro dark:text-mono-blanco">{{ user.nombres_ct }} {{
-                  user.apellidos_ct }}</h3>
+                <h3 class="font-semibold text-[30px] text-mono-negro dark:text-mono-blanco">{{ usuarioAuth.primer_nombre }} {{ usuarioAuth.segundo_nombre }} {{ usuarioAuth.primer_apellido }}</h3>
 
                 <div class="flex items-center justify-between">
                   <p id="rol-usuario"
                     class="flex items-center gap-1.5 text-secundary-default dark:text-mono-blanco py-1">
                     <span class="material-symbols-rounded text-[20px] text-universal-azul">local_police</span>
-                    {{ user.rol?.tipo_rol || 'Sin rol' }}
+                    {{ rolUsuario || 'Sin rol' }}
                   </p>
                   <div
                     class="flex items-center gap-1 shadowM text-mono-blanco bg-universal-azul w-[auto] py-1 px-2 rounded-md">
-                    {{
-                      user.tienda?.aplicacion?.membresia?.nombre_membresia }} <span
+                    {{ usuario.user.tienda[0].aplicacion_web.membresia.nombre_membresia  }} <span
                       class="material-symbols-rounded text-[18px]">bolt</span></div>
                 </div>
 
@@ -181,7 +189,7 @@ const logout = () => {
                     <p id="id-usuario"
                       class="flex items-center gap-1.5 text-secundary-default dark:text-mono-blanco border border-secundary-light secundary-light px-2 py-1 rounded-md w-full">
                       <span class="material-symbols-rounded text-[20px]" :class="[textoClase]">badge</span>
-                      {{ user.id || 'Sin Id' }}
+                      {{ usuarioAuth.id || 'Sin Id' }}
                     </p>
                   </div>
 

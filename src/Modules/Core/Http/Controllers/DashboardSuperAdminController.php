@@ -1,34 +1,27 @@
 <?php
 
-namespace Core\Http\Controllers; // Tu namespace personalizado
+namespace Core\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Models\User;
-use Core\Models\AplicacionesWeb; // Asegúrate de que tus modelos estén en App\Models
-use Core\Models\PerfilUsuario;
-use Core\Models\Establecimientos;
+use Auth;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 
-class DashboardSuperAdminController extends Controller
+class  DashboardSuperAdminController extends Controller
 {
-    
-
     /**
-     * Muestra el dashboard para el SuperAdmin.
+     * Muestra el dashboard para la aplicación y rol especificados.
+     *
+     * @param  string  $aplicacion
+     * @param  string  $rol
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Inertia\Response
      */
-    public function show(Request $request, $aplicacion, $rol)
+    public function show($aplicacion, $rol, Request $request)
     {
-        // 1. AUTORIZACIÓN
-        // Suponiendo que tu método validarAcceso funciona, lo mantenemos.
-        // Asegúrate de que internamente use la lógica de roles correcta.
-        // Aquí podrías usar Gates o Policies de Laravel también.
-        // Gate::authorize('view-superadmin-dashboard');
-
-        // 2. OBTENER EL USUARIO AUTENTICADO Y SUS DATOS
-        // Cargamos las relaciones que necesitamos del perfil del usuario logueado.
         $usuario = Auth::user()->load(
             'perfilUsuario',
             'perfilUsuario.indicativo',
@@ -49,18 +42,20 @@ class DashboardSuperAdminController extends Controller
 
         );
         $tipoDeRol = $usuario->rol->tipo_rol; // Ej: "SuperAdmin"
-       
 
+        // Validar acceso con Gate (rol 4)
+        if (!in_array($usuario->rol->id, [1, 2, 3, 4])) {
+            abort(403, 'No tienes permisos para acceder a esta sección.');
+        }
 
-
-
-        // 5. RENDERIZAR LA VISTA DE INERTIA CON LOS PROPS CORRECTOS
+          // 5. RENDERIZAR LA VISTA DE INERTIA CON LOS PROPS CORRECTOS
         // Ya no necesitamos el 'if' que validaba la tienda, eso lo debe hacer la autorización.
-        return Inertia::render('Apps/' . ucfirst($aplicacion) . '/' . ucfirst($rol) . '/Dashboard/Dashboard', [
-            'usuario' => $usuario,
-            'rol' => $tipoDeRol
-            
-           
-        ]);
-    }
+            return Inertia::render('Apps/' . ucfirst($aplicacion) . '/' . ucfirst($rol) . '/Dashboard/Dashboard', [
+                'usuario' => $usuario,
+                'rol' => $tipoDeRol
+            ]);
+        }
+    
+    use AuthorizesRequests;
+
 }
