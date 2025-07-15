@@ -3,6 +3,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\LinkRecuperacionController;
+use Laravel\Socialite\Facades\Socialite;
 
 
 // Mostrar el formulario de login
@@ -16,6 +17,10 @@ Route::prefix('login')->group(function () {
 Route::prefix('register')->group(function () {
     // ✅ Ruta GET para mostrar el formulario de registro
     Route::get('/auth', [RegisterController::class, 'show'])->name('register.auth');
+
+    Route::get('/auth/google', function () {
+        return Socialite::driver('google')->redirect();
+    })->name('google.login');
 
     Route::post('/auth', [RegisterController::class, 'register'])->name('register.post');
 });

@@ -99,14 +99,14 @@ const { modoOscuro, animando, animarCambioTema } = useTema();
         </p>
 
         <div class="btn-inicio flex justify-center gap-2 mt-5">
-          <button
-            class="border border-secundary-light rounded-md py-2 gap-3 w-[70%] flex items-center justify-center hover:-translate-y-1 hover:bg-secundary-default"
-          >
-            <img width="20px" height="20px" :src="logoGoogle" alt="Logo google" />
-            <span class="dark:text-mono-blanco"
-              >Inicia sesión con tu cuenta de Google</span
-            >
-          </button>
+           <a :href="route('google.login')" class="border border-secundary-light rounded-md py-2 gap-3 w-[70%] flex items-center justify-center hover:-translate-y-1 hover:bg-secundary-default">
+           
+              <img width="20px" height="20px" :src="logoGoogle" alt="Logo google" />
+              <span class="dark:text-mono-blanco"
+                >Inicia sesión con tu cuenta de Google</span
+              >
+           
+          </a>
           <button
             class="border border-secundary-light rounded-md py-2 gap-3 w-[10%] flex items-center justify-center hover:-translate-y-1 hover:bg-secundary-default"
           >
