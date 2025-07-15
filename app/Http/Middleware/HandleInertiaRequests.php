@@ -48,8 +48,8 @@ class HandleInertiaRequests extends Middleware
     
             // ✅ Usa `session()->get()` para asegurar que se retiene el valor
             'flash' => [
-                'error' => session()->get('error'),
-                'success' => session()->get('success'),
+                'success' => fn () => $request->session()->get('success'),
+                'error' => fn () => $request->session()->get('error'),
             ],
         ]);
     }

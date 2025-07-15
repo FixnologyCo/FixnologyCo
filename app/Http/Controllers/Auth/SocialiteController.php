@@ -14,9 +14,13 @@ use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
 use Exception;
 use Log;
+use App\Http\Traits\Auth\ValidatesAndRedirectsUsers;
+use Illuminate\Http\Request;
+
 
 class SocialiteController extends Controller
 {
+    use ValidatesAndRedirectsUsers;
     /**
      * Redirige al usuario a la página de autenticación de Google.
      */
@@ -28,61 +32,56 @@ class SocialiteController extends Controller
     /**
      * Maneja la respuesta (callback) de Google después de la autenticación.
      */
-   public function handleGoogleCallback()
+    // En tu SocialiteController, reemplaza el método handleGoogleCallback con este:
+
+  public function handleGoogleCallback(Request $request)
     {
         try {
             $googleUser = Socialite::driver('google')->user();
             $googleEmail = $googleUser->getEmail();
             $googleId = $googleUser->getId();
 
-            // 1. Buscamos el PERFIL por el correo de Google. Esta es la única búsqueda inicial.
             $perfilExistente = PerfilUsuario::where('correo', $googleEmail)->first();
             $usuario = null;
-            $perfil = null;
 
-            // 2. Si el perfil ya existe, es un usuario registrado.
             if ($perfilExistente) {
-                // Obtenemos el USUARIO asociado a través de la relación.
                 $usuario = $perfilExistente->usuario;
-                $perfil = $perfilExistente; // Asignamos el perfil encontrado
+                $eraUsuarioRecurrente = ($usuario && $usuario->google_id);
 
-                // Verificamos si al usuario le falta el google_id para vincularlo.
                 if ($usuario && is_null($usuario->google_id)) {
                     $usuario->google_id = $googleId;
                     $usuario->save();
                 }
-            }
-            // 3. Si no existe el perfil, es un usuario completamente nuevo.
-            else {
-                // A. Primero, creamos el User ya que no depende de nada.
-                // ¡IMPORTANTE! No se incluye 'email' aquí.
+
+                if ($eraUsuarioRecurrente) {
+                    Auth::login($usuario);
+                    $request->session()->regenerate();
+                    return $this->validateAndRedirect($usuario); // <-- Esto ahora funciona
+                } else {
+                   return redirect()->route('login.auth')->with('success', '¡Hemos vinculado tu cuenta de Google! Ahora contáctanos.');
+                }
+            } else {
                 $usuario = User::create([
                     'google_id' => $googleId,
                     'password'  => Hash::make(Str::random(24)),
                     'estado_id' => 1,
                 ]);
 
-                // B. Ahora creamos el Perfil y lo vinculamos con el User recién creado.
                 $perfil = PerfilUsuario::create([
-                    'usuario_id'      => $usuario->id, // ID del usuario que acabamos de crear
+                    'usuario_id'      => $usuario->id,
                     'correo'          => $googleEmail,
                     'primer_nombre'   => $googleUser->user['given_name'] ?? 'Usuario',
                     'primer_apellido' => $googleUser->user['family_name'] ?? 'Google',
                     'ruta_foto'       => $googleUser->getAvatar(),
                 ]);
 
-                // C. Como el usuario se acaba de crear, generamos su estructura inicial.
                 $this->crearEstructuraInicial($usuario, $perfil);
+
+                return redirect()->route('login.auth')->with('success', '¡Tu cuenta ha sido creada con Google! Ahora contáctanos.');
             }
-
-            // Redirigimos al login con un mensaje de éxito.
-            // Asegúrate de que la ruta 'login.auth' sea la correcta para tu vista de login.
-            return redirect()->route('login.auth')->with('success', '¡Autenticación con Google exitosa! Ahora contáctanos.');
-
         } catch (Exception $e) {
-            // Registrar el error real te ayudará a depurar.
             Log::error('Error en Google Callback: ' . $e->getMessage() . ' en la línea ' . $e->getLine());
-            return redirect()->route('login.auth')->with('error', 'Hubo un problema al autenticar con Google.');
+           return redirect()->route('login.auth')->with('error', 'Hubo un problema al autenticar con Google, ponte en contacto con nosotros.');
         }
     }
 
@@ -93,7 +92,7 @@ class SocialiteController extends Controller
      */
     protected function crearEstructuraInicial(User $usuario, PerfilUsuario $perfil)
     {
-        
+
         $establecimiento = Establecimientos::create([
             'estado_id' => 1,
             'aplicacion_web_id' => 1, // Asumimos que siempre es la app 1
@@ -125,4 +124,6 @@ class SocialiteController extends Controller
             'dias_restantes' => 7, // Días de prueba
         ]);
     }
+
+
 }
