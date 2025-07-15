@@ -3,29 +3,37 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Models\User; // Asegúrate de usar el modelo correcto
+use App\Models\User; // Asegúrate de que el namespace de tu modelo User sea este
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class LoginController extends Controller
 {
+    /**
+     * Muestra el formulario de login.
+     */
     public function show()
     {
         return Inertia::render('Core/Auth/Auth');
     }
 
+    /**
+     * Procesa el intento de login.
+     */
     public function login(Request $request)
     {
+        // 1. Validación de los datos de entrada
         $credenciales = $request->validate([
             'numero_documento' => 'required|string',
             'password' => 'required|string',
         ]);
 
+        // 2. Intento de Autenticación con el método de Laravel
         if (Auth::attempt($credenciales)) {
             $request->session()->regenerate();
 
-            // Cargamos el usuario con su perfil personal y el rol de ese perfil. ¡Más eficiente!
+            // Cargamos el usuario con su perfil y el rol de ese perfil. ¡Más eficiente!
             $usuario = Auth::user()->load('perfilUsuario.rol');
 
             // --- VALIDACIONES GENERALES ---
@@ -34,15 +42,19 @@ class LoginController extends Controller
                 return back()->withErrors(['numero_documento' => 'Tu cuenta está inactiva o suspendida.']);
             }
 
-            // Variables que llenaremos según el rol
-            $rol = $usuario->perfilUsuario->rol->tipo_rol;
-            $nombreAplicacion = null;
+            if (!$usuario->perfilUsuario || !$usuario->perfilUsuario->rol) {
+                Auth::logout();
+                return back()->withErrors(['numero_documento' => 'Tu usuario no tiene un perfil o rol asignado.']);
+            }
 
             // --- LÓGICA BASADA EN ROLES ---
-            
+            $rol = $usuario->perfilUsuario->rol;
+            $nombreAplicacion = null;
+
             // Si es un rol que trabaja en un establecimiento (IDs 1, 2, 4 son Admin, Empleado, SuperAdmin)
-            if (in_array($usuario->perfilUsuario->rol_id, [1, 2, 4])) {
+            if (in_array($rol->id, [1, 2, 4])) {
                 
+                // Buscamos su perfil de empleado y cargamos las relaciones necesarias
                 $perfilEmpleado = $usuario->perfilEmpleado()->with('establecimiento.aplicacionWeb')->first();
 
                 if (!$perfilEmpleado || !$perfilEmpleado->establecimiento) {
@@ -71,14 +83,11 @@ class LoginController extends Controller
                 // Obtenemos el nombre de la aplicación desde el establecimiento
                 $nombreAplicacion = $establecimiento->aplicacionWeb?->nombre_app;
 
-            } elseif ($usuario->perfilUsuario->rol_id === 3) { // 3 = Cliente
-    
-                // Para un cliente, quizás no necesitemos validar un establecimiento.
-                // Tal vez solo usan una aplicación general.
-                // Aquí podrías poner validaciones específicas para clientes si las tuvieras.
+            } elseif ($rol->id === 3) { // 3 = Cliente
                 
-                // Asignamos un nombre de aplicación por defecto o el que corresponda a clientes.
-                $nombreAplicacion = 'ClienteApp'; // Puedes cambiar esto
+                // Para un cliente, no validamos establecimiento.
+                // Le asignamos un nombre de aplicación por defecto.
+                $nombreAplicacion = 'ClienteApp'; // Puedes cambiar esto o hacerlo más dinámico
 
             } else {
                 // Si el rol no es reconocido, cerramos sesión
@@ -86,30 +95,24 @@ class LoginController extends Controller
                 return back()->withErrors(['numero_documento' => 'Tu rol no tiene un destino definido.']);
             }
             
-            // Si no obtuvimos un nombre de aplicación, es un error de configuración
+            // Si después de la lógica, no tenemos un nombre de aplicación, es un error
             if (!$nombreAplicacion) {
                 Auth::logout();
                 return back()->withErrors(['numero_documento' => 'No se pudo determinar la aplicación para tu rol.']);
             }
 
-
             // --- REDIRECCIÓN FINAL ---
-            
-            $primerNombreUsuario = $usuario->perfilUsuario->primer_nombre;
-            $primerApellidoUsuario = $usuario->perfilUsuario->primer_apellido;
-            $nombreCompletoUsuario = $primerNombreUsuario . ' ' . $primerApellidoUsuario;
+            $nombreCompletoUsuario = $usuario->perfilUsuario->primer_nombre . ' ' . $usuario->perfilUsuario->primer_apellido;
 
-            // Pasamos las variables a la ruta del dashboard
-            return redirect()->route('aplicacion.dashboard', [
+            return redirect()->route('aplicacion.dashboard', parameters: [
                 'aplicacion' => $nombreAplicacion,
-                'rol' => $rol,
-            ])->with('success', '¡Bienvenido nuevamente, '. $nombreCompletoUsuario. '!');
+                'rol' => $rol->tipo_rol,
+            ])->with('success', '¡Bienvenido nuevamente, '. trim($nombreCompletoUsuario) .'!');
         }
 
-       
-
-        return redirect()->route('login.auth')->with('error', 'Las credenciales proporcionadas no son correctas.');
-
+        return back()->withErrors([
+            'numero_documento' => 'Las credenciales proporcionadas no son correctas.',
+        ])->onlyInput('numero_documento');
     }
 
     public function logout(Request $request)
@@ -117,6 +120,6 @@ class LoginController extends Controller
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        return redirect()->route('login.auth')->with('success',  'Has cerrado sesión correctamente.');
+        return redirect('/')->with('success', 'Has cerrado sesión correctamente.');
     }
 }

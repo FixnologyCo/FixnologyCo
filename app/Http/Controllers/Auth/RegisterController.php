@@ -7,6 +7,7 @@ use App\Models\User;
 use Carbon\Carbon;
 use Core\Models\Establecimientos;
 use Core\Models\FacturacionMembresias;
+use Core\Models\PerfilEmpleado;
 use Core\Models\PerfilUsuario;
 use Core\Models\TokensAcceso;
 use Core\Models\TipoDocumento;
@@ -56,8 +57,7 @@ class RegisterController extends Controller
             'numero_documento' => $request->numero_documento,
             'password' => Hash::make($request->password),
             'estado_id' => 1,
-            'created_at' => now(),
-            'updated_at' => now(),
+
         ]);
 
         $perfil_usuario = PerfilUsuario::create([
@@ -72,8 +72,16 @@ class RegisterController extends Controller
             'propietario_id' => $usuario->id,
             'nombre_establecimiento' => 'Tienda de ' . $perfil_usuario->primer_nombre,
             'ruta_foto_establecimiento' => 'https://imgmedia.larepublica.pe/640x959/larepublica/original/2025/01/07/677d743f33031862432cca4d.webp'
-
         ]);
+
+        $perfil_empleado = PerfilEmpleado::create([
+            'estado_id' => 1,
+            'usuario_id' => $usuario->id,
+            'establecimiento_id' => $establecimiento->id,
+            'rol_id' => 1,
+            'medio_pago_id' => 1            
+        ]);
+
 
         $usuario->update(['id_propietario' => $establecimiento->id]);
 
@@ -89,14 +97,11 @@ class RegisterController extends Controller
         FacturacionMembresias::create([
             'cliente_id' => $usuario->id,
             'establecimiento_id' => $establecimiento->id,
-            'aplicacion_id' => $establecimiento->aplicacion_web_id,
+            'aplicacion_web_id' => $establecimiento->aplicacion_web_id,
             'estado_id' => 16,
             'medio_pago_id' => 8,
             'monto_total' => 50000,
             'dias_restantes' => 5,
-            'created_at' => now(),
-            'updated_at' => now(),
-
         ]);
 
         // ✅ Guarda el mensaje en la sesión y redirige a login con Inertia

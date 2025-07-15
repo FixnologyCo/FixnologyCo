@@ -53,4 +53,6 @@ class PerfilUsuario extends Model
         return $this->belongsTo(TipoDocumento::class);
     }
 
+    
+
 }

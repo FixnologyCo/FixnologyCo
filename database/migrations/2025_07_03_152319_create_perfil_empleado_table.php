@@ -31,6 +31,7 @@ return new class extends Migration {
 
             $table->foreignId('created_by')->nullable()->constrained('usuarios')->onDelete('set null');
             $table->foreignId('updated_by')->nullable()->constrained('usuarios')->onDelete('set null');
+            $table->timestamps();
 
             $table->foreign('estado_id')->references('id')->on('estados')->onDelete('cascade');
             $table->foreign('establecimiento_id')->references('id')->on('establecimientos')->onDelete('cascade');

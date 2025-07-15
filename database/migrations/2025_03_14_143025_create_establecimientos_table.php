@@ -17,14 +17,14 @@ return new class extends Migration {
             $table->unsignedBigInteger('aplicacion_web_id')->nullable();
             $table->unsignedBigInteger('propietario_id')->nullable();
 
-            $table->string('ruta_foto_establecimiento');
-            $table->string('tipo_establecimiento');
-            $table->string('nombre_establecimiento');
-            $table->string('email_establecimiento');
-            $table->string('telefono_establecimiento');
-            $table->string('direccion_establecimiento');
-            $table->string('barrio_establecimiento');
-            $table->string('ciudad_establecimiento');
+            $table->string('ruta_foto_establecimiento')->nullable();
+            $table->string('tipo_establecimiento')->nullable();
+            $table->string('nombre_establecimiento')->nullable();
+            $table->string('email_establecimiento')->nullable();
+            $table->string('telefono_establecimiento')->nullable();
+            $table->string('direccion_establecimiento')->nullable();
+            $table->string('barrio_establecimiento')->nullable();
+            $table->string('ciudad_establecimiento')->nullable();
 
             $table->timestamps();
             $table->softDeletes();
