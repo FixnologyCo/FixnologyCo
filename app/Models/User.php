@@ -32,6 +32,7 @@ class User extends Authenticatable // El nombre de la clase DEBE ser 'User' para
         'numero_documento',
         'password',
         'estado_id',
+        'google_id',   
     ];
 
     /**

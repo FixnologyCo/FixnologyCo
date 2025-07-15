@@ -4,25 +4,25 @@ import { route } from "ziggy-js";
 
 import { onMounted } from "vue";
 
-onMounted(() => {
-  // Escucha en el canal privado 'actualizaciones' el evento 'Estado.Actualizado'
-  window.Echo.private("actualizaciones").listen(".Estado.Actualizado", (e) => {
-    console.log("¡Evento recibido en tiempo real!");
-    console.log(e.mensaje); // "¡El estado de algo ha cambiado!"
-    alert("Mensaje del servidor: " + e.mensaje);
-  });
-});
+// onMounted(() => {
+//   // Escucha en el canal privado 'actualizaciones' el evento 'Estado.Actualizado'
+//   window.Echo.private("actualizaciones").listen(".Estado.Actualizado", (e) => {
+//     console.log("¡Evento recibido en tiempo real!");
+//     console.log(e.mensaje); // "¡El estado de algo ha cambiado!"
+//     alert("Mensaje del servidor: " + e.mensaje);
+//   });
+// });
 
-const testBroadcast = () => {
-  // Envía un evento de prueba al servidor
-  fetch(route("test-broadcast"))
-    .then((response) => response.text())
-    .then((data) => {
-      console.log(data); // "¡Evento enviado!"
-      alert(data);
-    })
-    .catch((error) => console.error("Error al enviar el evento:", error));
-};
+// const testBroadcast = () => {
+//   // Envía un evento de prueba al servidor
+//   fetch(route("test-broadcast"))
+//     .then((response) => response.text())
+//     .then((data) => {
+//       console.log(data); // "¡Evento enviado!"
+//       alert(data);
+//     })
+//     .catch((error) => console.error("Error al enviar el evento:", error));
+// };
 </script>
 
 <template>

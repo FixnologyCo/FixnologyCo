@@ -12,10 +12,12 @@ use Core\Models\PerfilUsuario;
 use Core\Models\TokensAcceso;
 use Core\Models\TipoDocumento;
 use Core\Models\AplicacionesWeb;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
+use Laravel\Socialite\Facades\Socialite;
 
 class RegisterController extends Controller
 {
@@ -79,7 +81,7 @@ class RegisterController extends Controller
             'usuario_id' => $usuario->id,
             'establecimiento_id' => $establecimiento->id,
             'rol_id' => 1,
-            'medio_pago_id' => 1            
+            'medio_pago_id' => 1
         ]);
 
 
@@ -108,4 +110,6 @@ class RegisterController extends Controller
         return redirect()->route('login.auth')->with('success', 'Registro exitoso, Activa el token y ¡empecemos!');
 
     }
+
+ 
 }

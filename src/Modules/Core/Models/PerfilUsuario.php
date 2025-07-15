@@ -35,7 +35,7 @@ class PerfilUsuario extends Model
 
     public function usuario()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'usuario_id');
     }
 
     public function indicativo()
@@ -53,6 +53,6 @@ class PerfilUsuario extends Model
         return $this->belongsTo(TipoDocumento::class);
     }
 
-    
+
 
 }

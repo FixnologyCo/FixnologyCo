@@ -18,8 +18,8 @@ Route::get('/ping', function () {
 
 use App\Events\EstadoActualizado;
 
-Route::get('/test-broadcast', function () {
-    broadcast(new EstadoActualizado('¡El estado de algo ha cambiado!'))->toOthers();
-    return "¡Evento enviado!";
-})->name('test-broadcast');
+// Route::get('/test-broadcast', function () {
+//     broadcast(new EstadoActualizado('¡El estado de algo ha cambiado!'))->toOthers();
+//     return "¡Evento enviado!";
+// })->name('test-broadcast');
 

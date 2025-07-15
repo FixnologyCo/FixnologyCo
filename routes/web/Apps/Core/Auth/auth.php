@@ -1,4 +1,5 @@
 <?php
+use App\Http\Controllers\Auth\SocialiteController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
@@ -18,12 +19,14 @@ Route::prefix('register')->group(function () {
     // ✅ Ruta GET para mostrar el formulario de registro
     Route::get('/auth', [RegisterController::class, 'show'])->name('register.auth');
 
-    Route::get('/auth/google', function () {
-        return Socialite::driver('google')->redirect();
-    })->name('google.login');
 
     Route::post('/auth', [RegisterController::class, 'register'])->name('register.post');
 });
+
+// Redirige al usuario a la página de autenticación de Google
+Route::get('auth/google', [SocialiteController::class, 'redirectToGoogle'])->name('google.login');
+// Google llama a esta ruta después de la autenticación (el callback)
+Route::get('auth/google/callback', [SocialiteController::class, 'handleGoogleCallback'])->name('google.callback');
 
 Route::prefix('linkRecuperacion')->group(function () {
     // ✅ Ruta GET para mostrar el formulario de registro
