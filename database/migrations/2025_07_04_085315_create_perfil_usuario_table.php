@@ -50,7 +50,7 @@ return new class extends Migration {
                 'rol_id' => 4,
                 'indicativo_id' => 1,
                 'tipo_documento_id' => 1,
-                'ruta_foto' => 'https://fixnology.co/img/empleados/jhoann_zamudio.jpg',
+                'ruta_foto' => 'https://lh3.googleusercontent.com/a/ACg8ocK-foAmvtyzS_WJjiV_un-8-p9Kh-ca_sSsvppgivrWNBEE-Tpc3A=s288-c-no',
                 'primer_nombre' => 'Jhoann',
                 'segundo_nombre' => 'Sebastián',
                 'primer_apellido' => 'Zamudio',

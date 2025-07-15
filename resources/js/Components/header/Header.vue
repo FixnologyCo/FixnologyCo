@@ -172,10 +172,6 @@ const initials = computed(() => {
       </a>
 
       <div class="flex gap-1 items-center relative">
-        <!-- <template v-if="authStore.rutaFoto">
-                    <img :src="authStore.rutaFoto" class="border-2 rounded-[50px] w-[40px] h-[40px] object-cover" />
-                </template> -->
-
         <div class="" v-if="authStore.isAuthenticated === true">
           <div
             class="bg-semaforo-verde w-2.5 h-2.5 absolute top-0 left-1 z-10 shadow shadow-semaforo-verde rounded-full"
@@ -187,7 +183,14 @@ const initials = computed(() => {
           ></div>
         </div>
 
-        <template v-if="authStore">
+        <template v-if="authStore.rutaFoto !== null">
+          <img
+            :src="authStore.rutaFoto"
+            class="border-2 rounded-[50px] w-[40px] h-[40px] object-cover"
+          />
+        </template>
+
+        <template v-else="authStore">
           <div
             class="user relative bg-universal-naranja shadow shadow-universal-naranja text-mono-blanco h-[35px] w-[35px] rounded-full overflow-hidden flex items-center justify-center"
             :class="[bgClase]"

@@ -56,9 +56,9 @@ class SocialiteController extends Controller
                 if ($eraUsuarioRecurrente) {
                     Auth::login($usuario);
                     $request->session()->regenerate();
-                    return $this->validateAndRedirect($usuario); // <-- Esto ahora funciona
+                    return $this->validateAndRedirect($usuario);
                 } else {
-                   return redirect()->route('login.auth')->with('success', '¡Hemos vinculado tu cuenta de Google! Ahora contáctanos.');
+                   return redirect()->route('login.auth')->with('success', '¡Hemos vinculado tu cuenta de Google! ya puedes usarla.');
                 }
             } else {
                 $usuario = User::create([
