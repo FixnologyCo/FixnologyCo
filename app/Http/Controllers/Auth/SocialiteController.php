@@ -98,8 +98,8 @@ class SocialiteController extends Controller
             'aplicacion_web_id' => 1, // Asumimos que siempre es la app 1
             'propietario_id' => $usuario->id,
             'nombre_establecimiento' => 'Tienda de ' . $perfil->primer_nombre,
-            'email_establecimiento' => 'tienda-' . $usuario->id . '@example.com', // Email único temporal
-            'telefono_establecimiento' => '0000000000', // Teléfono temporal
+            'email_establecimiento' => 'tienda-' . $usuario->id . '@example.com', 
+            'telefono_establecimiento' => '0000000000', 
             'direccion_establecimiento' => 'Por definir',
             'barrio_establecimiento' => 'Por definir',
             'ciudad_establecimiento' => 'Por definir',
@@ -118,10 +118,10 @@ class SocialiteController extends Controller
             'cliente_id' => $usuario->id,
             'establecimiento_id' => $establecimiento->id,
             'aplicacion_web_id' => 1,
-            'estado_id' => 16, // Pendiente
-            'medio_pago_id' => 1, // Efectivo por defecto
+            'estado_id' => 16, 
+            'medio_pago_id' => 1,
             'monto_total' => 50000,
-            'dias_restantes' => 7, // Días de prueba
+            'dias_restantes' => 7,
         ]);
     }
 

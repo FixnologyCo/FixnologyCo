@@ -10,8 +10,8 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('password_reset_table', function (Blueprint $table) {
-            $table->string('email')->index();
+        Schema::create('password_resets', function (Blueprint $table) {
+            $table->string('correo')->index();
             $table->string('token');
             $table->timestamp('created_at')->nullable();
         });

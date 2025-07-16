@@ -1,39 +1,31 @@
 <script>
-import { Head, useForm, usePage } from '@inertiajs/vue3';
-import { ref, onMounted } from 'vue'
-import { route } from 'ziggy-js';
-import MensajesLayout from '@/Layouts/MensajesLayout.vue';
-
-
 export default {
-  name: 'Auth',
+  name: "Auth",
   components: {
     Head,
   },
   mounted() {
-    window.history.pushState(null, '', window.location.href);
+    window.history.pushState(null, "", window.location.href);
     window.onpopstate = function () {
-      window.history.pushState(null, '', window.location.href);
-      alert('Debes iniciar sesión primero.');
+      window.history.pushState(null, "", window.location.href);
+      alert("Debes iniciar sesión primero.");
     };
-  }
-}
-
-const page = usePage();
+  },
+};
 </script>
 
 <script setup>
+import { Head, useForm } from "@inertiajs/vue3";
+import { useTema } from "@/Composables/useTema";
+import { route } from "ziggy-js";
+import MensajesLayout from "@/Layouts/MensajesLayout.vue";
 
-const props = defineProps({
-  success: String
-})
-
+defineProps({});
 
 const form = useForm({
-  correo_vinculado: ''
-})
-
-
+  correo: "",
+  password: "",
+});
 
 const submit = () => {
   form.post(route('linkRecuperacion.auth'), {
@@ -41,120 +33,138 @@ const submit = () => {
   })
 }
 
-
+const { modoOscuro, animando, animarCambioTema } = useTema();
 </script>
 
 <template>
-  <div>
-
-    <Head title="Recupera tu cuenta FixnologyCO" />
+  <div class="p-[50px]">
+    <Head title="Nada se ha perdido" />
     <MensajesLayout />
 
-    <div class="
-    bg-mono-negro
-            sm:bg-green-500 
-            md:bg-yellow-500
-            lg:bg-red-500 
-            xl:bg-mono-blanco  xl:dark:bg-mono-negro
-            2xl:bg-mono-blanco 2xl:dark:bg-mono-negro
-            flex justify-center items-center
-            text-secundary-default dark:text-mono-blanco
-    ">
-      <main class="
-       2xl:w-[100%] 2xl:p-[80px] 2xl:gap-16
-      xl:w-[100%] xl:px-[80px] xl:gap-14
-      min-h-[100vh] flex items-center justify-center w-[100%] p-[40px] gap-14
-      ">
-        <div class="
-        left 
-        2xl:w-[70%]
-        xl:w-[65%]
-        max-w-[600px]
-        ">
-          <div class="options flex gap-1 items-center text-[14px] mt-4">
-            <a :href="route('login.auth')" class="hover:text-universal-azul flex items-center">
-              <span class="material-symbols-rounded text-[18px]">chevron_left</span>
-              <p>Inicia sesión</p>
-            </a>
-          </div>
-          <div class="logo
-          2xl:flex 2xl:gap-3 2xl:items-center
-          xl:flex xl:gap-2 xl:items-center
-          flex items-center gap-2 justify-center
-          ">
-            <div class="gota
-             2xl:h-7 2xl:w-10
-            xl:h-6 xl:w-9
-            h-5 w-8 rounded-full shadow-universal-naranja bg-universal-naranja
-            "></div>
-            <div class="logo">
-              <h1 class="text-[20px] font-semibold">Fixnology CO</h1>
-              <p class="-mt-[8px] text-[14px] font-medium">Empresa de software especializada</p>
-            </div>
-          </div>
+    <header class=" flex justify-between items-center">
+      <div
+        class="logo 2xl:flex 2xl:gap-3 2xl:items-center xl:flex xl:gap-2 xl:items-center flex items-center gap-2"
+      >
+        <div
+          class="gota 2xl:h-7 2xl:w-10 xl:h-6 xl:w-9 h-5 w-8 rounded-full shadow-universal-naranja bg-universal-naranja"
+        ></div>
+        <div class="logo">
+          <h1 class="text-[20px] font-semibold dark:text-mono-blanco">Fixnology CO</h1>
+          <p class="-mt-[8px] text-[14px] font-medium dark:text-mono-blanco">
+            Empresa de software especializada
+          </p>
+        </div>
+      </div>
+      <div class="btnAcciones flex items-center gap-4">
+        <button
+          @click="animarCambioTema"
+          class="flex items-center justify-center gap-2 h-[35px] w-[35px] rounded-full border border-secundary-light text-sm transition-all duration-500 ease-in-out relative overflow-hidden"
+          :class="[
+            modoOscuro ? 'text-mono-blanco' : 'text-mono-negro',
+            animando ? 'scale-105 shadow-lg rotate-1' : '',
+          ]"
+        >
+          <span
+            class="material-symbols-rounded text-[20px] transition-transform duration-500"
+            :class="{ 'animate-spin-slow': animando }"
+          >
+            {{ modoOscuro ? "light_mode" : "dark_mode" }}
+          </span>
+          <!-- destello -->
+          <span
+            v-if="animando"
+            class="absolute inset-0 bg-white/10 backdrop-blur-sm animate-ping z-0 rounded-md"
+          ></span>
+        </button>
 
-          <div class="welcome">
+        <a :href="route('login.auth')" class="">
+          <button
+            class="dark:bg-mono-blanco py-4 px-6 rounded-full shadowM font-semibold"
+          >
+            Iniciar sesión
+          </button>
+        </a>
+      </div>
+    </header>
 
-            <h2 class="
-            2xl:text-[35px] d 2xl:mt-[20px]
-            xl:text-[35px] d xl:mt-[20px]
-            font-bold text-[22px] mt-3 text-center
-            
-            ">Vamos a a recuperar tu cuenta</h2>
-            <p class="
-            2xl:text-[20px]
-            xl:text-[20px]
-            text-[15px]
-            text-center
-            px-7
-            ">Por favor ingresa tu correo electrónico vinculado a tu usuario</p>
-          </div>
+    <div class="flex justify-center items-center min-h-[83vh]">
+      <div
+        class="bg-mono-blanco shadow-lg dark:shadow-sm dark:bg-bg-empty w-[650px] rounded-lg py-2 px-10"
+      >
+        <h2 class="text-[35px] font-bold text-center dark:text-mono-blanco">
+          ¡Nada se ha perdido aún!
+        </h2>
+        <p class="text-[18px] dark:text-mono-blanco -mt-2 text-center">
+          Ingresa tu correo electrónico vinculado a tu cuenta.
+        </p>
 
+        <form
+          @submit.prevent="submit"
+          class="2xl:mt-5 2xl:flex 2xl:flex-col 2xl:gap-2 xl:mt-4 xl:flex xl:flex-col xl:gap-2 mt-3 flex flex-col gap-3"
+        >
+        
 
-
-          <!-- ✅ FORMULARIO DE LOGIN -->
-          <form @submit.prevent="submit" class="mt-5 flex flex-col gap-5">
-            <!-- ✅ Campo Usuario -->
-            <div class="w-[100%]">
-              <p class="my-[5px] text-[14px]">Correo electrónico:</p>
-              <div
-                class="w-[100%] transition-all rounded-[5px] border-[1px] border-secundary-light p-[3px] flex items-center gap-[8px]"
-                :class="{ 'border-universal-naranja': form.errors.correo_vinculado }">
-                <span class="material-symbols-rounded text-universal-naranja text-[20px] pl-[5px]">email</span>
-                <input type="text" v-model="form.correo_vinculado"
-                  class="w-full focus:outline-none focus:border-none font-normal bg-transparent"
-                  placeholder="Ingresa tu correo vinculado." />
+          <div
+            class="2xl:flex 2xl:flex-row 2xl:justify-between 2xl:items-center 2xl:gap-2 xl:flex xl:flex-row xl:justify-between xl:items-center xl:gap-2 gap-3 flex flex-col items-center"
+          >
+            <div class="2xl:w-[100%] xl:w-[100%] w-full">
+              <div class="contador-label flex items-center justify-between">
+                <p class="my-[5px] text-[14px] dark:text-mono-blanco">
+                  Correo electrónico vinculado:
+                </p>
+                
               </div>
-             
-              <span v-if="form.errors.correo_vinculado" class="text-universal-naranja text-sm">
-                {{ form.errors.correo_vinculado }}
+
+              <div
+                class="w-[100%] p-[3px] flex items-center gap-[8px] transition-all rounded-[5px] border-[1px] border-secundary-ligh"
+                t
+                :class="{ 'border-universal-naranja': form.errors.correo }"
+              >
+                <span
+                  class="material-symbols-rounded text-universal-naranja text-[20px] pl-[5px]"
+                  >email</span
+                >
+
+                <input
+                  type="text"
+                  class="2xl:w-full focus:outline-none focus:border-none font-normal bg-transparent dark:text-mono-blanco w-full"
+                  placeholder="Ingresa tu usuario"
+                  v-model="form.correo"
+                />
+              </div>
+              <span
+                v-if="form.errors.correo"
+                class="2xl:text-sm text-universal-naranja"
+              >
+                {{ form.errors.correo }}
               </span>
             </div>
+          </div>
 
-            <!-- ✅ BOTÓN DE INICIAR SESIÓN -->
-            <button type="submit" class="btn-taurus text-mono-blanco">
-              Validar usuario
-              <span class="material-symbols-rounded bg-transparent">bolt</span>
-            </button>
+        
+           <a
+            href="https://api.whatsapp.com/send/?phone=573219631459&text=No+puedo+acceder+a+mi+app.&type=phone_number&app_absent=0"
+            class="2xl:my-3 text-[14px] text-right text-universal-azul_secundaria"
+            >Tengo problemas con la cuenta</a
+          >
 
+          <button
+            type="submit"
+            class="flex items-center bg-universal-azul_secundaria px-4 py-2 rounded-md justify-center text-mono-blanco font-semibold shadowM hover:bg-universal-naranja"
+          >
+            ¡Buscar! <span class="material-symbols-rounded bg-transparent">arrow_outward</span>
+          </button>
 
-            <p class="
-            mt-4
-            text-center
-            ">¿Tienes problemas?, <a href="https://api.whatsapp.com/send/?phone=573219631459&text=Buen+día,+vengo+desde+la+app%2C+necesito+ayuda+con+mi+cuenta.&type=phone_number&app_absent=0" class="
-                text-universal-azul
-                ">Contactanos</a>.</p>
-
-            <p class="
-             text-[12px]
-             text-center
-            text-universal-azul 
-            ">Versión Deimos 1.0.0</p>
-          </form>
-        </div>
-
-
-      </main>
+          <p class="text-[12px] mt-3 text-universal-naranja text-center">
+            Versión Deimos 1.0.0
+          </p>
+        </form>
+      </div>
     </div>
+
+  
   </div>
 </template>
+
+
+

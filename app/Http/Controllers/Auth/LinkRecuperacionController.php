@@ -23,90 +23,103 @@ class LinkRecuperacionController extends Controller
 
     public function LinkRecuperacion(Request $request)
     {
-        $request->validate([
-            'correo_vinculado' => 'required|email|exists:perfil_usuario,correo',
-        ], [
-            'correo_vinculado.exists' => 'Verifica, ese usuario no existe.',
-            'correo_vinculado.required' => 'El correo es requerido.',
-        ]);
-
-        $correo = $request->correo_vinculado;
-        $cliente = PerfilUsuario::where('correo', $correo)->first();
-        
-
-        if (!$cliente) {
-            return back()->withErrors([
-                'correo_vinculado' => 'No reconocemos ese usuario :(',
-            ]);
-        }
-
-        $token = Str::random(64);
-
-        DB::table('password_reset_table')->updateOrInsert(
-            ['correo' => $correo],
-            [
-                'token' => $token,
-                'created_at' => Carbon::now(),
-            ]
+        $request->validate(
+            ['correo' => 'required|email|exists:perfil_usuario,correo'],
+            ['correo.required' => 'Debes ingresar un correo.']
         );
 
-        Mail::to($correo)->send(new RecuperarPassword($token, $correo, $cliente));
+        $perfil = PerfilUsuario::where('correo', $request->correo)->first();
+
+        if (!$perfil) {
+            return back()->withErrors(['correo' => 'No se encontró un usuario con ese correo.']);
+        }
+
+        $nombre = $perfil->primer_nombre;
+        $token = Str::random(60);
 
 
-        return redirect()->back()->with('success', $cliente->primer_nombre .', se ha enviado el enlace a tu correo.'  );
+        DB::table('password_resets')->insert([
+            'correo' => $request->correo,
+            'token' => $token,
+            'created_at' => Carbon::now()
+        ]);
+
+        Mail::to($perfil->correo)->send(new RecuperarPassword($token, $perfil->correo, $nombre));
+
+        return redirect()->back()->with('success', $nombre . ', se ha enviado el enlace a tu correo vinculado.');
     }
 
     public function showResetForm($token, Request $request)
     {
-        $email = $request->query('correo');
+        
+        $resetRecord = DB::table('password_resets')->where('token', $token)->first();
+
+        // Si el token no existe, redirigimos con un error
+        if (!$resetRecord) {
+            return redirect()->route('login.auth')->with('error', 'Este enlace de recuperación no es válido o ya fue utilizado.');
+        }
+
+      
+        $tokenCreatedAt = Carbon::parse($resetRecord->created_at);
+        $minutesSinceCreation = $tokenCreatedAt->diffInMinutes(Carbon::now());
+
+    
+        if ($minutesSinceCreation > 5) {
+          
+            DB::table('password_resets')->where('token', $token)->delete();
+
+            return redirect()->route('login.auth') 
+                ->with('error', 'Tu enlace de recuperación ha expirado. Por favor, solicita uno nuevo.');
+        }
+
 
         return Inertia::render('Core/Auth/ResetPassword', [
             'token' => $token,
-            'correo' => $email,
+            'correo' => $resetRecord->correo,
         ]);
     }
 
     public function reset(Request $request)
     {
+        // 1. Validación (añadimos la regla 'confirmed' para la contraseña)
         $request->validate([
             'correo' => 'required|email|exists:perfil_usuario,correo',
-            'password' => 'required|string|min:6|confirmed',
-            'token' => 'required'
+            'password' => 'required|string|min:6|confirmed', // 'confirmed' busca un campo 'password_confirmation'
+            'token' => 'required|string'
         ], [
             'correo.exists' => 'Este correo no está registrado.',
-            'password.confirmed' => 'Las contraseñas no coinciden.',
-            'password.required' => 'La contraseña no puede quedar vacia.',
+            'password.required' => 'La contraseña no puede quedar vacía.',
             'password.min' => 'La contraseña debe tener al menos 6 caracteres.',
+            'password.confirmed' => 'Las contraseñas no coinciden.'
         ]);
 
-        $resetRecord = DB::table('password_reset_table')
-            ->where('correo', $request->email)
+        // 2. Verificación del token
+        $resetRecord = DB::table('password_resets')
+            ->where('correo', $request->correo)
             ->where('token', $request->token)
             ->first();
 
         if (!$resetRecord) {
-            return redirect()->back()->withErrors(['email' => 'Token inválido o expirado.']);
+            return back()->withErrors(['correo' => 'Este enlace de recuperación no es válido o ya ha expirado.']);
         }
 
-        $cliente = PerfilUsuario::where('correo', $request->email)->first();
-        $usuario = User::first();
+        // 3. Encontrar al usuario CORRECTO
+        $perfil = PerfilUsuario::where('correo', $request->correo)->first();
 
-        if (!$cliente) {
-            return redirect()->back()->withErrors(['email' => 'Cliente no encontrado.']);
+        if (!$perfil || !$perfil->usuario) {
+            return back()->withErrors(['correo' => 'Error: No se encontró un usuario asociado a este correo.']);
         }
 
-        // Actualizamos la contraseña
+        $usuario = $perfil->usuario;
+
+        // 4. Actualizar la contraseña
         $usuario->password = Hash::make($request->password);
         $usuario->save();
 
+        // 5. Eliminar el token (con el nombre de tabla correcto)
+        DB::table('password_resets')->where('correo', $request->correo)->delete();
 
-        // Actualizamos la contraseña
-        $cliente->password = Hash::make($request->password);
-        $cliente->save();
-
-        // Borramos el token de recuperación
-        DB::table('password_reset_table')->where('email', $request->email)->delete();
-
-        return redirect()->route('login.auth')->with('success', '¡Contraseña restablecida correctamente!');
+        // 6. Redirigir con éxito
+        return redirect()->route('login.auth')->with('success', '¡Tu contraseña ha sido restablecida! Ya puedes iniciar sesión.');
     }
 }
