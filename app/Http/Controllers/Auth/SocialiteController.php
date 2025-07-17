@@ -34,56 +34,72 @@ class SocialiteController extends Controller
      */
     // En tu SocialiteController, reemplaza el método handleGoogleCallback con este:
 
-  public function handleGoogleCallback(Request $request)
-    {
-        try {
-            $googleUser = Socialite::driver('google')->user();
-            $googleEmail = $googleUser->getEmail();
-            $googleId = $googleUser->getId();
+ public function handleGoogleCallback(Request $request)
+{
+    try {
+        $googleUser = Socialite::driver('google')->user();
+        $googleEmail = $googleUser->getEmail();
+        $googleId = $googleUser->getId();
+        // 1. Obtenemos la URL del avatar de Google al inicio.
+        // Usamos getAvatar() que es el método estándar y suele dar mejor calidad.
+        $googleAvatar = $googleUser->getAvatar();
 
-            $perfilExistente = PerfilUsuario::where('correo', $googleEmail)->first();
-            $usuario = null;
+        $perfilExistente = PerfilUsuario::where('correo', $googleEmail)->first();
+        $usuario = null;
 
-            if ($perfilExistente) {
-                $usuario = $perfilExistente->usuario;
-                $eraUsuarioRecurrente = ($usuario && $usuario->google_id);
+        // Si el usuario ya existe en la base de datos...
+        if ($perfilExistente) {
+            $usuario = $perfilExistente->usuario;
+            $eraUsuarioRecurrente = ($usuario && $usuario->google_id);
 
-                if ($usuario && is_null($usuario->google_id)) {
-                    $usuario->google_id = $googleId;
-                    $usuario->save();
-                }
-
-                if ($eraUsuarioRecurrente) {
-                    Auth::login($usuario);
-                    $request->session()->regenerate();
-                    return $this->validateAndRedirect($usuario);
-                } else {
-                   return redirect()->route('login.auth')->with('success', '¡Hemos vinculado tu cuenta de Google! ya puedes usarla.');
-                }
-            } else {
-                $usuario = User::create([
-                    'google_id' => $googleId,
-                    'password'  => Hash::make(Str::random(24)),
-                    'estado_id' => 1,
-                ]);
-
-                $perfil = PerfilUsuario::create([
-                    'usuario_id'      => $usuario->id,
-                    'correo'          => $googleEmail,
-                    'primer_nombre'   => $googleUser->user['given_name'] ?? 'Usuario',
-                    'primer_apellido' => $googleUser->user['family_name'] ?? 'Google',
-                    'ruta_foto'       => $googleUser->getAvatar(),
-                ]);
-
-                $this->crearEstructuraInicial($usuario, $perfil);
-
-                return redirect()->route('login.auth')->with('success', '¡Tu cuenta ha sido creada con Google! Ahora contáctanos.');
+            // 2. LÓGICA PARA ACTUALIZAR LA FOTO (SI NO TIENE UNA)
+            // Se comprueba si el campo de la foto está vacío o nulo.
+            if ($usuario && empty($perfilExistente->ruta_foto)) {
+                $perfilExistente->ruta_foto = $googleAvatar;
+                $perfilExistente->save();
             }
-        } catch (Exception $e) {
-            Log::error('Error en Google Callback: ' . $e->getMessage() . ' en la línea ' . $e->getLine());
-           return redirect()->route('login.auth')->with('error', 'Hubo un problema al autenticar con Google, ponte en contacto con nosotros.');
+
+            // Vinculamos la cuenta si es la primera vez que inicia con Google
+            if ($usuario && is_null($usuario->google_id)) {
+                $usuario->google_id = $googleId;
+                $usuario->save();
+            }
+
+            // Redireccionamos según si ya era un usuario de Google o no
+            if ($eraUsuarioRecurrente) {
+                Auth::login($usuario);
+                $request->session()->regenerate();
+                return $this->validateAndRedirect($usuario);
+            } else {
+                return redirect()->route('login.auth')->with('success', '¡Hemos vinculado tu cuenta de Google! ya puedes usarla.');
+            }
+        } 
+        // Si es un usuario completamente nuevo...
+        else {
+            $usuario = User::create([
+                'google_id' => $googleId,
+                'password'  => Hash::make(Str::random(24)),
+                'estado_id' => 1,
+            ]);
+
+            // Al ser nuevo, siempre se le asigna la foto de Google.
+            $perfil = PerfilUsuario::create([
+                'usuario_id'      => $usuario->id,
+                'correo'          => $googleEmail,
+                'primer_nombre'   => $googleUser->user['given_name'] ?? 'Usuario',
+                'primer_apellido' => $googleUser->user['family_name'] ?? 'NA',
+                'ruta_foto'       => $googleAvatar,
+            ]);
+
+            $this->crearEstructuraInicial($usuario, $perfil);
+
+            return redirect()->route('login.auth')->with('success', '¡Tu cuenta ha sido creada con Google! Ahora contáctanos.');
         }
+    } catch (Exception $e) {
+        Log::error('Error en Google Callback: ' . $e->getMessage() . ' en la línea ' . $e->getLine());
+        return redirect()->route('login.auth')->with('error', 'Hubo un problema al autenticar con Google, intentalo nuevamente.');
     }
+}
 
 
     /**

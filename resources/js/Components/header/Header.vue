@@ -183,7 +183,7 @@ const initials = computed(() => {
           ></div>
         </div>
 
-        <template v-if="authStore.rutaFoto !== null">
+        <template v-if="authStore.rutaFoto !== 'Sin foto'">
           <img
             :src="authStore.rutaFoto"
             class="border-2 rounded-[50px] w-[40px] h-[40px] object-cover"
@@ -198,8 +198,8 @@ const initials = computed(() => {
             <span class="text-[12px] font-bold">
               {{ initials }}
             </span>
-          </div>
-        </template>
+          </div></template
+        >
         <div class="usuario">
           <div v-if="authStore && authStore">
             <h3 class="font-semibold text-[13px] text-mono-negro dark:text-mono-blanco">
