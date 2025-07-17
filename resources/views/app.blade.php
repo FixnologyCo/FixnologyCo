@@ -8,7 +8,7 @@
   <title inertia>{{ config('app.name', 'Laravel') }}</title>
     @vite('resources/js/app.js')
       @livewireStyles
-  <link rel="shortcut icon" href="{{ Vite::asset('resources/images/logoTC.svg') }}" type="image/x-icon">
+  <link rel="shortcut icon" href="{{ Vite::asset('resources/images/icon_white.png') }}" type="image/x-icon">
 
 
   @routes

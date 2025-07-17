@@ -21,7 +21,8 @@ import { useTema } from "@/Composables/useTema";
 import { route } from "ziggy-js";
 import MensajesLayout from "@/Layouts/MensajesLayout.vue";
 import logoGoogle from "/resources/images/LogoGoogle.png";
-import logoGit from "/resources/images/LogoGitHub.svg";
+import logoFixDark from "/resources/images/Logo_160px_dark.svg";
+import logoFixWhite from "/resources/images/Logo_160px_white.svg";
 
 defineProps({});
 
@@ -50,11 +51,26 @@ const { modoOscuro, animando, animarCambioTema } = useTema();
       <div
         class="logo 2xl:flex 2xl:gap-3 2xl:items-center xl:flex xl:gap-2 xl:items-center flex items-center gap-2"
       >
-        <div
-          class="gota 2xl:h-7 2xl:w-10 xl:h-6 xl:w-9 h-5 w-8 rounded-full shadow-universal-naranja bg-universal-naranja"
-        ></div>
-        <div class="logo">
-          <h1 class="text-[20px] font-semibold dark:text-mono-blanco">Fixnology CO</h1>
+        <div v-if="modoOscuro">
+          <img
+            width="50px"
+            height="50px"
+            class="rounded-xl"
+            :src="logoFixWhite"
+            alt="Fixnology"
+          />
+        </div>
+        <div v-else>
+          <img
+            width="50px"
+            height="50px"
+            class="rounded-xl"
+            :src="logoFixDark"
+            alt="Fixnology"
+          />
+        </div>
+        <div class="logo flex flex-col gap-1">
+          <h1 class="text-[25px] font-semibold text-universal-naranja">Fixnology CO</h1>
           <p class="-mt-[8px] text-[14px] font-medium dark:text-mono-blanco">
             Empresa de software especializada
           </p>
@@ -91,9 +107,9 @@ const { modoOscuro, animando, animarCambioTema } = useTema();
       </div>
     </header>
 
-    <div class="flex justify-center items-center">
+    <div class="flex justify-center items-center min-h-[83vh]">
       <div
-        class="bg-mono-blanco shadow-lg dark:shadow-sm dark:bg-bg-empty w-[800px] rounded-lg py-2 px-10"
+        class="bg-mono-blanco shadow-lg dark:shadow-md dark:bg-bg-empty w-[800px] rounded-lg py-10 px-16"
       >
         <h2 class="text-[35px] font-bold text-center dark:text-mono-blanco">
           Únete a la familia Fix
@@ -103,20 +119,15 @@ const { modoOscuro, animando, animarCambioTema } = useTema();
         </p>
 
         <div class="btn-inicio flex justify-center gap-2 mt-5">
-          <a :href="route('google.login')" class="border border-secundary-light rounded-md py-2 gap-3 w-[70%] flex items-center justify-center hover:-translate-y-1 hover:bg-secundary-default">
-           
-              <img width="20px" height="20px" :src="logoGoogle" alt="Logo google" />
-              <span class="dark:text-mono-blanco"
-                >Inicia sesión con tu cuenta de Google</span
-              >
-           
-          </a>
-
-          <button
-            class="border border-secundary-light rounded-md py-2 gap-3 w-[10%] flex items-center justify-center hover:-translate-y-1 hover:bg-secundary-default"
+          <a
+            :href="route('google.login')"
+            class="border border-secundary-light rounded-md py-2 gap-3 w-[70%] flex items-center justify-center hover:-translate-y-1 hover:bg-secundary-default"
           >
-            <img width="20px" height="20px" :src="logoGit" alt="Logo google" />
-          </button>
+            <img width="20px" height="20px" :src="logoGoogle" alt="Logo google" />
+            <span class="dark:text-mono-blanco"
+              >Inicia sesión con tu cuenta de Google</span
+            >
+          </a>
         </div>
 
         <div class="relative mt-3 flex justify-center items-center gap-2">

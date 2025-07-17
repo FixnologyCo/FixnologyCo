@@ -4,11 +4,13 @@ import { usePage } from "@inertiajs/vue3";
 import { route } from "ziggy-js";
 import Colors from "@/Composables/ModularColores";
 import { useSidebar } from "@/Composables/useSidebar";
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { useAuthStore } from "@/stores/auth"; 
+import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
+import { useAuthStore } from "@/stores/auth";
+import logoFixWhite from "/resources/images/Logo_160px_white.svg";
+
 const authStore = useAuthStore();
 defineOptions({
-  layout: AuthenticatedLayout
+  layout: AuthenticatedLayout,
 });
 
 const { sidebarExpandido, toggleSidebar } = useSidebar();
@@ -17,7 +19,7 @@ const { NombreApp, bgClase, bgOpacity, textoClase, focus, buttonLink, hover } = 
 const page = usePage();
 
 const aplicacion = authStore.aplicacion || "Sin app";
-const rol = authStore.rol  || "Sin rol";
+const rol = authStore.rol || "Sin rol";
 
 // Normaliza las rutas para que la comparación funcione
 const currentRoute = computed(() => new URL(page.url, window.location.origin).pathname);
@@ -67,8 +69,6 @@ const dashboardRoute = computed(
 // const ordenTrabajoRoute = computed(() => new URL(route('aplicacion.ordenTrabajos', { aplicacion, rol }), window.location.origin).pathname);
 // const resenasRoute = computed(() => new URL(route('aplicacion.resenas', { aplicacion, rol }), window.location.origin).pathname);
 
-
-
 const inicialesNombreTienda = computed(() => {
   const nombreTienda = authStore.nombreTienda || "";
 
@@ -85,13 +85,14 @@ const inicialesNombreTienda = computed(() => {
     <aside class="relative h-full">
       <div class="infoTienda flex items-center justify-between gap-2 px-2">
         <div v-if="sidebarExpandido" class="flex gap-2 items-center">
-          <div
-            class="user h-[25px] w-[25px] rounded-[5px] overflow-hidden flex items-center justify-center bg-slate-500"
-          >
-            <span class="text-md font-bold">
-              {{ inicialesNombreTienda }}
-            </span>
-          </div>
+          <img
+            width="25px"
+            height="25px"
+            class="rounded-sm"
+            :src="logoFixWhite"
+            alt="Fixnology"
+          />
+
           <div class="logo">
             <h1 class="font-semibold text-[14px]">{{ authStore.aplicacion }}</h1>
           </div>

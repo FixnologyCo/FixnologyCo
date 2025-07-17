@@ -12,26 +12,27 @@ class RecuperarPassword extends Mailable
 
     public $token;
     public $correo;
-     public $nombre;
+    public $nombre;
 
     public function __construct($token, $correo, $nombre)
     {
         $this->token = $token;
         $this->correo = $correo;
-         $this->nombre = $nombre;
+        $this->nombre = $nombre;
     }
 
 
-   public function build()
-{
-    $url = url("/linkRecuperacion/reset-password/{$this->token}?email={$this->correo}");
-
-    return $this->subject('Recuperar contraseña - Fixnology')
-        ->view('emails.recuperar-password')
-        ->with([
-            'url' => $url,
-            'nombre' => $this->nombre,
-        ]);
-}
+    public function build()
+    {
+        $url = url("/linkRecuperacion/reset-password/{$this->token}?email={$this->correo}");
+        $pathToImage = public_path('images/logo.png');
+        return $this->subject('Recuperar contraseña - Fixnology')
+            ->view('emails.recuperar-password')
+            ->with([
+                'url' => $url,
+                'nombre' => $this->nombre,
+                'pathToImage' => $pathToImage, 
+            ]);
+    }
 
 }
