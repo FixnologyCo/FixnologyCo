@@ -21,7 +21,6 @@ import { useTema } from "@/Composables/useTema";
 import { route } from "ziggy-js";
 import MensajesLayout from "@/Layouts/MensajesLayout.vue";
 import logoGoogle from "/resources/images/LogoGoogle.png";
-import logoGit from "/resources/images/LogoGitHub.svg";
 import logoFixDark from "/resources/images/Logo_160px_dark.svg";
 import logoFixWhite from "/resources/images/Logo_160px_white.svg";
 
@@ -129,12 +128,6 @@ const { modoOscuro, animando, animarCambioTema } = useTema();
               >Inicia sesión con tu cuenta de Google</span
             >
           </a>
-
-          <button
-            class="border border-secundary-light rounded-md py-2 gap-3 w-[10%] flex items-center justify-center hover:-translate-y-1 hover:bg-secundary-default"
-          >
-            <img width="20px" height="20px" :src="logoGit" alt="Logo google" />
-          </button>
         </div>
 
         <div class="relative mt-3 flex justify-center items-center gap-2">
