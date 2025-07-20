@@ -10,7 +10,7 @@ export default function useAppColors() {
     };
 
     const bgFocus = {
-        'FixnologyCO': 'bg-universal-naranja text-mono-blanco shadow-universal-naranja w-[15px] h-[10px] mx-3 rounded-full',
+        'FixnologyCO': 'bg-universal-naranja text-mono-blanco shadow-universal-naranja w-[15px] h-[10px] ml-3 rounded-full',
         'default': 'bg-gray-300 shadow-gray-300'
     };
 

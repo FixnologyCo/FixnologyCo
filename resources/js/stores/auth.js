@@ -12,6 +12,7 @@ export const useAuthStore = defineStore('auth', {
 
         // datos de usuario
         idUsuario: (state) => state.user.perfil_usuario.id || 'Cargando info...',
+        google_id: (state) => state.user.google_id || null,
         estadoUsuario: (state) => state.user.perfil_usuario.estado.tipo_estado || 'Cargando info...',
         rol: (state) => state.user?.rol?.tipo_rol || 'Cargando info...',
         rutaFoto: (state) => state.user?.perfil_usuario?.ruta_foto || 'Sin foto',

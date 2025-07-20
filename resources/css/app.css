@@ -7,7 +7,9 @@
 :root {
   /* UNIVERSAL */
   --mono_blanco: #F5EFFF;
+  --mono_blanco_opacity: #f5f7f8cb;
   --mono_negro: #060809;
+  --mono:#151515be;
   --bg_empty: #1F1D2B;
   --naranja: #FE4F2D;
   --naranja_opacity: #fe502d36;

@@ -10,7 +10,10 @@ module.exports = {
             colors: {
                 mono: {
                   blanco: '#F5F7F8',
-                  negro: '#0B192C',
+                  blanco_opacity: '#f5f7f8cb',
+                  negro: '#151515',
+                  negro_opacity_medio: '#1515153a',
+                  negro_opacity_full: '#151515be',
                 },
                 bg: {
                   empty: '#1A2130',

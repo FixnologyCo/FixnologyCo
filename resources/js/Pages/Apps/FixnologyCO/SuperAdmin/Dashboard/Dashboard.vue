@@ -11,9 +11,8 @@ import { useAuthStore } from "@/stores/auth";
 const authStore = useAuthStore();
 defineOptions({
   layout: AuthenticatedLayout,
-  inheritAttrs: false
+  inheritAttrs: false,
 });
-
 
 const {
   appName,
@@ -100,41 +99,20 @@ if (fecha.getHours() < 12) {
 } else {
   saludo.value = "¡Buenas noches!";
 }
-
-const logout = () => {
-  router.visit(route("logout"), {
-    method: "post",
-    preserveScroll: true,
-  });
-};
 </script>
 
 <template>
   <Head :title="`Bienvenido ${authStore.nombreCompleto} ` || 'Dashboard'" />
-  <MensajesLayout />
-
-  <div class="flex">
-    <SidebarSuperAdmin :auth="authStore" />
-
-    <div class="w-full">
-      <Header :auth="authStore" />
-
-      <div class="contenido p-3">
-        <div class="">
-          <p class="text-[20px] text-mono-negro dark:text-mono-blanco">
-            {{ saludo }}, {{ authStore.nombreCompleto }}
-          </p>
-          <p class="text-[14px] -mt-[5px] text-mono-negro dark:text-mono-blanco">
-            {{ nombreDia }} {{ dia }} de {{ mes }} {{ anio }}, {{ hora }}
-          </p>
-        </div>
-        <br />
-        <button @click="logout" class="" :class="[buttonSecundario]">
-          <p>Cerrar sesión</p>
-        </button>
-       
-     
-      </div>
+  <SidebarSuperAdmin :auth="authStore">
+    <MensajesLayout />
+    <div class="">
+      <p class="text-[20px] text-mono-negro dark:text-mono-blanco">
+        {{ saludo }}, {{ authStore.nombreCompleto }}
+      </p>
+      <p class="text-[14px] -mt-[5px] text-mono-negro dark:text-mono-blanco">
+        {{ nombreDia }} {{ dia }} de {{ mes }} {{ anio }}, {{ hora }}
+      </p>
     </div>
-  </div>
+    <br />
+  </SidebarSuperAdmin>
 </template>
