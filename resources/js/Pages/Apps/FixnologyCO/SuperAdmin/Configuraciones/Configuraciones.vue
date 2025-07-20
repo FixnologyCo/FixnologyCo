@@ -144,9 +144,6 @@ const logout = () => {
                   >
                     <button class="" :class="buttonClase">Editar perfil</button>
                   </a>
-                  <button @click="logout" class="" :class="[buttonSecundario]">
-                    <p>Cerrar sesión</p>
-                  </button>
                 </div>
               </div>
             </div>
@@ -199,6 +196,9 @@ const logout = () => {
                 </button>
               </nav>
             </div>
+          </div>
+          <div class="mx-12" v-if="activeTab === 0">
+            <pre>{{ authStore.primerNombre }}</pre>
           </div>
         </div></SidebarSuperAdmin
       >

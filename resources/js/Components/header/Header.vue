@@ -1,13 +1,13 @@
 <script setup>
-import { ref, onMounted, onUnmounted, computed } from "vue";
+import { ref, computed } from "vue";
 import { usePage, router } from "@inertiajs/vue3";
 import { route } from "ziggy-js";
 
 import Colors from "@/Composables/ModularColores";
 import { useTema } from "@/Composables/useTema";
 const { modoOscuro, animando, animarCambioTema } = useTema();
-import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue"; // 1. Importa tu layout
-import { useAuthStore } from "@/stores/auth"; // 1. Importa la tienda
+import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
+import { useAuthStore } from "@/stores/auth";
 const authStore = useAuthStore();
 defineOptions({
   layout: AuthenticatedLayout,
@@ -23,30 +23,8 @@ const {
   hoverClase,
 } = Colors();
 
-const page = usePage();
-
 const aplicacion = authStore.aplicacion || "Sin app";
 const rol = authStore.rol || "Sin rol";
-
-const currentRoute = computed(() => new URL(page.url, window.location.origin).pathname);
-const dashboardRoute = computed(
-  () =>
-    new URL(route("aplicacion.dashboard", { aplicacion, rol }), window.location.origin)
-      .pathname
-);
-const clientesFixRoute = computed(
-  () =>
-    new URL(route("aplicacion.clientesFix", { aplicacion, rol }), window.location.origin)
-      .pathname
-);
-const configuracionesRoute = computed(
-  () =>
-    new URL(
-      route("aplicacion.configuraciones", { aplicacion, rol }),
-      window.location.origin
-    ).pathname
-);
-// const historialRoute = computed(() => new URL(route('aplicacion.historial', { aplicacion, rol }), window.location.origin).pathname);
 
 const iconosPorComponente = {
   Dashboard: "dashboard",

@@ -109,7 +109,7 @@ const { modoOscuro, animando, animarCambioTema } = useTema();
 
     <div class="flex justify-center items-center min-h-[83vh]">
       <div
-        class="bg-mono-blanco shadow-lg dark:shadow-md dark:bg-bg-empty w-[800px] rounded-lg py-10 px-16"
+        class="bg-mono-blanco shadow-lg dark:shadow-md dark:bg-mono-negro w-[800px] rounded-lg py-10 px-16"
       >
         <h2 class="text-[35px] font-bold text-center dark:text-mono-blanco">
           Únete a la familia Fix

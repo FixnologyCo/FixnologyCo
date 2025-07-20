@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref } from "vue";
+import { computed } from "vue";
 import { usePage } from "@inertiajs/vue3";
 import { route } from "ziggy-js";
 import Colors from "@/Composables/ModularColores";
@@ -22,7 +22,6 @@ const page = usePage();
 const aplicacion = authStore.aplicacion || "Sin app";
 const rol = authStore.rol || "Sin rol";
 
-// Normaliza las rutas para que la comparación funcione
 const currentRoute = computed(() => new URL(page.url, window.location.origin).pathname);
 const dashboardRoute = computed(
   () =>
