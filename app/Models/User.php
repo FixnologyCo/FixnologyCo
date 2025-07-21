@@ -29,6 +29,7 @@ class User extends Authenticatable // El nombre de la clase DEBE ser 'User' para
      * Los atributos que se pueden asignar masivamente.
      */
     protected $fillable = [
+        'id',
         'numero_documento',
         'password',
         'estado_id',

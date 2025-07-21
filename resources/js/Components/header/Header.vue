@@ -1,12 +1,13 @@
 <script setup>
-import { ref, onMounted, onUnmounted, computed } from "vue";
-import { usePage } from "@inertiajs/vue3";
+import { ref, computed, onMounted, onUnmounted } from "vue";
+import { usePage, router } from "@inertiajs/vue3";
 import { route } from "ziggy-js";
+
 import Colors from "@/Composables/ModularColores";
 import { useTema } from "@/Composables/useTema";
-const { modoOscuro, animando, animarCambioTema } = useTema();
-import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue"; // 1. Importa tu layout
-import { useAuthStore } from "@/stores/auth"; // 1. Importa la tienda
+const { modoOscuro, animando, animarCambioTema, backgroundStyle } = useTema();
+import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
+import { useAuthStore } from "@/stores/auth";
 const authStore = useAuthStore();
 defineOptions({
   layout: AuthenticatedLayout,
@@ -22,30 +23,8 @@ const {
   hoverClase,
 } = Colors();
 
-const page = usePage();
-
 const aplicacion = authStore.aplicacion || "Sin app";
 const rol = authStore.rol || "Sin rol";
-
-const currentRoute = computed(() => new URL(page.url, window.location.origin).pathname);
-const dashboardRoute = computed(
-  () =>
-    new URL(route("aplicacion.dashboard", { aplicacion, rol }), window.location.origin)
-      .pathname
-);
-const clientesFixRoute = computed(
-  () =>
-    new URL(route("aplicacion.clientesFix", { aplicacion, rol }), window.location.origin)
-      .pathname
-);
-const configuracionesRoute = computed(
-  () =>
-    new URL(
-      route("aplicacion.configuraciones", { aplicacion, rol }),
-      window.location.origin
-    ).pathname
-);
-// const historialRoute = computed(() => new URL(route('aplicacion.historial', { aplicacion, rol }), window.location.origin).pathname);
 
 const iconosPorComponente = {
   Dashboard: "dashboard",
@@ -78,36 +57,234 @@ const initials = computed(() => {
 
   return firstNameInitial + lastNameInitial;
 });
+
+const isMenuOpen = ref(false);
+
+const toggleMenu = () => {
+  isMenuOpen.value = !isMenuOpen.value;
+};
+const logout = () => {
+  router.visit(route("logout"), {
+    method: "post",
+    preserveScroll: true,
+  });
+};
+
+const nombreDia = ref("");
+const dia = ref("");
+const mes = ref("");
+const anio = ref("");
+const hora = ref("");
+const saludo = ref("");
+
+function actualizarFechaHora() {
+  const fecha = new Date();
+  dia.value = fecha.getDate();
+
+  const nombreDias = [
+    "Domingo",
+    "Lunes",
+    "Martes",
+    "Miércoles",
+    "Jueves",
+    "Viernes",
+    "Sábado",
+  ];
+  const monthNamesClock = [
+    "enero",
+    "febrero",
+    "marzo",
+    "abril",
+    "mayo",
+    "junio",
+    "julio",
+    "agosto",
+    "septiembre",
+    "octubre",
+    "noviembre",
+    "diciembre",
+  ];
+  mes.value = monthNamesClock[fecha.getMonth()];
+  nombreDia.value = nombreDias[fecha.getDay()];
+  anio.value = fecha.getFullYear();
+
+  let horas = fecha.getHours();
+  const minutos = fecha.getMinutes().toString().padStart(2, "0");
+  const segundos = fecha.getSeconds().toString().padStart(2, "0");
+  const periodo = horas >= 12 ? "pm" : "am";
+
+  if (horas > 12) {
+    horas -= 12;
+  } else if (horas === 0) {
+    horas = 12;
+  }
+  hora.value = `${horas}:${minutos}:${segundos} ${periodo}`;
+}
+
+let clockInterval = null;
+onMounted(() => {
+  actualizarFechaHora();
+  clockInterval = setInterval(actualizarFechaHora, 1000);
+});
+onUnmounted(() => {
+  clearInterval(clockInterval);
+});
+
+let fecha = new Date();
+let horas = fecha.getHours();
+
+if (horas > 12) {
+  horas -= 12;
+} else if (horas === 0) {
+  horas = 12;
+}
+
+if (fecha.getHours() < 12) {
+  saludo.value = "¡Buenos días!";
+} else if (fecha.getHours() < 18) {
+  saludo.value = "¡Buenas tardes!";
+} else {
+  saludo.value = "¡Buenas noches!";
+}
 </script>
 
 <template>
-  <header
-    class="header px-3 py-2 flex items-center justify-between gap-3 bg-mono-blanco shadow-md dark:bg-mono-negro"
-  >
+  <header class="header flex items-center justify-between gap-3">
     <div class="left w-[20%] rounded-md">
-      <div class="infoTienda flex items-center gap-2">
-        <div class="">
-          <div class="flex items-center" v-if="authStore && authStore">
-            <span
-              class="material-symbols-rounded align-middle mr-1"
-              :class="[textoClase]"
-            >
-              {{ icono }}
-            </span>
-            <h1 class="text-[25px] font-semibold text-mono-negro dark:text-mono-blanco">
-              {{ ruta }}
-            </h1>
+      <div class="relative max-w-[280px]">
+        <div class="cajaUser flex items-center">
+          <div class="flex gap-1 items-center relative">
+            <div v-if="authStore.isAuthenticated === true">
+              <div
+                class="bg-semaforo-verde w-2.5 h-2.5 absolute top-0 left-1 z-10 shadow shadow-semaforo-verde rounded-full"
+              ></div>
+            </div>
+            <div v-else>
+              <div
+                class="bg-semaforo-rojo w-2.5 h-2.5 absolute top-0 left-1 z-10 shadow shadow-semaforo-rojo rounded-full"
+              ></div>
+            </div>
+
+            <template v-if="authStore.rutaFoto !== 'Sin foto'">
+              <img
+                :src="authStore.rutaFoto"
+                class="border-2 rounded-[50px] w-[40px] h-[40px] object-cover shadowM"
+              />
+            </template>
+
+            <template v-else>
+              <div
+                class="user relative bg-universal-naranja shadow shadow-universal-naranja text-mono-blanco h-[35px] w-[35px] rounded-full overflow-hidden flex items-center justify-center"
+                :class="[bgClase]"
+              >
+                <span class="text-[12px] font-bold">{{ initials }}</span>
+              </div>
+            </template>
           </div>
-          <div v-else>
-            <p class="text-mono-negro dark:text-mono-blanco">
-              Cargando información del usuario...
+
+          
+          <div class="ml-2">
+            <p class=" font-semibold text-mono-negro dark:text-mono-blanco">
+              {{ saludo }}, {{ authStore.primerNombre }}.
             </p>
+            <p class="text-[12px] font-medium text-secundary-default dark:text-secundary-light"> {{ nombreDia }} {{ dia }} de {{ mes }} {{ anio }}, {{ hora }}</p>
           </div>
+
+          <span
+            @click="toggleMenu"
+            class="material-symbols-rounded text-[16px] dark:text-mono-blanco text-mono-negro cursor-pointer"
+            >keyboard_arrow_down</span
+          >
+        </div>
+
+        <div
+          v-if="isMenuOpen"
+          class="absolute right-0 mt-2 w-52 bg-mono-blanco_opacity dark:bg-mono-negro_opacity_full backdrop-blur-md rounded-xl shadow-lg p-3 z-20"
+        >
+          <div class="nombreUsuario px-2 py-2">
+            <div class="flex items-center justify-between">
+              <span class="material-symbols-rounded text-[18px] text-universal-naranja"
+                  >crown</span>
+              <h3 class="text-mono-negro font-semibold dark:text-mono-blanco">
+                {{ authStore.primerNombre + " " + authStore.primerApellido }}
+              </h3>
+              <div class="grid place-items-center" v-if="authStore.google_id === null">
+                <span class="material-symbols-rounded text-[18px] text-gray-700"
+                  >verified_off</span
+                >
+              </div>
+              <div class="" v-else>
+                <span
+                  class="grid place-items-center material-symbols-rounded text-[18px] text-universal-azul_secundaria"
+                  >verified</span
+                >
+              </div>
+            </div>
+          </div>
+
+          <a
+            :href="route('aplicacion.miPerfil', { aplicacion, rol })"
+            :class="hoverClase"
+            class="flex items-center gap-2 px-2 rounded-full py-2 text-sm text-mono-negro dark:text-mono-blanco"
+            ><span class="material-symbols-rounded text-[18px]">for_you</span> Mi
+            Perfil</a
+          >
+
+          <a
+            href="#"
+            :class="hoverClase"
+            class="flex items-center gap-2 px-2 rounded-full py-2 text-sm text-mono-negro dark:text-mono-blanco"
+            ><span class="material-symbols-rounded text-[18px]">settings</span>
+            Configuraciones</a
+          >
+          <a
+            href="#"
+            :class="hoverClase"
+            class="flex items-center gap-2 px-2 rounded-full py-2 text-sm text-mono-negro dark:text-mono-blanco"
+            ><span class="material-symbols-rounded text-[18px]">Help</span>
+            Ayuda</a
+          >
+
+          <div class="border-t border-gray-200 dark:border-gray-700 my-2"></div>
+          <a
+            href="#"
+            :class="hoverClase"
+            class="flex items-center gap-2 px-2 rounded-full py-2 text-sm text-mono-negro dark:text-mono-blanco"
+            ><span class="material-symbols-rounded text-[18px]"
+              >deployed_code_update</span
+            >
+            Actualizaciones
+          </a>
+          <a
+            @click="logout"
+            :class="hoverClase"
+            class="cursor-pointer flex items-center gap-2 px-2 rounded-full py-2 text-sm text-mono-negro dark:text-mono-blanco"
+            ><span class="material-symbols-rounded text-[18px]">logout</span> Cerrar
+            sesión</a
+          >
         </div>
       </div>
     </div>
 
+    
+
     <div class="flex gap-2 items-center">
+    <div class="search flex items-center gap-1">
+    <span class="material-symbols-rounded border dark:border-secundary-light border-mono-negro rounded-full p-2  dark:text-secundary-light text-mono-negro font-medium text-[16px]">search</span>
+    <input type="search" placeholder="Buscar..." name="" id="" class="outline-none dark:text-secundary-light text-mono-negro font-medium text-[14px] bg-transparent border dark:border-secundary-light border-mono-negro rounded-full px-3 py-1">
+    </div>
+    <a :href="route('aplicacion.miPerfil', { aplicacion, rol })">
+        <div
+          class="user h-[30px] w-[30px] rounded-full overflow-hidden flex items-center justify-center cursor-pointer"
+          :class="[hoverClase]"
+        >
+          <span
+            class="material-symbols-rounded text-[20px] dark:text-mono-blanco text-mono-negro"
+          >
+            notifications
+          </span>
+        </div>
+      </a>
       <button
         @click="animarCambioTema"
         class="flex items-center justify-center gap-2 h-[35px] w-[35px] rounded-full border border-secundary-light text-sm transition-all duration-500 ease-in-out relative overflow-hidden"
@@ -125,7 +302,7 @@ const initials = computed(() => {
         <!-- destello -->
         <span
           v-if="animando"
-          class="absolute inset-0 bg-white/10 backdrop-blur-sm animate-ping z-0 rounded-md"
+          class="absolute inset-0 bg-mono-blanco/10 backdrop-blur-sm animate-ping z-0 rounded-md"
         ></span>
       </button>
 
@@ -137,87 +314,7 @@ const initials = computed(() => {
                     </span>
                 </div>
             </a> -->
-
-      <div
-        class="user h-[30px] w-[30px] rounded-full overflow-hidden flex items-center justify-center cursor-pointer"
-        :class="[hoverClase]"
-      >
-        <span class="material-symbols-rounded text-[20px] dark:text-mono-blanco">
-          help
-        </span>
-      </div>
-
-      <a :href="route('aplicacion.configuraciones', { aplicacion, rol })">
-        <div
-          class="user h-[30px] w-[30px] rounded-full overflow-hidden flex items-center justify-center cursor-pointer"
-          :class="[hoverClase]"
-        >
-          <span class="material-symbols-rounded text-[20px] dark:text-mono-blanco">
-            notifications
-          </span>
-        </div>
-      </a>
-      <a :href="route('aplicacion.configuraciones', { aplicacion, rol })">
-        <div
-          class="user h-[30px] w-[30px] rounded-full overflow-hidden flex items-center justify-center cursor-pointer"
-          :class="[
-            currentRoute === configuracionesRoute ? [bgClase] : 'bg-transparent',
-            hoverClase,
-          ]"
-        >
-          <span class="material-symbols-rounded text-[20px] dark:text-mono-blanco">
-            settings
-          </span>
-        </div>
-      </a>
-
-      <div class="flex gap-1 items-center relative">
-        <div class="" v-if="authStore.isAuthenticated === true">
-          <div
-            class="bg-semaforo-verde w-2.5 h-2.5 absolute top-0 left-1 z-10 shadow shadow-semaforo-verde rounded-full"
-          ></div>
-        </div>
-        <div v-else>
-          <div
-            class="bg-semaforo-rojo w-2.5 h-2.5 absolute top-0 left-1 z-10 shadow shadow-semaforo-rojo rounded-full"
-          ></div>
-        </div>
-
-        <template v-if="authStore.rutaFoto !== 'Sin foto'">
-          <img
-            :src="authStore.rutaFoto"
-            class="border-2 rounded-[50px] w-[40px] h-[40px] object-cover"
-          />
-        </template>
-
-        <template v-else="authStore">
-          <div
-            class="user relative bg-universal-naranja shadow shadow-universal-naranja text-mono-blanco h-[35px] w-[35px] rounded-full overflow-hidden flex items-center justify-center"
-            :class="[bgClase]"
-          >
-            <span class="text-[12px] font-bold">
-              {{ initials }}
-            </span>
-          </div></template
-        >
-        <div class="usuario">
-          <div v-if="authStore && authStore">
-            <h3 class="font-semibold text-[13px] text-mono-negro dark:text-mono-blanco">
-              {{ authStore.nombreCompleto }}
-            </h3>
-            <p
-              class="-mt-[5px] text-[12px] font-medium text-mono-negro dark:text-secundary-light"
-            >
-              {{ authStore.rol || "Sin rol" }}
-            </p>
-          </div>
-          <div v-else>
-            <p class="text-mono-negro dark:text-mono-blanco">
-              Cargando información del usuario...
-            </p>
-          </div>
-        </div>
-      </div>
+      
     </div>
   </header>
 </template>

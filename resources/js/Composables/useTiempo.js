@@ -1,42 +1,51 @@
 // resources/js/composables/useTiempo.js
-import { ref, onMounted, onUnmounted } from 'vue'
-import dayjs from 'dayjs'
-import { fromNow, calcularRestantes } from '@/Utils/date'
+import { ref, onMounted, onUnmounted } from 'vue';
+import dayjs from 'dayjs';
+import { fromNow, calcularRestantes } from '@/Utils/date';
+import { useAuthStore } from "@/stores/auth";
 
-export function useTiempo(user) {
-  const tiempoActivo = ref('')
-  const diasRestantes = ref(0)
+// No llames a la tienda aquí arriba
 
-  let intervalo = null
-  let intervaloRestante = null
+export function useTiempo() { // El parámetro 'user' no es necesario si usas el authStore
+  // ¡CORRECTO! Llama a la tienda aquí dentro.
+  const authStore = useAuthStore(); 
+
+  const tiempoActivo = ref('');
+  const diasRestantes = ref(0);
+
+  let intervalo = null;
+  let intervaloRestante = null;
 
   const calcularTiempo = () => {
-    if (!user.value?.fecha_creacion || !dayjs(user.value.fecha_creacion).isValid()) {
-      tiempoActivo.value = 'Sin fecha'
-      return
+    // Verifica si la fecha de creación existe en la tienda
+    if (!authStore.createdAt || !dayjs(authStore.createdAt).isValid()) {
+      tiempoActivo.value = 'Fecha no disponible';
+      return;
     }
-
-    tiempoActivo.value = fromNow(user.value.fecha_creacion)
-  }
+    tiempoActivo.value = fromNow(authStore.createdAt);
+  };
 
   const calcularDiasRestantes = () => {
-    const fechaActivacion = user.value?.tienda?.pagos_membresia?.fecha_activacion
-    const duracion = user.value?.tienda?.aplicacion?.membresia?.duracion
-    diasRestantes.value = calcularRestantes(fechaActivacion, duracion)
-  }
+    const fechaActivacion = authStore.fechaPago;
+    const duracion = authStore.duracionMembresia;
+    diasRestantes.value = calcularRestantes(fechaActivacion, duracion);
+  };
 
   onMounted(() => {
-    calcularTiempo()
-    calcularDiasRestantes()
+    // Llama a las funciones para establecer los valores iniciales
+    calcularTiempo();
+    calcularDiasRestantes();
 
-    intervalo = setInterval(calcularTiempo, 60000)
-    intervaloRestante = setInterval(calcularDiasRestantes, 8640000) // 24 horas en milisegundos
-  })
+    // Configura los intervalos para que se actualicen periódicamente
+    intervalo = setInterval(calcularTiempo, 60000); // Cada minuto
+    intervaloRestante = setInterval(calcularDiasRestantes, 3600000); // Cada hora
+  });
 
   onUnmounted(() => {
-    clearInterval(intervalo)
-    clearInterval(intervaloRestante)
-  })
+    // Limpia los intervalos cuando el componente se destruye
+    clearInterval(intervalo);
+    clearInterval(intervaloRestante);
+  });
 
-  return { tiempoActivo, diasRestantes }
+  return { tiempoActivo, diasRestantes };
 }
