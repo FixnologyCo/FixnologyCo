@@ -7,8 +7,6 @@ import { useSidebar } from "@/Composables/useSidebar";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import { useAuthStore } from "@/stores/auth";
 
-
-
 import Header from "@/Components/header/Header.vue";
 
 const authStore = useAuthStore();
@@ -103,9 +101,9 @@ const inicialesNombreTienda = computed(() => {
       </div>
       <div
         :class="[sidebarExpandido ? 'w-[85%]' : 'w-[100%]']"
-        class="contenido p-6 dark:bg-mono-negro_opacity_full bg-mono-blanco_opacity text-mono-blanco rounded-2xl"
+        class="contenido p-5 dark:bg-mono-negro_opacity_full bg-mono-blanco_opacity text-mono-blanco rounded-2xl"
       >
-        <Header :auth="authStore" class="mb-3" />
+        <Header :auth="authStore" class="mb-5" />
         <slot></slot>
       </div>
     </div>

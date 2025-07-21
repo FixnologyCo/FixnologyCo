@@ -1,10 +1,10 @@
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, onMounted, onUnmounted } from "vue";
 import { usePage, router } from "@inertiajs/vue3";
 import { route } from "ziggy-js";
 
 import Colors from "@/Composables/ModularColores";
-import { useTema  } from "@/Composables/useTema";
+import { useTema } from "@/Composables/useTema";
 const { modoOscuro, animando, animarCambioTema, backgroundStyle } = useTema();
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import { useAuthStore } from "@/stores/auth";
@@ -69,89 +69,89 @@ const logout = () => {
     preserveScroll: true,
   });
 };
+
+const nombreDia = ref("");
+const dia = ref("");
+const mes = ref("");
+const anio = ref("");
+const hora = ref("");
+const saludo = ref("");
+
+function actualizarFechaHora() {
+  const fecha = new Date();
+  dia.value = fecha.getDate();
+
+  const nombreDias = [
+    "Domingo",
+    "Lunes",
+    "Martes",
+    "Miércoles",
+    "Jueves",
+    "Viernes",
+    "Sábado",
+  ];
+  const monthNamesClock = [
+    "enero",
+    "febrero",
+    "marzo",
+    "abril",
+    "mayo",
+    "junio",
+    "julio",
+    "agosto",
+    "septiembre",
+    "octubre",
+    "noviembre",
+    "diciembre",
+  ];
+  mes.value = monthNamesClock[fecha.getMonth()];
+  nombreDia.value = nombreDias[fecha.getDay()];
+  anio.value = fecha.getFullYear();
+
+  let horas = fecha.getHours();
+  const minutos = fecha.getMinutes().toString().padStart(2, "0");
+  const segundos = fecha.getSeconds().toString().padStart(2, "0");
+  const periodo = horas >= 12 ? "pm" : "am";
+
+  if (horas > 12) {
+    horas -= 12;
+  } else if (horas === 0) {
+    horas = 12;
+  }
+  hora.value = `${horas}:${minutos}:${segundos} ${periodo}`;
+}
+
+let clockInterval = null;
+onMounted(() => {
+  actualizarFechaHora();
+  clockInterval = setInterval(actualizarFechaHora, 1000);
+});
+onUnmounted(() => {
+  clearInterval(clockInterval);
+});
+
+let fecha = new Date();
+let horas = fecha.getHours();
+
+if (horas > 12) {
+  horas -= 12;
+} else if (horas === 0) {
+  horas = 12;
+}
+
+if (fecha.getHours() < 12) {
+  saludo.value = "¡Buenos días!";
+} else if (fecha.getHours() < 18) {
+  saludo.value = "¡Buenas tardes!";
+} else {
+  saludo.value = "¡Buenas noches!";
+}
 </script>
 
 <template>
   <header class="header flex items-center justify-between gap-3">
     <div class="left w-[20%] rounded-md">
-      <div class="infoTienda flex items-center gap-2">
-        <div class="">
-          <div class="flex items-center" v-if="authStore && authStore">
-            <span
-              class="material-symbols-rounded align-middle mr-1"
-              :class="[textoClase]"
-            >
-              {{ icono }}
-            </span>
-            <h1 class="text-[25px] font-medium text-mono-negro dark:text-mono-blanco">
-              {{ ruta }}
-            </h1>
-          </div>
-          <div v-else>
-            <p class="text-mono-negro dark:text-mono-blanco">
-              Cargando información del usuario...
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="flex gap-2 items-center">
-      <button
-        @click="animarCambioTema"
-        class="flex items-center justify-center gap-2 h-[35px] w-[35px] rounded-full border border-secundary-light text-sm transition-all duration-500 ease-in-out relative overflow-hidden"
-        :class="[
-          modoOscuro ? 'text-mono-blanco' : 'text-mono-negro',
-          animando ? 'scale-105 shadow-lg rotate-1' : '',
-        ]"
-      >
-        <span
-          class="material-symbols-rounded text-[20px] transition-transform duration-500"
-          :class="{ 'animate-spin-slow': animando }"
-        >
-          {{ modoOscuro ? "light_mode" : "dark_mode" }}
-        </span>
-        <!-- destello -->
-        <span
-          v-if="animando"
-          class="absolute inset-0 bg-mono-blanco/10 backdrop-blur-sm animate-ping z-0 rounded-md"
-        ></span>
-      </button>
-
-      <!-- <a :href="route('aplicacion.historial', { aplicacion, rol })">
-                <div class="user h-[30px] w-[30px] rounded-full overflow-hidden flex items-center justify-center cursor-pointer"
-                    :class="[currentRoute === historialRoute ? [bgClase] : 'bg-transparent' , hoverClase]">
-                    <span class="material-symbols-rounded text-[20px] dark:text-mono-blanco">
-                        history
-                    </span>
-                </div>
-            </a> -->
-
-      <div
-        class="user h-[30px] w-[30px] rounded-full overflow-hidden flex items-center justify-center cursor-pointer"
-        :class="[hoverClase]"
-      >
-        <span
-          class="material-symbols-rounded text-[20px] dark:text-mono-blanco text-mono-negro"
-        >
-          help
-        </span>
-      </div>
-
-      <a :href="route('aplicacion.configuraciones', { aplicacion, rol })">
-        <div
-          class="user h-[30px] w-[30px] rounded-full overflow-hidden flex items-center justify-center cursor-pointer"
-          :class="[hoverClase]"
-        >
-          <span
-            class="material-symbols-rounded text-[20px] dark:text-mono-blanco text-mono-negro"
-          >
-            notifications
-          </span>
-        </div>
-      </a>
-
-      <div class="relative">
+      <div class="relative max-w-[280px]">
         <div class="cajaUser flex items-center">
           <div class="flex gap-1 items-center relative">
             <div v-if="authStore.isAuthenticated === true">
@@ -182,20 +182,30 @@ const logout = () => {
             </template>
           </div>
 
+          
+          <div class="ml-2">
+            <p class=" font-semibold text-mono-negro dark:text-mono-blanco">
+              {{ saludo }}, {{ authStore.primerNombre }}.
+            </p>
+            <p class="text-[12px] font-medium text-secundary-default dark:text-secundary-light"> {{ nombreDia }} {{ dia }} de {{ mes }} {{ anio }}, {{ hora }}</p>
+          </div>
+
           <span
             @click="toggleMenu"
-            class="material-symbols-rounded text-[16px] cursor-pointer"
+            class="material-symbols-rounded text-[16px] dark:text-mono-blanco text-mono-negro cursor-pointer"
             >keyboard_arrow_down</span
           >
         </div>
 
         <div
           v-if="isMenuOpen"
-          class="absolute right-0 mt-2 w-52 bg-mono-blanco dark:bg-mono-negro_opacity_full rounded-xl shadow-lg p-3 z-20"
+          class="absolute right-0 mt-2 w-52 bg-mono-blanco_opacity dark:bg-mono-negro_opacity_full backdrop-blur-md rounded-xl shadow-lg p-3 z-20"
         >
-          <div class="nombreUsuario px-4 py-2">
+          <div class="nombreUsuario px-2 py-2">
             <div class="flex items-center justify-between">
-              <h3 class="text-mono-negro dark:text-mono-blanco">
+              <span class="material-symbols-rounded text-[18px] text-universal-naranja"
+                  >crown</span>
+              <h3 class="text-mono-negro font-semibold dark:text-mono-blanco">
                 {{ authStore.primerNombre + " " + authStore.primerApellido }}
               </h3>
               <div class="grid place-items-center" v-if="authStore.google_id === null">
@@ -227,6 +237,13 @@ const logout = () => {
             ><span class="material-symbols-rounded text-[18px]">settings</span>
             Configuraciones</a
           >
+          <a
+            href="#"
+            :class="hoverClase"
+            class="flex items-center gap-2 px-2 rounded-full py-2 text-sm text-mono-negro dark:text-mono-blanco"
+            ><span class="material-symbols-rounded text-[18px]">Help</span>
+            Ayuda</a
+          >
 
           <div class="border-t border-gray-200 dark:border-gray-700 my-2"></div>
           <a
@@ -247,6 +264,57 @@ const logout = () => {
           >
         </div>
       </div>
+    </div>
+
+    
+
+    <div class="flex gap-2 items-center">
+    <div class="search flex items-center gap-1">
+    <span class="material-symbols-rounded border dark:border-secundary-light border-mono-negro rounded-full p-2  dark:text-secundary-light text-mono-negro font-medium text-[16px]">search</span>
+    <input type="search" placeholder="Buscar..." name="" id="" class="outline-none dark:text-secundary-light text-mono-negro font-medium text-[14px] bg-transparent border dark:border-secundary-light border-mono-negro rounded-full px-3 py-1">
+    </div>
+    <a :href="route('aplicacion.configuraciones', { aplicacion, rol })">
+        <div
+          class="user h-[30px] w-[30px] rounded-full overflow-hidden flex items-center justify-center cursor-pointer"
+          :class="[hoverClase]"
+        >
+          <span
+            class="material-symbols-rounded text-[20px] dark:text-mono-blanco text-mono-negro"
+          >
+            notifications
+          </span>
+        </div>
+      </a>
+      <button
+        @click="animarCambioTema"
+        class="flex items-center justify-center gap-2 h-[35px] w-[35px] rounded-full border border-secundary-light text-sm transition-all duration-500 ease-in-out relative overflow-hidden"
+        :class="[
+          modoOscuro ? 'text-mono-blanco' : 'text-mono-negro',
+          animando ? 'scale-105 shadow-lg rotate-1' : '',
+        ]"
+      >
+        <span
+          class="material-symbols-rounded text-[20px] transition-transform duration-500"
+          :class="{ 'animate-spin-slow': animando }"
+        >
+          {{ modoOscuro ? "light_mode" : "dark_mode" }}
+        </span>
+        <!-- destello -->
+        <span
+          v-if="animando"
+          class="absolute inset-0 bg-mono-blanco/10 backdrop-blur-sm animate-ping z-0 rounded-md"
+        ></span>
+      </button>
+
+      <!-- <a :href="route('aplicacion.historial', { aplicacion, rol })">
+                <div class="user h-[30px] w-[30px] rounded-full overflow-hidden flex items-center justify-center cursor-pointer"
+                    :class="[currentRoute === historialRoute ? [bgClase] : 'bg-transparent' , hoverClase]">
+                    <span class="material-symbols-rounded text-[20px] dark:text-mono-blanco">
+                        history
+                    </span>
+                </div>
+            </a> -->
+      
     </div>
   </header>
 </template>
