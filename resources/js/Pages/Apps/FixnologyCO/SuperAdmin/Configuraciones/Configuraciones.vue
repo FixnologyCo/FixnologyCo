@@ -40,8 +40,8 @@ const rol = authStore.rol;
 const { tiempoActivo, diasRestantes } = useTiempo(usuario);
 
 const inicialesNombreUsuario = computed(() => {
-  const nombres = authStore.primer_nombre || "";
-  const apellidos = authStore.primer_apellido || "";
+  const nombres = authStore.primerNombre || "";
+  const apellidos = authStore.primerApellido || "";
   const firstNameInitial = nombres.split(" ")[0]?.charAt(0).toUpperCase() || "";
   const lastNameInitial = apellidos.split(" ")[0]?.charAt(0).toUpperCase() || "";
   return firstNameInitial + lastNameInitial;
@@ -88,7 +88,7 @@ const logout = () => {
               <div
                 class="grid place-content-center foto w-[230px] h-[230px] rounded-[55px] bg-secundary-opacity dark:bg-mono-blanco backdrop-blur-lg"
               >
-                <template v-if="authStore.rutaFoto">
+                <template v-if="authStore.rutaFoto  !== 'Sin foto'">
                   <div class="relative w-[220px] h-[220px] group">
                     <img
                       :src="authStore.rutaFoto"
@@ -102,7 +102,7 @@ const logout = () => {
                     class="p-2 w-[220px] h-[220px] rounded-[50px] grid place-content-center"
                     :class="[bgClase]"
                   >
-                    <p class="text-[45px] font-semibold">{{ inicialesNombreUsuario }}</p>
+                    <p class="text-[60px] font-semibold">{{ inicialesNombreUsuario }}</p>
                   </div>
                 </template>
               </div>

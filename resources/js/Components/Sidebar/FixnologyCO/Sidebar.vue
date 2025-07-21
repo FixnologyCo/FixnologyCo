@@ -7,6 +7,8 @@ import { useSidebar } from "@/Composables/useSidebar";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import { useAuthStore } from "@/stores/auth";
 
+
+
 import Header from "@/Components/header/Header.vue";
 
 const authStore = useAuthStore();
@@ -38,7 +40,7 @@ const inicialesNombreTienda = computed(() => {
 </script>
 
 <template>
-  <div class="bg-[url('/resources/images/02.webp')] bg-cover w-full min-h-[100vh]">
+  <div class="dark:bg-[url('/resources/images/01.webp')] bg-[url('/resources/images/02.webp')] bg-cover w-full min-h-[100vh]">
     <div
       class="p-4 flex bg-mono-negro_opacity_medio backdrop-blur-md w-full min-h-[100vh] rounded-xl"
     >
@@ -89,11 +91,11 @@ const inicialesNombreTienda = computed(() => {
 
             <div
               v-if="!sidebarExpandido"
-              class="text-center text-secundary-light text-[12px]"
+              class="text-center text-mono-blanco dark:text-secundary-light text-[12px]"
             >
               -
             </div>
-            <p v-if="sidebarExpandido" class="text-secundary-light text-[12px] mt-2.5">
+            <p v-if="sidebarExpandido" class="text-mono-blanco dark:text-secundary-light text-[12px] mt-2.5">
               Gestión
             </p>
           </ul>

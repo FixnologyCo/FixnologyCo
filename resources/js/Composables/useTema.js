@@ -1,12 +1,13 @@
 // /utils/useTheme.js
 
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 
 // La función composable
 export function useTema() {
-  // El estado y la lógica se encapsulan aquí dentro
+ 
   const modoOscuro = ref(false);
   const animando = ref(false);
+
 
   const detectarPreferencia = () => {
     const preferencia = localStorage.getItem("modoOscuro");
@@ -25,7 +26,7 @@ export function useTema() {
   };
 
   const animarCambioTema = () => {
-    if (animando.value) return; // Evita doble clic
+    if (animando.value) return; 
     animando.value = true;
     toggleTema();
     setTimeout(() => {
@@ -33,15 +34,16 @@ export function useTema() {
     }, 600);
   };
 
-  // El ciclo de vida se conecta al componente que usa el composable
+ 
   onMounted(() => {
     detectarPreferencia();
   });
 
-  // Retornamos solo lo que el componente necesita usar
+
   return {
     modoOscuro,
     animando,
     animarCambioTema,
+   
   };
 }

@@ -4,8 +4,8 @@ import { usePage, router } from "@inertiajs/vue3";
 import { route } from "ziggy-js";
 
 import Colors from "@/Composables/ModularColores";
-import { useTema } from "@/Composables/useTema";
-const { modoOscuro, animando, animarCambioTema } = useTema();
+import { useTema  } from "@/Composables/useTema";
+const { modoOscuro, animando, animarCambioTema, backgroundStyle } = useTema();
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import { useAuthStore } from "@/stores/auth";
 const authStore = useAuthStore();
