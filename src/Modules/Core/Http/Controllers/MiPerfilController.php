@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 
-class ConfiguracionesController extends Controller
+class MiPerfilController extends Controller
 {
     /**
      * Muestra el dashboard para la aplicación y rol especificados.
@@ -26,6 +26,7 @@ class ConfiguracionesController extends Controller
             'perfilUsuario',
             'perfilUsuario.indicativo',
             'perfilUsuario.tipoDocumento',
+            'perfilUsuario.estado',
             'perfilEmpleado',
             'perfilEmpleado.estado',
             'perfilEmpleado.medioPago',
@@ -38,19 +39,21 @@ class ConfiguracionesController extends Controller
             'tienda.aplicacionWeb.membresia.estado',
             'tienda.facturas',
             'tienda.facturas.estado',
+            'tienda.facturas.medioPago',
             'tienda.propietario'
 
         );
-        $tipoDeRol = $usuario->rol->tipo_rol; // Ej: "SuperAdmin"
+        $tipoDeRol = $usuario->rol->tipo_rol;
+        $aplicacionWeb = $usuario->tienda[0]->aplicacionWeb->nombre_app ?? null;
 
+        
         // Validar acceso con Gate (rol 4)
-        if (!in_array($usuario->rol->id, [1, 2, 3, 4])) {
+        if (!in_array($usuario->rol->id, [4])) {
             abort(403, 'No tienes permisos para acceder a esta sección.');
         }
-
           // 5. RENDERIZAR LA VISTA DE INERTIA CON LOS PROPS CORRECTOS
         // Ya no necesitamos el 'if' que validaba la tienda, eso lo debe hacer la autorización.
-            return Inertia::render('Apps/' . ucfirst($aplicacion) . '/' . ucfirst($rol) . '/Configuraciones/Configuraciones', [
+            return Inertia::render('Apps/' . ucfirst($aplicacion) . '/' . ucfirst($rol) . '/MiPerfil/MiPerfil', [
                 'usuario' => $usuario,
                 'rol' => $tipoDeRol
             ]);

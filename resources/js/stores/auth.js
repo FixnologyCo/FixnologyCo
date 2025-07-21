@@ -52,12 +52,12 @@ export const useAuthStore = defineStore('auth', {
         tipoContratoEmpleado: (state) => state.user.perfil_empleado.tipo_contrato || 'Cargando info...',
         documentoIngresoEmpleado: (state) => state.user.perfil_empleado.documentos_zip || 'Cargando info...',
         fechaIngresoEmpleado: (state) => state.user.perfil_empleado.fecha_ingreso || 'Cargando info...',
-        fechaEgresoEmpleado: (state) => state.user.perfil_empleado.fecha_egreso || 'Cargando info...',
+        fechaEgresoEmpleado: (state) => state.user.perfil_empleado.fecha_egreso || 'No aplica',
         fechaModificacionEmpleado: (state) => state.user.perfil_empleado.fecha_modificacion || 'Cargando info...',
 
         // datos de tienda
         estadoTienda: (state) => state.user.tienda[0].estado.tipo_estado || 'Cargando info...',
-        rutaFotoEstablecimiento: (state) => state.user.tienda[0].ruta_foto_establecimiento || 'Cargando info...',
+        rutaFotoEstablecimiento: (state) => state.user.tienda[0].ruta_foto_establecimiento || 'Sin foto',
         tipoEstablecimiento: (state) => state.user.tienda[0].tipo_establecimiento || 'Cargando info...',
         nombreTienda: (state) => state.user.tienda[0].nombre_establecimiento || 'Cargando info...',
         emailEstablecimiento: (state) => state.user.tienda[0].email_establecimiento || 'Cargando info...',

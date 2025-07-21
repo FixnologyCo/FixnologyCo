@@ -223,7 +223,7 @@ if (fecha.getHours() < 12) {
           </div>
 
           <a
-            :href="route('aplicacion.configuraciones', { aplicacion, rol })"
+            :href="route('aplicacion.miPerfil', { aplicacion, rol })"
             :class="hoverClase"
             class="flex items-center gap-2 px-2 rounded-full py-2 text-sm text-mono-negro dark:text-mono-blanco"
             ><span class="material-symbols-rounded text-[18px]">for_you</span> Mi
@@ -273,7 +273,7 @@ if (fecha.getHours() < 12) {
     <span class="material-symbols-rounded border dark:border-secundary-light border-mono-negro rounded-full p-2  dark:text-secundary-light text-mono-negro font-medium text-[16px]">search</span>
     <input type="search" placeholder="Buscar..." name="" id="" class="outline-none dark:text-secundary-light text-mono-negro font-medium text-[14px] bg-transparent border dark:border-secundary-light border-mono-negro rounded-full px-3 py-1">
     </div>
-    <a :href="route('aplicacion.configuraciones', { aplicacion, rol })">
+    <a :href="route('aplicacion.miPerfil', { aplicacion, rol })">
         <div
           class="user h-[30px] w-[30px] rounded-full overflow-hidden flex items-center justify-center cursor-pointer"
           :class="[hoverClase]"
