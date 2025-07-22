@@ -12,6 +12,8 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import { useAuthStore } from "@/stores/auth";
 import { useTiempo } from "@/Composables/useTiempo";
 import useEstadoClass from "@/Composables/useEstado";
+import { useSidebar } from "@/Composables/useSidebar";
+
 const authStore = useAuthStore();
 defineOptions({
   layout: AuthenticatedLayout,
@@ -19,6 +21,8 @@ defineOptions({
 });
 
 const { getEstadoClass } = useEstadoClass();
+const { sidebarExpandido, toggleSidebar } = useSidebar();
+
 const page = usePage();
 
 const {
@@ -75,7 +79,9 @@ const tabs = [
 
     <div class="flex">
       <SidebarSuperAdmin :auth="authStore">
-        <div class="contenido px-3 max-h-[90vh] w-full overflow-auto scrollbar-custom">
+        <div
+          class="contenido px-3 max-h-[90vh] w-full overflow-auto scrollbar-custom contenido-principal"
+        >
           <div class="options flex gap-1 items-center justify-center text-[14px] mb-10">
             <a
               :href="route('aplicacion.dashboard', { aplicacion, rol })"
@@ -98,10 +104,16 @@ const tabs = [
               class="rounded-[15px] div2 bg-mono-blanco_opacity dark:bg-secundary-opacity"
             >
               <div
-                class="mb-2 grid place-content-center foto w-[450px] h-[300px] rounded-[18px] bg-mono-blanco_opacity dark:bg-secundary-opacity backdrop-blur-lg"
+                :class="sidebarExpandido ? 'w-[400px] h-[300px]' : 'w-[450px] h-[300px]'"
+                class="mb-2 grid place-content-center foto rounded-[18px] bg-mono-blanco_opacity dark:bg-secundary-opacity backdrop-blur-lg"
               >
                 <template v-if="authStore.rutaFoto !== 'Sin foto'">
-                  <div class="relative w-[420px] h-[270px] group">
+                  <div
+                    :class="
+                      sidebarExpandido ? 'w-[380px] h-[280px]' : 'w-[430px] h-[280px]'
+                    "
+                    class="relative group"
+                  >
                     <img
                       :src="authStore.rutaFoto"
                       class="rounded-[18px] w-full h-full object-cover shadow-lg"
@@ -111,8 +123,11 @@ const tabs = [
 
                 <template v-else>
                   <div
-                    class="w-[450px] h-[300px] rounded-[18px] grid place-content-center"
-                    :class="[bgClase]"
+                    :class="
+                      ( sidebarExpandido ? 'w-[380px] h-[280px]' : 'w-[430px] h-[280px]',
+                      [bgClase])
+                    "
+                    class=" rounded-[18px] grid place-content-center"
                   >
                     <p class="text-[60px] font-semibold">{{ inicialesNombreUsuario }}</p>
                   </div>
@@ -135,7 +150,8 @@ const tabs = [
                     >crown</span
                   >
                   <h3
-                    class="text-mono-negro font-semibold text-[30px] dark:text-mono-blanco"
+                  :class="sidebarExpandido ? 'text-[25px]' : 'text-[30px]'"
+                    class="text-mono-negro font-semibold dark:text-mono-blanco"
                   >
                     {{ authStore.nombreCompleto }}
                   </h3>
@@ -241,7 +257,9 @@ const tabs = [
                       Tu membresía finaliza en:
                     </h4>
                     <p
-                      class="text-[30px] font-semibold -mt-1 text-secundary-default dark:text-mono-blanco"
+                  :class="sidebarExpandido ? 'text-[25px]' : 'text-[30px]'"
+
+                      class=" font-semibold -mt-1 text-secundary-default dark:text-mono-blanco"
                     >
                       {{ diasRestantes
                       }}<span
@@ -255,7 +273,9 @@ const tabs = [
                       Te uniste a la familia:
                     </h4>
                     <p
-                      class="text-[30px] font-semibold -mt-1 text-secundary-default dark:text-mono-blanco"
+                  :class="sidebarExpandido ? 'text-[25px]' : 'text-[30px]'"
+
+                      class=" font-semibold -mt-1 text-secundary-default dark:text-mono-blanco"
                     >
                       {{ tiempoActivo }} <span class="text-[14px]"></span>
                     </p>
@@ -298,7 +318,20 @@ const tabs = [
                 </button>
               </div>
             </div>
-            <div class="rounded-[15px] div4 bg-violet-400">3</div>
+            <div class="rounded-[15px] div4 flex justify-between items-center dark:bg-secundary-opacity bg-mono-blanco_opacity p-5">
+             <h4 class=" text-[60px] font-medium text-secundary-default dark:text-mono-blanco">
+                    Mi perfil
+                  </h4>
+                   <button
+                   :class="bgClase"
+                  class=" flex items-center gap-1 p-2 rounded-lg "
+                >
+                  Actualiza tus datos
+                  <span class="material-symbols-rounded text-[20px]">edit</span>
+                </button>
+                
+           
+            </div>
             <div
               class="rounded-[15px] p-3 div5 dark:bg-secundary-opacity bg-mono-blanco_opacity"
             >
@@ -627,14 +660,52 @@ const tabs = [
               </div>
 
               <div
-                class="w-full p-2 h-[auto] rounded-md mt-4"
+                class="w-full p-3 h-[auto] rounded-md mt-4 outline-dashed outline-1 outline-semaforo-verde"
                 :class="getEstadoClass(authStore.estadoFactura)"
               >
-                <p>Detalles de factura:</p>
-                <p>{{ authStore.medioPagoFactura }}</p>
+                <div class="flex justify-between items-center">
+                <p class="text-secundary-default dark:text-mono-blanco">{{ formatFecha(authStore.fechaPago) }}</p>
+                 <button
+                  class="bg-semaforo-verde flex items-center text-[14px] gap-1 px-2 py-1 rounded-md shadow-verde hover:bg-semaforo-verde_opacity hover:text-semaforo-verde"
+                >
+                  {{ authStore.estadoFactura }}
+                 
+                </button>
+                </div>
+                <div class="flex justify-between items-center mt-1">
+                <p class="flex items-center gap-1 text-secundary-default dark:text-mono-blanco"><span class="material-symbols-rounded text-[16px] ">account_balance_wallet</span>{{ authStore.medioPagoFactura }}</p>
                 <p>{{ formatCOP(authStore.montoFactura) }}</p>
-                <p>{{ formatFecha(authStore.fechaPago) }}</p>
+                </div>
+                
               </div>
+              <div class="flex justify-between items-center my-5">
+                <h4 class="text-secundary-default dark:text-mono-blanco">
+                  Próximo cobro
+                </h4>
+                <span
+                  class="material-symbols-rounded text-[16px] cursor-pointer text-secundary-default dark:text-mono-blanco hover:text-universal-azul_secundaria"
+                  >info</span
+                >
+              </div>
+              <div
+                class="w-full p-3 h-[auto] rounded-md mt-4 outline-dashed outline-1 outline-gray-400 bg-gray-800"
+                
+              >
+                <div class="flex justify-between items-center">
+                <p class="">lunes 21 de julio de 4763 a las 12:27 pm</p>
+                 <button
+                  class="bg-gray-400 flex items-center text-[14px] gap-1 px-2 py-1 rounded-md shadowM"
+                >
+                  Proceso
+                 
+                </button>
+                </div>
+                <div class="flex justify-between items-center mt-1">
+                <p class="flex items-center gap-1"><span class="material-symbols-rounded text-[16px]">account_balance_wallet</span>{{ authStore.medioPagoFactura }}</p>
+                <p>{{ formatCOP(authStore.montoFactura) }}</p>
+                </div>
+                
+              </div>  
             </div>
           </div>
         </div></SidebarSuperAdmin
