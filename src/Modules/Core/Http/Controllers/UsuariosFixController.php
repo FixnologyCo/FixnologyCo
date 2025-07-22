@@ -11,7 +11,7 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use function Laravel\Prompts\alert;
 
 
-class  DashboardSuperAdminController extends Controller
+class UsuariosFixController extends Controller
 {
     /**
      * Muestra el dashboard para la aplicación y rol especificados.
@@ -38,7 +38,7 @@ class  DashboardSuperAdminController extends Controller
 
           // 5. RENDERIZAR LA VISTA DE INERTIA CON LOS PROPS CORRECTOS
         // Ya no necesitamos el 'if' que validaba la tienda, eso lo debe hacer la autorización.
-            return Inertia::render('Apps/' . ucfirst($aplicacion) . '/' . ucfirst($rol) . '/Dashboard/Dashboard', [
+            return Inertia::render('Apps/' . ucfirst($aplicacion) . '/' . ucfirst($rol) . '/Usuarios/GestorUsuarios', [
                 'aplicacion' => $aplicacionWeb,
                 'rol' => $tipoDeRol,
                 'usuario' => $usuario,

@@ -124,10 +124,10 @@ const tabs = [
                 <template v-else>
                   <div
                     :class="
-                      ( sidebarExpandido ? 'w-[380px] h-[280px]' : 'w-[430px] h-[280px]',
+                      (sidebarExpandido ? 'w-[380px] h-[280px]' : 'w-[430px] h-[280px]',
                       [bgClase])
                     "
-                    class=" rounded-[18px] grid place-content-center"
+                    class="rounded-[18px] grid place-content-center"
                   >
                     <p class="text-[60px] font-semibold">{{ inicialesNombreUsuario }}</p>
                   </div>
@@ -150,7 +150,7 @@ const tabs = [
                     >crown</span
                   >
                   <h3
-                  :class="sidebarExpandido ? 'text-[25px]' : 'text-[30px]'"
+                    :class="sidebarExpandido ? 'text-[25px]' : 'text-[30px]'"
                     class="text-mono-negro font-semibold dark:text-mono-blanco"
                   >
                     {{ authStore.nombreCompleto }}
@@ -257,9 +257,8 @@ const tabs = [
                       Tu membresía finaliza en:
                     </h4>
                     <p
-                  :class="sidebarExpandido ? 'text-[25px]' : 'text-[30px]'"
-
-                      class=" font-semibold -mt-1 text-secundary-default dark:text-mono-blanco"
+                      :class="sidebarExpandido ? 'text-[25px]' : 'text-[30px]'"
+                      class="font-semibold -mt-1 text-secundary-default dark:text-mono-blanco"
                     >
                       {{ diasRestantes
                       }}<span
@@ -273,9 +272,8 @@ const tabs = [
                       Te uniste a la familia:
                     </h4>
                     <p
-                  :class="sidebarExpandido ? 'text-[25px]' : 'text-[30px]'"
-
-                      class=" font-semibold -mt-1 text-secundary-default dark:text-mono-blanco"
+                      :class="sidebarExpandido ? 'text-[25px]' : 'text-[30px]'"
+                      class="font-semibold -mt-1 text-secundary-default dark:text-mono-blanco"
                     >
                       {{ tiempoActivo }} <span class="text-[14px]"></span>
                     </p>
@@ -318,19 +316,20 @@ const tabs = [
                 </button>
               </div>
             </div>
-            <div class="rounded-[15px] div4 flex justify-between items-center dark:bg-secundary-opacity bg-mono-blanco_opacity p-5">
-             <h4 class=" text-[60px] font-medium text-secundary-default dark:text-mono-blanco">
-                    Mi perfil
-                  </h4>
-                   <button
-                   :class="bgClase"
-                  class=" flex items-center gap-1 p-2 rounded-lg "
-                >
+            <div
+              class="rounded-[15px] div4 flex justify-between items-center dark:bg-secundary-opacity bg-mono-blanco_opacity p-5"
+            >
+              <h4
+                class="text-[60px] font-medium text-secundary-default dark:text-mono-blanco"
+              >
+                Mi perfil
+              </h4>
+              <a :href="route('aplicacion.miPerfil.editarMiPerfil', { aplicacion, rol })">
+                <button :class="bgClase" class="flex items-center gap-1 p-2 rounded-lg">
                   Actualiza tus datos
                   <span class="material-symbols-rounded text-[20px]">edit</span>
                 </button>
-                
-           
+              </a>
             </div>
             <div
               class="rounded-[15px] p-3 div5 dark:bg-secundary-opacity bg-mono-blanco_opacity"
@@ -664,19 +663,25 @@ const tabs = [
                 :class="getEstadoClass(authStore.estadoFactura)"
               >
                 <div class="flex justify-between items-center">
-                <p class="text-secundary-default dark:text-mono-blanco">{{ formatFecha(authStore.fechaPago) }}</p>
-                 <button
-                  class="bg-semaforo-verde flex items-center text-[14px] gap-1 px-2 py-1 rounded-md shadow-verde hover:bg-semaforo-verde_opacity hover:text-semaforo-verde"
-                >
-                  {{ authStore.estadoFactura }}
-                 
-                </button>
+                  <p class="text-secundary-default dark:text-mono-blanco">
+                    {{ formatFecha(authStore.fechaPago) }}
+                  </p>
+                  <button
+                    class="bg-semaforo-verde flex items-center text-[14px] gap-1 px-2 py-1 rounded-md shadow-verde hover:bg-semaforo-verde_opacity hover:text-semaforo-verde"
+                  >
+                    {{ authStore.estadoFactura }}
+                  </button>
                 </div>
                 <div class="flex justify-between items-center mt-1">
-                <p class="flex items-center gap-1 text-secundary-default dark:text-mono-blanco"><span class="material-symbols-rounded text-[16px] ">account_balance_wallet</span>{{ authStore.medioPagoFactura }}</p>
-                <p>{{ formatCOP(authStore.montoFactura) }}</p>
+                  <p
+                    class="flex items-center gap-1 text-secundary-default dark:text-mono-blanco"
+                  >
+                    <span class="material-symbols-rounded text-[16px]"
+                      >account_balance_wallet</span
+                    >{{ authStore.medioPagoFactura }}
+                  </p>
+                  <p>{{ formatCOP(authStore.montoFactura) }}</p>
                 </div>
-                
               </div>
               <div class="flex justify-between items-center my-5">
                 <h4 class="text-secundary-default dark:text-mono-blanco">
@@ -688,24 +693,25 @@ const tabs = [
                 >
               </div>
               <div
-                class="w-full p-3 h-[auto] rounded-md mt-4 outline-dashed outline-1 outline-gray-400 bg-gray-800"
-                
+                class="w-full p-3 h-[auto] rounded-md mt-4 outline-dashed outline-1 outline-gray-400 bg-mono-negro_opacity_full dark:bg-gray-800"
               >
                 <div class="flex justify-between items-center">
-                <p class="">lunes 21 de julio de 4763 a las 12:27 pm</p>
-                 <button
-                  class="bg-gray-400 flex items-center text-[14px] gap-1 px-2 py-1 rounded-md shadowM"
-                >
-                  Proceso
-                 
-                </button>
+                  <p class="">lunes 21 de julio de 4763 a las 12:27 pm</p>
+                  <button
+                    class="bg-gray-400 flex items-center text-[14px] gap-1 px-2 py-1 rounded-md shadowM"
+                  >
+                    Proceso
+                  </button>
                 </div>
                 <div class="flex justify-between items-center mt-1">
-                <p class="flex items-center gap-1"><span class="material-symbols-rounded text-[16px]">account_balance_wallet</span>{{ authStore.medioPagoFactura }}</p>
-                <p>{{ formatCOP(authStore.montoFactura) }}</p>
+                  <p class="flex items-center gap-1">
+                    <span class="material-symbols-rounded text-[16px]"
+                      >account_balance_wallet</span
+                    >{{ authStore.medioPagoFactura }}
+                  </p>
+                  <p>{{ formatCOP(authStore.montoFactura) }}</p>
                 </div>
-                
-              </div>  
+              </div>
             </div>
           </div>
         </div></SidebarSuperAdmin

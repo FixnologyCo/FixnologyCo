@@ -1,516 +1,645 @@
 <script setup>
+import { Head, usePage, router, useForm } from "@inertiajs/vue3";
+import { route } from "ziggy-js";
+import { defineProps, computed, ref } from "vue";
+import SidebarSuperAdmin from "@/Components/Sidebar/FixnologyCO/Sidebar.vue";
+import Header from "@/Components/header/Header.vue";
+import Colors from "@/Composables/ModularColores";
+import MensajesLayout from "@/Layouts/MensajesLayout.vue";
+import { formatFecha } from "@/Utils/date";
+import { formatCOP } from "@/Utils/formateoMoneda";
+import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
+import { useAuthStore } from "@/stores/auth";
+import { useTiempo } from "@/Composables/useTiempo";
+import useEstadoClass from "@/Composables/useEstado";
+import { handleBlur, handleInput, limitesCaracteres } from "@/Utils/formateoInputs";
 
-import { Head, usePage, router } from '@inertiajs/vue3';
-import { route } from 'ziggy-js';
-import { defineProps, computed, ref } from 'vue';
-import SidebarSuperAdmin from '@/Components/Sidebar/FixnologyCO/Sidebar.vue';
-import Header from '@/Components/header/Header.vue';
-import Colors from '@/Composables/ModularColores';
-import MensajesLayout from '@/Layouts/MensajesLayout.vue';
-import { useTiempo } from '@/Composables/useTiempo';
+const authStore = useAuthStore();
+defineOptions({
+  layout: AuthenticatedLayout,
+  inheritAttrs: false,
+});
 
-const page = usePage();
-const user = ref(page.props.auth.user)
-const { tiempoActivo, diasRestantes } = useTiempo(user)
+const form = useForm({
+  ruta_foto: authStore.rutaFoto,
+  primer_nombre: authStore.primerNombre || "No encontrado",
+  segundo_nombre: authStore.segundoNombre || "No encontrado",
+  primer_apellido: authStore.primerApellido || "No encontrado",
+  segundo_apellido: authStore.segundoApellido || "",
+  id_tipo_documento: authStore.tipoDocumento || "No encontrado",
+  numero_documento: authStore.numero_documento || "No encontrado",
+  indicativo: authStore.indicativo || 1,
+  telefono: authStore.telefono || "No encontrado",
+  email: authStore.email || "No encontrado",
+  genero: authStore.genero || "No encontrado",
+  direccion: authStore.direccionResidencia || "No encontrado",
+  ciudad: authStore.ciudadResidencia || "No encontrado",
+  barrio: authStore.barrioResidencia || "No encontrado",
+});
 
-const { appName, bgClase, bgOpacity, textoClase, borderClase, hoverClase, hoverTexto, buttonClase, buttonSecundario } = Colors();
+const submit = () => {
+  form.post(route("aplicacion.editarMiPerfil.actualizar"));
+};
 
-const props = defineProps({
-  auth: {
-    type: Object,
-  },
-  clientes: {
-    type: Array,
-    default: () => [],
-  },
-  aplicacion: {
-    type: String,
-    default: ''
-  },
-  foto_base64: String,
-  errors: {
-    type: Object,
-    required: true
-  }
-})
+const {
+  appName,
+  bgClase,
+  bgOpacity,
+  focus,
+  textoClase,
+  borderClase,
+  buttonFocus,
+  hoverClase,
+  hoverTexto,
+  buttonClase,
+  buttonSecundario,
+} = Colors();
 
-const miUsuario = props.auth.user
+const aplicacion = authStore.aplicacion;
+const rol = authStore.rol;
 
 const inicialesNombreUsuario = computed(() => {
-  const nombres = props.auth.user?.nombres_ct || '';
-  const apellidos = props.auth.user?.apellidos_ct || '';
-
-
-  const firstNameInitial = nombres.split(' ')[0]?.charAt(0).toUpperCase() || '';
-  const lastNameInitial = apellidos.split(' ')[0]?.charAt(0).toUpperCase() || '';
-
+  const nombres = authStore.primerNombre || "";
+  const apellidos = authStore.primerApellido || "";
+  const firstNameInitial = nombres.split(" ")[0]?.charAt(0).toUpperCase() || "";
+  const lastNameInitial = apellidos.split(" ")[0]?.charAt(0).toUpperCase() || "";
   return firstNameInitial + lastNameInitial;
 });
 
-const aplicacion = props.auth?.user?.tienda?.aplicacion?.nombre_app || 'Sin app';
-const rol = props.auth.user.rol?.tipo_rol || 'Sin rol'; // Obtén el tipo de rol
+const inicialesNombreTienda = computed(() => {
+  const nombresTienda = authStore.nombreTienda || "";
 
+  const nombreEstablecimiento =
+    nombresTienda.split(" ")[0]?.charAt(0).toUpperCase() || "";
 
-
-const activeTab = ref(0)
-
-const tabs = [
-  { label: 'Cliente' },
-  { label: 'Tienda' },
-  { label: 'Ajustes avanzados' }
-]
-
-function getEstadoClass(estado) {
-  if (estado === 'Inactivo' || estado === 'Pendiente') return 'bg-semaforo-rojo shadow-rojo';
-  if (estado === 'Suspendido') return 'bg-semaforo-amarillo shadow-amarillo';
-  if (estado === 'Activo' || estado === 'Pagada') return 'bg-semaforo-verde shadow-verde';
-  return '';
-}
-
-
-const onFileChange = (event) => {
-  const file = event.target.files[0]
-  if (!file) return
-
-  const formData = new FormData()
-  formData.append('foto', file)
-
-  router.post(route('usuario.actualizar.foto'), formData, {
-    preserveScroll: true,
-    preserveState: true,
-  })
-}
-
-const form = ref({
-  nombres_ct: miUsuario.nombres_ct || '',
-  apellidos_ct: miUsuario.apellidos_ct || '',
-  email_ct: miUsuario.email_ct || '',
-  telefono_ct: miUsuario.telefono_ct || '',
-
-  nombre_tienda: miUsuario.tienda?.nombre_tienda || '',
-  email_tienda: miUsuario.tienda?.email_tienda || '',
-  telefono_tienda: miUsuario.tienda?.telefono_tienda || '',
-  barrio_tienda: miUsuario.tienda?.barrio_tienda || '',
-  direccion_tienda: miUsuario.tienda?.direccion_tienda || '',
-})
-
-const submitForm = () => {
-  router.put(
-    route('aplicacion.editarMiPerfil.actualizar', {
-      aplicacion: appName.value,
-      rol: props.auth.user.rol.tipo_rol,
-    }),
-    form.value
-  )
-}
-
-
-// ✅ Límites de caracteres para cada campo
-const limitesCaracteres = {
-  nombres_ct: 25,
-  apellidos_ct: 25,
-  email_ct: 60,
-  telefono_ct: 10,
-
-  nombre_tienda: 30,
-  email_tienda: 60,
-  telefono_tienda: 10,
-  barrio_tienda: 30,
-  direccion_tienda: 50,
-}
-
-// ✅ Función para capitalizar cada palabra
-const capitalizeWords = (str) => {
-  return str
-    .split(' ')
-    .filter(word => word)
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-    .join(' ')
-}
-
-// ✅ Función para capitalizar al salir del campo
-const handleBlur = (field) => {
-  if (typeof form[field] === 'string') {
-    form[field] = capitalizeWords(form[field].trim())
-  }
-}
-
-// ✅ Función para limitar caracteres y actualizar el valor
-const handleInput = (event, field) => {
-  const maxCaracteres = limitesCaracteres[field] || 25
-  form[field] = event.target.value.slice(0, maxCaracteres)
-}
+  return nombreEstablecimiento;
+});
 </script>
 
 <template>
   <div>
-
-    <Head title="Editar mi perfil" />
     <MensajesLayout />
-
+    <Head title="Editar mis datos" />
 
     <div class="flex">
-      <SidebarSuperAdmin :auth="auth" />
-
-      <div class="w-full ">
-        <Header :auth="auth" :foto_base64="foto_base64" />
-
-
-        <div class="contenido px-3 max-h-[90vh] w-full overflow-auto scrollbar-custom">
-          <div class="banner w-full min-h-[150px] rounded-lg" :class="[bgOpacity]"></div>
-          <div class="flex items-end justify-between encabezado-config h-[auto] py-10 mx-12">
-            <div class="left-foto -mt-[120px] flex items-end gap-4">
+      <SidebarSuperAdmin :auth="authStore">
+        <div
+          class="contenido px-3 max-h-[90vh] w-full overflow-auto scrollbar-custom contenido-principal"
+        >
+          <div class="options flex gap-1 items-center justify-center text-[14px] mb-10">
+            <a
+              :href="route('aplicacion.dashboard', { aplicacion, rol })"
+              class="text-mono-negro dark:text-mono-blanco dark:hover:text-universal-azul flex items-center gap-1"
+              :class="hoverTexto"
+            >
+              <span class="material-symbols-rounded text-[16px]">home</span>
+              <p>Home</p>
+            </a>
+            <span
+              class="material-symbols-rounded text-[18px] text-mono-negro dark:text-mono-blanco"
+              >chevron_right</span
+            >
+            <a
+              :href="route('aplicacion.miPerfil', { aplicacion, rol })"
+              class="text-mono-negro dark:text-mono-blanco dark:hover:text-universal-azul flex items-center gap-1"
+              :class="hoverTexto"
+            >
+              <span class="material-symbols-rounded text-[16px]">crown</span>
+              <p>Mi perfil</p>
+            </a>
+            <span
+              class="material-symbols-rounded text-[18px] text-mono-negro dark:text-mono-blanco"
+              >chevron_right</span
+            >
+            <p class="font-bold text-mono-negro dark:text-mono-blanco">
+              Editar datos personales
+            </p>
+          </div>
+          <!-- <h1 class="text-[30px] dark:text-mono-blanco text-mono-negro">Mi perfil</h1> -->
+          <form @submit.prevent="submit">
+            <div class="editarMiPerfil w-full min-h-[78dvh]">
               <div
-                class="grid place-content-center foto w-[230px] h-[230px] rounded-[55px] bg-secundary-opacity dark:bg-mono-blanco backdrop-blur-lg">
-                <template v-if="foto_base64">
-                  <div class="relative w-[220px] h-[220px] group">
-
-                    <img v-if="foto_base64" :src="foto_base64"
-                      class="rounded-[50px] w-full h-full object-cover shadow-lg" />
-
-
-                    <div
-                      class="absolute inset-0 bg-black/40 rounded-[50px] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-
-                      <label for="fotoInput"
-                        class="cursor-pointer bg-white p-3 rounded-full shadow-md hover:bg-gray-200 transition"
-                        title="Cambiar foto">
-                        <span class="material-symbols-rounded text-2xl" :class="[textoClase]">edit</span>
-                      </label>
+                class="rounded-[15px] cajaUsuario p-5 bg-mono-blanco_opacity dark:bg-secundary-opacity"
+              >
+                <div
+                  class="mb-2 grid place-content-center foto w-[280px] h-[280px] rounded-[18px] bg-mono-blanco_opacity dark:bg-secundary-opacity backdrop-blur-lg"
+                >
+                  <template v-if="authStore.rutaFoto !== 'Sin foto'">
+                    <div class="relative group w-[260px] h-[260px]">
+                      <img
+                        :src="authStore.rutaFoto"
+                        class="rounded-[18px] w-full h-full object-cover shadow-lg"
+                      />
                     </div>
+                  </template>
 
-                    <!-- Input oculto -->
-                    <input id="fotoInput" type="file" accept="image/*" @change="onFileChange" class="hidden" />
-                  </div>
-                </template>
-
-
-
-                <template v-else>
-                  <div class="relative w-[220px] h-[220px] group">
-
-                    <div class="relative p-2 w-[220px] h-[220px] rounded-[50px] grid place-content-center bg-secundary-opacity"
-                    :class="[bgClase]">
-                    <p class="text-[45px] font-semibold">{{ inicialesNombreUsuario }}</p>
-                  </div>
-
-
+                  <template v-else>
                     <div
-                      class="absolute inset-0 bg-black/40 rounded-[50px] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-
-                      <label for="fotoInput"
-                        class="cursor-pointer bg-white p-3 rounded-full shadow-md hover:bg-gray-200 transition"
-                        title="Cambiar foto">
-                        <span class="material-symbols-rounded text-2xl" :class="[textoClase]">edit</span>
-                      </label>
+                      :class="[bgClase]"
+                      class="rounded-[18px] grid place-content-center w-[280px] h-[280px]"
+                    >
+                      <p class="text-[60px] font-semibold">
+                        {{ inicialesNombreUsuario }}
+                      </p>
                     </div>
+                  </template>
+                </div>
 
-                    <!-- Input oculto -->
-                    <input id="fotoInput" type="file" accept="image/*" @change="onFileChange" class="hidden" />
+                <div class="infoBasica px-4">
+                  <div class="flex justify-between items-center">
+                    <h4 class="text-secundary-default dark:text-mono-blanco">
+                      Editar mi usuario:
+                    </h4>
                   </div>
-                  
-                </template>
-              </div>
 
-
-
-              <div class="nombre">
-                <h3 class="font-semibold text-[30px] text-mono-negro dark:text-mono-blanco">{{ user.nombres_ct }} {{
-                  user.apellidos_ct }}</h3>
-
-                <div class="flex items-center justify-between">
-                  <p id="rol-usuario" class="flex items-center gap-1.5 py-1 text-mono-negro dark:text-mono-blanco">
-                    <span class="material-symbols-rounded text-[20px] text-universal-azul">local_police</span>
-                    {{ user.rol?.tipo_rol || 'Sin rol' }}
-                  </p>
+                  <!-- nombres -->
                   <div
-                    class="flex items-center gap-1 shadowM text-mono-blanco bg-universal-azul w-[auto] py-1 px-2 rounded-md">
-                    {{
-                      user.tienda?.aplicacion?.membresia?.nombre_membresia }} <span
-                      class="material-symbols-rounded text-[18px]">bolt</span></div>
+                    class="2xl:flex 2xl:flex-row 2xl:justify-between 2xl:items-center 2xl:gap-2 xl:flex xl:flex-row xl:justify-between xl:items-center xl:gap-2 gap-3 flex flex-col items-center"
+                  >
+                    <div class="2xl:w-[50%] xl:w-[50%] w-full">
+                      <div class="contador-label flex items-center justify-between">
+                        <p class="my-[5px] text-[14px] dark:text-mono-blanco">
+                          Primer nombre:
+                        </p>
+                        <p
+                          class="2xl:text-[10px] xl:text-[12px] text-[8px] text-secundary-light"
+                        >
+                          {{ form.primer_nombre.length }} /
+                          {{ limitesCaracteres.primer_nombre }}
+                        </p>
+                      </div>
+
+                      <div
+                        class="w-[100%] p-[3px] flex items-center gap-[8px] transition-all rounded-[5px] border-[1px] border-secundary-ligh"
+                        t
+                        :class="{ 'border-universal-naranja': form.errors.primer_nombre }"
+                      >
+                        <span
+                          class="material-symbols-rounded text-universal-naranja text-[20px] pl-[5px]"
+                          >format_italic</span
+                        >
+
+                        <input
+                          type="text"
+                          class="2xl:w-full focus:outline-none focus:border-none font-normal bg-transparent dark:text-mono-blanco"
+                          placeholder="Ej: Juan"
+                          v-model="form.primer_nombre"
+                          @blur="handleBlur(form, 'primer_nombre')"
+                          @input="(e) => handleInput(e, form, 'primer_nombre')"
+                        />
+                      </div>
+                      <span
+                        v-if="form.errors.primer_nombre"
+                        class="2xl:text-sm text-universal-naranja"
+                      >
+                        {{ form.errors.primer_nombre }}
+                      </span>
+                    </div>
+
+                    <div class="2xl:w-[50%] xl:w-[50%] w-full">
+                      <div class="contador-label flex items-center justify-between">
+                        <p class="my-[5px] text-[14px] dark:text-mono-blanco">
+                          Segundo nombre:
+                        </p>
+                        <p
+                          class="2xl:text-[10px] xl:text-[12px] text-[8px] text-secundary-light"
+                        >
+                          {{ form.segundo_nombre.length }} /
+                          {{ limitesCaracteres.segundo_nombre }}
+                        </p>
+                      </div>
+
+                      <div
+                        class="w-[100%] p-[3px] flex items-center gap-[8px] transition-all rounded-[5px] border-[1px] border-secundary-ligh"
+                        t
+                        :class="{
+                          'border-universal-naranja': form.errors.segundo_nombre,
+                        }"
+                      >
+                        <span
+                          class="material-symbols-rounded text-universal-naranja text-[20px] pl-[5px]"
+                          >format_italic</span
+                        >
+
+                        <input
+                          type="text"
+                          class="2xl:w-full focus:outline-none focus:border-none font-normal bg-transparent dark:text-mono-blanco"
+                          placeholder="Ej: Guarnizo"
+                          v-model="form.segundo_nombre"
+                          @blur="handleBlur(form, 'segundo_nombre')"
+                          @input="(e) => handleInput(e, form, 'segundo_nombre')"
+                        />
+                      </div>
+                      <span
+                        v-if="form.errors.segundo_nombre"
+                        class="2xl:text-sm text-universal-naranja"
+                      >
+                        {{ form.errors.segundo_nombre }}
+                      </span>
+                    </div>
+                  </div>
+
+                  <!-- apellidos -->
+                  <div
+                    class="2xl:flex 2xl:flex-row 2xl:justify-between 2xl:items-center 2xl:gap-2 xl:flex xl:flex-row xl:justify-between xl:items-center xl:gap-2 gap-3 flex flex-col items-center"
+                  >
+                    <div class="2xl:w-[50%] xl:w-[50%] w-full">
+                      <div class="contador-label flex items-center justify-between">
+                        <p class="my-[5px] text-[14px] dark:text-mono-blanco">
+                          Primer apellido:
+                        </p>
+                        <p
+                          class="2xl:text-[10px] xl:text-[12px] text-[8px] text-secundary-light"
+                        >
+                          {{ form.primer_apellido.length }} /
+                          {{ limitesCaracteres.primer_apellido }}
+                        </p>
+                      </div>
+
+                      <div
+                        class="w-[100%] p-[3px] flex items-center gap-[8px] transition-all rounded-[5px] border-[1px] border-secundary-ligh"
+                        t
+                        :class="{
+                          'border-universal-naranja': form.errors.primer_apellido,
+                        }"
+                      >
+                        <span
+                          class="material-symbols-rounded text-universal-naranja text-[20px] pl-[5px]"
+                          >format_italic</span
+                        >
+
+                        <input
+                          type="text"
+                          class="2xl:w-full focus:outline-none focus:border-none font-normal bg-transparent dark:text-mono-blanco"
+                          placeholder="Ej: Juan"
+                          v-model="form.primer_apellido"
+                          @blur="handleBlur(form, 'primer_apellido')"
+                          @input="(e) => handleInput(e, form, 'primer_apellido')"
+                        />
+                      </div>
+                      <span
+                        v-if="form.errors.primer_apellido"
+                        class="2xl:text-sm text-universal-naranja"
+                      >
+                        {{ form.errors.primer_apellido }}
+                      </span>
+                    </div>
+
+                    <div class="2xl:w-[50%] xl:w-[50%] w-full">
+                      <div class="contador-label flex items-center justify-between">
+                        <p class="my-[5px] text-[14px] dark:text-mono-blanco">
+                          Segundo apellido:
+                        </p>
+                        <p
+                          class="2xl:text-[10px] xl:text-[12px] text-[8px] text-secundary-light"
+                        >
+                          {{ form.segundo_apellido.length }} /
+                          {{ limitesCaracteres.segundo_apellido }}
+                        </p>
+                      </div>
+
+                      <div
+                        class="w-[100%] p-[3px] flex items-center gap-[8px] transition-all rounded-[5px] border-[1px] border-secundary-ligh"
+                        t
+                        :class="{
+                          'border-universal-naranja': form.errors.segundo_apellido,
+                        }"
+                      >
+                        <span
+                          class="material-symbols-rounded text-universal-naranja text-[20px] pl-[5px]"
+                          >format_italic</span
+                        >
+
+                        <input
+                          type="text"
+                          class="2xl:w-full focus:outline-none focus:border-none font-normal bg-transparent dark:text-mono-blanco"
+                          placeholder="Ej: Guarnizo"
+                          v-model="form.segundo_apellido"
+                          @blur="handleBlur(form, 'segundo_apellido')"
+                          @input="(e) => handleInput(e, form, 'segundo_apellido')"
+                        />
+                      </div>
+                      <span
+                        v-if="form.errors.segundo_apellido"
+                        class="2xl:text-sm text-universal-naranja"
+                      >
+                        {{ form.errors.segundo_apellido }}
+                      </span>
+                    </div>
+                  </div>
+
+                  <!-- telefonos -->
+                  <div
+                    class="2xl:flex 2xl:flex-row 2xl:justify-between 2xl:items-center 2xl:gap-2 xl:flex xl:flex-row xl:justify-between xl:items-center xl:gap-2 gap-3 flex flex-col items-center"
+                  >
+                    <div class="2xl:w-[50%] xl:w-[50%] w-full">
+                      <div class="contador-label flex items-center justify-between">
+                        <p class="my-[5px] text-[14px] dark:text-mono-blanco">
+                          Primer nombre:
+                        </p>
+                        <p
+                          class="2xl:text-[10px] xl:text-[12px] text-[8px] text-secundary-light"
+                        >
+                          {{ form.primer_nombre.length }} /
+                          {{ limitesCaracteres.primer_nombre }}
+                        </p>
+                      </div>
+
+                      <div
+                        class="w-[100%] p-[3px] flex items-center gap-[8px] transition-all rounded-[5px] border-[1px] border-secundary-ligh"
+                        t
+                        :class="{ 'border-universal-naranja': form.errors.primer_nombre }"
+                      >
+                        <span
+                          class="material-symbols-rounded text-universal-naranja text-[20px] pl-[5px]"
+                          >format_italic</span
+                        >
+
+                        <input
+                          type="text"
+                          class="2xl:w-full focus:outline-none focus:border-none font-normal bg-transparent dark:text-mono-blanco"
+                          placeholder="Ej: Juan"
+                          v-model="form.primer_nombre"
+                          @blur="handleBlur(form, 'primer_nombre')"
+                          @input="(e) => handleInput(e, form, 'primer_nombre')"
+                        />
+                      </div>
+                      <span
+                        v-if="form.errors.primer_nombre"
+                        class="2xl:text-sm text-universal-naranja"
+                      >
+                        {{ form.errors.primer_nombre }}
+                      </span>
+                    </div>
+
+                    <div class="2xl:w-[50%] xl:w-[50%] w-full">
+                      <div class="contador-label flex items-center justify-between">
+                        <p class="my-[5px] text-[14px] dark:text-mono-blanco">
+                          Segundo nombre:
+                        </p>
+                        <p
+                          class="2xl:text-[10px] xl:text-[12px] text-[8px] text-secundary-light"
+                        >
+                          {{ form.segundo_nombre.length }} /
+                          {{ limitesCaracteres.segundo_nombre }}
+                        </p>
+                      </div>
+
+                      <div
+                        class="w-[100%] p-[3px] flex items-center gap-[8px] transition-all rounded-[5px] border-[1px] border-secundary-ligh"
+                        t
+                        :class="{
+                          'border-universal-naranja': form.errors.segundo_nombre,
+                        }"
+                      >
+                        <span
+                          class="material-symbols-rounded text-universal-naranja text-[20px] pl-[5px]"
+                          >format_italic</span
+                        >
+
+                        <input
+                          type="text"
+                          class="2xl:w-full focus:outline-none focus:border-none font-normal bg-transparent dark:text-mono-blanco"
+                          placeholder="Ej: Guarnizo"
+                          v-model="form.segundo_nombre"
+                          @blur="handleBlur(form, 'segundo_nombre')"
+                          @input="(e) => handleInput(e, form, 'segundo_nombre')"
+                        />
+                      </div>
+                      <span
+                        v-if="form.errors.segundo_nombre"
+                        class="2xl:text-sm text-universal-naranja"
+                      >
+                        {{ form.errors.segundo_nombre }}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div
+                    class="2xl:flex 2xl:flex-row 2xl:justify-between 2xl:items-center 2xl:gap-2 xl:flex xl:flex-row xl:justify-between xl:items-center xl:gap-2 gap-3 flex flex-col items-center"
+                  >
+                    <div class="2xl:w-[50%] xl:w-[50%] w-full">
+                      <div class="contador-label flex items-center justify-between">
+                        <p class="my-[5px] text-[14px] dark:text-mono-blanco">
+                          Primer nombre:
+                        </p>
+                        <p
+                          class="2xl:text-[10px] xl:text-[12px] text-[8px] text-secundary-light"
+                        >
+                          {{ form.primer_nombre.length }} /
+                          {{ limitesCaracteres.primer_nombre }}
+                        </p>
+                      </div>
+
+                      <div
+                        class="w-[100%] p-[3px] flex items-center gap-[8px] transition-all rounded-[5px] border-[1px] border-secundary-ligh"
+                        t
+                        :class="{ 'border-universal-naranja': form.errors.primer_nombre }"
+                      >
+                        <span
+                          class="material-symbols-rounded text-universal-naranja text-[20px] pl-[5px]"
+                          >format_italic</span
+                        >
+
+                        <input
+                          type="text"
+                          class="2xl:w-full focus:outline-none focus:border-none font-normal bg-transparent dark:text-mono-blanco"
+                          placeholder="Ej: Juan"
+                          v-model="form.primer_nombre"
+                          @blur="handleBlur(form, 'primer_nombre')"
+                          @input="(e) => handleInput(e, form, 'primer_nombre')"
+                        />
+                      </div>
+                      <span
+                        v-if="form.errors.primer_nombre"
+                        class="2xl:text-sm text-universal-naranja"
+                      >
+                        {{ form.errors.primer_nombre }}
+                      </span>
+                    </div>
+
+                    <div class="2xl:w-[50%] xl:w-[50%] w-full">
+                      <div class="contador-label flex items-center justify-between">
+                        <p class="my-[5px] text-[14px] dark:text-mono-blanco">
+                          Segundo nombre:
+                        </p>
+                        <p
+                          class="2xl:text-[10px] xl:text-[12px] text-[8px] text-secundary-light"
+                        >
+                          {{ form.segundo_nombre.length }} /
+                          {{ limitesCaracteres.segundo_nombre }}
+                        </p>
+                      </div>
+
+                      <div
+                        class="w-[100%] p-[3px] flex items-center gap-[8px] transition-all rounded-[5px] border-[1px] border-secundary-ligh"
+                        t
+                        :class="{
+                          'border-universal-naranja': form.errors.segundo_nombre,
+                        }"
+                      >
+                        <span
+                          class="material-symbols-rounded text-universal-naranja text-[20px] pl-[5px]"
+                          >format_italic</span
+                        >
+
+                        <input
+                          type="text"
+                          class="2xl:w-full focus:outline-none focus:border-none font-normal bg-transparent dark:text-mono-blanco"
+                          placeholder="Ej: Guarnizo"
+                          v-model="form.segundo_nombre"
+                          @blur="handleBlur(form, 'segundo_nombre')"
+                          @input="(e) => handleInput(e, form, 'segundo_nombre')"
+                        />
+                      </div>
+                      <span
+                        v-if="form.errors.segundo_nombre"
+                        class="2xl:text-sm text-universal-naranja"
+                      >
+                        {{ form.errors.segundo_nombre }}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div
+                    class="2xl:flex 2xl:flex-row 2xl:justify-between 2xl:items-center 2xl:gap-2 xl:flex xl:flex-row xl:justify-between xl:items-center xl:gap-2 gap-3 flex flex-col items-center"
+                  >
+                    <div class="2xl:w-[50%] xl:w-[50%] w-full">
+                      <div class="contador-label flex items-center justify-between">
+                        <p class="my-[5px] text-[14px] dark:text-mono-blanco">
+                          Primer nombre:
+                        </p>
+                        <p
+                          class="2xl:text-[10px] xl:text-[12px] text-[8px] text-secundary-light"
+                        >
+                          {{ form.primer_nombre.length }} /
+                          {{ limitesCaracteres.primer_nombre }}
+                        </p>
+                      </div>
+
+                      <div
+                        class="w-[100%] p-[3px] flex items-center gap-[8px] transition-all rounded-[5px] border-[1px] border-secundary-ligh"
+                        t
+                        :class="{ 'border-universal-naranja': form.errors.primer_nombre }"
+                      >
+                        <span
+                          class="material-symbols-rounded text-universal-naranja text-[20px] pl-[5px]"
+                          >format_italic</span
+                        >
+
+                        <input
+                          type="text"
+                          class="2xl:w-full focus:outline-none focus:border-none font-normal bg-transparent dark:text-mono-blanco"
+                          placeholder="Ej: Juan"
+                          v-model="form.primer_nombre"
+                          @blur="handleBlur(form, 'primer_nombre')"
+                          @input="(e) => handleInput(e, form, 'primer_nombre')"
+                        />
+                      </div>
+                      <span
+                        v-if="form.errors.primer_nombre"
+                        class="2xl:text-sm text-universal-naranja"
+                      >
+                        {{ form.errors.primer_nombre }}
+                      </span>
+                    </div>
+
+                    <div class="2xl:w-[50%] xl:w-[50%] w-full">
+                      <div class="contador-label flex items-center justify-between">
+                        <p class="my-[5px] text-[14px] dark:text-mono-blanco">
+                          Segundo nombre:
+                        </p>
+                        <p
+                          class="2xl:text-[10px] xl:text-[12px] text-[8px] text-secundary-light"
+                        >
+                          {{ form.segundo_nombre.length }} /
+                          {{ limitesCaracteres.segundo_nombre }}
+                        </p>
+                      </div>
+
+                      <div
+                        class="w-[100%] p-[3px] flex items-center gap-[8px] transition-all rounded-[5px] border-[1px] border-secundary-ligh"
+                        t
+                        :class="{
+                          'border-universal-naranja': form.errors.segundo_nombre,
+                        }"
+                      >
+                        <span
+                          class="material-symbols-rounded text-universal-naranja text-[20px] pl-[5px]"
+                          >format_italic</span
+                        >
+
+                        <input
+                          type="text"
+                          class="2xl:w-full focus:outline-none focus:border-none font-normal bg-transparent dark:text-mono-blanco"
+                          placeholder="Ej: Guarnizo"
+                          v-model="form.segundo_nombre"
+                          @blur="handleBlur(form, 'segundo_nombre')"
+                          @input="(e) => handleInput(e, form, 'segundo_nombre')"
+                        />
+                      </div>
+                      <span
+                        v-if="form.errors.segundo_nombre"
+                        class="2xl:text-sm text-universal-naranja"
+                      >
+                        {{ form.errors.segundo_nombre }}
+                      </span>
+                    </div>
+                  </div>
                 </div>
+              </div>
 
-
-                <div class="botonesConfig my-3 flex gap-2 items-center">
-                  <button @click="submitForm" :class="[buttonClase]">
-                    Guardar cambios
+              <div
+                class="rounded-[15px] cajaheader flex justify-between items-center dark:bg-secundary-opacity bg-mono-blanco_opacity p-5"
+              >
+                <h4
+                  class="text-[45px] font-medium text-secundary-default dark:text-mono-blanco"
+                >
+                  Estás editando tu perfil
+                </h4>
+                <a
+                  :href="route('aplicacion.miPerfil.editarMiPerfil', { aplicacion, rol })"
+                >
+                  <button :class="bgClase" class="flex items-center gap-1 p-2 rounded-lg">
+                    Estoy seguro, actualizar
+                    <span class="material-symbols-rounded text-[20px]">check_circle</span>
                   </button>
-                  <a :href="route('aplicacion.configuraciones', { aplicacion, rol })">
-                    <button class="" :class="[buttonSecundario]">
-                      <p>Cancelar</p>
-                    </button>
-                  </a>
-                </div>
+                </a>
               </div>
+              <div
+                class="rounded-[15px] p-5 cajaTienda dark:bg-secundary-opacity bg-mono-blanco_opacity"
+              >
+                <div
+                  class="mb-4 grid place-content-center foto w-[390px] h-[170px] rounded-[18px] bg-mono-blanco_opacity dark:bg-secundary-opacity backdrop-blur-lg"
+                >
+                  <template v-if="authStore.rutaFotoEstablecimiento !== 'Sin foto'">
+                    <div class="relative w-[370px] h-[150px] group">
+                      <img
+                        :src="authStore.rutaFotoEstablecimiento"
+                        class="rounded-[18px] w-full h-full object-cover shadow-lg"
+                      />
+                    </div>
+                  </template>
 
-            </div>
-
-            <div class="right-info">
-
-              <div class="datos-recurentes flex items-end flex-col gap-2">
-                <div class="dias-restante text-right w-auto rounded-md">
-                  <h4 class="text-secundary-default dark:text-mono-blanco">Tu membresía finaliza en:</h4>
-                  <p class="text-[35px] font-semibold -mt-3 text-secundary-default dark:text-mono-blanco">{{
-                    diasRestantes }}<span class="text-[14px] text-secundary-default dark:text-mono-blanco">Días</span>
-                  </p>
+                  <template v-else>
+                    <div
+                      class="w-[370px] h-[150px] rounded-[18px] grid place-content-center"
+                      :class="[bgClase]"
+                    >
+                      <p class="text-[60px] font-semibold">{{ inicialesNombreTienda }}</p>
+                    </div>
+                  </template>
                 </div>
-                <div class="dias-activo w-auto rounded-md ">
-                  <h4 class="text-right text-secundary-default dark:text-mono-blanco">Te uniste a la familia: </h4>
-                  <p class="text-[35px] font-semibold -mt-3 text-secundary-default dark:text-mono-blanco">{{
-                    tiempoActivo }} <span class="text-[14px]"></span></p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="w-full px-12 ">
-            <div class="mb-6">
-              <nav class="-mb-px flex space-x-4">
-                <button v-for="(tab, index) in tabs" :key="index" @click="activeTab = index" :class="[
-                  'text-md font-medium px-4 py-2',
-                  activeTab === index
-                    ? textoClase + ' ' + borderClase
-                    : 'text-secundary-default dark:text-secundary-light ' + hover
-                ]">
-                  {{ tab.label }}
-                </button>
-              </nav>
-            </div>
-
-            <div v-if="activeTab === 0">
-              <h2 class="text-2xl font-bold mb-4 text-secundary-default dark:text-mono-blanco">Editar mis datos
-                personales</h2>
-              <div class="flex w-full justify-between gap-10">
-
-                <div class="right-table w-[50%] flex flex-col gap-1">
-                  <div class="nombre-usuario">
-                    <div
-                      class="contador-input flex items-center justify-between xl:flex xl:items-center xl:justify-between">
-                      <label for="nombre-usuario"
-                        class="text-[14px] text-secundary-default dark:text-secundary-light">Nombre
-                        usuario:</label>
-                      <p class="2xl:text-[10px] xl:text-[12px] text-[8px] text-right  text-secundary-light">
-                        {{ form.nombres_ct.length }} / {{ limitesCaracteres.nombres_ct }}
-                      </p>
-                    </div>
-
-                    <div
-                      class=" w-[100%] p-[3px] flex items-center gap-[8px] xl:w-[100%] xl:p-[3px] xl:flex xl:items-center xl:gap-[8px] transition-all rounded-[5px] border-[1px] border-secundary-light">
-                      <span class=" text-[20px] pl-[5px] material-symbols-rounded"
-                        :class="[textoClase]">format_italic</span>
-
-
-                      <input type="text"
-                        class="w-full focus:outline-none focus:border-none font-normal bg-transparent text-secundary-default dark:text-mono-blanco"
-                        placeholder="Ingresa tus nombres" v-model="form.nombres_ct"
-                        @input="handleInput($event, 'nombres_ct')" @blur="handleBlur('nombres_ct')" />
-                    </div>
-                  </div>
-
-                  <div class="email-usuario">
-                    <div
-                      class="contador-input flex items-center justify-between xl:flex xl:items-center xl:justify-between">
-                      <label for="email-usuario"
-                        class="text-[14px] text-secundary-default dark:text-secundary-light">Email
-                        usuario:</label>
-                      <p class="2xl:text-[10px] xl:text-[12px] text-[8px] text-right  text-secundary-light">
-                        {{ form.email_ct.length }} / {{ limitesCaracteres.email_ct }}
-                      </p>
-                    </div>
-
-                    <div
-                      class=" w-[100%] p-[3px] flex items-center gap-[8px] xl:w-[100%] xl:p-[3px] xl:flex xl:items-center xl:gap-[8px] transition-all rounded-[5px] border-[1px] border-secundary-light">
-                      <span class=" text-[20px] pl-[5px] material-symbols-rounded" :class="[textoClase]">email</span>
-
-
-                      <input type="text"
-                        class="w-full focus:outline-none focus:border-none font-normal bg-transparent text-secundary-default dark:text-mono-blanco"
-                        placeholder="Ingresa tus nombres" v-model="form.email_ct"
-                        @input="handleInput($event, 'email_ct')" @blur="handleBlur('email_ct')" />
-                    </div>
-                  </div>
-                </div>
-
-                <div class="right-table w-[50%] flex flex-col gap-1">
-                  <div class="apellido-usuario">
-                    <div
-                      class="contador-input flex items-center justify-between xl:flex xl:items-center xl:justify-between">
-                      <label for="apellido-usuario"
-                        class="text-[14px] text-secundary-default dark:text-secundary-light">Apellidos
-                        usuario:</label>
-                      <p class="2xl:text-[10px] xl:text-[12px] text-[8px] text-right  text-secundary-light">
-                        {{ form.apellidos_ct.length }} / {{ limitesCaracteres.apellidos_ct }}
-                      </p>
-                    </div>
-
-                    <div
-                      class="w-[100%] p-[3px] flex items-center gap-[8px] xl:w-[100%] xl:p-[3px] xl:flex xl:items-center xl:gap-[8px] transition-all rounded-[5px] border-[1px] border-secundary-light">
-                      <span class="text-[20px] pl-[5px] material-symbols-rounded"
-                        :class="[textoClase]">format_italic</span>
-                      <input type="text"
-                        class="w-full focus:outline-none focus:border-none font-normal bg-transparent text-secundary-default dark:text-mono-blanco"
-                        placeholder="Ingresa tus nombres" v-model="form.apellidos_ct"
-                        @input="handleInput($event, 'apellidos_ct')" @blur="handleBlur('apellidos_ct')" />
-                    </div>
-                  </div>
-
-                  <div class="telefono-usuario">
-                    <div
-                      class="contador-input flex items-center justify-between xl:flex xl:items-center xl:justify-between">
-                      <label for="telefono-usuario"
-                        class="text-[14px] text-secundary-default dark:text-secundary-light">Teléfono
-                        usuario:</label>
-                      <p class="2xl:text-[10px] xl:text-[12px] text-[8px] text-right  text-secundary-light">
-                        {{ form.telefono_ct.length }} / {{ limitesCaracteres.telefono_ct }}
-                      </p>
-                    </div>
-
-                    <div
-                      class="w-[100%] p-[3px] flex items-center gap-[8px] xl:w-[100%] xl:p-[3px] xl:flex xl:items-center xl:gap-[8px] transition-all rounded-[5px] border-[1px] border-secundary-light">
-                      <span class="text-[20px] pl-[5px] material-symbols-rounded" :class="[textoClase]">phone</span>
-                      <input type="text"
-                        class="w-full focus:outline-none focus:border-none font-normal bg-transparent text-secundary-default dark:text-mono-blanco"
-                        placeholder="Ingresa tu teléfono" v-model="form.telefono_ct"
-                        @input="handleInput($event, 'telefono_ct')" @blur="handleBlur('telefono_ct')" />
-                    </div>
-                  </div>
+                <div class="flex justify-between items-center">
+                  <h4 class="text-secundary-default dark:text-mono-blanco">
+                    Editar mi establecimiento
+                  </h4>
                 </div>
               </div>
             </div>
-            <div v-else-if="activeTab === 1">
-              <h2 class="text-2xl font-bold mb-4 text-secundary-default dark:text-mono-blanco">Editar datos de mi tienda
-              </h2>
-              <div class="flex justify-between w-full gap-10">
-                <div class="left-table w-[50%] flex flex-col gap-1">
-                  <div class="tienda-usuario">
-                    <div
-                      class="contador-input flex items-center justify-between xl:flex xl:items-center xl:justify-between">
-                      <label for="tienda-usuario"
-                        class="text-[14px] text-secundary-default dark:text-secundary-light">Nombre de
-                        mi tienda:</label>
-                      <p class="2xl:text-[10px] xl:text-[12px] text-[8px] text-right  text-secundary-light">
-                        {{ form.nombre_tienda.length }} / {{ limitesCaracteres.nombre_tienda }}
-                      </p>
-                    </div>
-
-                    <div
-                      class="w-[100%] p-[3px] flex items-center gap-[8px] xl:w-[100%] xl:p-[3px] xl:flex xl:items-center xl:gap-[8px] transition-all rounded-[5px] border-[1px] border-secundary-light">
-                      <span class="text-[20px] pl-[5px] material-symbols-rounded" :class="[textoClase]">store</span>
-                      <input type="text"
-                        class="w-full focus:outline-none focus:border-none font-normal bg-transparent text-secundary-default dark:text-mono-blanco"
-                        placeholder="Ingresa el nombre de tu empresa" v-model="form.nombre_tienda"
-                        @input="handleInput($event, 'nombre_tienda')" @blur="handleBlur('nombre_tienda')" />
-                    </div>
-                  </div>
-
-                  <div class="direccion-tienda">
-                    <div
-                      class="contador-input flex items-center justify-between xl:flex xl:items-center xl:justify-between">
-                      <label for="tienda-usuario"
-                        class="text-[14px] text-secundary-default dark:text-secundary-light">Dirección
-                        de la tienda:</label>
-                      <p class="2xl:text-[10px] xl:text-[12px] text-[8px] text-right  text-secundary-light">
-                        {{ form.direccion_tienda.length }} / {{ limitesCaracteres.direccion_tienda }}
-                      </p>
-                    </div>
-
-                    <div
-                      class="w-[100%] p-[3px] flex items-center gap-[8px] xl:w-[100%] xl:p-[3px] xl:flex xl:items-center xl:gap-[8px] transition-all rounded-[5px] border-[1px] border-secundary-light">
-                      <span class="text-[20px] pl-[5px] material-symbols-rounded" :class="[textoClase]">pin_drop</span>
-                      <input type="text"
-                        class="w-full focus:outline-none focus:border-none font-normal bg-transparent text-secundary-default dark:text-mono-blanco"
-                        placeholder="Ingresa la direccion de la tienda" v-model="form.direccion_tienda"
-                        @input="handleInput($event, 'direccion_tienda')" @blur="handleBlur('direccion_tienda')" />
-                    </div>
-                  </div>
-
-                  <div class="barrio-tienda">
-                    <div
-                      class="contador-input flex items-center justify-between xl:flex xl:items-center xl:justify-between">
-                      <label for="tienda-usuario"
-                        class="text-[14px] text-secundary-default dark:text-secundary-light">Barrio de
-                        la tienda:</label>
-                      <p class="2xl:text-[10px] xl:text-[12px] text-[8px] text-right  text-secundary-light">
-                        {{ form.barrio_tienda.length }} / {{ limitesCaracteres.barrio_tienda }}
-                      </p>
-                    </div>
-
-                    <div
-                      class="w-[100%] p-[3px] flex items-center gap-[8px] xl:w-[100%] xl:p-[3px] xl:flex xl:items-center xl:gap-[8px] transition-all rounded-[5px] border-[1px] border-secundary-light">
-                      <span class="text-[20px] pl-[5px] material-symbols-rounded" :class="[textoClase]">pin_drop</span>
-                      <input type="text"
-                        class="w-full focus:outline-none focus:border-none font-normal bg-transparent text-secundary-default dark:text-mono-blanco"
-                        placeholder="Ingresa el departamento de la tienda" v-model="form.barrio_tienda"
-                        @input="handleInput($event, 'barrio_tienda')" @blur="handleBlur('barrio_tienda')" />
-                    </div>
-                  </div>
-
-
-                </div>
-                <div class="right-table w-[50%] flex flex-col gap-1">
-                  <div class="email-tienda">
-                    <div
-                      class="contador-input flex items-center justify-between xl:flex xl:items-center xl:justify-between">
-                      <label for="email-tienda"
-                        class="text-[14px] text-secundary-default dark:text-secundary-light">Email
-                        corporativo:</label>
-                      <p class="2xl:text-[10px] xl:text-[12px] text-[8px] text-right  text-secundary-light">
-                        {{ form.email_tienda.length }} / {{ limitesCaracteres.email_tienda }}
-                      </p>
-                    </div>
-
-                    <div
-                      class="w-[100%] p-[3px] flex items-center gap-[8px] xl:w-[100%] xl:p-[3px] xl:flex xl:items-center xl:gap-[8px] transition-all rounded-[5px] border-[1px] border-secundary-light">
-                      <span class="text-[20px] pl-[5px] material-symbols-rounded" :class="[textoClase]">email</span>
-                      <input type="text"
-                        class="w-full focus:outline-none focus:border-none font-normal bg-transparent text-secundary-default dark:text-mono-blanco"
-                        placeholder="Ingresa el email de la tienda" v-model="form.email_tienda"
-                        @input="handleInput($event, 'email_tienda')" @blur="handleBlur('email_tienda')" />
-                    </div>
-                  </div>
-
-                  <div class="telefono-tienda">
-                    <div
-                      class="contador-input flex items-center justify-between xl:flex xl:items-center xl:justify-between">
-                      <label for="telefono-tienda"
-                        class="text-[14px] text-secundary-default dark:text-secundary-light">Teléfono
-                        corporativo:</label>
-                      <p class="2xl:text-[10px] xl:text-[12px] text-[8px] text-right  text-secundary-light">
-                        {{ form.telefono_tienda.length }} / {{ limitesCaracteres.telefono_tienda }}
-                      </p>
-                    </div>
-
-                    <div
-                      class="w-[100%] p-[3px] flex items-center gap-[8px] xl:w-[100%] xl:p-[3px] xl:flex xl:items-center xl:gap-[8px] transition-all rounded-[5px] border-[1px] border-secundary-light">
-                      <span class="text-[20px] pl-[5px] material-symbols-rounded" :class="[textoClase]">phone</span>
-                      <input type="text"
-                        class="w-full focus:outline-none focus:border-none font-normal bg-transparent text-secundary-default dark:text-mono-blanco"
-                        placeholder="Ingresa el teléfono de la tienda" v-model="form.telefono_tienda"
-                        @input="handleInput($event, 'telefono_tienda')" @blur="handleBlur('telefono_tienda')" />
-                    </div>
-                  </div>
-
-
-
-                </div>
-              </div>
-
-
-            </div>
-
-            <div v-else-if="activeTab === 2">
-              <h2 class="text-2xl font-bold mb-4 text-secundary-default dark:text-mono-blanco">Configuraciones Avanzadas
-              </h2>
-              <p class="text-secundary-default dark:text-mono-blanco">Esta sección está reservada para configuraciones
-                avanzadas
-                que no están disponibles en la interfaz
-                principal.</p>
-              <p class="text-secundary-default dark:text-mono-blanco">Próximamente...</p>
-            </div>
-          </div>
-        </div>
-      </div>
+          </form>
+        </div></SidebarSuperAdmin
+      >
     </div>
   </div>
-
 </template>

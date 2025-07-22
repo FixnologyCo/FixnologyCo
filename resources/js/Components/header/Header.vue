@@ -151,7 +151,7 @@ if (fecha.getHours() < 12) {
 <template>
   <header class="header flex items-center justify-between gap-3">
     <div class="left w-[20%] rounded-md">
-      <div class="relative max-w-[280px]">
+      <div class="relative min-w-[280px] max-w-[400px]">
         <div class="cajaUser flex items-center">
           <div class="flex gap-1 items-center relative">
             <div v-if="authStore.isAuthenticated === true">
@@ -199,7 +199,7 @@ if (fecha.getHours() < 12) {
 
         <div
           v-if="isMenuOpen"
-          class="absolute right-0 mt-2 w-52 bg-mono-blanco_opacity dark:bg-mono-negro_opacity_full backdrop-blur-md rounded-xl shadow-lg p-3 z-20"
+          class="absolute right-0 mt-2 w-52 bg-mono-blanco_opacity dark:bg-transparent backdrop-blur-md rounded-xl shadow-lg p-3 z-20"
         >
           <div class="nombreUsuario px-2 py-2">
             <div class="flex items-center justify-between">

@@ -21,10 +21,18 @@ const {
   buttonSecundario,
 } = Colors();
 
+import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
+import { useAuthStore } from "@/stores/auth";
+
+
+const authStore = useAuthStore();
+defineOptions({
+  layout: AuthenticatedLayout,
+});
 import useEstadoClass from "@/Composables/useEstado";
 const { getEstadoClass } = useEstadoClass();
 
-import { formatFecha, formatFechaShort } from "@/utils/date";
+import { formatFecha, formatFechaShort } from "@/Utils/date";
 
 function obtenerIniciales(nombre, apellido) {
   const inicial1 = nombre?.charAt(0) || "";
@@ -32,36 +40,7 @@ function obtenerIniciales(nombre, apellido) {
   return (inicial1 + inicial2).toUpperCase();
 }
 
-const props = defineProps({
-  auth: {
-    type: Object,
-    required: true,
-  },
-  clientesFix: {
-    type: Array,
-    default: () => [],
-  },
-  empleadosFix: {
-    type: Array,
-    default: () => [],
-  },
-  aplicacion: {
-    type: String,
-    default: "",
-  },
-  rol: {
-    type: String,
-    default: "",
-  },
-  errors: {
-    type: Object,
-    required: true,
-  },
-  foto_base64: {
-    type: String,
-    default: "",
-  },
-});
+
 
 const seleccionado = ref(false);
 const auth = usePage().props.auth;
@@ -81,15 +60,14 @@ function irADetalle(id) {
 </script>
 
 <template>
-  <Head title="Gestor de usuarios" />
+  <div>
+    <Head title="Gestor de usuarios" />
   <MensajesLayout />
 
-  <div class="flex">
-    <SidebarSuperAdmin :auth="auth" />
-
-    <div class="w-full">
-      <Header :auth="auth" :foto_base64="foto_base64" />
-
+ <div class="flex">
+    <SidebarSuperAdmin :authStore >
+     <div class="w-full">
+  
       <div class="contenido p-3">
         <div class="mb-6">
           <nav class="-mb-px flex space-x-4">
@@ -118,7 +96,7 @@ function irADetalle(id) {
                 <span class="material-symbols-rounded">diversity_1</span>
               </div>
               <p class="text-[30px] font-semibold text-mono-blanco">
-                {{ clientesFix.length }}
+                {{ clientesFix }}
                 <span class="text-secundary-light text-[14px]">Total clientes</span>
               </p>
             </div>
@@ -317,7 +295,7 @@ function irADetalle(id) {
                 <span class="material-symbols-rounded">engineering</span>
               </div>
               <p class="text-[30px] font-semibold text-mono-blanco">
-                {{ empleadosFix.length }}
+                {{ empleadosFix}}
                 <span class="text-secundary-light text-[14px]">Total empleados</span>
               </p>
             </div>
@@ -514,5 +492,14 @@ function irADetalle(id) {
         </div>
       </div>
     </div>
+    
+    </SidebarSuperAdmin>
+
+   
   </div>
+  
+  </div>
+
+
+  
 </template>

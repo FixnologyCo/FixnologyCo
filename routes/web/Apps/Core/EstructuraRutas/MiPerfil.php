@@ -9,14 +9,12 @@ Route::middleware('auth')->group(function () {
     Route::prefix('{aplicacion}/{rol}')->group(function () {
         Route::get('/miPerfil', [MiPerfilController::class, 'index'])
             ->name('aplicacion.miPerfil');
-        Route::get('/editarMiPerfil', [MiPerfilController::class, 'index'])
+        Route::get('/editarMiPerfil', [MiPerfilController::class, 'formUpdate'])
             ->name('aplicacion.miPerfil.editarMiPerfil');
         Route::put('/editarMiPerfil', [MiPerfilController::class, 'actualizar'])
             ->name('aplicacion.editarMiPerfil.actualizar')
             ->middleware(['auth']);
     });
-    Route::post('/perfil/foto', [MiPerfilController::class, 'actualizarFoto'])
-        ->name('usuario.actualizar.foto');
 });
 
 
