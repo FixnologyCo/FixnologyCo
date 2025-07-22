@@ -7,14 +7,14 @@
 :root {
   /* UNIVERSAL */
   --mono_blanco: #F5EFFF;
-  --mono_blanco_opacity: #f5f7f8cb;
+  --mono_blanco_opacity: #f5f7f873;
   --mono_negro: #060809;
-  --mono:#151515be;
+  --mono: #151515be;
   --bg_empty: #1F1D2B;
   --naranja: #FE4F2D;
   --naranja_opacity: #fe502d36;
   --azul: #4F959D;
-  --azul_opacity:#4f959d3a;
+  --azul_opacity: #4f959d3a;
 
   /* SEMAFORO */
   --verde: #1BCC75;
@@ -85,13 +85,15 @@
   box-shadow: 0px 2px 16px var(--secundary_light);
 }
 
-.shadow-verde{
+.shadow-verde {
   box-shadow: 0px 2px 16px var(--verde);
 }
-.shadow-amarillo{
+
+.shadow-amarillo {
   box-shadow: 0px 2px 16px var(--amarillo);
 }
-.shadow-rojo{
+
+.shadow-rojo {
   box-shadow: 0px 2px 16px var(--rojo);
 }
 
@@ -198,9 +200,20 @@
 }
 
 @keyframes pingTexto {
-  0% { color: #00c853; transform: scale(1.05); }
-  50% { color: #43a047; transform: scale(1.08); }
-  100% { color: inherit; transform: scale(1); }
+  0% {
+    color: #00c853;
+    transform: scale(1.05);
+  }
+
+  50% {
+    color: #43a047;
+    transform: scale(1.08);
+  }
+
+  100% {
+    color: inherit;
+    transform: scale(1);
+  }
 }
 
 .animate-ping-texto {
@@ -208,8 +221,15 @@
 }
 
 @keyframes parpadeo {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.4;
+  }
 }
 
 .animate-parpadeo {
@@ -220,6 +240,7 @@
 .fade-leave-active {
   transition: all 0.4s ease;
 }
+
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
@@ -245,19 +266,135 @@
   transform: rotate(3deg);
 }
 
+/* --- 1. DISEÑO POR DEFECTO: ESCRITORIO (4 COLUMNAS) --- */
+/* Tu código original, se aplica a pantallas grandes */
 .miPerfil {
-display: grid;
-grid-template-columns: repeat(4, 1fr);
-grid-template-rows: repeat(5, 1fr);
-grid-column-gap: 12px;
-grid-row-gap: 12px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(5, 1fr);
+  gap: 12px;
 }
 
-.contenedorPerfil { grid-area: 1 / 1 / 6 / 6;}
-.div2 { grid-area: 1 / 1 / 5 / 2; }
-.div3 { grid-area: 5 / 1 / 6 / 2; }
-.div4 { grid-area: 1 / 2 / 2 / 5; }
-.div5 { grid-area: 2 / 2 / 5 / 3; }
-.div6 { grid-area: 2 / 3 / 5 / 4; }
-.div7 { grid-area: 5 / 2 / 6 / 4; }
-.div8 { grid-area: 2 / 4 / 6 / 5; }
+.contenedorPerfil {
+  grid-area: 1 / 1 / 6 / 5;
+}
+
+.div2 {
+  grid-area: 1 / 1 / 5 / 2;
+}
+
+.div3 {
+  grid-area: 5 / 1 / 6 / 2;
+}
+
+.div4 {
+  grid-area: 1 / 2 / 2 / 5;
+}
+
+.div5 {
+  grid-area: 2 / 2 / 5 / 3;
+}
+
+.div6 {
+  grid-area: 2 / 3 / 5 / 4;
+}
+
+.div7 {
+  grid-area: 5 / 2 / 6 / 4;
+}
+
+.div8 {
+  grid-area: 2 / 4 / 6 / 5;
+}
+
+
+/* --- 2. AJUSTE PARA PORTÁTIL (2 COLUMNAS) --- */
+/* Se activa cuando la pantalla es de 1399px o menos */
+@media (max-width: 1399px) {
+  .miPerfil {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: auto;
+    /* Las filas se ajustan solas */
+  }
+
+  /* Reorganizamos los divs en el layout de 2 columnas */
+  .contenedorPerfil {
+    grid-area: 1 / 1 / 6 / 3;
+  }
+
+  .div4 {
+    grid-area: 1 / 1 / 2 / 3;
+  }
+
+  /* Header */
+  .div2 {
+    grid-area: 2 / 1 / 4 / 2;
+  }
+
+  /* Bloque izquierdo */
+  .div3 {
+    grid-area: 4 / 1 / 5 / 2;
+  }
+
+  .div5 {
+    grid-area: 2 / 2 / 3 / 3;
+  }
+
+  /* Bloques derechos */
+  .div6 {
+    grid-area: 3 / 2 / 4 / 3;
+  }
+
+  .div8 {
+    grid-area: 4 / 2 / 5 / 3;
+  }
+
+  .div7 {
+    grid-area: 5 / 1 / 6 / 3;
+  }
+
+  /* Footer */
+}
+
+
+/* --- 3. AJUSTE PARA MÓVIL (1 COLUMNA) --- */
+/* Se activa cuando la pantalla es de 991px o menos */
+@media (max-width: 991px) {
+  .miPerfil {
+    grid-template-columns: 1fr;
+    /* Una sola columna */
+  }
+
+  /* Reseteamos TODOS los divs para que se apilen verticalmente */
+  .miPerfil>div {
+    grid-area: auto;
+  }
+}
+
+/* form editar usuario */
+
+.editarMiPerfil {
+  display: grid;
+grid-template-columns: repeat(2, 1fr);
+grid-template-rows: repeat(5, 1fr);
+  gap: 12px;
+  
+}
+
+.cajaGrid {
+  grid-area: 1 / 1 / 6 / 5;
+}
+
+.cajaUsuario {
+  grid-area: 1 / 1 / 6/ 2;
+}
+
+.cajaheader {
+  grid-area: 1 / 2 / 2 / 3;
+}
+
+.cajaTienda {
+ grid-area: 2 / 2 / 6 / 3;
+
+}
+

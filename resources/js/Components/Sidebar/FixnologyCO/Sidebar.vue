@@ -7,15 +7,22 @@ import { useSidebar } from "@/Composables/useSidebar";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import { useAuthStore } from "@/stores/auth";
 
-import Header from "@/Components/header/Header.vue";
-
 const authStore = useAuthStore();
 defineOptions({
   layout: AuthenticatedLayout,
 });
 
+import Header from "@/Components/header/Header.vue";
 const { sidebarExpandido, toggleSidebar } = useSidebar();
-const { NombreApp, bgClase, bgOpacity, textoClase, focus, buttonLink, hover } = Colors();
+const {
+  NombreApp,
+  bgClase,
+  bgOpacity,
+  textoClase,
+  focus,
+  buttonLink,
+  hoverClase,
+} = Colors();
 
 const page = usePage();
 
@@ -28,6 +35,13 @@ const dashboardRoute = computed(
     new URL(route("aplicacion.dashboard", { aplicacion, rol }), window.location.origin)
       .pathname
 );
+const gestorUsuarios = computed(
+  () =>
+    new URL(
+      route("aplicacion.gestorUsuarios", { aplicacion, rol }),
+      window.location.origin
+    ).pathname
+);
 
 const inicialesNombreTienda = computed(() => {
   const nombreTienda = authStore.nombreTienda || "";
@@ -38,14 +52,11 @@ const inicialesNombreTienda = computed(() => {
 </script>
 
 <template>
-  <div class="dark:bg-[url('/resources/images/01.webp')] bg-[url('/resources/images/02.webp')] bg-cover w-full min-h-[100vh]">
-    <div
-      class="p-4 flex bg-mono-negro_opacity_medio backdrop-blur-md w-full min-h-[100vh] rounded-xl"
-    >
-      <div
-        class="sidebar w-[15%] pr-3 py-2"
-        :class="[sidebarExpandido ? 'w-[15%]' : 'w-[45px]']"
-      >
+  <div
+    class="dark:bg-[url('/resources/images/01.webp')] bg-[url('/resources/images/02.webp')] bg-cover w-full min-h-[100vh]"
+  >
+    <div class="p-4 flex backdrop-blur-md w-full min-h-[100vh] rounded-xl">
+      <div class="sidebar pr-3 py-2" :class="[sidebarExpandido ? 'w-[12%]' : 'w-[45px]']">
         <div class="headerSidebar flex justify-between items-start">
           <div
             v-if="sidebarExpandido"
@@ -63,12 +74,16 @@ const inicialesNombreTienda = computed(() => {
         <div class="navegacion mt-10">
           <ul class="flex flex-col gap-1">
             <li
-              :class="[currentRoute === dashboardRoute ? [bgOpacity] : 'bg-transparent']"
-              class="py-2 rounded-full cursor-pointer flex justify-center items-center"
+              :class="
+                ([currentRoute === dashboardRoute ? [bgOpacity] : 'bg-transparent'],
+                [hoverClase],
+                [sidebarExpandido ? 'justify-between' : 'justify-center'])
+              "
+              class="py-2 px-3 rounded-full cursor-pointer flex items-center"
             >
               <a :href="route('aplicacion.dashboard', { aplicacion, rol })">
-                <span class="flex items-center justify-between">
-                  <div class="flex items-center gap-2">
+                <span class="flex items-center">
+                  <div class="flex items-center justify-between gap-2">
                     <div class="flex items-center">
                       <span
                         class="text-[18px] material-symbols-rounded text-secundary-light"
@@ -93,15 +108,46 @@ const inicialesNombreTienda = computed(() => {
             >
               -
             </div>
-            <p v-if="sidebarExpandido" class="text-mono-blanco dark:text-secundary-light text-[12px] mt-2.5">
+            <p
+              v-if="sidebarExpandido"
+              class="text-mono-blanco dark:text-secundary-light text-[12px] my-2.5"
+            >
               Gestión
             </p>
+            <li
+              :class="
+                [currentRoute === gestorUsuarios ? [bgOpacity] : 'bg-transparent'],
+                [hoverClase],
+                [sidebarExpandido ? 'justify-between' : 'justify-center']
+              "
+              class="py-2 px-3 rounded-full cursor-pointer flex items-center"
+            >
+              <a :href="route('aplicacion.gestorUsuarios', { aplicacion, rol })">
+                <span class="flex items-center">
+                  <div class="flex items-center justify-between gap-2">
+                    <div class="flex items-center">
+                      <span
+                        class="text-[18px] material-symbols-rounded text-secundary-light"
+                        >people</span
+                      >
+                    </div>
+                    <span v-if="sidebarExpandido" class="text-[14px] text-mono-blanco"
+                      >Clientes Fix</span
+                    >
+                  </div>
+                  <div
+                    v-if="sidebarExpandido"
+                    :class="[currentRoute === gestorUsuarios ? focus : hover]"
+                  ></div>
+                </span>
+              </a>
+            </li>
           </ul>
         </div>
       </div>
       <div
-        :class="[sidebarExpandido ? 'w-[85%]' : 'w-[100%]']"
-        class="contenido p-5 dark:bg-mono-negro_opacity_full bg-mono-blanco_opacity text-mono-blanco rounded-2xl"
+        :class="[sidebarExpandido ? 'w-[88%]' : 'w-[100%]']"
+        class="contenido p-5 dark:bg-mono-negro_opacity_medio bg-mono-blanco_opacity backdrop-blur-md text-mono-blanco rounded-2xl"
       >
         <Header :auth="authStore" class="mb-5" />
         <slot></slot>

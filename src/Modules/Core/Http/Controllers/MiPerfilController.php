@@ -2,7 +2,7 @@
 
 namespace Core\Http\Controllers;
 
-use App\Models\User;
+use Core\Models\Roles;
 use Auth;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -47,17 +47,54 @@ class MiPerfilController extends Controller
         $aplicacionWeb = $usuario->tienda[0]->aplicacionWeb->nombre_app ?? null;
 
         
-        // Validar acceso con Gate (rol 4)
-        if (!in_array($usuario->rol->id, [4])) {
+       
+        if (!in_array($usuario->rol->id, [1,2,4])) {
             abort(403, 'No tienes permisos para acceder a esta sección.');
         }
-          // 5. RENDERIZAR LA VISTA DE INERTIA CON LOS PROPS CORRECTOS
-        // Ya no necesitamos el 'if' que validaba la tienda, eso lo debe hacer la autorización.
+        
             return Inertia::render('Apps/' . ucfirst($aplicacion) . '/' . ucfirst($rol) . '/MiPerfil/MiPerfil', [
                 'usuario' => $usuario,
                 'rol' => $tipoDeRol
             ]);
+    }
+
+    public function formUpdate($aplicacion, $rol, Request $request)
+    {
+        $usuario = Auth::user()->load(
+            'perfilUsuario',
+            'perfilUsuario.indicativo',
+            'perfilUsuario.tipoDocumento',
+            'perfilUsuario.estado',
+            'perfilEmpleado',
+            'perfilEmpleado.estado',
+            'perfilEmpleado.medioPago',
+            'tienda',
+            'tienda.token',
+            'tienda.token.estado',
+            'tienda.aplicacionWeb',
+            'tienda.aplicacionWeb.estado',
+            'tienda.aplicacionWeb.membresia',
+            'tienda.aplicacionWeb.membresia.estado',
+            'tienda.facturas',
+            'tienda.facturas.estado',
+            'tienda.facturas.medioPago',
+            'tienda.propietario'
+
+        );
+        $tipoDeRol = $usuario->rol->tipo_rol;
+        $aplicacionWeb = $usuario->tienda[0]->aplicacionWeb->nombre_app ?? null;
+
+        
+       
+        if (!in_array($usuario->rol->id, [1,2,4])) {
+            abort(403, 'No tienes permisos para acceder a esta sección.');
         }
+        
+            return Inertia::render('Apps/' . ucfirst($aplicacion) . '/' . ucfirst($rol) . '/MiPerfil/EditarMiPerfil', [
+                'usuario' => $usuario,
+                'rol' => $tipoDeRol
+            ]);
+    }
     
     use AuthorizesRequests;
 

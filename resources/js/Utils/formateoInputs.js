@@ -1,13 +1,27 @@
 // ✅ Límites de caracteres para cada campo
 export const limitesCaracteres = {
+  // inputs usuarios
+  ruta_foto: 60,
+  primer_nombre: 25,
+  segundo_nombre: 25,
+  primer_apellido: 25,
+  segundo_apellido: 25,
+  id_tipo_documento: 2,
+  numero_documento: 20,
+  indicativo: 4,
+  telefono: 10,
+  email: 60,
+  genero: 25,
+  direccion_residencia: 60,
+  ciudad_residencia: 60,
+  barrio_residencia: 60,
+  password: 30,
+  password_confirm: 30,
+
+  // inputs app
   descripcion_app: 100,
   nombre_app: 30,
-  primer_nombre: 25,
-  primer_apellido: 25,
-  numero_identificacion: 20,
-  password: 30,
-  password_confirm: 30
-
+  
 }
 
 // ✅ Función para capitalizar cada palabra
