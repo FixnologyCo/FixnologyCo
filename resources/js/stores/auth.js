@@ -5,6 +5,7 @@ export const useAuthStore = defineStore('auth', {
     state: () => ({
         user: null,
     }),
+    
 
     getters: {
         // esta activo
@@ -15,6 +16,7 @@ export const useAuthStore = defineStore('auth', {
         google_id: (state) => state.user.google_id || null,
         estadoUsuario: (state) => state.user.perfil_usuario.estado.tipo_estado || 'Cargando info...',
         rol: (state) => state.user?.rol?.tipo_rol || 'Cargando info...',
+        rol_id: (state) => state.user?.rol?.id,
         rutaFoto: (state) => state.user?.perfil_usuario?.ruta_foto || 'Sin foto',
         primerNombre: (state) => state.user?.perfil_usuario?.primer_nombre || 'Cargando info...',
         segundoNombre: (state) => state.user?.perfil_usuario?.segundo_nombre || 'Cargando info...',
@@ -24,11 +26,13 @@ export const useAuthStore = defineStore('auth', {
             return `${state.user.perfil_usuario.primer_nombre} ${state.user.perfil_usuario.segundo_nombre} ${state.user.perfil_usuario.primer_apellido}`.trim();
         },
         indicativo: (state) => state.user.perfil_usuario.indicativo.codigo_pais || 'Cargando info...',
+        indicativo_id: (state) => state.user.perfil_usuario.indicativo.id || 1,
         telefono: (state) => state.user.perfil_usuario.telefono || 'Cargando info...',
         telefonoCompleto: (state) => {
             return `${state.user.perfil_usuario.indicativo.codigo_pais}${state.user.perfil_usuario.telefono}`.trim();
         },
         tipoDocumento: (state) => state.user.perfil_usuario.tipo_documento.documento_legal || 'Cargando info...',
+        tipoDocumento_id: (state) => state.user.perfil_usuario.tipo_documento.id || 1,
         numero_documento: (state) => state.user.numero_documento || 'Cargando info...',
         email: (state) => state.user.perfil_usuario.correo || 'Cargando info...',
         genero: (state) => state.user.perfil_usuario.genero || 'Cargando info...',
@@ -56,6 +60,7 @@ export const useAuthStore = defineStore('auth', {
         fechaModificacionEmpleado: (state) => state.user.perfil_empleado.fecha_modificacion || 'Cargando info...',
 
         // datos de tienda
+        tienda_id: (state) => state.user.tienda[0].id || 8,
         estadoTienda: (state) => state.user.tienda[0].estado.tipo_estado || 'Cargando info...',
         rutaFotoEstablecimiento: (state) => state.user.tienda[0].ruta_foto_establecimiento || 'Sin foto',
         tipoEstablecimiento: (state) => state.user.tienda[0].tipo_establecimiento || 'Cargando info...',
@@ -80,6 +85,7 @@ export const useAuthStore = defineStore('auth', {
         periodoMembresia: (state) => state.user.tienda[0].aplicacion_web.membresia.periodo_duracion || 'Cargando info...',
         duracionMembresia: (state) => state.user.tienda[0].aplicacion_web.membresia.duracion_membresia || 'Cargando info...',
         descripcionMembresia: (state) => state.user.tienda[0].aplicacion_web.membresia.descripcion_corta || 'Cargando info...',
+        bgColor: (state) => state.user.tienda[0].aplicacion_web.estilo.color_fondo || 'Cargando info...',
 
         // datos de facturacion
         estadoFactura: (state) => state.user.tienda[0].facturas[0].estado.tipo_estado || 'Cargando info...',

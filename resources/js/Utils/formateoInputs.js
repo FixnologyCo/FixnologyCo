@@ -12,11 +12,11 @@ export const limitesCaracteres = {
   telefono: 10,
   email: 60,
   genero: 25,
-  direccion_residencia: 60,
-  ciudad_residencia: 60,
-  barrio_residencia: 60,
+  direccion: 60,
   password: 30,
   password_confirm: 30,
+  nombre_tienda: 20,
+  tipo_tienda:60,
 
   // inputs app
   descripcion_app: 100,

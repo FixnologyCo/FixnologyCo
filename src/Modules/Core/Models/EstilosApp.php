@@ -25,7 +25,7 @@ class EstilosApp extends Model
 
     public function aplicacionWeb()
     {
-        return $this->hasMany(AplicacionesWeb::class);
+        return $this->belongsTo(AplicacionesWeb::class);
     }
 
 }

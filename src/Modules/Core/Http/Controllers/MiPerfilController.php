@@ -2,11 +2,11 @@
 
 namespace Core\Http\Controllers;
 
-use Core\Models\Roles;
+use Core\Models\Indicativos;
 use Auth;
+use Core\Models\TipoDocumento;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 
@@ -34,6 +34,7 @@ class MiPerfilController extends Controller
             'tienda.token',
             'tienda.token.estado',
             'tienda.aplicacionWeb',
+            'tienda.aplicacionWeb.estilo',
             'tienda.aplicacionWeb.estado',
             'tienda.aplicacionWeb.membresia',
             'tienda.aplicacionWeb.membresia.estado',
@@ -72,6 +73,7 @@ class MiPerfilController extends Controller
             'tienda.token',
             'tienda.token.estado',
             'tienda.aplicacionWeb',
+            'tienda.aplicacionWeb.estilo',
             'tienda.aplicacionWeb.estado',
             'tienda.aplicacionWeb.membresia',
             'tienda.aplicacionWeb.membresia.estado',
@@ -82,7 +84,10 @@ class MiPerfilController extends Controller
 
         );
         $tipoDeRol = $usuario->rol->tipo_rol;
-        $aplicacionWeb = $usuario->tienda[0]->aplicacionWeb->nombre_app ?? null;
+       
+
+        $indicativos = Indicativos::all();
+        $tipoDocumentos = TipoDocumento::all();
 
         
        
@@ -92,7 +97,9 @@ class MiPerfilController extends Controller
         
             return Inertia::render('Apps/' . ucfirst($aplicacion) . '/' . ucfirst($rol) . '/MiPerfil/EditarMiPerfil', [
                 'usuario' => $usuario,
-                'rol' => $tipoDeRol
+                'rol' => $tipoDeRol,
+                'indicativos' => $indicativos,
+                'tipoDocumentos'=> $tipoDocumentos
             ]);
     }
     
