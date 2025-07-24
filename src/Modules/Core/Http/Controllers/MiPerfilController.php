@@ -47,16 +47,16 @@ class MiPerfilController extends Controller
         $tipoDeRol = $usuario->rol->tipo_rol;
         $aplicacionWeb = $usuario->tienda[0]->aplicacionWeb->nombre_app ?? null;
 
-        
-       
-        if (!in_array($usuario->rol->id, [1,2,4])) {
+
+
+        if (!in_array($usuario->rol->id, [1, 2, 4])) {
             abort(403, 'No tienes permisos para acceder a esta sección.');
         }
-        
-            return Inertia::render('Apps/' . ucfirst($aplicacion) . '/' . ucfirst($rol) . '/MiPerfil/MiPerfil', [
-                'usuario' => $usuario,
-                'rol' => $tipoDeRol
-            ]);
+
+        return Inertia::render('Apps/' . ucfirst($aplicacion) . '/' . ucfirst($rol) . '/MiPerfil/MiPerfil', [
+            'usuario' => $usuario,
+            'rol' => $tipoDeRol
+        ]);
     }
 
     public function formUpdate($aplicacion, $rol, Request $request)
@@ -84,25 +84,53 @@ class MiPerfilController extends Controller
 
         );
         $tipoDeRol = $usuario->rol->tipo_rol;
-       
+
 
         $indicativos = Indicativos::all();
         $tipoDocumentos = TipoDocumento::all();
 
-        
-       
-        if (!in_array($usuario->rol->id, [1,2,4])) {
+
+
+        if (!in_array($usuario->rol->id, [1, 2, 4])) {
             abort(403, 'No tienes permisos para acceder a esta sección.');
         }
-        
-            return Inertia::render('Apps/' . ucfirst($aplicacion) . '/' . ucfirst($rol) . '/MiPerfil/EditarMiPerfil', [
-                'usuario' => $usuario,
-                'rol' => $tipoDeRol,
-                'indicativos' => $indicativos,
-                'tipoDocumentos'=> $tipoDocumentos
-            ]);
+
+        return Inertia::render('Apps/' . ucfirst($aplicacion) . '/' . ucfirst($rol) . '/MiPerfil/EditarMiPerfil', [
+            'usuario' => $usuario,
+            'rol' => $tipoDeRol,
+            'indicativos' => $indicativos,
+            'tipoDocumentos' => $tipoDocumentos
+        ]);
     }
-    
+
+    public function updateProfilePhoto(Request $request)
+    {
+        // 1. Validar la petición
+        $request->validate([
+            'photo' => ['required', 'image', 'max:2048'], // 2MB Max
+        ]);
+
+        // 2. Obtener el usuario
+        $user = $request->user();
+
+        // 3. Borrar la foto anterior si existe
+        if ($user->ruta_roto) {
+            Storage::disk('public')->delete($user->ruta_roto);
+        }
+
+        // 4. Guardar la nueva foto y obtener la ruta
+        // store() genera un nombre único para el archivo automáticamente
+        $path = $request->file('photo')->store('fotosUsuarios/' . $user->id, 'public');
+
+        // 5. Actualizar la base de datos
+        $user->forceFill([
+            'ruta_roto' => $path,
+        ])->save();
+
+        // Para Inertia, es común redirigir de vuelta
+        return Redirect::route('aplicacion.editarMiPerfil.actualizar')->with('success', 'Foto de perfil actualizada.');
+    }
+
     use AuthorizesRequests;
 
 }

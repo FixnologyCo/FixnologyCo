@@ -134,12 +134,29 @@ const inicialesNombreTienda = computed(() => {
                     class="-mt-20 ml-5 mb-2 grid place-content-center foto w-[180px] h-[180px] rounded-[18px] bg-mono-blanco_opacity dark:bg-secundary-opacity backdrop-blur-lg">
                     <template v-if="authStore.rutaFoto !== 'Sin foto'">
                       <div class="relative group w-[160px] h-[160px]">
+
                         <img :src="authStore.rutaFoto" class="rounded-[18px] w-full h-full object-cover shadow-lg" />
+
+
+                        <div
+                          class="absolute inset-0 bg-black/40 rounded-[18px] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+
+                          <label for="fotoInput"
+                            class="cursor-pointer bg-white p-3 rounded-full shadow-md hover:bg-gray-200 transition"
+                            title="Cambiar foto">
+                            <span class="material-symbols-rounded text-2xl" :class="[textoClase]">edit</span>
+                          </label>
+                        </div>
+
+                        <!-- Input oculto -->
+                        <input id="fotoInput" type="file" accept="image/*" @change="onFileChange" class="hidden" />
                       </div>
                     </template>
 
+
+
                     <template v-else>
-                      <div :class="[bgClase]" class="rounded-[18px] grid place-content-center w-[180px] h-[180px]">
+                      <div :class="[bgClase]" class="rounded-[18px] grid place-content-center w-[160px] h-[160px]">
                         <p class="text-[60px] font-semibold">
                           {{ inicialesNombreUsuario }}
                         </p>
@@ -169,7 +186,7 @@ const inicialesNombreTienda = computed(() => {
                         <div class="w-3 h-3 rounded-full" :class="getEstadoClass(authStore.estadoUsuario)"></div>
                         <span class="text-secundary-default dark:text-mono-blanco">{{
                           authStore.estadoUsuario
-                          }}</span>
+                        }}</span>
                       </div>
 
                     </div>
@@ -352,8 +369,7 @@ const inicialesNombreTienda = computed(() => {
                         t :class="{
                           'border-universal-naranja': form.errors.telefono,
                         }">
-                        <span
-                          class="material-symbols-rounded text-universal-naranja text-[20px] pl-[5px]">pin</span>
+                        <span class="material-symbols-rounded text-universal-naranja text-[20px] pl-[5px]">pin</span>
 
                         <input type="number"
                           class="2xl:w-full outline-none border-none font-normal bg-transparent dark:text-mono-blanco"
@@ -412,8 +428,7 @@ const inicialesNombreTienda = computed(() => {
                         t :class="{
                           'border-universal-naranja': form.errors.numero_documento,
                         }">
-                        <span
-                          class="material-symbols-rounded text-universal-naranja text-[20px] pl-[5px]">pin</span>
+                        <span class="material-symbols-rounded text-universal-naranja text-[20px] pl-[5px]">pin</span>
 
                         <input type="number"
                           class="2xl:w-full outline-none border-none font-normal bg-transparent dark:text-mono-blanco"
@@ -559,18 +574,34 @@ const inicialesNombreTienda = computed(() => {
               <div class="rounded-[15px] p-5 cajaTienda dark:bg-secundary-opacity bg-mono-blanco_opacity">
                 <div class="w-full h-[130px] rounded-md opacity-50" :class="authStore.bgColor"></div>
 
-                <div class="flex gap-2 items-center">
+                 <div class="flex gap-2 items-center">
                   <div
                     class="-mt-20 ml-5 mb-2 grid place-content-center foto w-[180px] h-[180px] rounded-[18px] bg-mono-blanco_opacity dark:bg-secundary-opacity backdrop-blur-lg">
                     <template v-if="authStore.rutaFotoEstablecimiento !== 'Sin foto'">
                       <div class="relative group w-[160px] h-[160px]">
-                        <img :src="authStore.rutaFotoEstablecimiento"
-                          class="rounded-[18px] w-full h-full object-cover shadow-lg" />
+
+                        <img :src="authStore.rutaFotoEstablecimiento" class="rounded-[18px] w-full h-full object-cover shadow-lg" />
+
+
+                        <div
+                          class="absolute inset-0 bg-black/40 rounded-[18px] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+
+                          <label for="fotoInputEstablecimiento"
+                            class="cursor-pointer bg-white p-3 rounded-full shadow-md hover:bg-gray-200 transition"
+                            title="Cambiar foto">
+                            <span class="material-symbols-rounded text-2xl" :class="[textoClase]">edit</span>
+                          </label>
+                        </div>
+
+                        <!-- Input oculto -->
+                        <input id="fotoInputEstablecimiento" type="file" accept="image/*" @change="onFileChange" class="hidden" />
                       </div>
                     </template>
 
+
+
                     <template v-else>
-                      <div :class="[bgClase]" class="rounded-[18px] grid place-content-center w-[180px] h-[180px]">
+                      <div :class="[bgClase]" class="rounded-[18px] grid place-content-center w-[160px] h-[160px]">
                         <p class="text-[60px] font-semibold">
                           {{ inicialesNombreTienda }}
                         </p>
@@ -578,21 +609,27 @@ const inicialesNombreTienda = computed(() => {
                     </template>
                   </div>
 
-                  <div class="nombreTimeReal w-full px-2">
-                    <p class="text-[32px] font-medium flex items-center justify-between">{{ authStore.nombreTienda }}
-
+                  <div class="nombreTimeReal">
+                    <p class="text-[32px] font-medium flex items-center gap-1">{{ authStore.nombreTienda}}
+                    <div class="grid place-items-center" v-if="authStore.google_id === null">
+                      <span class="material-symbols-rounded  text-gray-700">verified_off</span>
+                    </div>
+                    <div class="text-secundary-default dark:text-mono-blanco" v-else>
+                      <span
+                        class="grid place-items-center material-symbols-rounded  text-universal-azul_secundaria">verified</span>
+                    </div>
                     </p>
 
-                    <div class="flex justify-between w-full items-center -mt-1">
+                    <div class="flex justify-between gap-5 items-center -mt-1">
                       <p class="text-[18 px] text-secundary-light font-normal flex items-center gap-1"><span
                           class="material-symbols-rounded" :class="[textoClase]">key</span> {{
                             authStore.tokenTienda || authStore.tienda_id }}</p>
 
                       <div class="flex items-center gap-1">
-                        <div class="w-3 h-3 rounded-full" :class="getEstadoClass(authStore.estadoUsuario)"></div>
+                        <div class="w-3 h-3 rounded-full" :class="getEstadoClass(authStore.estadoTienda)"></div>
                         <span class="text-secundary-default dark:text-mono-blanco">{{
                           authStore.estadoTienda
-                          }}</span>
+                        }}</span>
                       </div>
 
                     </div>
@@ -683,8 +720,7 @@ const inicialesNombreTienda = computed(() => {
                         t :class="{
                           'border-universal-naranja': form.errors.telefono,
                         }">
-                        <span
-                          class="material-symbols-rounded text-universal-naranja text-[20px] pl-[5px]">pin</span>
+                        <span class="material-symbols-rounded text-universal-naranja text-[20px] pl-[5px]">pin</span>
 
                         <input type="number"
                           class="2xl:w-full outline-none border-none font-normal bg-transparent dark:text-mono-blanco"
@@ -711,8 +747,7 @@ const inicialesNombreTienda = computed(() => {
                         t :class="{
                           'border-universal-naranja': form.errors.email_tienda,
                         }">
-                        <span
-                          class="material-symbols-rounded text-universal-naranja text-[20px] pl-[5px]">email</span>
+                        <span class="material-symbols-rounded text-universal-naranja text-[20px] pl-[5px]">email</span>
 
                         <input type="email"
                           class="2xl:w-full outline-none border-none font-normal bg-transparent dark:text-mono-blanco"
