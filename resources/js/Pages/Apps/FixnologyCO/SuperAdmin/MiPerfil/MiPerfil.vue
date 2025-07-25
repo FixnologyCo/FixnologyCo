@@ -94,7 +94,7 @@ const fotoUsuario = computed(() => {
     <div class="flex">
       <SidebarSuperAdmin :auth="authStore">
         <div
-          class="contenido px-3 max-h-[90vh] w-full overflow-auto scrollbar-custom contenido-principal"
+          class="contenido px-3 max-h-[85vh] w-full overflow-auto scrollbar-custom contenido-principal"
         >
           <div class="options flex gap-1 items-center justify-center text-[14px] mb-10">
             <a
@@ -112,45 +112,36 @@ const fotoUsuario = computed(() => {
             <p class="font-bold text-mono-negro dark:text-mono-blanco">Mi perfil</p>
           </div>
           <!-- <h1 class="text-[30px] dark:text-mono-blanco text-mono-negro">Mi perfil</h1> -->
-          <div class="miPerfil w-full min-h-[78dvh]">
-            <div class="rounded-[15px] contenedorPerfil"></div>
+          <div class="miPerfil w-full">
             <div
-              class="rounded-[15px] div2 bg-mono-blanco_opacity dark:bg-secundary-opacity"
+              class="rounded-[15px] p-3 flex flex-col gap-5 div2 bg-mono-blanco_opacity dark:bg-secundary-opacity"
             >
               <div
-                :class="sidebarExpandido ? 'w-[400px] h-[300px]' : 'w-[450px] h-[300px]'"
-                class="mb-2 grid place-content-center foto rounded-[18px] bg-mono-blanco_opacity dark:bg-secundary-opacity backdrop-blur-lg"
-              >
-                <template v-if="authStore.fotoUrlCompletaUsuario">
-                  <div
-                    :class="
-                      sidebarExpandido ? 'w-[380px] h-[280px]' : 'w-[430px] h-[280px]'
-                    "
-                    class="relative group"
-                  >
-                    <img
-                      :src="authStore.fotoUrlCompletaUsuario"
-                      class="rounded-[18px] w-full h-full object-cover shadow-lg"
-                    />
-                  </div>
-                </template>
+                class="w-full h-[130px] rounded-md opacity-50"
+                :class="authStore.bgColor"
+              ></div>
 
-                <template v-else>
-                  <div :class="bgClase" class="rounded-[18px] grid place-content-center">
-                    <p class="text-[60px] font-semibold">{{ inicialesNombreUsuario }}</p>
-                  </div>
-                </template>
-              </div>
+              <div class="flex justify-center flex-col items-center">
+                <div
+                  class="-mt-28 ml-5 mb-2 grid place-content-center foto w-[180px] h-[180px] rounded-[18px] bg-mono-blanco_opacity dark:bg-secundary-opacity backdrop-blur-lg"
+                >
+                  <template v-if="authStore.fotoUrlCompletaUsuario">
+                    <div class="relative group w-[160px] h-[160px]">
+                      <img
+                        :src="authStore.fotoUrlCompletaUsuario"
+                        class="rounded-[18px] w-full h-full object-cover shadow-lg"
+                      />
+                    </div>
+                  </template>
 
-              <div class="infoBasica px-4">
-                <div class="flex justify-between items-center">
-                  <h4 class="text-secundary-default dark:text-mono-blanco">
-                    Información de usuario
-                  </h4>
-                  <span
-                    class="material-symbols-rounded text-[16px] cursor-pointer text-secundary-default dark:text-mono-blanco hover:text-universal-azul_secundaria"
-                    >info</span
-                  >
+                  <template v-else>
+                    <div
+                      :class="bgClase"
+                      class="relative flex justify-center rounded-[18px] items-center group w-[160px] h-[160px]"
+                    >
+                      <p class="text-[60px] font-semibold">{{ inicialesNombreTienda }}</p>
+                    </div>
+                  </template>
                 </div>
                 <div class="flex items-center justify-between gap-1">
                   <span
@@ -158,8 +149,7 @@ const fotoUsuario = computed(() => {
                     >crown</span
                   >
                   <h3
-                    :class="sidebarExpandido ? 'text-[25px]' : 'text-[30px]'"
-                    class="text-mono-negro font-semibold dark:text-mono-blanco"
+                    class="text-mono-negro text-[25px] font-semibold dark:text-mono-blanco"
                   >
                     {{ authStore.nombreCompleto }}
                   </h3>
@@ -178,6 +168,9 @@ const fotoUsuario = computed(() => {
                     >
                   </div>
                 </div>
+              </div>
+
+              <div class="infoBasica">
                 <div class="number flex items-center justify-between gap-2">
                   <div class="flex items-center gap-2">
                     <span
@@ -258,34 +251,32 @@ const fotoUsuario = computed(() => {
                     </p>
                   </div>
                 </div>
-
-                <div class="datos-recurentes flex justify-between mt-3 gap-2">
-                  <div class="dias-restante w-auto rounded-md">
-                    <h4 class="text-secundary-default dark:text-mono-blanco">
-                      Tu membresía finaliza en:
-                    </h4>
-                    <p
-                      :class="sidebarExpandido ? 'text-[25px]' : 'text-[30px]'"
-                      class="font-semibold -mt-1 text-secundary-default dark:text-mono-blanco"
+              </div>
+              <div class="datos-recurentes flex justify-between mt-3 gap-2">
+                <div class="dias-restante w-auto rounded-md">
+                  <h4 class="text-secundary-default dark:text-mono-blanco">
+                    Tu membresía finaliza en:
+                  </h4>
+                  <p
+                    :class="sidebarExpandido ? 'text-[25px]' : 'text-[30px]'"
+                    class="font-semibold -mt-1 text-secundary-default dark:text-mono-blanco"
+                  >
+                    {{ diasRestantes
+                    }}<span
+                      class="text-[14px] text-secundary-default dark:text-mono-blanco"
+                      >Días</span
                     >
-                      {{ diasRestantes
-                      }}<span
-                        class="text-[14px] text-secundary-default dark:text-mono-blanco"
-                        >Días</span
-                      >
-                    </p>
-                  </div>
-                  <div class="dias-activo w-auto rounded-md">
-                    <h4 class="text-right text-secundary-default dark:text-mono-blanco">
-                      Te uniste a la familia:
-                    </h4>
-                    <p
-                      :class="sidebarExpandido ? 'text-[25px]' : 'text-[30px]'"
-                      class="font-semibold -mt-1 text-secundary-default dark:text-mono-blanco"
-                    >
-                      {{ tiempoActivo }} <span class="text-[14px]"></span>
-                    </p>
-                  </div>
+                  </p>
+                </div>
+                <div class="dias-activo w-auto rounded-md">
+                  <h4 class="text-right text-secundary-default dark:text-mono-blanco">
+                    Te uniste a la familia:
+                  </h4>
+                  <p
+                    class="font-semibold -mt-1 text-secundary-default text-[25px] dark:text-mono-blanco"
+                  >
+                    {{ tiempoActivo }} <span class="text-[14px]"></span>
+                  </p>
                 </div>
               </div>
             </div>
@@ -343,22 +334,32 @@ const fotoUsuario = computed(() => {
               class="rounded-[15px] p-3 div5 dark:bg-secundary-opacity bg-mono-blanco_opacity"
             >
               <div
-                class="mb-4 grid place-content-center foto w-[390px] h-[170px] rounded-[18px] bg-mono-blanco_opacity dark:bg-secundary-opacity backdrop-blur-lg"
-              >
-                <template v-if="!authStore.fotoUrlCompletaEstablecimiento">
-                  <div :class="bgClase" class="rounded-[18px] grid place-content-center">
-                    <p class="text-[60px] font-semibold">{{ inicialesNombreTienda }}</p>
-                  </div>
-                </template>
+                class="w-full h-[130px] rounded-md opacity-50"
+                :class="authStore.bgColor"
+              ></div>
 
-                <template v-else>
-                  <div class="w-[370px] h-[150px] relative group">
-                    <img
-                      :src="authStore.fotoUrlCompletaEstablecimiento"
-                      class="rounded-[18px] w-full h-full object-cover shadow-lg"
-                    />
-                  </div>
-                </template>
+              <div class="flex gap-2 justify-center items-center">
+                <div
+                  class="-mt-20 ml-5 mb-2 grid place-content-center foto w-[180px] h-[180px] rounded-[18px] bg-mono-blanco_opacity dark:bg-secundary-opacity backdrop-blur-lg"
+                >
+                  <template v-if="authStore.fotoUrlCompletaEstablecimiento">
+                    <div class="relative group w-[160px] h-[160px]">
+                      <img
+                        :src="authStore.fotoUrlCompletaEstablecimiento"
+                        class="rounded-[18px] w-full h-full object-cover shadow-lg"
+                      />
+                    </div>
+                  </template>
+
+                  <template v-else>
+                    <div
+                      :class="bgClase"
+                      class="relative flex justify-center rounded-[18px] items-center group w-[160px] h-[160px]"
+                    >
+                      <p class="text-[60px] font-semibold">{{ inicialesNombreTienda }}</p>
+                    </div>
+                  </template>
+                </div>
               </div>
               <div class="flex justify-between items-center">
                 <h4 class="text-secundary-default dark:text-mono-blanco">
