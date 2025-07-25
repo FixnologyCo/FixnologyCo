@@ -70,11 +70,25 @@ const tabs = [
   { label: "Membresía" },
   { label: "Ajustes avanzados" },
 ];
+
+const fotoUsuario = computed(() => {
+  const ruta = authStore.rutaFoto;
+
+  if (ruta && ruta !== "Sin foto") {
+    if (ruta.startsWith("http")) {
+      return ruta;
+    }
+    return `/storage/${ruta}`;
+  }
+
+  return "Sin foto";
+});
 </script>
 
 <template>
   <div>
     <MensajesLayout />
+
     <Head title="Configuraciones" />
 
     <div class="flex">
@@ -107,7 +121,7 @@ const tabs = [
                 :class="sidebarExpandido ? 'w-[400px] h-[300px]' : 'w-[450px] h-[300px]'"
                 class="mb-2 grid place-content-center foto rounded-[18px] bg-mono-blanco_opacity dark:bg-secundary-opacity backdrop-blur-lg"
               >
-                <template v-if="authStore.rutaFoto !== 'Sin foto'">
+                <template v-if="authStore.fotoUrlCompletaUsuario">
                   <div
                     :class="
                       sidebarExpandido ? 'w-[380px] h-[280px]' : 'w-[430px] h-[280px]'
@@ -115,20 +129,14 @@ const tabs = [
                     class="relative group"
                   >
                     <img
-                      :src="authStore.rutaFoto"
+                      :src="authStore.fotoUrlCompletaUsuario"
                       class="rounded-[18px] w-full h-full object-cover shadow-lg"
                     />
                   </div>
                 </template>
 
                 <template v-else>
-                  <div
-                    :class="
-                      (sidebarExpandido ? 'w-[380px] h-[280px]' : 'w-[430px] h-[280px]',
-                      [bgClase])
-                    "
-                    class="rounded-[18px] grid place-content-center"
-                  >
+                  <div :class="bgClase" class="rounded-[18px] grid place-content-center">
                     <p class="text-[60px] font-semibold">{{ inicialesNombreUsuario }}</p>
                   </div>
                 </template>
@@ -337,21 +345,18 @@ const tabs = [
               <div
                 class="mb-4 grid place-content-center foto w-[390px] h-[170px] rounded-[18px] bg-mono-blanco_opacity dark:bg-secundary-opacity backdrop-blur-lg"
               >
-                <template v-if="authStore.rutaFotoEstablecimiento !== 'Sin foto'">
-                  <div class="relative w-[370px] h-[150px] group">
-                    <img
-                      :src="authStore.rutaFotoEstablecimiento"
-                      class="rounded-[18px] w-full h-full object-cover shadow-lg"
-                    />
+                <template v-if="!authStore.fotoUrlCompletaEstablecimiento">
+                  <div :class="bgClase" class="rounded-[18px] grid place-content-center">
+                    <p class="text-[60px] font-semibold">{{ inicialesNombreTienda }}</p>
                   </div>
                 </template>
 
                 <template v-else>
-                  <div
-                    class="w-[370px] h-[150px] rounded-[18px] grid place-content-center"
-                    :class="[bgClase]"
-                  >
-                    <p class="text-[60px] font-semibold">{{ inicialesNombreTienda }}</p>
+                  <div class="w-[370px] h-[150px] relative group">
+                    <img
+                      :src="authStore.fotoUrlCompletaEstablecimiento"
+                      class="rounded-[18px] w-full h-full object-cover shadow-lg"
+                    />
                   </div>
                 </template>
               </div>
@@ -714,8 +719,8 @@ const tabs = [
               </div>
             </div>
           </div>
-        </div></SidebarSuperAdmin
-      >
+        </div>
+      </SidebarSuperAdmin>
     </div>
   </div>
 </template>

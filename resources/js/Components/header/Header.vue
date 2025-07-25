@@ -165,29 +165,32 @@ if (fecha.getHours() < 12) {
               ></div>
             </div>
 
-            <template v-if="authStore.rutaFoto !== 'Sin foto'">
-              <img
-                :src="authStore.rutaFoto"
-                class="border-2 rounded-[50px] w-[40px] h-[40px] object-cover shadowM"
-              />
-            </template>
-
-            <template v-else>
+            <template v-if="!authStore.fotoUrlCompletaUsuario">
               <div
-                class="user relative bg-universal-naranja shadow shadow-universal-naranja text-mono-blanco h-[35px] w-[35px] rounded-full overflow-hidden flex items-center justify-center"
+                class="user relative shadow shadowM text-mono-blanco h-[35px] w-[35px] rounded-full overflow-hidden flex items-center justify-center"
                 :class="[bgClase]"
               >
                 <span class="text-[12px] font-bold">{{ initials }}</span>
               </div>
             </template>
+
+            <template v-else>
+              <img
+                :src="authStore.fotoUrlCompletaUsuario"
+                class="border-2 rounded-[50px] w-[40px] h-[40px] object-cover shadowM"
+              />
+            </template>
           </div>
 
-          
           <div class="ml-2">
-            <p class=" font-semibold text-mono-negro dark:text-mono-blanco">
+            <p class="font-semibold text-mono-negro dark:text-mono-blanco">
               {{ saludo }}, {{ authStore.primerNombre }}.
             </p>
-            <p class="text-[12px] font-medium text-secundary-default dark:text-secundary-light"> {{ nombreDia }} {{ dia }} de {{ mes }} {{ anio }}, {{ hora }}</p>
+            <p
+              class="text-[12px] font-medium text-secundary-default dark:text-secundary-light"
+            >
+              {{ nombreDia }} {{ dia }} de {{ mes }} {{ anio }}, {{ hora }}
+            </p>
           </div>
 
           <span
@@ -204,7 +207,8 @@ if (fecha.getHours() < 12) {
           <div class="nombreUsuario px-2 py-2">
             <div class="flex items-center justify-between">
               <span class="material-symbols-rounded text-[18px] text-universal-naranja"
-                  >crown</span>
+                >crown</span
+              >
               <h3 class="text-mono-negro font-semibold dark:text-mono-blanco">
                 {{ authStore.primerNombre + " " + authStore.primerApellido }}
               </h3>
@@ -241,8 +245,7 @@ if (fecha.getHours() < 12) {
             href="#"
             :class="hoverClase"
             class="flex items-center gap-2 px-2 rounded-full py-2 text-sm text-mono-negro dark:text-mono-blanco"
-            ><span class="material-symbols-rounded text-[18px]">Help</span>
-            Ayuda</a
+            ><span class="material-symbols-rounded text-[18px]">Help</span> Ayuda</a
           >
 
           <div class="border-t border-gray-200 dark:border-gray-700 my-2"></div>
@@ -266,14 +269,21 @@ if (fecha.getHours() < 12) {
       </div>
     </div>
 
-    
-
     <div class="flex gap-2 items-center">
-    <div class="search flex items-center gap-1">
-    <span class="material-symbols-rounded border dark:border-secundary-light border-mono-negro rounded-full p-2  dark:text-secundary-light text-mono-negro font-medium text-[16px]">search</span>
-    <input type="search" placeholder="Buscar..." name="" id="" class="outline-none dark:text-secundary-light text-mono-negro font-medium text-[14px] bg-transparent border dark:border-secundary-light border-mono-negro rounded-full px-3 py-1">
-    </div>
-    <a :href="route('aplicacion.miPerfil', { aplicacion, rol })">
+      <div class="search flex items-center gap-1">
+        <span
+          class="material-symbols-rounded border dark:border-secundary-light border-mono-negro rounded-full p-2 dark:text-secundary-light text-mono-negro font-medium text-[16px]"
+          >search</span
+        >
+        <input
+          type="search"
+          placeholder="Buscar..."
+          name=""
+          id=""
+          class="outline-none dark:text-secundary-light text-mono-negro font-medium text-[14px] bg-transparent border dark:border-secundary-light border-mono-negro rounded-full px-3 py-1"
+        />
+      </div>
+      <a :href="route('aplicacion.miPerfil', { aplicacion, rol })">
         <div
           class="user h-[30px] w-[30px] rounded-full overflow-hidden flex items-center justify-center cursor-pointer"
           :class="[hoverClase]"
@@ -314,7 +324,6 @@ if (fecha.getHours() < 12) {
                     </span>
                 </div>
             </a> -->
-      
     </div>
   </header>
 </template>

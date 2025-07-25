@@ -4,10 +4,14 @@ namespace Core\Http\Controllers;
 
 use Core\Models\Indicativos;
 use Auth;
+use Core\Models\PerfilUsuario;
 use Core\Models\TipoDocumento;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Validator;
 
 
 class MiPerfilController extends Controller
@@ -103,32 +107,42 @@ class MiPerfilController extends Controller
         ]);
     }
 
-    public function updateProfilePhoto(Request $request)
+    public function updateProfilePhoto(Request $request, $aplicacion, $rol)
     {
-        // 1. Validar la petición
-        $request->validate([
-            'photo' => ['required', 'image', 'max:2048'], // 2MB Max
+
+       // 2. CREA EL VALIDADOR MANUALMENTE
+        $validator = Validator::make($request->all(), [
+            'photo' => ['required', 'image', 'max:3048'], // 2MB
+        ], [
+            'photo.max' => 'La imagen no debe superar los 3MB.',
         ]);
 
-        // 2. Obtener el usuario
-        $user = $request->user();
-
-        // 3. Borrar la foto anterior si existe
-        if ($user->ruta_roto) {
-            Storage::disk('public')->delete($user->ruta_roto);
+        
+        if ($validator->fails()) {
+            // Si la validación falla, redirige con tu mensaje flash
+            return redirect()->route('aplicacion.miPerfil.editarMiPerfil', [
+                'aplicacion' => $aplicacion,
+                'rol' => $rol,
+            ])->with('error', 'La imagen es muy pesada y no debe superar los 3MB.');
         }
 
-        // 4. Guardar la nueva foto y obtener la ruta
-        // store() genera un nombre único para el archivo automáticamente
-        $path = $request->file('photo')->store('fotosUsuarios/' . $user->id, 'public');
+        $user = $request->user();
+        $perfil = $user->perfilUsuario;
 
-        // 5. Actualizar la base de datos
-        $user->forceFill([
-            'ruta_roto' => $path,
+        $directory = 'fotosUsuarios/' . $user->id;
+
+        Storage::disk('public')->deleteDirectory($directory);
+
+        $path = $request->file('photo')->store($directory, 'public');
+
+        $perfil->forceFill([
+            'ruta_foto' => $path,
         ])->save();
 
-        // Para Inertia, es común redirigir de vuelta
-        return Redirect::route('aplicacion.editarMiPerfil.actualizar')->with('success', 'Foto de perfil actualizada.');
+        return Redirect::route('aplicacion.miPerfil.editarMiPerfil', [
+            'aplicacion' => $aplicacion,
+            'rol' => $rol
+        ])->with('success', '¡Foto de perfil actualizada con éxito!.');
     }
 
     use AuthorizesRequests;

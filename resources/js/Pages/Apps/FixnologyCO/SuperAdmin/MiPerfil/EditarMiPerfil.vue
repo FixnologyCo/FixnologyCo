@@ -6,29 +6,91 @@ import SidebarSuperAdmin from "@/Components/Sidebar/FixnologyCO/Sidebar.vue";
 import Header from "@/Components/header/Header.vue";
 import Colors from "@/Composables/ModularColores";
 import MensajesLayout from "@/Layouts/MensajesLayout.vue";
-import { formatFecha } from "@/Utils/date";
-import { formatCOP } from "@/Utils/formateoMoneda";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import { useAuthStore } from "@/stores/auth";
-import { useTiempo } from "@/Composables/useTiempo";
 import useEstadoClass from "@/Composables/useEstado";
 import { handleBlur, handleInput, limitesCaracteres } from "@/Utils/formateoInputs";
+import logoGoogle from "/resources/images/LogoGoogle.png";
 
 const authStore = useAuthStore();
 defineOptions({
   layout: AuthenticatedLayout,
   inheritAttrs: false,
 });
-import logoGoogle from "/resources/images/LogoGoogle.png";
 
 const props = defineProps({
   indicativos: Array,
   tipoDocumentos: Array,
 })
+const {
+  appName,
+  bgClase,
+  bgOpacity,
+  focus,
+  textoClase,
+  borderClase,
+  buttonFocus,
+  hoverClase,
+  hoverTexto,
+  buttonClase,
+  buttonSecundario,
+} = Colors();
+
 const { getEstadoClass } = useEstadoClass();
+const aplicacion = authStore.aplicacion;
+const rol = authStore.rol;
+const photoPreview = ref(null);
+const photoInput = ref(null);
+
+const selectNewPhoto = () => {
+  photoInput.value.click();
+};
+
+const onFileChange = (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
+  form.photo = file;
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    photoPreview.value = e.target.result;
+  };
+  reader.readAsDataURL(file);
+
+  updatePhoto();
+};
+
+const updatePhoto = () => {
+  form.post(route("aplicacion.miPerfil.updatePhoto", {
+    aplicacion: aplicacion,
+    rol: rol,
+  }), {
+    preserveScroll: true,
+    onSuccess: () => {
+      photoPreview.value = null;
+      if (photoInput.value) {
+        photoInput.value.value = null;
+      }
+    },
+    onError: () => {
+      // Manejar errores si es necesario
+    }
+  });
+};
+
+const inicialesNombreTienda = computed(() => {
+  const nombresTienda = authStore.nombreTienda || "";
+
+  const nombreEstablecimiento =
+    nombresTienda.split(" ")[0]?.charAt(0).toUpperCase() || "";
+
+  return nombreEstablecimiento;
+});
+
 
 const form = useForm({
   ruta_foto: authStore.rutaFoto,
+  photo: null,
   primer_nombre: authStore.primerNombre || "No encontrado",
   segundo_nombre: authStore.segundoNombre || "No encontrado",
   primer_apellido: authStore.primerApellido || "No encontrado",
@@ -50,29 +112,7 @@ const form = useForm({
   direccion_tienda: authStore.direccionEstablecimiento || "No encontrado",
   ciudad_tienda: authStore.ciudadEstablecimiento || "No encontrado",
   barrio_tienda: authStore.barrioEstablecimiento || "No encontrado",
-
 });
-
-const submit = () => {
-  form.post(route("aplicacion.editarMiPerfil.actualizar"));
-};
-
-const {
-  appName,
-  bgClase,
-  bgOpacity,
-  focus,
-  textoClase,
-  borderClase,
-  buttonFocus,
-  hoverClase,
-  hoverTexto,
-  buttonClase,
-  buttonSecundario,
-} = Colors();
-
-const aplicacion = authStore.aplicacion;
-const rol = authStore.rol;
 
 const inicialesNombreUsuario = computed(() => {
   const nombres = authStore.primerNombre || "";
@@ -82,24 +122,17 @@ const inicialesNombreUsuario = computed(() => {
   return firstNameInitial + lastNameInitial;
 });
 
-const inicialesNombreTienda = computed(() => {
-  const nombresTienda = authStore.nombreTienda || "";
 
-  const nombreEstablecimiento =
-    nombresTienda.split(" ")[0]?.charAt(0).toUpperCase() || "";
-
-  return nombreEstablecimiento;
-});
 </script>
 
 <template>
   <div>
-    <MensajesLayout />
 
     <Head title="Editar mis datos" />
 
     <div class="flex">
       <SidebarSuperAdmin :auth="authStore">
+        <MensajesLayout />
         <div class="contenido px-3 max-h-[90vh] w-full overflow-auto scrollbar-custom contenido-principal">
           <div class="options flex gap-1 items-center justify-center text-[14px] mb-10">
             <a :href="route('aplicacion.dashboard', { aplicacion, rol })"
@@ -132,36 +165,38 @@ const inicialesNombreTienda = computed(() => {
                 <div class="flex gap-2 items-center">
                   <div
                     class="-mt-20 ml-5 mb-2 grid place-content-center foto w-[180px] h-[180px] rounded-[18px] bg-mono-blanco_opacity dark:bg-secundary-opacity backdrop-blur-lg">
-                    <template v-if="authStore.rutaFoto !== 'Sin foto'">
+                    <template v-if="authStore.fotoUrlCompletaUsuario">
                       <div class="relative group w-[160px] h-[160px]">
-
-                        <img :src="authStore.rutaFoto" class="rounded-[18px] w-full h-full object-cover shadow-lg" />
-
+                        <img :src="authStore.fotoUrlCompletaUsuario"
+                          class="rounded-[18px] w-full h-full object-cover shadow-lg" />
 
                         <div
                           class="absolute inset-0 bg-black/40 rounded-[18px] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-
-                          <label for="fotoInput"
+                          <button @click="selectNewPhoto"
                             class="cursor-pointer bg-white p-3 rounded-full shadow-md hover:bg-gray-200 transition"
                             title="Cambiar foto">
                             <span class="material-symbols-rounded text-2xl" :class="[textoClase]">edit</span>
-                          </label>
+                          </button>
                         </div>
-
-                        <!-- Input oculto -->
-                        <input id="fotoInput" type="file" accept="image/*" @change="onFileChange" class="hidden" />
                       </div>
                     </template>
-
-
 
                     <template v-else>
-                      <div :class="[bgClase]" class="rounded-[18px] grid place-content-center w-[160px] h-[160px]">
-                        <p class="text-[60px] font-semibold">
-                          {{ inicialesNombreUsuario }}
-                        </p>
+                      <div :class="bgClase"
+                        class="relative flex justify-center rounded-[18px] items-center group w-[160px] h-[160px]">
+                        <p class="text-[60px] font-semibold">{{ inicialesNombreUsuario }}</p>
+                        <div
+                          class="absolute inset-0 bg-black/40 rounded-[18px] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                          <button @click="selectNewPhoto"
+                            class="cursor-pointer bg-white p-3 rounded-full shadow-md hover:bg-gray-200 transition"
+                            title="Añadir foto">
+                            <span class="material-symbols-rounded text-2xl" :class="[textoClase]">add_a_photo</span>
+                          </button>
+                        </div>
                       </div>
                     </template>
+
+                    <input ref="photoInput" type="file" accept="image/*" @change="onFileChange" class="hidden" />
                   </div>
 
                   <div class="nombreTimeReal">
@@ -574,43 +609,45 @@ const inicialesNombreTienda = computed(() => {
               <div class="rounded-[15px] p-5 cajaTienda dark:bg-secundary-opacity bg-mono-blanco_opacity">
                 <div class="w-full h-[130px] rounded-md opacity-50" :class="authStore.bgColor"></div>
 
-                 <div class="flex gap-2 items-center">
+                <div class="flex gap-2 items-center">
                   <div
                     class="-mt-20 ml-5 mb-2 grid place-content-center foto w-[180px] h-[180px] rounded-[18px] bg-mono-blanco_opacity dark:bg-secundary-opacity backdrop-blur-lg">
-                    <template v-if="authStore.rutaFotoEstablecimiento !== 'Sin foto'">
+                    <template v-if="authStore.fotoUrlCompletaEstablecimiento">
                       <div class="relative group w-[160px] h-[160px]">
-
-                        <img :src="authStore.rutaFotoEstablecimiento" class="rounded-[18px] w-full h-full object-cover shadow-lg" />
-
+                        <img :src="authStore.fotoUrlCompletaEstablecimiento"
+                          class="rounded-[18px] w-full h-full object-cover shadow-lg" />
 
                         <div
                           class="absolute inset-0 bg-black/40 rounded-[18px] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-
-                          <label for="fotoInputEstablecimiento"
+                          <button @click="selectNewPhoto"
                             class="cursor-pointer bg-white p-3 rounded-full shadow-md hover:bg-gray-200 transition"
                             title="Cambiar foto">
                             <span class="material-symbols-rounded text-2xl" :class="[textoClase]">edit</span>
-                          </label>
+                          </button>
                         </div>
-
-                        <!-- Input oculto -->
-                        <input id="fotoInputEstablecimiento" type="file" accept="image/*" @change="onFileChange" class="hidden" />
                       </div>
                     </template>
-
-
 
                     <template v-else>
-                      <div :class="[bgClase]" class="rounded-[18px] grid place-content-center w-[160px] h-[160px]">
-                        <p class="text-[60px] font-semibold">
-                          {{ inicialesNombreTienda }}
-                        </p>
+                      <div :class="bgClase"
+                        class="relative flex justify-center rounded-[18px] items-center group w-[160px] h-[160px]">
+                        <p class="text-[60px] font-semibold">{{ inicialesNombreTienda }}</p>
+                        <div
+                          class="absolute inset-0 bg-black/40 rounded-[18px] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                          <button @click="selectNewPhoto"
+                            class="cursor-pointer bg-white p-3 rounded-full shadow-md hover:bg-gray-200 transition"
+                            title="Añadir foto">
+                            <span class="material-symbols-rounded text-2xl" :class="[textoClase]">add_a_photo</span>
+                          </button>
+                        </div>
                       </div>
                     </template>
+
+                    <input ref="photoInput" type="file" accept="image/*" @change="onFileChange" class="hidden" />
                   </div>
 
                   <div class="nombreTimeReal">
-                    <p class="text-[32px] font-medium flex items-center gap-1">{{ authStore.nombreTienda}}
+                    <p class="text-[32px] font-medium flex items-center gap-1">{{ authStore.nombreTienda }}
                     <div class="grid place-items-center" v-if="authStore.google_id === null">
                       <span class="material-symbols-rounded  text-gray-700">verified_off</span>
                     </div>
