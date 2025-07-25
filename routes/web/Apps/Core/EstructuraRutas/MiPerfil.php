@@ -11,12 +11,15 @@ Route::middleware('auth')->group(function () {
         Route::get('/editarMiPerfil', [MiPerfilController::class, 'formUpdate'])
             ->name('aplicacion.miPerfil.editarMiPerfil');
 
-        // Ruta PUT para actualizar los datos del formulario (nombre, email, etc.)
+       
         Route::put('/editarMiPerfil', [MiPerfilController::class, 'actualizar'])
             ->name('aplicacion.editarMiPerfil.actualizar');
 
-        // ¡NUEVA RUTA! POST para actualizar SOLO la foto de perfil
-        Route::post('/update-profile-photo', [MiPerfilController::class, 'updateProfilePhoto'])
-            ->name('aplicacion.miPerfil.updatePhoto');
+        
+        Route::post('/actualizarFotoPerfil', [MiPerfilController::class, 'actualizarFotoPerfil'])
+            ->name('aplicacion.miPerfil.actualizarFotoPerfil');
+
+            Route::post('/actualizarFotoTienda', [MiPerfilController::class, 'actualizarFotoTienda'])
+            ->name('aplicacion.miPerfil.actualizarFotoTienda');
     });
 });

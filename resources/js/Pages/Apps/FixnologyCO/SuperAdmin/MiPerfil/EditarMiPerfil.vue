@@ -39,41 +39,62 @@ const {
 const { getEstadoClass } = useEstadoClass();
 const aplicacion = authStore.aplicacion;
 const rol = authStore.rol;
-const photoPreview = ref(null);
-const photoInput = ref(null);
 
-const selectNewPhoto = () => {
-  photoInput.value.click();
+// Los refs para los inputs y previsualizaciones siguen siendo necesarios
+const previsualizarFotoUsuario = ref(null);
+const inputFotoUsuario = ref(null);
+const previsualizarFotoTienda = ref(null);
+const inputFotoTienda = ref(null);
+
+
+// --- FUNCIONES UNIFICADAS ---
+
+/**
+ * Dispara el click en el input de archivo correcto.
+ * @param {('usuario' | 'tienda')} tipo - Define a qué input hacer click.
+ */
+const seleccionarFoto = (tipo) => {
+  if (tipo === 'usuario') {
+    inputFotoUsuario.value?.click();
+  } else if (tipo === 'tienda') {
+    inputFotoTienda.value?.click();
+  }
 };
 
-const onFileChange = (event) => {
+/**
+ * Función principal que maneja la selección, previsualización y subida del archivo.
+ * @param {Event} event - El evento del input de archivo.
+ * @param {('usuario' | 'tienda')} tipo - El tipo de foto que se está subiendo.
+ */
+const manejarSubidaDeFoto = (event, tipo) => {
   const file = event.target.files[0];
   if (!file) return;
+
+  // 1. Asigna el archivo al formulario
   form.photo = file;
 
+  // 2. Previsualiza la imagen
   const reader = new FileReader();
   reader.onload = (e) => {
-    photoPreview.value = e.target.result;
+    // Decide qué ref de previsualización actualizar
+    if (tipo === 'usuario') {
+      previsualizarFotoUsuario.value = e.target.result;
+    } else {
+      previsualizarFotoTienda.value = e.target.result;
+    }
   };
   reader.readAsDataURL(file);
 
-  updatePhoto();
-};
+  // 3. Elige la ruta correcta y sube el archivo
+  const routeName = tipo === 'usuario'
+    ? 'aplicacion.miPerfil.actualizarFotoPerfil'
+    : 'aplicacion.miPerfil.actualizarFotoTienda';
 
-const updatePhoto = () => {
-  form.post(route("aplicacion.miPerfil.updatePhoto", {
-    aplicacion: aplicacion,
-    rol: rol,
-  }), {
+  form.post(route(routeName, { aplicacion: aplicacion, rol: rol }), {
     preserveScroll: true,
     onSuccess: () => {
-      photoPreview.value = null;
-      if (photoInput.value) {
-        photoInput.value.value = null;
-      }
-    },
-    onError: () => {
-      // Manejar errores si es necesario
+      
+      form.reset('photo');
     }
   });
 };
@@ -167,16 +188,18 @@ const inicialesNombreUsuario = computed(() => {
                     class="-mt-20 ml-5 mb-2 grid place-content-center foto w-[180px] h-[180px] rounded-[18px] bg-mono-blanco_opacity dark:bg-secundary-opacity backdrop-blur-lg">
                     <template v-if="authStore.fotoUrlCompletaUsuario">
                       <div class="relative group w-[160px] h-[160px]">
-                        <img :src="authStore.fotoUrlCompletaUsuario"
-                          class="rounded-[18px] w-full h-full object-cover shadow-lg" />
+
+                        <img :src="authStore.fotoUrlCompletaUsuario" class="rounded-[18px] w-full h-full object-cover shadow-lg" />
 
                         <div
                           class="absolute inset-0 bg-black/40 rounded-[18px] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                          <button @click="selectNewPhoto"
+
+                          <button @click="seleccionarFoto('usuario')"
                             class="cursor-pointer bg-white p-3 rounded-full shadow-md hover:bg-gray-200 transition"
                             title="Cambiar foto">
                             <span class="material-symbols-rounded text-2xl" :class="[textoClase]">edit</span>
                           </button>
+
                         </div>
                       </div>
                     </template>
@@ -187,16 +210,19 @@ const inicialesNombreUsuario = computed(() => {
                         <p class="text-[60px] font-semibold">{{ inicialesNombreUsuario }}</p>
                         <div
                           class="absolute inset-0 bg-black/40 rounded-[18px] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                          <button @click="selectNewPhoto"
+
+                          <button @click="seleccionarFoto('usuario')"
                             class="cursor-pointer bg-white p-3 rounded-full shadow-md hover:bg-gray-200 transition"
                             title="Añadir foto">
                             <span class="material-symbols-rounded text-2xl" :class="[textoClase]">add_a_photo</span>
                           </button>
+
                         </div>
                       </div>
                     </template>
 
-                    <input ref="photoInput" type="file" accept="image/*" @change="onFileChange" class="hidden" />
+                    <input ref="inputFotoUsuario" type="file" accept="image/*"
+                      @change="manejarSubidaDeFoto($event, 'usuario')" class="hidden" />
                   </div>
 
                   <div class="nombreTimeReal">
@@ -614,16 +640,18 @@ const inicialesNombreUsuario = computed(() => {
                     class="-mt-20 ml-5 mb-2 grid place-content-center foto w-[180px] h-[180px] rounded-[18px] bg-mono-blanco_opacity dark:bg-secundary-opacity backdrop-blur-lg">
                     <template v-if="authStore.fotoUrlCompletaEstablecimiento">
                       <div class="relative group w-[160px] h-[160px]">
-                        <img :src="authStore.fotoUrlCompletaEstablecimiento"
-                          class="rounded-[18px] w-full h-full object-cover shadow-lg" />
+
+                        <img :src="authStore.fotoUrlCompletaEstablecimiento" class="rounded-[18px] w-full h-full object-cover shadow-lg" />
 
                         <div
                           class="absolute inset-0 bg-black/40 rounded-[18px] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                          <button @click="selectNewPhoto"
+
+                          <button @click="seleccionarFoto('tienda')"
                             class="cursor-pointer bg-white p-3 rounded-full shadow-md hover:bg-gray-200 transition"
                             title="Cambiar foto">
                             <span class="material-symbols-rounded text-2xl" :class="[textoClase]">edit</span>
                           </button>
+
                         </div>
                       </div>
                     </template>
@@ -634,16 +662,19 @@ const inicialesNombreUsuario = computed(() => {
                         <p class="text-[60px] font-semibold">{{ inicialesNombreTienda }}</p>
                         <div
                           class="absolute inset-0 bg-black/40 rounded-[18px] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                          <button @click="selectNewPhoto"
+
+                          <button @click="seleccionarFoto('tienda')"
                             class="cursor-pointer bg-white p-3 rounded-full shadow-md hover:bg-gray-200 transition"
                             title="Añadir foto">
                             <span class="material-symbols-rounded text-2xl" :class="[textoClase]">add_a_photo</span>
                           </button>
+
                         </div>
                       </div>
                     </template>
 
-                    <input ref="photoInput" type="file" accept="image/*" @change="onFileChange" class="hidden" />
+                    <input ref="inputFotoTienda" type="file" accept="image/*"
+                      @change="manejarSubidaDeFoto($event, 'tienda')" class="hidden" />
                   </div>
 
                   <div class="nombreTimeReal">

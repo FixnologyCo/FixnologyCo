@@ -17,13 +17,13 @@ export const useAuthStore = defineStore("auth", {
             state.user.perfil_usuario.estado.tipo_estado || null,
         rol: (state) => state.user?.rol?.tipo_rol || null,
         rol_id: (state) => state.user?.rol?.id,
-        rutaFoto (state) {
+        rutaFoto(state) {
             return state.user?.perfil_usuario?.ruta_foto || null;
         },
         fotoUrlCompletaUsuario(state) {
             const ruta = this.rutaFoto;
             if (ruta) {
-                
+
                 if (ruta.startsWith("http")) {
                     return ruta;
                 }
@@ -114,12 +114,13 @@ export const useAuthStore = defineStore("auth", {
         rutaFotoEstablecimiento: (state) =>
             state.user.tienda[0].ruta_foto_establecimiento || null,
         fotoUrlCompletaEstablecimiento(state) {
-            const ruta = this.rutaFotoEstablecimiento;
+            const ruta = this.rutaFotoEstablecimiento; 
             if (ruta) {
-                
-                if (ruta.startsWith("")) {
+               
+                if (ruta.startsWith('http')) {
                     return ruta;
                 }
+                
                 return `/storage/${ruta}`;
             }
             return null;

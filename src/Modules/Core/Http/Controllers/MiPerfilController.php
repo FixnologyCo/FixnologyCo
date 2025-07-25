@@ -107,7 +107,7 @@ class MiPerfilController extends Controller
         ]);
     }
 
-    public function updateProfilePhoto(Request $request, $aplicacion, $rol)
+    public function actualizarFotoPerfil(Request $request, $aplicacion, $rol)
     {
 
        // 2. CREA EL VALIDADOR MANUALMENTE
@@ -143,6 +143,54 @@ class MiPerfilController extends Controller
             'aplicacion' => $aplicacion,
             'rol' => $rol
         ])->with('success', '¡Foto de perfil actualizada con éxito!.');
+    }
+
+    public function actualizarFotoTienda(Request $request, $aplicacion, $rol)
+    {
+        // La validación está bien
+        $validator = Validator::make($request->all(), [
+            'photo' => ['required', 'image', 'max:3072'], // 3072 KB = 3MB
+        ], [
+            'photo.max' => 'La imagen no debe superar los 3MB.',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->route('aplicacion.miPerfil.editarMiPerfil', [
+                'aplicacion' => $aplicacion,
+                'rol' => $rol,
+            ])->with('error', 'La imagen es muy pesada y no debe superar los 3MB.');
+        }
+
+        $user = $request->user();
+
+        // --- CAMBIO CLAVE AQUÍ ---
+        // Obtenemos el PRIMER establecimiento de la colección.
+        $establecimiento = $user->tienda()->first();
+
+        // Añadimos una comprobación de seguridad
+        if (!$establecimiento) {
+            return redirect()->route('aplicacion.miPerfil.editarMiPerfil', [
+                'aplicacion' => $aplicacion,
+                'rol' => $rol,
+            ])->with('error', 'No se encontró ningún establecimiento asociado a tu cuenta.');
+        }
+
+        // El resto de tu lógica ahora funcionará porque $establecimiento es un solo objeto
+        $directory = 'fotosEstablecimientos/' . $establecimiento->id;
+        
+        Storage::disk('public')->deleteDirectory($directory);
+
+        $path = $request->file('photo')->store($directory, 'public');
+
+        // Asumimos que la columna se llama 'ruta_foto_establecimiento'
+        $establecimiento->forceFill([
+            'ruta_foto_establecimiento' => $path,
+        ])->save();
+
+        return Redirect::route('aplicacion.miPerfil.editarMiPerfil', [
+            'aplicacion' => $aplicacion,
+            'rol' => $rol
+        ])->with('success', '¡Foto del establecimiento actualizada con éxito!'); // Mensaje corregido
     }
 
     use AuthorizesRequests;
