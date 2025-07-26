@@ -93,7 +93,7 @@ const manejarSubidaDeFoto = (event, tipo) => {
   form.post(route(routeName, { aplicacion: aplicacion, rol: rol }), {
     preserveScroll: true,
     onSuccess: () => {
-      
+
       form.reset('photo');
     }
   });
@@ -127,13 +127,19 @@ const form = useForm({
   barrio: authStore.barrioResidencia || "No encontrado",
   ruta_foto_establecimiento: authStore.rutaFotoEstablecimiento,
   nombre_tienda: authStore.nombreTienda,
-  telefono_tienda: authStore.telefonoEstablecimiento,
-  email_tienda: authStore.emailEstablecimiento,
+  telefono_establecimiento: authStore.telefonoEstablecimiento,
+  email_establecimiento: authStore.emailEstablecimiento,
   tipo_tienda: authStore.tipoEstablecimiento,
-  direccion_tienda: authStore.direccionEstablecimiento || "No encontrado",
-  ciudad_tienda: authStore.ciudadEstablecimiento || "No encontrado",
-  barrio_tienda: authStore.barrioEstablecimiento || "No encontrado",
+  direccion_establecimiento: authStore.direccionEstablecimiento || "No encontrado",
+  ciudad_establecimiento: authStore.ciudadEstablecimiento || "No encontrado",
+  barrio_establecimiento: authStore.barrioEstablecimiento || "No encontrado",
 });
+
+const submit = () => {
+  form.put(route('aplicacion.miPerfil.actualizarPerfilUsuario', { aplicacion: aplicacion, rol: rol }), {
+    preserveScroll: true,
+  });
+};
 
 const inicialesNombreUsuario = computed(() => {
   const nombres = authStore.primerNombre || "";
@@ -189,7 +195,8 @@ const inicialesNombreUsuario = computed(() => {
                     <template v-if="authStore.fotoUrlCompletaUsuario">
                       <div class="relative group w-[160px] h-[160px]">
 
-                        <img :src="authStore.fotoUrlCompletaUsuario" class="rounded-[18px] w-full h-full object-cover shadow-lg" />
+                        <img :src="authStore.fotoUrlCompletaUsuario"
+                          class="rounded-[18px] w-full h-full object-cover shadow-lg" />
 
                         <div
                           class="absolute inset-0 bg-black/40 rounded-[18px] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -589,6 +596,41 @@ const inicialesNombreUsuario = computed(() => {
 
                   </div>
 
+                  <!-- documento id -->
+                  <div
+                    class="2xl:flex 2xl:flex-row 2xl:justify-between mt-2 2xl:items-center 2xl:gap-2 xl:flex xl:flex-row xl:justify-between xl:items-center xl:gap-2 gap-3 flex flex-col items-center">
+                    
+
+                    <div class="2xl:w-[100%] xl:w-[50%] w-full">
+                      <div class="contador-label flex items-center justify-between">
+                        <p class="my-[5px] text-[14px] dark:text-mono-blanco">
+                          Correo electrónico:
+                        </p>
+                        <p class="2xl:text-[10px] xl:text-[12px] text-[8px] text-secundary-light">
+                          {{ form.email.length }} /
+                          {{ limitesCaracteres.email }}
+                        </p>
+                      </div>
+
+                      <div
+                        class="w-[100%] p-[3px] flex items-center gap-[8px] transition-all rounded-[5px] border-[1px] border-secundary-ligh"
+                        t :class="{
+                          'border-universal-naranja': form.errors.email,
+                        }">
+                        <span class="material-symbols-rounded text-universal-naranja text-[20px] pl-[5px]">pin</span>
+
+                        <input type="email"
+                          class="2xl:w-full outline-none border-none font-normal bg-transparent dark:text-mono-blanco"
+                          placeholder="example@dominio.com" v-model="form.email"
+                          @blur="handleBlur(form, 'email')"
+                          @input="(e) => handleInput(e, form, 'email')" />
+                      </div>
+                      <span v-if="form.errors.email" class="2xl:text-sm text-universal-naranja">
+                        {{ form.errors.email }}
+                      </span>
+                    </div>
+                  </div>
+
                   <div class="" v-if="authStore.google_id">
                     <div class="btn-inicio flex justify-center gap-2 mt-5">
                       <span class="rounded-md py-2 gap-3 w-[100%] flex items-center justify-center">
@@ -622,14 +664,14 @@ const inicialesNombreUsuario = computed(() => {
               <div
                 class="rounded-[15px] cajaheader flex justify-between items-center dark:bg-secundary-opacity bg-mono-blanco_opacity p-5">
                 <h4 class="text-[45px] font-medium text-secundary-default dark:text-mono-blanco">
-                  Estás editando tu perfil
+                  ¡Uy!, Cambio de look
                 </h4>
-                <a :href="route('aplicacion.miPerfil.editarMiPerfil', { aplicacion, rol })">
-                  <button :class="bgClase" class="flex items-center gap-1 p-2 rounded-lg">
-                    Estoy seguro, actualizar
-                    <span class="material-symbols-rounded text-[20px]">check_circle</span>
+                <button type="submit" :disabled="form.processing" :class="bgClase"
+                  class="flex items-center gap-1 p-2 rounded-lg">
+                  <span v-if="form.processing">Actualizando...</span>
+                  <span v-else>Estoy seguro, actualizar</span>
+                  <span class="material-symbols-rounded text-[20px]">check_circle</span>
                   </button>
-                </a>
               </div>
 
               <div class="rounded-[15px] p-5 cajaTienda dark:bg-secundary-opacity bg-mono-blanco_opacity">
@@ -641,7 +683,8 @@ const inicialesNombreUsuario = computed(() => {
                     <template v-if="authStore.fotoUrlCompletaEstablecimiento">
                       <div class="relative group w-[160px] h-[160px]">
 
-                        <img :src="authStore.fotoUrlCompletaEstablecimiento" class="rounded-[18px] w-full h-full object-cover shadow-lg" />
+                        <img :src="authStore.fotoUrlCompletaEstablecimiento"
+                          class="rounded-[18px] w-full h-full object-cover shadow-lg" />
 
                         <div
                           class="absolute inset-0 bg-black/40 rounded-[18px] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -778,7 +821,7 @@ const inicialesNombreUsuario = computed(() => {
                           Número de teléfono:
                         </p>
                         <p class="2xl:text-[10px] xl:text-[12px] text-[8px] text-secundary-light">
-                          {{ form.telefono.length }} /
+                          {{ form.telefono_establecimiento.length }} /
                           {{ limitesCaracteres.telefono }}
                         </p>
                       </div>
@@ -786,17 +829,17 @@ const inicialesNombreUsuario = computed(() => {
                       <div
                         class="w-[100%] p-[3px] flex items-center gap-[8px] transition-all rounded-[5px] border-[1px] border-secundary-ligh"
                         t :class="{
-                          'border-universal-naranja': form.errors.telefono,
+                          'border-universal-naranja': form.errors.telefono_establecimiento,
                         }">
                         <span class="material-symbols-rounded text-universal-naranja text-[20px] pl-[5px]">pin</span>
 
                         <input type="number"
                           class="2xl:w-full outline-none border-none font-normal bg-transparent dark:text-mono-blanco"
-                          placeholder="Ej: Guarnizo" v-model="form.telefono" @blur="handleBlur(form, 'telefono')"
-                          @input="(e) => handleInput(e, form, 'telefono')" />
+                          placeholder="Ej: Guarnizo" v-model="form.telefono_establecimiento" @blur="handleBlur(form, 'telefono_establecimiento')"
+                          @input="(e) => handleInput(e, form, 'telefono_establecimiento')" />
                       </div>
-                      <span v-if="form.errors.telefono" class="2xl:text-sm text-universal-naranja">
-                        {{ form.errors.telefono }}
+                      <span v-if="form.errors.telefono_establecimiento" class="2xl:text-sm text-universal-naranja">
+                        {{ form.errors.telefono_establecimiento }}
                       </span>
                     </div>
                     <div class="2xl:w-[50%] xl:w-[50%] w-full">
@@ -805,7 +848,7 @@ const inicialesNombreUsuario = computed(() => {
                           Email corporativo:
                         </p>
                         <p class="2xl:text-[10px] xl:text-[12px] text-[8px] text-secundary-light">
-                          {{ form.email_tienda.length }} /
+                          {{ form.email_establecimiento.length }} /
                           {{ limitesCaracteres.email }}
                         </p>
                       </div>
@@ -813,18 +856,18 @@ const inicialesNombreUsuario = computed(() => {
                       <div
                         class="w-[100%] p-[3px] flex items-center gap-[8px] transition-all rounded-[5px] border-[1px] border-secundary-ligh"
                         t :class="{
-                          'border-universal-naranja': form.errors.email_tienda,
+                          'border-universal-naranja': form.errors.email_establecimiento,
                         }">
                         <span class="material-symbols-rounded text-universal-naranja text-[20px] pl-[5px]">email</span>
 
                         <input type="email"
                           class="2xl:w-full outline-none border-none font-normal bg-transparent dark:text-mono-blanco"
-                          placeholder="Ej: Guarnizo" v-model="form.email_tienda"
-                          @blur="handleBlur(form, 'email_tienda')"
-                          @input="(e) => handleInput(e, form, 'email_tienda')" />
+                          placeholder="Ej: Guarnizo" v-model="form.email_establecimiento"
+                          @blur="handleBlur(form, 'email_establecimiento')"
+                          @input="(e) => handleInput(e, form, 'email_establecimiento')" />
                       </div>
-                      <span v-if="form.errors.email_tienda" class="2xl:text-sm text-universal-naranja">
-                        {{ form.errors.email_tienda }}
+                      <span v-if="form.errors.email_establecimiento" class="2xl:text-sm text-universal-naranja">
+                        {{ form.errors.email_establecimiento }}
                       </span>
                     </div>
                   </div>
@@ -840,25 +883,25 @@ const inicialesNombreUsuario = computed(() => {
                           Dirección:
                         </p>
                         <p class="2xl:text-[10px] xl:text-[12px] text-[8px] text-secundary-light">
-                          {{ form.direccion_tienda.length }} /
+                          {{ form.direccion_establecimiento.length }} /
                           {{ limitesCaracteres.direccion }}
                         </p>
                       </div>
 
                       <div
                         class="w-[100%] p-[3px] flex items-center gap-[8px] transition-all rounded-[5px] border-[1px] border-secundary-ligh"
-                        :class="{ 'border-universal-naranja': form.errors.direccion_tienda }">
+                        :class="{ 'border-universal-naranja': form.errors.direccion_establecimiento }">
                         <span
                           class="material-symbols-rounded text-universal-naranja text-[20px] pl-[5px]">format_italic</span>
 
                         <input type="text"
                           class="2xl:w-full outline-none border-none font-normal bg-transparent dark:text-mono-blanco"
-                          placeholder="Ej: Juan" v-model="form.direccion_tienda"
-                          @blur="handleBlur(form, 'direccion_tienda')"
-                          @input="(e) => handleInput(e, form, 'direccion_tienda')" />
+                          placeholder="Ej: Juan" v-model="form.direccion_establecimiento"
+                          @blur="handleBlur(form, 'direccion_establecimiento')"
+                          @input="(e) => handleInput(e, form, 'direccion_establecimiento')" />
                       </div>
-                      <span v-if="form.errors.direccion_tienda" class="2xl:text-sm text-universal-naranja">
-                        {{ form.errors.direccion_tienda }}
+                      <span v-if="form.errors.direccion_establecimiento" class="2xl:text-sm text-universal-naranja">
+                        {{ form.errors.direccion_establecimiento }}
                       </span>
                     </div>
 
@@ -868,24 +911,24 @@ const inicialesNombreUsuario = computed(() => {
                           Ciudad:
                         </p>
                         <p class="2xl:text-[10px] xl:text-[12px] text-[8px] text-secundary-light">
-                          {{ form.ciudad_tienda.length }} /
+                          {{ form.ciudad_establecimiento.length }} /
                           {{ limitesCaracteres.direccion }}
                         </p>
                       </div>
 
                       <div
                         class="w-[100%] p-[3px] flex items-center gap-[8px] transition-all rounded-[5px] border-[1px] border-secundary-ligh"
-                        :class="{ 'border-universal-naranja': form.errors.ciudad_tienda }">
+                        :class="{ 'border-universal-naranja': form.errors.ciudad_establecimiento }">
                         <span
                           class="material-symbols-rounded text-universal-naranja text-[20px] pl-[5px]">format_italic</span>
 
                         <input type="text"
                           class="2xl:w-full outline-none border-none font-normal bg-transparent dark:text-mono-blanco"
-                          placeholder="Ej: Juan" v-model="form.ciudad_tienda" @blur="handleBlur(form, 'ciudad_tienda')"
-                          @input="(e) => handleInput(e, form, 'ciudad_tienda')" />
+                          placeholder="Ej: Juan" v-model="form.ciudad_establecimiento" @blur="handleBlur(form, 'ciudad_establecimiento')"
+                          @input="(e) => handleInput(e, form, 'ciudad_establecimiento')" />
                       </div>
-                      <span v-if="form.errors.ciudad_tienda" class="2xl:text-sm text-universal-naranja">
-                        {{ form.errors.ciudad_tienda }}
+                      <span v-if="form.errors.ciudad_establecimiento" class="2xl:text-sm text-universal-naranja">
+                        {{ form.errors.ciudad_establecimiento }}
                       </span>
                     </div>
 
@@ -895,24 +938,24 @@ const inicialesNombreUsuario = computed(() => {
                           Barrio:
                         </p>
                         <p class="2xl:text-[10px] xl:text-[12px] text-[8px] text-secundary-light">
-                          {{ form.barrio_tienda.length }} /
+                          {{ form.barrio_establecimiento.length }} /
                           {{ limitesCaracteres.direccion }}
                         </p>
                       </div>
 
                       <div
                         class="w-[100%] p-[3px] flex items-center gap-[8px] transition-all rounded-[5px] border-[1px] border-secundary-ligh"
-                        :class="{ 'border-universal-naranja': form.errors.barrio_tienda }">
+                        :class="{ 'border-universal-naranja': form.errors.barrio_establecimiento }">
                         <span
                           class="material-symbols-rounded text-universal-naranja text-[20px] pl-[5px]">format_italic</span>
 
                         <input type="text"
                           class="2xl:w-full outline-none border-none font-normal bg-transparent dark:text-mono-blanco"
-                          placeholder="Ej: Juan" v-model="form.barrio_tienda" @blur="handleBlur(form, 'barrio_tienda')"
-                          @input="(e) => handleInput(e, form, 'barrio_tienda')" />
+                          placeholder="Ej: Juan" v-model="form.barrio_establecimiento" @blur="handleBlur(form, 'barrio_establecimiento')"
+                          @input="(e) => handleInput(e, form, 'barrio_establecimiento')" />
                       </div>
-                      <span v-if="form.errors.barrio_tienda" class="2xl:text-sm text-universal-naranja">
-                        {{ form.errors.barrio_tienda }}
+                      <span v-if="form.errors.barrio_establecimiento" class="2xl:text-sm text-universal-naranja">
+                        {{ form.errors.barrio_establecimiento }}
                       </span>
                     </div>
 

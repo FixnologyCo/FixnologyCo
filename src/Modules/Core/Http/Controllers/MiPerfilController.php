@@ -66,10 +66,10 @@ class MiPerfilController extends Controller
     public function formUpdate($aplicacion, $rol, Request $request)
     {
         $usuario = Auth::user()->load(
-            'perfilUsuario',
+
             'perfilUsuario.indicativo',
             'perfilUsuario.tipoDocumento',
-            'perfilUsuario.estado',
+                'perfilUsuario.estado',
             'perfilEmpleado',
             'perfilEmpleado.estado',
             'perfilEmpleado.medioPago',
@@ -110,14 +110,14 @@ class MiPerfilController extends Controller
     public function actualizarFotoPerfil(Request $request, $aplicacion, $rol)
     {
 
-       // 2. CREA EL VALIDADOR MANUALMENTE
+        // 2. CREA EL VALIDADOR MANUALMENTE
         $validator = Validator::make($request->all(), [
             'photo' => ['required', 'image', 'max:3048'], // 2MB
         ], [
             'photo.max' => 'La imagen no debe superar los 3MB.',
         ]);
 
-        
+
         if ($validator->fails()) {
             // Si la validación falla, redirige con tu mensaje flash
             return redirect()->route('aplicacion.miPerfil.editarMiPerfil', [
@@ -147,7 +147,6 @@ class MiPerfilController extends Controller
 
     public function actualizarFotoTienda(Request $request, $aplicacion, $rol)
     {
-        // La validación está bien
         $validator = Validator::make($request->all(), [
             'photo' => ['required', 'image', 'max:3072'], // 3072 KB = 3MB
         ], [
@@ -163,11 +162,10 @@ class MiPerfilController extends Controller
 
         $user = $request->user();
 
-        // --- CAMBIO CLAVE AQUÍ ---
-        // Obtenemos el PRIMER establecimiento de la colección.
+
         $establecimiento = $user->tienda()->first();
 
-        // Añadimos una comprobación de seguridad
+
         if (!$establecimiento) {
             return redirect()->route('aplicacion.miPerfil.editarMiPerfil', [
                 'aplicacion' => $aplicacion,
@@ -175,14 +173,14 @@ class MiPerfilController extends Controller
             ])->with('error', 'No se encontró ningún establecimiento asociado a tu cuenta.');
         }
 
-        // El resto de tu lógica ahora funcionará porque $establecimiento es un solo objeto
+
         $directory = 'fotosEstablecimientos/' . $establecimiento->id;
-        
+
         Storage::disk('public')->deleteDirectory($directory);
 
         $path = $request->file('photo')->store($directory, 'public');
 
-        // Asumimos que la columna se llama 'ruta_foto_establecimiento'
+
         $establecimiento->forceFill([
             'ruta_foto_establecimiento' => $path,
         ])->save();
@@ -190,8 +188,83 @@ class MiPerfilController extends Controller
         return Redirect::route('aplicacion.miPerfil.editarMiPerfil', [
             'aplicacion' => $aplicacion,
             'rol' => $rol
-        ])->with('success', '¡Foto del establecimiento actualizada con éxito!'); // Mensaje corregido
+        ])->with('success', '¡Foto del establecimiento actualizada con éxito!');
     }
+
+    // En tu MiPerfilController.php
+
+public function actualizarPerfilUsuario(Request $request, $aplicacion, $rol)
+{
+    // 1. Obtén el usuario y sus relaciones
+    $user = $request->user();
+    $perfilUsuario = $user->perfilUsuario;
+    $establecimiento = $user->tienda()->first();
+
+    // 2. Valida TODOS los campos que vienen del formulario
+    $validatedData = $request->validate([
+        'primer_nombre' => 'required|string|max:50',
+        'segundo_nombre' => 'nullable|string|max:50',
+        'primer_apellido' => 'required|string|max:50',
+        'segundo_apellido' => 'nullable|string|max:50',
+        'indicativo_id' => 'required|exists:indicativos,id',
+        'telefono' => 'required|numeric|digits_between:7,15',
+        'tipo_documento_id' => 'required|exists:tipo_documentos,id',
+        'numero_documento' => 'required|string|max:20|unique:usuarios,numero_documento,' . $user->id,
+        'direccion' => 'nullable|string|max:255',
+        'ciudad' => 'nullable|string|max:100',
+        'barrio' => 'nullable|string|max:100',
+        'email' => 'required|email|max:60',
+        
+        // --- Validación para el establecimiento ---
+        'nombre_tienda' => 'required|string|max:100',
+        'tipo_tienda' => 'nullable|string|max:100',
+        'telefono_establecimiento' => 'required|numeric|digits_between:7,15',
+        'ciudad_establecimiento' => 'nullable|string|max:100',
+        'barrio_establecimiento' => 'nullable|string|max:100',
+        'email_establecimiento' => 'required|email|max:60',
+        'direccion_establecimiento' => 'required|string|max:60',
+        // ... agrega las demás validaciones para la tienda
+    ]);
+
+    // 3. Actualiza la tabla `perfil_usuario`
+    if ($perfilUsuario) {
+        $perfilUsuario->update([
+            'primer_nombre' => $validatedData['primer_nombre'],
+            'segundo_nombre' => $validatedData['segundo_nombre'],
+            'primer_apellido' => $validatedData['primer_apellido'],
+            'segundo_apellido' => $validatedData['segundo_apellido'],
+            'indicativo_id' => $validatedData['indicativo_id'],
+            'telefono' => $validatedData['telefono'],
+            'tipo_documento_id' => $validatedData['tipo_documento_id'],
+            'direccion_residencia' => $validatedData['direccion'],
+            'ciudad_residencia' => $validatedData['ciudad'],
+            'barrio_residencia' => $validatedData['barrio'],
+            'email' => $validatedData['email'],
+        ]);
+    }
+
+    // 4. Actualiza la tabla `users` (si hay campos que le pertenecen)
+    $user->update([
+        'numero_documento' => $validatedData['numero_documento'],
+    ]);
+
+    // 5. Actualiza la tabla `establecimientos`
+    if ($establecimiento) {
+        $establecimiento->update([
+            'nombre_establecimiento' => $validatedData['nombre_tienda'],
+            'tipo_establecimiento' => $validatedData['tipo_tienda'],
+            'telefono_establecimiento' => $validatedData['telefono_establecimiento'],
+            'email_establecimiento' => $validatedData['email_establecimiento'],
+            'direccion_establecimiento' => $validatedData['direccion_establecimiento'],
+            'ciudad_establecimiento' => $validatedData['ciudad_establecimiento'],
+            'barrio_establecimiento' => $validatedData['barrio_establecimiento'],
+            
+        ]);
+    }
+
+    // 6. Redirige con un mensaje de éxito
+    return Redirect::back()->with('success', 'Tu perfil ha sido actualizado correctamente.');
+}
 
     use AuthorizesRequests;
 

@@ -11,15 +11,16 @@ Route::middleware('auth')->group(function () {
         Route::get('/editarMiPerfil', [MiPerfilController::class, 'formUpdate'])
             ->name('aplicacion.miPerfil.editarMiPerfil');
 
-       
-        Route::put('/editarMiPerfil', [MiPerfilController::class, 'actualizar'])
-            ->name('aplicacion.editarMiPerfil.actualizar');
 
-        
+
+        Route::put('/editarMiPerfil/actualizar', [MiPerfilController::class, 'actualizarPerfilUsuario'])
+            ->name('aplicacion.miPerfil.actualizarPerfilUsuario');
+
+
         Route::post('/actualizarFotoPerfil', [MiPerfilController::class, 'actualizarFotoPerfil'])
             ->name('aplicacion.miPerfil.actualizarFotoPerfil');
 
-            Route::post('/actualizarFotoTienda', [MiPerfilController::class, 'actualizarFotoTienda'])
+        Route::post('/actualizarFotoTienda', [MiPerfilController::class, 'actualizarFotoTienda'])
             ->name('aplicacion.miPerfil.actualizarFotoTienda');
     });
 });
