@@ -215,7 +215,6 @@ public function actualizarPerfilUsuario(Request $request, $aplicacion, $rol)
         'barrio' => 'nullable|string|max:100',
         'email' => 'required|email|max:60',
         
-        // --- Validación para el establecimiento ---
         'nombre_tienda' => 'required|string|max:100',
         'tipo_tienda' => 'nullable|string|max:100',
         'telefono_establecimiento' => 'required|numeric|digits_between:7,15',
@@ -223,7 +222,7 @@ public function actualizarPerfilUsuario(Request $request, $aplicacion, $rol)
         'barrio_establecimiento' => 'nullable|string|max:100',
         'email_establecimiento' => 'required|email|max:60',
         'direccion_establecimiento' => 'required|string|max:60',
-        // ... agrega las demás validaciones para la tienda
+      
     ]);
 
     // 3. Actualiza la tabla `perfil_usuario`
@@ -261,8 +260,7 @@ public function actualizarPerfilUsuario(Request $request, $aplicacion, $rol)
             
         ]);
     }
-
-    // 6. Redirige con un mensaje de éxito
+    
     return Redirect::back()->with('success', 'Tu perfil ha sido actualizado correctamente.');
 }
 
