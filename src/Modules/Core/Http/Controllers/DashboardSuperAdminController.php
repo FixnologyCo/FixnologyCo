@@ -11,7 +11,7 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use function Laravel\Prompts\alert;
 
 
-class  DashboardSuperAdminController extends Controller
+class DashboardSuperAdminController extends Controller
 {
     /**
      * Muestra el dashboard para la aplicación y rol especificados.
@@ -23,28 +23,46 @@ class  DashboardSuperAdminController extends Controller
      */
     public function show($aplicacion, $rol, Request $request)
     {
-        $usuario = Auth::user()->load(
-            'perfilUsuario',
-            'tienda.aplicacionWeb',
-        );
-        $tipoDeRol = $usuario->rol->tipo_rol;
-        $aplicacionWeb = $usuario->tienda[0]->aplicacionWeb->nombre_app ?? null;
+        $usuario = Auth::user()->load([
 
-        
-        // Validar acceso con Gate (rol 4)
-        if (!in_array($usuario->rol->id, [4])) {
+            'perfilUsuario' => function ($query) {
+                $query->with(['indicativo', 'tipoDocumento', 'estado', 'rol']);
+            },
+
+            'perfilEmpleado' => function ($query) {
+                $query->with(['estado', 'medioPago']);
+            },
+
+            'establecimientoAsignado' => function ($query) {
+                $query->with([
+                    'aplicacionWeb' => function ($subQuery) {
+                        $subQuery->with(['estilo', 'estado', 'membresia.estado']);
+                    }
+                ]);
+            },
+
+            'establecimientos' => function ($query) {
+                $query->with([
+                    'token.estado',
+                    'propietario',
+                    'facturas' => function ($subQuery) {
+                        $subQuery->with(['estado', 'medioPago']);
+                    }
+                ]);
+            },
+
+        ]);
+
+
+        if (!in_array($usuario->perfilUsuario->rol->id, [4])) {
             abort(403, 'No tienes permisos para acceder a esta sección.');
         }
 
-          // 5. RENDERIZAR LA VISTA DE INERTIA CON LOS PROPS CORRECTOS
-        // Ya no necesitamos el 'if' que validaba la tienda, eso lo debe hacer la autorización.
-            return Inertia::render('Apps/' . ucfirst($aplicacion) . '/' . ucfirst($rol) . '/Dashboard/Dashboard', [
-                'aplicacion' => $aplicacionWeb,
-                'rol' => $tipoDeRol,
-                'usuario' => $usuario,
-            ]);
-        }
-    
+        return Inertia::render('Apps/' . ucfirst($aplicacion) . '/' . ucfirst($rol) . '/Dashboard/Dashboard', [
+            'usuario' => $usuario,
+        ]);
+    }
+
     use AuthorizesRequests;
 
 }

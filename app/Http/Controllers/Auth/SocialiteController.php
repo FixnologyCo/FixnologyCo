@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Core\Models\PerfilUsuario;
-use Core\Models\Establecimientos;
+use Core\Models\establecimientos;
 use Core\Models\FacturacionMembresias;
 use Core\Models\TokensAcceso;
 use Illuminate\Support\Facades\Auth;
@@ -110,12 +110,12 @@ class SocialiteController extends Controller
     protected function crearEstructuraInicial(User $usuario, PerfilUsuario $perfil)
     {
 
-        $establecimiento = Establecimientos::create([
+        $establecimientos = establecimientos::create([
             'estado_id' => 1,
             'aplicacion_web_id' => 1, // Asumimos que siempre es la app 1
             'propietario_id' => $usuario->id,
-            'nombre_establecimiento' => 'Tienda de ' . $perfil->primer_nombre,
-            'email_establecimiento' => 'tienda-' . $usuario->id . '@example.com',
+            'nombre_establecimiento' => 'establecimientos de ' . $perfil->primer_nombre,
+            'email_establecimiento' => 'establecimientos-' . $usuario->id . '@example.com',
             'telefono_establecimiento' => '0000000000',
             'direccion_establecimiento' => 'Por definir',
             'barrio_establecimiento' => 'Por definir',
@@ -126,14 +126,14 @@ class SocialiteController extends Controller
         $token = TokensAcceso::create([
             'estado_id' => 2, // Inactivo por defecto
             'token_activacion' => Str::uuid(),
-            'establecimiento_id' => $establecimiento->id,
+            'establecimiento_id' => $establecimientos->id,
         ]);
 
-        $establecimiento->update(['token_id' => $token->id]);
+        $establecimientos->update(['token_id' => $token->id]);
 
         FacturacionMembresias::create([
             'cliente_id' => $usuario->id,
-            'establecimiento_id' => $establecimiento->id,
+            'establecimiento_id' => $establecimientos->id,
             'aplicacion_web_id' => 1,
             'estado_id' => 16,
             'medio_pago_id' => 1,

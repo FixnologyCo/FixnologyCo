@@ -179,7 +179,7 @@ const fotoUsuario = computed(() => {
                       >key</span
                     >
                     <p class="text-[14px] text-secundary-default dark:text-mono-blanco">
-                      {{ authStore.google_id || authStore.id }}
+                      {{ authStore.google_id || authStore.idUsuario }}
                     </p>
                   </div>
 
@@ -455,9 +455,9 @@ const fotoUsuario = computed(() => {
                     {{
                       authStore.direccionEstablecimiento +
                       ", " +
-                      authStore.direccionEstablecimiento +
+                      authStore.ciudadEstablecimiento +
                       " " +
-                      authStore.direccionEstablecimiento
+                      authStore.barrioEstablecimiento
                     }}
                   </p>
                 </div>
@@ -491,7 +491,7 @@ const fotoUsuario = computed(() => {
                       >key</span
                     >
                     <p class="text-[14px] text-secundary-default dark:text-mono-blanco">
-                      {{ authStore.establecimientoAsignado }}
+                      {{ authStore.establecimientoAsignado.id }}
                     </p>
                   </div>
 

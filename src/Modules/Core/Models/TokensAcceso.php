@@ -20,7 +20,7 @@ class TokensAcceso extends Model
         return $this->belongsTo(Estados::class);
     }
 
-     public function establecimiento()
+     public function establecimientos()
      {
          return $this->belongsTo(Establecimientos::class);
      }

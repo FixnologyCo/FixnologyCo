@@ -33,6 +33,13 @@ return new class extends Migration {
                 'created_by' =>1,
                 'updated_by' =>1
             ],
+            [
+                'estado_id' => 1,
+                'numero_documento' => '777',
+                'password' => bcrypt('123456'),
+                'created_by' =>1,
+                'updated_by' =>1
+            ],
         ]);
     }
 

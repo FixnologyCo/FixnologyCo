@@ -26,8 +26,8 @@ const {
 
 const page = usePage();
 
-const aplicacion = authStore.aplicacion || "Sin app";
-const rol = authStore.rol || "Sin rol";
+const aplicacion = authStore.aplicacion;
+const rol = authStore.rol;
 
 const currentRoute = computed(() => new URL(page.url, window.location.origin).pathname);
 const dashboardRoute = computed(
@@ -46,7 +46,7 @@ const gestorUsuarios = computed(
 const inicialesNombreTienda = computed(() => {
   const nombreTienda = authStore.nombreTienda || "";
 
-  const inicialTienda = nombreTienda.split(" ")[0]?.charAt(0).toUpperCase() || "";
+  const inicialTienda = nombreTienda.split(" ")?.charAt(0).toUpperCase() || "";
   return inicialTienda;
 });
 </script>
@@ -116,9 +116,9 @@ const inicialesNombreTienda = computed(() => {
             </p>
             <li
               :class="
-                [currentRoute === gestorUsuarios ? [bgOpacity] : 'bg-transparent'],
+                ([currentRoute === gestorUsuarios ? [bgOpacity] : 'bg-transparent'],
                 [hoverClase],
-                [sidebarExpandido ? 'justify-between' : 'justify-center']
+                [sidebarExpandido ? 'justify-between' : 'justify-center'])
               "
               class="py-2 px-3 rounded-full cursor-pointer flex items-center"
             >

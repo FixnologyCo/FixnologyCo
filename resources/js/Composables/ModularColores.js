@@ -53,12 +53,11 @@ export default function useAppColors() {
     }
 
 const appName = computed(() => {
-    return auth?.user?.tienda[0]?.aplicacion_web?.nombre_app || 'default'
-    
+    return auth.aplicacion_web?.nombre_app || 'default';
 });
 
 const colorFondo = computed(() => {
-  return auth?.user?.tienda?.aplicacion?.color_fondo || '#CCCCCC'; // color por defecto si no hay
+  return auth.aplicacionWeb?.estilo?.color_fondo || '#CCCCCC'; // color por defecto si no hay
 });
 
 

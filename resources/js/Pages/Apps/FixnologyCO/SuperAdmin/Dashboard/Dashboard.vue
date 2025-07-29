@@ -14,6 +14,17 @@ defineOptions({
   inheritAttrs: false,
 });
 
+const props = defineProps({
+  auth: {
+    type: Object,
+    required: true,
+  },
+  usuario: {
+    type: Object,
+    required: true,
+  },
+});
+
 const {
   appName,
   bgClase,
@@ -22,16 +33,17 @@ const {
   buttonFocus,
   buttonSecundario,
 } = Colors();
-
-
 </script>
 
 <template>
-  <Head :title="`${authStore.nombreTienda} ` || 'Dashboard'" />
+  <Head :title="`${authStore.aplicacion} ` || 'Dashboard'" />
+
   <SidebarSuperAdmin :auth="authStore">
     <MensajesLayout />
     <div class="">
       <h1 class="text-[30px] dark:text-mono-blanco text-mono-negro">Dashboard</h1>
+
+      <pre>{{ authStore.aplicacion }}</pre>
     </div>
   </SidebarSuperAdmin>
 </template>

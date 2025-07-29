@@ -26,7 +26,7 @@ class FacturacionMembresias extends Model
         return $this->belongsTo(User::class, 'cliente_id');
     }
 
-    public function establecimiento()
+    public function establecimientos()
     {
         return $this->belongsTo(Establecimientos::class, 'establecimiento_id');
     }
@@ -38,6 +38,9 @@ class FacturacionMembresias extends Model
 
     public function estado()
     {
+        // ANÁLISIS Y CORRECCIÓN: Cambiado de hasOne a belongsTo.
+        // Una factura "pertenece a" un estado, no "tiene uno".
+        // La tabla 'facturacion_membresias' tiene la columna 'estado_id'.
         return $this->belongsTo(Estados::class, 'estado_id');
     }
 

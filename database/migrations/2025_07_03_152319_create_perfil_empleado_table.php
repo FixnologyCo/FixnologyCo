@@ -59,6 +59,24 @@ return new class extends Migration {
                 'created_by' => 1,
                 'updated_by' => 1,
             ],
+            [
+                'usuario_id' => 2,
+                'establecimiento_id' => 1,
+                'rol_id' => 4,
+                'cargo' => 'CEO',
+                'salario_base' => 3000000.00,
+                'medio_pago_id' => 1,
+                'cuenta_ahorros' => '00000000',
+                'banco' => 'Nu',
+                'horario' => 'Lunes a Viernes 8:00 AM - 5:00 PM',
+                'tipo_contrato' => 'Indefinido',
+                'documentos_zip' => 'documentos.zip',
+                'fecha_ingreso' => now(),
+                'fecha_egreso' => null,
+                'fecha_modificacion' => now(),
+                'created_by' => 1,
+                'updated_by' => 1,
+            ],
         ]);
     }
 

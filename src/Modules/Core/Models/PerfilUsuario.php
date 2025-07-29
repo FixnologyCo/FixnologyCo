@@ -35,23 +35,34 @@ class PerfilUsuario extends Model
 
     public function usuario()
     {
+        // ANÁLISIS Y CORRECCIÓN: Correcto. Es el inverso de User::perfilUsuario.
         return $this->belongsTo(User::class, 'usuario_id');
     }
+
+    /**
+     * Perfil tiene un Rol.
+     */
+    public function rol()
+    {
+        // ANÁLISIS Y CORRECCIÓN: Correcto.
+        return $this->belongsTo(Roles::class, 'rol_id');
+    }
+
+
+
 
     public function indicativo()
     {
         return $this->belongsTo(Indicativos::class);
     }
 
-    public function rol()
-    {
-        return $this->belongsTo(Roles::class);
-    }
+
 
     public function tipoDocumento()
     {
         return $this->belongsTo(TipoDocumento::class);
     }
+
 
 
 

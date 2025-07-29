@@ -52,6 +52,14 @@ class Establecimientos extends Model
 
     public function propietario()
     {
-        return $this->belongsTo(User::class);
+        // ANÁLISIS Y CORRECCIÓN: Se especificó la llave foránea para mayor claridad.
+        return $this->belongsTo(User::class, 'propietario_id');
+    }
+
+     public function empleados()
+    {
+        // ANÁLISIS Y CORRECCIÓN: Se añadió esta relación faltante.
+        // Permite obtener todos los empleados de una tienda fácilmente.
+        return $this->hasMany(PerfilEmpleado::class, 'establecimiento_id');
     }
 }

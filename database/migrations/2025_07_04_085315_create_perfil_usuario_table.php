@@ -65,6 +65,26 @@ return new class extends Migration {
                 'created_by' => 1,
                 'updated_by' => 1,
             ],
+            [
+                'usuario_id' => 2,
+                'rol_id' => 4,
+                'indicativo_id' => 1,
+                'tipo_documento_id' => 1,
+                'primer_nombre' => 'Erik',
+                'segundo_nombre' => 'Manuel',
+                'primer_apellido' => 'Guevara',
+                'segundo_apellido' => 'Ladino',
+                'telefono' => '0000000000',
+                'correo' => 'emgladino@gmail.com',
+                'genero' => 'Masculino',
+                'direccion_residencia' => 'Carrera 31 #17-224',
+                'ciudad_residencia' => 'Cundinamarca',
+                'barrio_residencia' => 'Soacha',
+                'created_at' => now(),
+                'updated_at' => now(),
+                'created_by' => 1,
+                'updated_by' => 1,
+            ],
         ]);
     }
 

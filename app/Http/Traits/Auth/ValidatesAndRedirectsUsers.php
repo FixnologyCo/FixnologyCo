@@ -16,7 +16,7 @@ trait ValidatesAndRedirectsUsers
     protected function validateAndRedirect(User $usuario)
     {
         // Cargamos las relaciones necesarias de una sola vez para ser eficientes.
-        $usuario->load('perfilUsuario.rol', 'perfilEmpleado.establecimiento.aplicacionWeb', 'perfilEmpleado.establecimiento.token');
+        $usuario->load('perfilUsuario.rol', 'perfilEmpleado.establecimientos.aplicacionWeb', 'perfilEmpleado.establecimientos.token');
 
         if ($usuario->estado_id !== 1) { // 1 = Activo
             Auth::logout();
@@ -34,30 +34,30 @@ trait ValidatesAndRedirectsUsers
         if (in_array($rol->id, [1, 2, 4])) { // Admin, Empleado, SuperAdmin
             $perfilEmpleado = $usuario->perfilEmpleado;
 
-            if (!$perfilEmpleado || !$perfilEmpleado->establecimiento) {
+            if (!$perfilEmpleado || !$perfilEmpleado->establecimientos) {
                 Auth::logout();
-                return redirect()->route('login')->withErrors(['numero_documento' => 'No tienes un rol válido asignado en ningún establecimiento.']);
+                return redirect()->route('login')->withErrors(['numero_documento' => 'No tienes un rol válido asignado en ningún establecimientos.']);
             }
 
-            $establecimiento = $perfilEmpleado->establecimiento;
+            $establecimientos = $perfilEmpleado->establecimientos;
 
-            if ($establecimiento->estado_id !== 1) {
+            if ($establecimientos->estado_id !== 1) {
                 Auth::logout();
                 return redirect()->route('login')->withErrors(['numero_documento' => 'El establecimiento al que perteneces está inactivo.']);
             }
 
-            if ($establecimiento->token?->estado_id !== 1) {
+            if ($establecimientos->token?->estado_id !== 1) {
                 Auth::logout();
                 return redirect()->route('login')->withErrors(['numero_documento' => 'El token de tu establecimiento está inactivo.']);
             }
 
-            $ultimaFactura = $establecimiento->facturas()->latest('fecha_pago')->first();
+            $ultimaFactura = $establecimientos->facturas()->latest('fecha_pago')->first();
             if ($ultimaFactura && $ultimaFactura->estado_id === 16) { // 16 = Pendiente
                 Auth::logout();
-                return redirect()->route('login')->with('error', 'Tu establecimiento tiene un pago pendiente. Por favor, ponte al día.');
+                return redirect()->route('login')->with('error', 'Tu establecimientos tiene un pago pendiente. Por favor, ponte al día.');
             }
 
-            $nombreAplicacion = $establecimiento->aplicacionWeb?->nombre_app;
+            $nombreAplicacion = $establecimientos->aplicacionWeb?->nombre_app;
         } elseif ($rol->id === 3) { // Cliente
             $nombreAplicacion = 'ClienteApp';
         } else {

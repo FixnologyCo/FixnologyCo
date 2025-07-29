@@ -24,7 +24,7 @@ class AppServiceProvider extends ServiceProvider
             'auth' => function () {
                 if (Auth::check()) {
                     // ✅ Cargar todas las relaciones correctamente
-                    $user = Auth::user()->load('rol', 'estado', 'tienda.estado');
+                    $user = Auth::user()->load('rol', 'estado', 'establecimientos.estado');
 
                     return [
                         'user' => [
@@ -41,19 +41,19 @@ class AppServiceProvider extends ServiceProvider
                                 'id' => $user->estado->id,
                                 'nombre' => $user->estado->tipo_estado 
                             ] : null,
-                            'tienda' => $user->tienda ? [
-                                'nombre_tienda' => $user->tienda->nombre_tienda,
-                                'email_tienda' => $user->tienda->email_tienda,
-                                'telefono_tienda' => $user->tienda->telefono_ct,
-                                'direccion' => $user->tienda->direccion_ct,
-                                'barrio' => $user->tienda->barrio_ct,
-                                'estado' => $user->tienda->estado ? [
-                                    'id' => $user->tienda->estado->id,
-                                    'nombre' => $user->tienda->estado->tipo_estado
+                            'establecimiento' => $user->establecimientos ? [
+                                'nombre_establecimiento' => $user->establecimientos->nombre_establecimiento,
+                                'email_establecimiento' => $user->establecimientos->email_establecimiento,
+                                'telefono_establecimiento' => $user->establecimientos->telefono_ct,
+                                'direccion' => $user->establecimientos->direccion_ct,
+                                'barrio' => $user->establecimientos->barrio_ct,
+                                'estado' => $user->establecimientos->estado ? [
+                                    'id' => $user->establecimientos->estado->id,
+                                    'nombre' => $user->establecimientos->estado->tipo_estado
                                 ] : null,
-                                'created_at' => $user->tienda->created_at,
-                                'logo_tienda' => $user->tienda->logo_tienda
-                                    ? url('storage/' . $user->tienda->logo_tienda)
+                                'created_at' => $user->establecimientos->created_at,
+                                'logo_establecimiento' => $user->establecimientos->logo_establecimiento
+                                    ? url('storage/' . $user->establecimientos->logo_establecimiento)
                                     : null
                             ] : null
                         ]

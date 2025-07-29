@@ -49,6 +49,20 @@ return new class extends Migration {
                 'created_by' => 1,
                 'updated_by' => 1,
 
+            ],
+            [
+                'cliente_id' => '2',
+                'establecimiento_id' => '1',
+                'aplicacion_web_id' => '1',
+                'monto_total' => '9200000',
+                'estado_id' => '18',
+                'dias_restantes' => '999999',
+                'fecha_pago' => now(),
+                'created_at' => now(),
+                'updated_at' => now(),
+                'created_by' => 1,
+                'updated_by' => 1,
+
             ]
 
         ]);

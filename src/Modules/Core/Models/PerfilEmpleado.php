@@ -31,25 +31,30 @@ class PerfilEmpleado extends Model
         return $this->belongsTo(Estados::class);
     }
 
+    /**
+     * Los datos de empleado pertenecen a un Usuario.
+     */
     public function usuario()
     {
-        return $this->belongsTo(User::class);
+        // ANÁLISIS Y CORRECCIÓN: Se restaura la relación directa con User,
+        // que coincide con la estructura de la BD y el error SQL.
+        return $this->belongsTo(User::class, 'usuario_id');
     }
 
-    public function establecimiento()
-{
-    return $this->belongsTo(Establecimientos::class, 'establecimiento_id');
-}
+    public function establecimientos()
+    {
+        // ANÁLISIS Y CORRECCIÓN: Correcto.
+        return $this->belongsTo(Establecimientos::class, 'establecimiento_id');
+    }
 
     public function rol()
     {
-        return $this->belongsTo(Roles::class);
+        // ANÁLISIS Y CORRECCIÓN: Correcto.
+        return $this->belongsTo(Roles::class, 'rol_id');
     }
 
     public function medioPago()
     {
         return $this->belongsTo(MediosPago::class);
     }
-
-    
 }

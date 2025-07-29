@@ -26,40 +26,44 @@ class MiPerfilController extends Controller
      */
     public function index($aplicacion, $rol, Request $request)
     {
-        $usuario = Auth::user()->load(
-            'perfilUsuario',
-            'perfilUsuario.indicativo',
-            'perfilUsuario.tipoDocumento',
-            'perfilUsuario.estado',
-            'perfilEmpleado',
-            'perfilEmpleado.estado',
-            'perfilEmpleado.medioPago',
-            'tienda',
-            'tienda.token',
-            'tienda.token.estado',
-            'tienda.aplicacionWeb',
-            'tienda.aplicacionWeb.estilo',
-            'tienda.aplicacionWeb.estado',
-            'tienda.aplicacionWeb.membresia',
-            'tienda.aplicacionWeb.membresia.estado',
-            'tienda.facturas',
-            'tienda.facturas.estado',
-            'tienda.facturas.medioPago',
-            'tienda.propietario'
+       $usuario = Auth::user()->load([
 
-        );
-        $tipoDeRol = $usuario->rol->tipo_rol;
-        $aplicacionWeb = $usuario->tienda[0]->aplicacionWeb->nombre_app ?? null;
+            'perfilUsuario' => function ($query) {
+                $query->with(['indicativo', 'tipoDocumento', 'estado', 'rol']);
+            },
+
+            'perfilEmpleado' => function ($query) {
+                $query->with(['estado', 'medioPago']);
+            },
+
+            'establecimientoAsignado' => function ($query) {
+                $query->with([
+                    'aplicacionWeb' => function ($subQuery) {
+                        $subQuery->with(['estilo', 'estado', 'membresia.estado']);
+                    }
+                ]);
+            },
+
+            'establecimientos' => function ($query) {
+                $query->with([
+                    'token.estado',
+                    'propietario',
+                    'facturas' => function ($subQuery) {
+                        $subQuery->with(['estado', 'medioPago']);
+                    }
+                ]);
+            },
+
+        ]);
 
 
 
-        if (!in_array($usuario->rol->id, [1, 2, 4])) {
+        if (!in_array($usuario->perfilUsuario->rol->id, [1, 2, 4])) {
             abort(403, 'No tienes permisos para acceder a esta sección.');
         }
 
         return Inertia::render('Apps/' . ucfirst($aplicacion) . '/' . ucfirst($rol) . '/MiPerfil/MiPerfil', [
-            'usuario' => $usuario,
-            'rol' => $tipoDeRol
+          'usuario' => $usuario,
         ]);
     }
 
@@ -73,18 +77,18 @@ class MiPerfilController extends Controller
             'perfilEmpleado',
             'perfilEmpleado.estado',
             'perfilEmpleado.medioPago',
-            'tienda',
-            'tienda.token',
-            'tienda.token.estado',
-            'tienda.aplicacionWeb',
-            'tienda.aplicacionWeb.estilo',
-            'tienda.aplicacionWeb.estado',
-            'tienda.aplicacionWeb.membresia',
-            'tienda.aplicacionWeb.membresia.estado',
-            'tienda.facturas',
-            'tienda.facturas.estado',
-            'tienda.facturas.medioPago',
-            'tienda.propietario'
+            'establecimientos',
+            'establecimientos.token',
+            'establecimientos.token.estado',
+            'establecimientos.aplicacionWeb',
+            'establecimientos.aplicacionWeb.estilo',
+            'establecimientos.aplicacionWeb.estado',
+            'establecimientos.aplicacionWeb.membresia',
+            'establecimientos.aplicacionWeb.membresia.estado',
+            'establecimientos.facturas',
+            'establecimientos.facturas.estado',
+            'establecimientos.facturas.medioPago',
+            'establecimientos.propietario'
 
         );
         $tipoDeRol = $usuario->rol->tipo_rol;
@@ -145,7 +149,7 @@ class MiPerfilController extends Controller
         ])->with('success', '¡Foto de perfil actualizada con éxito!.');
     }
 
-    public function actualizarFotoTienda(Request $request, $aplicacion, $rol)
+    public function actualizarFotoestablecimientos(Request $request, $aplicacion, $rol)
     {
         $validator = Validator::make($request->all(), [
             'photo' => ['required', 'image', 'max:3072'], // 3072 KB = 3MB
@@ -163,32 +167,32 @@ class MiPerfilController extends Controller
         $user = $request->user();
 
 
-        $establecimiento = $user->tienda()->first();
+        $establecimientos = $user->establecimientos()->first();
 
 
-        if (!$establecimiento) {
+        if (!$establecimientos) {
             return redirect()->route('aplicacion.miPerfil.editarMiPerfil', [
                 'aplicacion' => $aplicacion,
                 'rol' => $rol,
-            ])->with('error', 'No se encontró ningún establecimiento asociado a tu cuenta.');
+            ])->with('error', 'No se encontró ningún establecimientos asociado a tu cuenta.');
         }
 
 
-        $directory = 'fotosEstablecimientos/' . $establecimiento->id;
+        $directory = 'fotosestablecimientoss/' . $establecimientos->id;
 
         Storage::disk('public')->deleteDirectory($directory);
 
         $path = $request->file('photo')->store($directory, 'public');
 
 
-        $establecimiento->forceFill([
-            'ruta_foto_establecimiento' => $path,
+        $establecimientos->forceFill([
+            'ruta_foto_establecimientos' => $path,
         ])->save();
 
         return Redirect::route('aplicacion.miPerfil.editarMiPerfil', [
             'aplicacion' => $aplicacion,
             'rol' => $rol
-        ])->with('success', '¡Foto del establecimiento actualizada con éxito!');
+        ])->with('success', '¡Foto del establecimientos actualizada con éxito!');
     }
 
     // En tu MiPerfilController.php
@@ -198,7 +202,7 @@ public function actualizarPerfilUsuario(Request $request, $aplicacion, $rol)
     // 1. Obtén el usuario y sus relaciones
     $user = $request->user();
     $perfilUsuario = $user->perfilUsuario;
-    $establecimiento = $user->tienda()->first();
+    $establecimientos = $user->establecimientos()->first();
 
     // 2. Valida TODOS los campos que vienen del formulario
     $validatedData = $request->validate([
@@ -215,13 +219,13 @@ public function actualizarPerfilUsuario(Request $request, $aplicacion, $rol)
         'barrio' => 'nullable|string|max:100',
         'email' => 'required|email|max:60',
         
-        'nombre_tienda' => 'required|string|max:100',
-        'tipo_tienda' => 'nullable|string|max:100',
-        'telefono_establecimiento' => 'required|numeric|digits_between:7,15',
-        'ciudad_establecimiento' => 'nullable|string|max:100',
-        'barrio_establecimiento' => 'nullable|string|max:100',
-        'email_establecimiento' => 'required|email|max:60',
-        'direccion_establecimiento' => 'required|string|max:60',
+        'nombre_establecimientos' => 'required|string|max:100',
+        'tipo_establecimientos' => 'nullable|string|max:100',
+        'telefono_establecimientos' => 'required|numeric|digits_between:7,15',
+        'ciudad_establecimientos' => 'nullable|string|max:100',
+        'barrio_establecimientos' => 'nullable|string|max:100',
+        'email_establecimientos' => 'required|email|max:60',
+        'direccion_establecimientos' => 'required|string|max:60',
       
     ]);
 
@@ -247,16 +251,16 @@ public function actualizarPerfilUsuario(Request $request, $aplicacion, $rol)
         'numero_documento' => $validatedData['numero_documento'],
     ]);
 
-    // 5. Actualiza la tabla `establecimientos`
-    if ($establecimiento) {
-        $establecimiento->update([
-            'nombre_establecimiento' => $validatedData['nombre_tienda'],
-            'tipo_establecimiento' => $validatedData['tipo_tienda'],
-            'telefono_establecimiento' => $validatedData['telefono_establecimiento'],
-            'email_establecimiento' => $validatedData['email_establecimiento'],
-            'direccion_establecimiento' => $validatedData['direccion_establecimiento'],
-            'ciudad_establecimiento' => $validatedData['ciudad_establecimiento'],
-            'barrio_establecimiento' => $validatedData['barrio_establecimiento'],
+    // 5. Actualiza la tabla `establecimientoss`
+    if ($establecimientos) {
+        $establecimientos->update([
+            'nombre_establecimientos' => $validatedData['nombre_establecimientos'],
+            'tipo_establecimientos' => $validatedData['tipo_establecimientos'],
+            'telefono_establecimientos' => $validatedData['telefono_establecimientos'],
+            'email_establecimientos' => $validatedData['email_establecimientos'],
+            'direccion_establecimientos' => $validatedData['direccion_establecimientos'],
+            'ciudad_establecimientos' => $validatedData['ciudad_establecimientos'],
+            'barrio_establecimientos' => $validatedData['barrio_establecimientos'],
             
         ]);
     }
