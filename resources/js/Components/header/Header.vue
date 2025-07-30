@@ -228,14 +228,12 @@ if (fecha.getHours() < 12) {
 
           <a
             href="#"
-            :class="hoverClase"
             class="flex items-center gap-2 px-2 rounded-full py-2 text-sm text-mono-negro dark:text-mono-blanco hover:bg-primary hover:shadow-[0px_4px_20px] hover:shadow-primary"
             ><span class="material-symbols-rounded text-[18px]">settings</span>
             Configuraciones</a
           >
           <a
             href="#"
-            :class="hoverClase"
             class="flex items-center gap-2 px-2 rounded-full py-2 text-sm text-mono-negro dark:text-mono-blanco hover:bg-primary hover:shadow-[0px_4px_20px] hover:shadow-primary"
             ><span class="material-symbols-rounded text-[18px]">Help</span> Ayuda</a
           >
@@ -243,7 +241,6 @@ if (fecha.getHours() < 12) {
           <div class="border-t border-gray-200 dark:border-gray-700 my-2"></div>
           <a
             href="#"
-            :class="hoverClase"
             class="flex items-center gap-2 px-2 rounded-full py-2 text-sm text-mono-negro dark:text-mono-blanco hover:bg-primary hover:shadow-[0px_4px_20px] hover:shadow-primary"
             ><span class="material-symbols-rounded text-[18px]"
               >deployed_code_update</span
@@ -252,7 +249,6 @@ if (fecha.getHours() < 12) {
           </a>
           <a
             @click="logout"
-            :class="hoverClase"
             class="cursor-pointer flex items-center gap-2 px-2 rounded-full py-2 text-sm text-mono-negro dark:text-mono-blanco hover:bg-primary hover:shadow-[0px_4px_20px] hover:shadow-primary"
             ><span class="material-symbols-rounded text-[18px]">logout</span> Cerrar
             sesión</a
