@@ -21,6 +21,7 @@ const {
   buttonLink,
   hoverTexto,
   hoverClase,
+  colorPrimario,
 } = Colors();
 
 const aplicacion = authStore.aplicacion || "Sin app";
@@ -167,8 +168,7 @@ if (fecha.getHours() < 12) {
 
             <template v-if="!authStore.fotoUrlCompletaUsuario">
               <div
-                class="user relative shadow shadowM text-mono-blanco h-[35px] w-[35px] rounded-full overflow-hidden flex items-center justify-center"
-                :class="[bgClase]"
+                class="user relative h-[35px] w-[35px] rounded-full overflow-hidden flex items-center justify-center text-mono-blanco bg-primary shadow-[0px_8px_20px] shadow-primary"
               >
                 <span class="text-[12px] font-bold">{{ initials }}</span>
               </div>
@@ -193,22 +193,27 @@ if (fecha.getHours() < 12) {
             </p>
           </div>
 
-          <span
-            @click="toggleMenu"
-            class="material-symbols-rounded text-[16px] dark:text-mono-blanco text-mono-negro cursor-pointer"
-            >keyboard_arrow_down</span
-          >
+          <div v-if="isMenuOpen === true" class="" @click="toggleMenu">
+            <span
+              class="material-symbols-rounded text-[16px] hover:text-primary dark:text-mono-blanco text-mono-negro cursor-pointer"
+              >keyboard_arrow_up</span
+            >
+          </div>
+          <div class="" v-else @click="toggleMenu">
+            <span
+              class="material-symbols-rounded text-[16px] hover:text-primary dark:text-mono-blanco text-mono-negro cursor-pointer"
+              >keyboard_arrow_down</span
+            >
+          </div>
         </div>
 
         <div
           v-if="isMenuOpen"
-          class="absolute right-0 mt-2 w-52 bg-mono-blanco_opacity dark:bg-transparent backdrop-blur-md rounded-xl shadow-lg p-3 z-20"
+          class="absolute right-0 mt-2 w-52 bg-mono-blanco_opacity dark:bg-mono-negro_opacity_full backdrop-blur-[100px] rounded-xl shadow-lg p-3 z-20"
         >
           <div class="nombreUsuario px-2 py-2">
             <div class="flex items-center justify-between">
-              <span class="material-symbols-rounded text-[18px] text-universal-naranja"
-                >crown</span
-              >
+              <span class="material-symbols-rounded text-[18px] text-primary">crown</span>
               <h3 class="text-mono-negro font-semibold dark:text-mono-blanco">
                 {{ authStore.primerNombre + " " + authStore.primerApellido }}
               </h3>
@@ -228,8 +233,7 @@ if (fecha.getHours() < 12) {
 
           <a
             :href="route('aplicacion.miPerfil', { aplicacion, rol })"
-            :class="hoverClase"
-            class="flex items-center gap-2 px-2 rounded-full py-2 text-sm text-mono-negro dark:text-mono-blanco"
+            class="flex items-center gap-2 px-2 rounded-full py-2 text-sm text-mono-negro dark:text-mono-blanco hover:bg-primary hover:shadow-[0px_4px_20px] hover:shadow-primary"
             ><span class="material-symbols-rounded text-[18px]">for_you</span> Mi
             Perfil</a
           >
@@ -237,14 +241,14 @@ if (fecha.getHours() < 12) {
           <a
             href="#"
             :class="hoverClase"
-            class="flex items-center gap-2 px-2 rounded-full py-2 text-sm text-mono-negro dark:text-mono-blanco"
+            class="flex items-center gap-2 px-2 rounded-full py-2 text-sm text-mono-negro dark:text-mono-blanco hover:bg-primary hover:shadow-[0px_4px_20px] hover:shadow-primary"
             ><span class="material-symbols-rounded text-[18px]">settings</span>
             Configuraciones</a
           >
           <a
             href="#"
             :class="hoverClase"
-            class="flex items-center gap-2 px-2 rounded-full py-2 text-sm text-mono-negro dark:text-mono-blanco"
+            class="flex items-center gap-2 px-2 rounded-full py-2 text-sm text-mono-negro dark:text-mono-blanco hover:bg-primary hover:shadow-[0px_4px_20px] hover:shadow-primary"
             ><span class="material-symbols-rounded text-[18px]">Help</span> Ayuda</a
           >
 
@@ -252,7 +256,7 @@ if (fecha.getHours() < 12) {
           <a
             href="#"
             :class="hoverClase"
-            class="flex items-center gap-2 px-2 rounded-full py-2 text-sm text-mono-negro dark:text-mono-blanco"
+            class="flex items-center gap-2 px-2 rounded-full py-2 text-sm text-mono-negro dark:text-mono-blanco hover:bg-primary hover:shadow-[0px_4px_20px] hover:shadow-primary"
             ><span class="material-symbols-rounded text-[18px]"
               >deployed_code_update</span
             >
@@ -261,7 +265,7 @@ if (fecha.getHours() < 12) {
           <a
             @click="logout"
             :class="hoverClase"
-            class="cursor-pointer flex items-center gap-2 px-2 rounded-full py-2 text-sm text-mono-negro dark:text-mono-blanco"
+            class="cursor-pointer flex items-center gap-2 px-2 rounded-full py-2 text-sm text-mono-negro dark:text-mono-blanco hover:bg-primary hover:shadow-[0px_4px_20px] hover:shadow-primary"
             ><span class="material-symbols-rounded text-[18px]">logout</span> Cerrar
             sesión</a
           >
@@ -285,12 +289,9 @@ if (fecha.getHours() < 12) {
       </div>
       <a :href="route('aplicacion.miPerfil', { aplicacion, rol })">
         <div
-          class="user h-[30px] w-[30px] rounded-full overflow-hidden flex items-center justify-center cursor-pointer"
-          :class="[hoverClase]"
+          class="user h-[30px] w-[30px] rounded-full overflow-hidden flex items-center justify-center cursor-pointer hover:bg-primary hover:shadow-[0px_4px_20px] hover:shadow-primary"
         >
-          <span
-            class="material-symbols-rounded text-[20px] dark:text-mono-blanco text-mono-negro"
-          >
+          <span class="material-symbols-rounded text-[20px] text-mono-blanco">
             notifications
           </span>
         </div>

@@ -18,6 +18,7 @@ module.exports = {
                 bg: {
                   empty: '#1A2130',
                 },
+                primary: 'var(--color-primary)',
                 universal:{
                   naranja: '#f05235',
                   naranja_opacity: '#fe502d36',
@@ -32,20 +33,16 @@ module.exports = {
                   verde_opacity: '#1bcc763f',
                   rojo_opacity : '#ff31312d',
                   amarillo_opacity: '#ffa8233f'
-
                 },
                 secundary: {
                   default: '#030637',
                   light: '#BFCFE7',
                   opacity: 'rgba(26, 33, 48, 0.479)'
                 }
-            },
-            boxShadow: {
-              'universal-naranja': '0px 8px 20px #FE4F2D;',
-              'blanco': '0px 2px 16px #BFCFE7'
             }
         },
     },
     plugins: [],
   }
   
+  // shadows: hover:shadow-[0px_4px_20px] hover:shadow-primary

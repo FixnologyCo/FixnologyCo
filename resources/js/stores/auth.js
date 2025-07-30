@@ -25,7 +25,7 @@ export const useAuthStore = defineStore("auth", {
         rutaFoto() { return this.perfilUsuario?.ruta_foto || null; },
         fotoUrlCompletaUsuario() {
             const ruta = this.rutaFoto;
-            if (!ruta) return null; // O una imagen por defecto
+            if (!ruta) return null;
             return ruta.startsWith("http") ? ruta : `/storage/${ruta}`;
         },
         primerNombre() { return this.perfilUsuario?.primer_nombre || null; },
@@ -109,6 +109,13 @@ export const useAuthStore = defineStore("auth", {
         montoFactura() { return this.establecimientoAsignado?.facturas?.[0]?.monto_total || null; },
         diasRestantesMembresia() { return this.establecimientoAsignado?.facturas?.[0]?.dias_restantes || null; },
         fechaPago() { return this.establecimientoAsignado?.facturas?.[0]?.fecha_pago || null; },
+
+        // --- DATOS DE ESTILO ---
+        estiloApp() { return this.aplicacionWeb?.estilo?.nombre_relacion || null; },
+        colorPrimario() { return this.aplicacionWeb?.estilo?.primary || null; },
+        colorSecundario() { return this.aplicacionWeb?.estilo?.secondary || null; },
+        icono() { return this.aplicacionWeb?.estilo?.icono || null; },
+       
     },
 
     actions: {

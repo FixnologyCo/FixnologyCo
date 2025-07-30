@@ -12,34 +12,23 @@ return new class extends Migration {
     {
         Schema::create('estilos_app', function (Blueprint $table) {
             $table->id();
-
-            $table->string('color_fondo');
-            $table->string('color_texto');
-            $table->string('color_hover_texto');
-            $table->string('color_border');
-            $table->string('color_shadow')->default('shadow-xl');
+            $table->string('nombre_relacion');
+            $table->string('primary');
+            $table->string('secondary');
             $table->string('icono')->default('function');
-
             $table->timestamps();
-
         });
 
-
+        // Seeder
         DB::table('estilos_app')->insert([
-            [
-                'id' => '1',
-                'color_fondo' => 'bg-universal-naranja',
-                'color_texto' => 'text-universal-naranja',
-                'color_hover_texto' => 'hover:text-universal-naranja',
-                'color_border' => 'border-b-2 border-universal-naranja',
-                'color_shadow' => 'shadow-xl',
-                'icono' => 'function',
-                'created_at' => now(),
-                'updated_at' => now()
-            ]
-
+            'id' => 1,
+            'nombre_relacion' => 'Fixnology App',
+            'primary' => '#f05235',
+            'secondary' => '#83B4FF',
+            'icono' => 'function',
+            'created_at' => now(),
+            'updated_at' => now()
         ]);
-
     }
 
     /**

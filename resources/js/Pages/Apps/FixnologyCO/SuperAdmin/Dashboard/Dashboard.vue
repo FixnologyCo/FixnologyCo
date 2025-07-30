@@ -43,7 +43,7 @@ const {
     <div class="">
       <h1 class="text-[30px] dark:text-mono-blanco text-mono-negro">Dashboard</h1>
 
-      <pre>{{ authStore.aplicacion }}</pre>
+      <pre>{{ auth.user.establecimiento_asignado.aplicacion_web.estilo.primary }}</pre>
     </div>
   </SidebarSuperAdmin>
 </template>
