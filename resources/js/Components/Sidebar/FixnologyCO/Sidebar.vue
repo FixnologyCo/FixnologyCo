@@ -43,11 +43,21 @@ const gestorUsuarios = computed(
     ).pathname
 );
 
-const inicialesNombreTienda = computed(() => {
-  const nombreTienda = authStore.nombreTienda || "";
+const inicialesNombreEstablecimiento = computed(() => {
+  const nombreEstablecimiento = authStore.nombreEstablecimiento || "Tienda de Ejemplo";
 
-  const inicialTienda = nombreTienda.split(" ")?.charAt(0).toUpperCase() || "";
-  return inicialTienda;
+  const palabrasAIgnorar = ["de", "el", "la", "los", "las", "y", "a"];
+
+  const iniciales = nombreEstablecimiento
+
+    .split(" ")
+
+    .filter((palabra) => !palabrasAIgnorar.includes(palabra.toLowerCase()))
+
+    .map((palabra) => palabra[0])
+    .join("");
+
+  return iniciales.toUpperCase().slice(0, 2);
 });
 </script>
 
@@ -57,20 +67,40 @@ const inicialesNombreTienda = computed(() => {
   >
     <div class="p-4 flex backdrop-blur-md w-full min-h-[100vh] rounded-xl">
       <div class="sidebar pr-3 py-2" :class="[sidebarExpandido ? 'w-[12%]' : 'w-[45px]']">
-        <div class="headerSidebar flex justify-between items-start">
-          <div
-            v-if="sidebarExpandido"
-            class="logoStore rounded-md w-7 h-7 grid place-items-center"
-            :class="[bgClase]"
-          >
-            {{ inicialesNombreTienda }}
-          </div>
+        <div
+          class="headerSidebar"
+          :class="[
+            sidebarExpandido
+              ? 'flex justify-between items-start'
+              : 'flex flex-col-reverse items-center justify-center gap-3',
+          ]"
+        >
+          <template v-if="authStore.fotoUrlCompletaEstablecimiento">
+            <div class="relative group w-[28px] h-[28px]">
+              <img
+                :src="authStore.fotoUrlCompletaEstablecimiento"
+                class="rounded-[5px] w-full h-full object-cover shadow-lg"
+              />
+            </div>
+          </template>
+
+          <template v-else>
+            <div
+              class="relative flex justify-center rounded-[5px] items-center group w-[28px] h-[28px] bg-primary shadow-[0px_8px_20px] shadow-primary"
+            >
+              <p class="font-semibold text-mono-blanco">
+                {{ inicialesNombreEstablecimiento }}
+              </p>
+            </div>
+          </template>
+
           <button @click="sidebarExpandido = !sidebarExpandido">
             <span class="material-symbols-rounded text-mono-blanco">
               {{ sidebarExpandido ? "arrow_menu_close" : "arrow_menu_open" }}
             </span>
           </button>
         </div>
+
         <div class="navegacion mt-10">
           <ul class="flex flex-col gap-1">
             <li

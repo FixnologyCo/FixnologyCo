@@ -73,7 +73,7 @@ export const useAuthStore = defineStore("auth", {
 
         // --- DATOS DE ESTABLECIMIENTO ASIGNADO ---
         establecimiento_id() { return this.establecimientoAsignado?.id || null; },
-        estadoestablecimiento() { return this.establecimientoAsignado?.estado?.tipo_estado || null; },
+        estadoEstablecimiento() { return this.establecimientoAsignado?.estado?.tipo_estado || null; },
         rutaFotoEstablecimiento() { return this.establecimientoAsignado?.ruta_foto_establecimiento || null; },
         fotoUrlCompletaEstablecimiento() {
             const ruta = this.rutaFotoEstablecimiento;
@@ -81,7 +81,7 @@ export const useAuthStore = defineStore("auth", {
             return ruta.startsWith('http') ? ruta : `/storage/${ruta}`;
         },
         tipoEstablecimiento() { return this.establecimientoAsignado?.tipo_establecimiento || null; },
-        nombreestablecimiento() { return this.establecimientoAsignado?.nombre_establecimiento || null; },
+        nombreEstablecimiento() { return this.establecimientoAsignado?.nombre_establecimiento || null; },
         emailEstablecimiento() { return this.establecimientoAsignado?.email_establecimiento || null; },
         telefonoEstablecimiento() { return this.establecimientoAsignado?.telefono_establecimiento || null; },
         direccionEstablecimiento() { return this.establecimientoAsignado?.direccion_establecimiento || null; },
@@ -90,7 +90,7 @@ export const useAuthStore = defineStore("auth", {
 
         // --- DATOS DE TOKEN ---
         estadoToken() { return this.establecimientoAsignado?.token?.estado?.tipo_estado || null; },
-        tokenestablecimiento() { return this.establecimientoAsignado?.token?.token_activacion || null; },
+        tokenEstablecimiento() { return this.establecimientoAsignado?.token?.token_activacion || null; },
 
         // --- DATOS DE APP ---
         aplicacion() { return this.aplicacionWeb?.nombre_app || null; },
@@ -104,12 +104,14 @@ export const useAuthStore = defineStore("auth", {
         bgColor() { return this.aplicacionWeb?.estilo?.color_fondo || null; },
 
         // --- DATOS DE FACTURACION ---
-        estadoFactura() { return this.establecimientoAsignado?.facturas?.[0]?.estado?.tipo_estado || null; },
-        medioPagoFactura() { return this.establecimientoAsignado?.facturas?.[0]?.medio_pago?.forma_pago || null; },
-        montoFactura() { return this.establecimientoAsignado?.facturas?.[0]?.monto_total || null; },
-        diasRestantesMembresia() { return this.establecimientoAsignado?.facturas?.[0]?.dias_restantes || null; },
-        fechaPago() { return this.establecimientoAsignado?.facturas?.[0]?.fecha_pago || null; },
+        estadoFactura() { return this.user?.establecimientos?.facturas?.[0]?.estado?.tipo_estado || null; },
+        medioPagoFactura() { return this.user?.establecimientos?.facturas?.[0]?.medio_pago?.forma_pago || null; },
+        montoFactura() { return this.user?.establecimientos?.facturas?.[0]?.monto_total || null; },
+        diasRestantesMembresia() { return this.user?.establecimientos?.facturas?.[0]?.dias_restantes || null; },
+        fechaPago() { return this.user?.establecimientos?.facturas?.[0]?.fecha_pago || null; },
 
+        
+        
         // --- DATOS DE ESTILO ---
         estiloApp() { return this.aplicacionWeb?.estilo?.nombre_relacion || null; },
         colorPrimario() { return this.aplicacionWeb?.estilo?.primary || null; },
@@ -126,4 +128,5 @@ export const useAuthStore = defineStore("auth", {
             this.user = null;
         },
     },
+
 });

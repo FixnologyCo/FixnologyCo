@@ -19,6 +19,7 @@ module.exports = {
                   empty: '#1A2130',
                 },
                 primary: 'var(--color-primary)',
+                secondary: 'var(--color-secondary)',
                 universal:{
                   naranja: '#f05235',
                   naranja_opacity: '#fe502d36',

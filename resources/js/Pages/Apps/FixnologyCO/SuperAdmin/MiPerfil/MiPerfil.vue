@@ -3,8 +3,7 @@ import { Head, usePage, router } from "@inertiajs/vue3";
 import { route } from "ziggy-js";
 import { defineProps, computed, ref } from "vue";
 import SidebarSuperAdmin from "@/Components/Sidebar/FixnologyCO/Sidebar.vue";
-import Header from "@/Components/header/Header.vue";
-import Colors from "@/Composables/ModularColores";
+
 import MensajesLayout from "@/Layouts/MensajesLayout.vue";
 import { formatFecha } from "@/Utils/date";
 import { formatCOP } from "@/Utils/formateoMoneda";
@@ -25,20 +24,6 @@ const { sidebarExpandido, toggleSidebar } = useSidebar();
 
 const page = usePage();
 
-const {
-  appName,
-  bgClase,
-  bgOpacity,
-  focus,
-  textoClase,
-  borderClase,
-  buttonFocus,
-  hoverClase,
-  hoverTexto,
-  buttonClase,
-  buttonSecundario,
-} = Colors();
-
 const usuario = authStore.user;
 const aplicacion = authStore.aplicacion;
 const rol = authStore.rol;
@@ -53,13 +38,16 @@ const inicialesNombreUsuario = computed(() => {
   return firstNameInitial + lastNameInitial;
 });
 
-const inicialesNombreTienda = computed(() => {
-  const nombresTienda = authStore.nombreTienda || "";
+const inicialesNombreEstablecimiento = computed(() => {
+  const nombreEstablecimiento = authStore.nombreEstablecimiento || "Tienda de Ejemplo";
+  const palabrasAIgnorar = ["de", "el", "la", "los", "las", "y", "a"];
+  const iniciales = nombreEstablecimiento
+    .split(" ")
+    .filter((palabra) => !palabrasAIgnorar.includes(palabra.toLowerCase()))
+    .map((palabra) => palabra[0])
+    .join("");
 
-  const nombreEstablecimiento =
-    nombresTienda.split(" ")[0]?.charAt(0).toUpperCase() || "";
-
-  return nombreEstablecimiento;
+  return iniciales.toUpperCase().slice(0, 2);
 });
 
 const activeTab = ref(0);
@@ -99,10 +87,9 @@ const fotoUsuario = computed(() => {
           <div class="options flex gap-1 items-center justify-center text-[14px] mb-10">
             <a
               :href="route('aplicacion.dashboard', { aplicacion, rol })"
-              class="text-mono-negro dark:text-mono-blanco dark:hover:text-universal-azul flex items-center gap-1"
-              :class="hoverTexto"
+              class="text-mono-blanco hover:text-secondary flex items-center gap-1"
             >
-              <span class="material-symbols-rounded text-[16px]">home</span>
+              <span class="material-symbols-rounded text-[16px] text-primary">home</span>
               <p>Home</p>
             </a>
             <span
@@ -116,10 +103,7 @@ const fotoUsuario = computed(() => {
             <div
               class="rounded-[15px] p-3 flex flex-col gap-5 div2 bg-mono-blanco_opacity dark:bg-secundary-opacity"
             >
-              <div
-                class="w-full h-[130px] rounded-md opacity-50"
-                :class="authStore.bgColor"
-              ></div>
+              <div class="w-full h-[130px] rounded-md opacity-50 bg-primary"></div>
 
               <div class="flex justify-center flex-col items-center">
                 <div
@@ -136,16 +120,16 @@ const fotoUsuario = computed(() => {
 
                   <template v-else>
                     <div
-                      :class="bgClase"
-                      class="relative flex justify-center rounded-[18px] items-center group w-[160px] h-[160px]"
+                      class="relative flex justify-center rounded-[18px] items-center group w-[160px] h-[160px] bg-primary shadow-[0px_10px_20px] shadow-primary"
                     >
-                      <p class="text-[60px] font-semibold">{{ inicialesNombreTienda }}</p>
+                      <p class="text-[60px] font-semibold">
+                        {{ inicialesNombreUsuario }}
+                      </p>
                     </div>
                   </template>
                 </div>
                 <div class="flex items-center justify-between gap-1">
-                  <span
-                    class="material-symbols-rounded text-[18px] text-universal-naranja"
+                  <span class="material-symbols-rounded text-[18px] text-primary"
                     >crown</span
                   >
                   <h3
@@ -173,9 +157,7 @@ const fotoUsuario = computed(() => {
               <div class="infoBasica">
                 <div class="number flex items-center justify-between gap-2">
                   <div class="flex items-center gap-2">
-                    <span
-                      class="material-symbols-rounded text-[16px]"
-                      :class="[textoClase]"
+                    <span class="material-symbols-rounded text-[16px] text-primary"
                       >key</span
                     >
                     <p class="text-[14px] text-secundary-default dark:text-mono-blanco">
@@ -196,9 +178,7 @@ const fotoUsuario = computed(() => {
 
                 <div class="flex items-center justify-between">
                   <div class="flex items-center gap-2">
-                    <span
-                      class="material-symbols-rounded text-[16px]"
-                      :class="[textoClase]"
+                    <span class="material-symbols-rounded text-[16px] text-primary"
                       >phone</span
                     >
                     <p class="text-secundary-default dark:text-mono-blanco">
@@ -209,9 +189,7 @@ const fotoUsuario = computed(() => {
 
                 <div class="flex items-center justify-between">
                   <div class="flex items-center gap-2">
-                    <span
-                      class="material-symbols-rounded text-[16px]"
-                      :class="[textoClase]"
+                    <span class="material-symbols-rounded text-[16px] text-primary"
                       >email</span
                     >
                     <p class="text-secundary-default dark:text-mono-blanco">
@@ -222,9 +200,7 @@ const fotoUsuario = computed(() => {
 
                 <div class="flex items-center justify-between">
                   <div class="flex items-center gap-2">
-                    <span
-                      class="material-symbols-rounded text-[16px]"
-                      :class="[textoClase]"
+                    <span class="material-symbols-rounded text-[16px] text-primary"
                       >id_card</span
                     >
                     <p class="text-secundary-default dark:text-mono-blanco">
@@ -235,9 +211,7 @@ const fotoUsuario = computed(() => {
 
                 <div class="flex items-center justify-between">
                   <div class="flex items-center gap-2">
-                    <span
-                      class="material-symbols-rounded text-[16px]"
-                      :class="[textoClase]"
+                    <span class="material-symbols-rounded text-[16px] text-primary"
                       >location_chip</span
                     >
                     <p class="text-secundary-default dark:text-mono-blanco">
@@ -288,7 +262,7 @@ const fotoUsuario = computed(() => {
                   ¡Felicitaciones!, tu membresía es
                 </h4>
                 <span
-                  class="material-symbols-rounded text-[16px] cursor-pointer text-secundary-default dark:text-mono-blanco hover:text-universal-azul_secundaria"
+                  class="material-symbols-rounded text-[16px] text-primary cursor-pointer text-secundary-default dark:text-mono-blanco dark:hover:text-universal-azul_secundaria"
                   >info</span
                 >
               </div>
@@ -324,7 +298,9 @@ const fotoUsuario = computed(() => {
                 Mi perfil
               </h4>
               <a :href="route('aplicacion.miPerfil.editarMiPerfil', { aplicacion, rol })">
-                <button :class="bgClase" class="flex items-center gap-1 p-2 rounded-lg">
+                <button
+                  class="flex items-center gap-1 p-2 rounded-lg bg-primary shadow-[0px_8px_20px] shadow-primary"
+                >
                   Actualiza tus datos
                   <span class="material-symbols-rounded text-[20px]">edit</span>
                 </button>
@@ -333,10 +309,7 @@ const fotoUsuario = computed(() => {
             <div
               class="rounded-[15px] p-3 div5 dark:bg-secundary-opacity bg-mono-blanco_opacity"
             >
-              <div
-                class="w-full h-[130px] rounded-md opacity-50"
-                :class="authStore.bgColor"
-              ></div>
+              <div class="w-full h-[130px] rounded-md opacity-50 bg-primary"></div>
 
               <div class="flex gap-2 justify-center items-center">
                 <div
@@ -353,10 +326,11 @@ const fotoUsuario = computed(() => {
 
                   <template v-else>
                     <div
-                      :class="bgClase"
-                      class="relative flex justify-center rounded-[18px] items-center group w-[160px] h-[160px]"
+                      class="relative flex justify-center rounded-[18px] items-center group w-[160px] h-[160px] bg-primary shadow-[0px_8px_20px] shadow-primary"
                     >
-                      <p class="text-[60px] font-semibold">{{ inicialesNombreTienda }}</p>
+                      <p class="text-[60px] font-semibold">
+                        {{ inicialesNombreEstablecimiento }}
+                      </p>
                     </div>
                   </template>
                 </div>
@@ -366,19 +340,19 @@ const fotoUsuario = computed(() => {
                   Tienda vinculada
                 </h4>
                 <span
-                  class="material-symbols-rounded text-[16px] cursor-pointer text-secundary-default dark:text-mono-blanco hover:text-universal-azul_secundaria"
+                  class="material-symbols-rounded text-[16px] text-primary cursor-pointer text-secundary-default dark:text-mono-blanco dark:hover:text-universal-azul_secundaria"
                   >info</span
                 >
               </div>
 
               <div class="flex items-center justify-between gap-1">
-                <span class="material-symbols-rounded text-[20px] text-universal-naranja"
+                <span class="material-symbols-rounded text-[20px] text-primary"
                   >store</span
                 >
                 <h3
                   class="text-mono-negro font-semibold text-[35px] dark:text-mono-blanco"
                 >
-                  {{ authStore.nombreTienda }}
+                  {{ authStore.nombreEstablecimiento }}
                 </h3>
                 <div class="grid place-items-center" v-if="authStore.google_id === null">
                   <span class="material-symbols-rounded text-[20px] text-gray-700"
@@ -394,7 +368,7 @@ const fotoUsuario = computed(() => {
               </div>
               <div class="number flex items-center justify-between gap-2">
                 <div class="flex items-center gap-2">
-                  <span class="material-symbols-rounded text-[16px]" :class="[textoClase]"
+                  <span class="material-symbols-rounded text-[16px] text-primary"
                     >key</span
                   >
                   <p class="text-[14px] text-secundary-default dark:text-mono-blanco">
@@ -415,7 +389,7 @@ const fotoUsuario = computed(() => {
 
               <div class="flex items-center justify-between">
                 <div class="flex items-center gap-2">
-                  <span class="material-symbols-rounded text-[16px]" :class="[textoClase]"
+                  <span class="material-symbols-rounded text-[16px] text-primary"
                     >phone</span
                   >
                   <p class="text-secundary-default dark:text-mono-blanco">
@@ -426,7 +400,7 @@ const fotoUsuario = computed(() => {
 
               <div class="flex items-center justify-between">
                 <div class="flex items-center gap-2">
-                  <span class="material-symbols-rounded text-[16px]" :class="[textoClase]"
+                  <span class="material-symbols-rounded text-[16px] text-primary"
                     >email</span
                   >
                   <p class="text-secundary-default dark:text-mono-blanco">
@@ -437,7 +411,7 @@ const fotoUsuario = computed(() => {
 
               <div class="flex items-center justify-between">
                 <div class="flex items-center gap-2">
-                  <span class="material-symbols-rounded text-[16px]" :class="[textoClase]"
+                  <span class="material-symbols-rounded text-[16px] text-primary"
                     >category</span
                   >
                   <p class="text-secundary-default dark:text-mono-blanco">
@@ -448,7 +422,7 @@ const fotoUsuario = computed(() => {
 
               <div class="flex items-center justify-between">
                 <div class="flex items-center gap-2">
-                  <span class="material-symbols-rounded text-[16px]" :class="[textoClase]"
+                  <span class="material-symbols-rounded text-[16px] text-primary"
                     >location_chip</span
                   >
                   <p class="text-secundary-default dark:text-mono-blanco">
@@ -472,7 +446,7 @@ const fotoUsuario = computed(() => {
                     Información de empleado
                   </h4>
                   <span
-                    class="material-symbols-rounded text-[16px] cursor-pointer text-secundary-default dark:text-mono-blanco hover:text-universal-azul_secundaria"
+                    class="material-symbols-rounded text-[16px] text-primary cursor-pointer text-secundary-default dark:text-mono-blanco dark:hover:text-universal-azul_secundaria"
                     >info</span
                   >
                 </div>
@@ -485,9 +459,7 @@ const fotoUsuario = computed(() => {
                 </div>
                 <div class="number flex items-center justify-between gap-2">
                   <div class="flex items-center gap-2">
-                    <span
-                      class="material-symbols-rounded text-[16px]"
-                      :class="[textoClase]"
+                    <span class="material-symbols-rounded text-[16px] text-primary"
                       >key</span
                     >
                     <p class="text-[14px] text-secundary-default dark:text-mono-blanco">
@@ -508,9 +480,7 @@ const fotoUsuario = computed(() => {
 
                 <div class="flex items-center justify-between">
                   <div class="flex items-center gap-2">
-                    <span
-                      class="material-symbols-rounded text-[16px]"
-                      :class="[textoClase]"
+                    <span class="material-symbols-rounded text-[16px] text-primary"
                       >event</span
                     >
                     <p class="text-secundary-default dark:text-mono-blanco">
@@ -521,9 +491,7 @@ const fotoUsuario = computed(() => {
 
                 <div class="flex items-center justify-between">
                   <div class="flex items-center gap-2">
-                    <span
-                      class="material-symbols-rounded text-[16px]"
-                      :class="[textoClase]"
+                    <span class="material-symbols-rounded text-[16px] text-primary"
                       >article_person</span
                     >
                     <p class="text-secundary-default dark:text-mono-blanco">
@@ -534,9 +502,7 @@ const fotoUsuario = computed(() => {
 
                 <div class="flex items-center justify-between">
                   <div class="flex items-center gap-2">
-                    <span
-                      class="material-symbols-rounded text-[16px]"
-                      :class="[textoClase]"
+                    <span class="material-symbols-rounded text-[16px] text-primary"
                       >attach_money</span
                     >
                     <p class="text-secundary-default dark:text-mono-blanco">
@@ -547,9 +513,7 @@ const fotoUsuario = computed(() => {
 
                 <div class="flex items-center justify-between">
                   <div class="flex items-center gap-2">
-                    <span
-                      class="material-symbols-rounded text-[16px]"
-                      :class="[textoClase]"
+                    <span class="material-symbols-rounded text-[16px] text-primary"
                       >tag</span
                     >
                     <p class="text-secundary-default dark:text-mono-blanco">
@@ -560,9 +524,7 @@ const fotoUsuario = computed(() => {
 
                 <div class="flex items-center justify-between">
                   <div class="flex items-center gap-2">
-                    <span
-                      class="material-symbols-rounded text-[16px]"
-                      :class="[textoClase]"
+                    <span class="material-symbols-rounded text-[16px] text-primary"
                       >account_balance</span
                     >
                     <p class="text-secundary-default dark:text-mono-blanco">
@@ -572,9 +534,7 @@ const fotoUsuario = computed(() => {
                 </div>
                 <div class="flex items-center justify-between">
                   <div class="flex items-center gap-2">
-                    <span
-                      class="material-symbols-rounded text-[16px]"
-                      :class="[textoClase]"
+                    <span class="material-symbols-rounded text-[16px] text-primary"
                       >account_balance_wallet</span
                     >
                     <p class="text-secundary-default dark:text-mono-blanco">
@@ -585,9 +545,7 @@ const fotoUsuario = computed(() => {
 
                 <div class="flex items-center justify-between">
                   <div class="flex items-center gap-2">
-                    <span
-                      class="material-symbols-rounded text-[16px]"
-                      :class="[textoClase]"
+                    <span class="material-symbols-rounded text-[16px] text-primary"
                       >event</span
                     >
                     <p class="text-secundary-default dark:text-mono-blanco">
@@ -598,9 +556,7 @@ const fotoUsuario = computed(() => {
 
                 <div class="flex items-center justify-between">
                   <div class="flex items-center gap-2">
-                    <span
-                      class="material-symbols-rounded text-[16px]"
-                      :class="[textoClase]"
+                    <span class="material-symbols-rounded text-[16px] text-primary"
                       >event</span
                     >
                     <p class="text-secundary-default dark:text-mono-blanco">
@@ -618,7 +574,7 @@ const fotoUsuario = computed(() => {
                   Estas disfrutando de tu app
                 </h4>
                 <span
-                  class="material-symbols-rounded text-[16px] cursor-pointer text-secundary-default dark:text-mono-blanco hover:text-universal-azul_secundaria"
+                  class="material-symbols-rounded text-[16px] text-primary cursor-pointer text-secundary-default dark:text-mono-blanco dark:hover:text-universal-azul_secundaria"
                   >info</span
                 >
               </div>
@@ -638,15 +594,13 @@ const fotoUsuario = computed(() => {
                 <p
                   class="flex items-center gap-1 text-secundary-default dark:text-mono-blanco"
                 >
-                  <span class="material-symbols-rounded" :class="[textoClase]"
-                    >app_badging</span
+                  <span class="material-symbols-rounded text-primary">app_badging</span
                   >{{ authStore.categoriaApp }}
                 </p>
                 <p
                   class="flex items-center gap-1 text-secundary-default dark:text-mono-blanco"
                 >
-                  <span class="material-symbols-rounded" :class="[textoClase]"
-                    >calendar_clock</span
+                  <span class="material-symbols-rounded text-primary">calendar_clock</span
                   >{{ authStore.periodoMembresia }}
                 </p>
               </div>
@@ -659,7 +613,7 @@ const fotoUsuario = computed(() => {
                   Facturación de tu cuenta
                 </h4>
                 <span
-                  class="material-symbols-rounded text-[16px] cursor-pointer text-secundary-default dark:text-mono-blanco hover:text-universal-azul_secundaria"
+                  class="material-symbols-rounded text-[16px] text-primary cursor-pointer text-secundary-default dark:text-mono-blanco dark:hover:text-universal-azul_secundaria"
                   >info</span
                 >
               </div>
@@ -682,7 +636,7 @@ const fotoUsuario = computed(() => {
                   <p
                     class="flex items-center gap-1 text-secundary-default dark:text-mono-blanco"
                   >
-                    <span class="material-symbols-rounded text-[16px]"
+                    <span class="material-symbols-rounded text-[16px] text-primary"
                       >account_balance_wallet</span
                     >{{ authStore.medioPagoFactura }}
                   </p>
@@ -694,7 +648,7 @@ const fotoUsuario = computed(() => {
                   Próximo cobro
                 </h4>
                 <span
-                  class="material-symbols-rounded text-[16px] cursor-pointer text-secundary-default dark:text-mono-blanco hover:text-universal-azul_secundaria"
+                  class="material-symbols-rounded text-[16px] text-primary cursor-pointer text-secundary-default dark:text-mono-blanco dark:hover:text-universal-azul_secundaria"
                   >info</span
                 >
               </div>
@@ -711,7 +665,7 @@ const fotoUsuario = computed(() => {
                 </div>
                 <div class="flex justify-between items-center mt-1">
                   <p class="flex items-center gap-1">
-                    <span class="material-symbols-rounded text-[16px]"
+                    <span class="material-symbols-rounded text-[16px] text-primary"
                       >account_balance_wallet</span
                     >{{ authStore.medioPagoFactura }}
                   </p>

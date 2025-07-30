@@ -3,7 +3,6 @@ import { ref, computed, onMounted, onUnmounted } from "vue";
 import { usePage, router } from "@inertiajs/vue3";
 import { route } from "ziggy-js";
 
-import Colors from "@/Composables/ModularColores";
 import { useTema } from "@/Composables/useTema";
 const { modoOscuro, animando, animarCambioTema, backgroundStyle } = useTema();
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
@@ -12,17 +11,6 @@ const authStore = useAuthStore();
 defineOptions({
   layout: AuthenticatedLayout,
 });
-
-const {
-  NombreApp,
-  bgClase,
-  textoClase,
-  focus,
-  buttonLink,
-  hoverTexto,
-  hoverClase,
-  colorPrimario,
-} = Colors();
 
 const aplicacion = authStore.aplicacion || "Sin app";
 const rol = authStore.rol || "Sin rol";
