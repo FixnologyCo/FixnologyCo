@@ -20,7 +20,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/actualizarFotoPerfil', [MiPerfilController::class, 'actualizarFotoPerfil'])
             ->name('aplicacion.miPerfil.actualizarFotoPerfil');
 
-        Route::post('/actualizarFotoTienda', [MiPerfilController::class, 'actualizarFotoTienda'])
-            ->name('aplicacion.miPerfil.actualizarFotoTienda');
+        Route::post('/actualizarFotoEstablecimiento', [MiPerfilController::class, 'actualizarFotoEstablecimiento'])
+            ->name('aplicacion.miPerfil.actualizarFotoEstablecimiento');
     });
 });

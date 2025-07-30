@@ -82,6 +82,9 @@ const inicialesNombreEstablecimiento = computed(() => {
                 class="rounded-[5px] w-full h-full object-cover shadow-lg"
               />
             </div>
+            <p v-if="sidebarExpandido" class="text-mono-blanco">
+              {{ authStore.nombreEstablecimiento }}
+            </p>
           </template>
 
           <template v-else>
@@ -92,10 +95,13 @@ const inicialesNombreEstablecimiento = computed(() => {
                 {{ inicialesNombreEstablecimiento }}
               </p>
             </div>
+            <p v-if="sidebarExpandido" class="text-mono-blanco">
+              {{ authStore.nombreEstablecimiento }}
+            </p>
           </template>
 
-          <button @click="sidebarExpandido = !sidebarExpandido">
-            <span class="material-symbols-rounded text-mono-blanco">
+          <button @click="sidebarExpandido = !sidebarExpandido" class="">
+            <span class="material-symbols-rounded text-mono-blanco hover:text-primary">
               {{ sidebarExpandido ? "arrow_menu_close" : "arrow_menu_open" }}
             </span>
           </button>
@@ -105,18 +111,16 @@ const inicialesNombreEstablecimiento = computed(() => {
           <ul class="flex flex-col gap-1">
             <li
               :class="
-                ([currentRoute === dashboardRoute ? [bgOpacity] : 'bg-transparent'],
-                [hoverClase],
+                ([currentRoute === dashboardRoute ? 'bg-red-400' : 'bg-blue-400'],
                 [sidebarExpandido ? 'justify-between' : 'justify-center'])
               "
-              class="py-2 px-3 rounded-full cursor-pointer flex items-center"
+              class="py-2 px-3 rounded-full cursor-pointer flex items-center hover:bg-primary hover:bg-opacity-50 hover:shadow-[0px_4px_20px] hover:shadow-primary"
             >
               <a :href="route('aplicacion.dashboard', { aplicacion, rol })">
-                <span class="flex items-center">
+                <span class="flex items-center justify-between">
                   <div class="flex items-center justify-between gap-2">
                     <div class="flex items-center">
-                      <span
-                        class="text-[18px] material-symbols-rounded text-secundary-light"
+                      <span class="text-[18px] material-symbols-rounded text-mono-blanco"
                         >space_dashboard</span
                       >
                     </div>
@@ -126,7 +130,11 @@ const inicialesNombreEstablecimiento = computed(() => {
                   </div>
                   <div
                     v-if="sidebarExpandido"
-                    :class="[currentRoute === dashboardRoute ? focus : hover]"
+                    :class="[
+                      currentRoute === dashboardRoute
+                        ? 'w-4 h-2.5 mx-3 bg-primary rounded-full'
+                        : null,
+                    ]"
                   ></div>
                 </span>
               </a>
@@ -134,30 +142,28 @@ const inicialesNombreEstablecimiento = computed(() => {
 
             <div
               v-if="!sidebarExpandido"
-              class="text-center text-mono-blanco dark:text-secundary-light text-[12px]"
+              class="text-center text-mono-blanco dark:text-mono-blanco text-[12px]"
             >
               -
             </div>
             <p
               v-if="sidebarExpandido"
-              class="text-mono-blanco dark:text-secundary-light text-[12px] my-2.5"
+              class="text-mono-blanco dark:text-mono-blanco text-[12px] my-2.5"
             >
               Gestión
             </p>
             <li
               :class="
                 ([currentRoute === gestorUsuarios ? [bgOpacity] : 'bg-transparent'],
-                [hoverClase],
                 [sidebarExpandido ? 'justify-between' : 'justify-center'])
               "
-              class="py-2 px-3 rounded-full cursor-pointer flex items-center"
+              class="py-2 px-3 rounded-full cursor-pointer flex items-center hover:bg-primary hover:shadow-[0px_8px_20px] hover:shadow-primary"
             >
               <a :href="route('aplicacion.gestorUsuarios', { aplicacion, rol })">
                 <span class="flex items-center">
                   <div class="flex items-center justify-between gap-2">
                     <div class="flex items-center">
-                      <span
-                        class="text-[18px] material-symbols-rounded text-secundary-light"
+                      <span class="text-[18px] material-symbols-rounded text-mono-blanco"
                         >people</span
                       >
                     </div>
@@ -167,7 +173,11 @@ const inicialesNombreEstablecimiento = computed(() => {
                   </div>
                   <div
                     v-if="sidebarExpandido"
-                    :class="[currentRoute === gestorUsuarios ? focus : hover]"
+                    :class="[
+                      currentRoute === dashboardRoute
+                        ? 'w-4 h-2.5 mx-3 bg-primary rounded-full'
+                        : null,
+                    ]"
                   ></div>
                 </span>
               </a>

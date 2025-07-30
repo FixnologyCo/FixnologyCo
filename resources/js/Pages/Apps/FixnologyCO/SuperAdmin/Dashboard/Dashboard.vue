@@ -32,18 +32,6 @@ const props = defineProps({
     <MensajesLayout />
     <div class="">
       <h1 class="text-[30px] dark:text-mono-blanco text-mono-negro">Dashboard</h1>
-
-      <pre>{{
-        authStore.user.establecimientos?.facturas?.[0]?.estado?.tipo_estado || "na"
-      }}</pre>
-
-      <!-- estadoFactura() { return this.establecimientos?.facturas?.[0]?.estado?.tipo_estado
-      || null; }, medioPagoFactura() { return
-      this.establecimientos?.facturas?.[0]?.medio_pago?.forma_pago || null; },
-      montoFactura() { return this.establecimientos?.facturas?.[0]?.monto_total || null;
-      }, diasRestantesMembresia() { return
-      this.establecimientos?.facturas?.[0]?.dias_restantes || null; }, fechaPago() {
-      return this.establecimientos?.facturas?.[0]?.fecha_pago || null; }, -->
     </div>
   </SidebarSuperAdmin>
 </template>

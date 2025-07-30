@@ -3,8 +3,6 @@ import { Head, usePage, router, useForm } from "@inertiajs/vue3";
 import { route } from "ziggy-js";
 import { defineProps, computed, ref } from "vue";
 import SidebarSuperAdmin from "@/Components/Sidebar/FixnologyCO/Sidebar.vue";
-import Header from "@/Components/header/Header.vue";
-import Colors from "@/Composables/ModularColores";
 import MensajesLayout from "@/Layouts/MensajesLayout.vue";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import { useAuthStore } from "@/stores/auth";
@@ -22,19 +20,7 @@ const props = defineProps({
   indicativos: Array,
   tipoDocumentos: Array,
 })
-const {
-  appName,
-  bgClase,
-  bgOpacity,
-  focus,
-  textoClase,
-  borderClase,
-  buttonFocus,
-  hoverClase,
-  hoverTexto,
-  buttonClase,
-  buttonSecundario,
-} = Colors();
+
 
 const { getEstadoClass } = useEstadoClass();
 const aplicacion = authStore.aplicacion;
@@ -43,28 +29,28 @@ const rol = authStore.rol;
 // Los refs para los inputs y previsualizaciones siguen siendo necesarios
 const previsualizarFotoUsuario = ref(null);
 const inputFotoUsuario = ref(null);
-const previsualizarFotoTienda = ref(null);
-const inputFotoTienda = ref(null);
+const previsualizarFotoEstablecimientos = ref(null);
+const inputFotoEstablecimiento = ref(null);
 
 
 // --- FUNCIONES UNIFICADAS ---
 
 /**
  * Dispara el click en el input de archivo correcto.
- * @param {('usuario' | 'tienda')} tipo - Define a qué input hacer click.
+ * @param {('usuario' | 'establecimiento')} tipo - Define a qué input hacer click.
  */
 const seleccionarFoto = (tipo) => {
   if (tipo === 'usuario') {
     inputFotoUsuario.value?.click();
-  } else if (tipo === 'tienda') {
-    inputFotoTienda.value?.click();
+  } else if (tipo === 'establecimiento') {
+    inputFotoEstablecimiento.value?.click();
   }
 };
 
 /**
  * Función principal que maneja la selección, previsualización y subida del archivo.
  * @param {Event} event - El evento del input de archivo.
- * @param {('usuario' | 'tienda')} tipo - El tipo de foto que se está subiendo.
+ * @param {('usuario' | 'establecimiento')} tipo - El tipo de foto que se está subiendo.
  */
 const manejarSubidaDeFoto = (event, tipo) => {
   const file = event.target.files[0];
@@ -80,7 +66,7 @@ const manejarSubidaDeFoto = (event, tipo) => {
     if (tipo === 'usuario') {
       previsualizarFotoUsuario.value = e.target.result;
     } else {
-      previsualizarFotoTienda.value = e.target.result;
+      previsualizarFotoEstablecimiento.value = e.target.result;
     }
   };
   reader.readAsDataURL(file);
@@ -88,7 +74,7 @@ const manejarSubidaDeFoto = (event, tipo) => {
   // 3. Elige la ruta correcta y sube el archivo
   const routeName = tipo === 'usuario'
     ? 'aplicacion.miPerfil.actualizarFotoPerfil'
-    : 'aplicacion.miPerfil.actualizarFotoTienda';
+    : 'aplicacion.miPerfil.actualizarFotoEstablecimiento';
 
   form.post(route(routeName, { aplicacion: aplicacion, rol: rol }), {
     preserveScroll: true,
@@ -99,13 +85,16 @@ const manejarSubidaDeFoto = (event, tipo) => {
   });
 };
 
-const inicialesNombreTienda = computed(() => {
-  const nombresTienda = authStore.nombreTienda || "";
+const inicialesNombreEstablecimiento = computed(() => {
+  const nombreEstablecimiento = authStore.nombreEstablecimiento || "Tienda de Ejemplo";
+  const palabrasAIgnorar = ["de", "el", "la", "los", "las", "y", "a"];
+  const iniciales = nombreEstablecimiento
+    .split(" ")
+    .filter((palabra) => !palabrasAIgnorar.includes(palabra.toLowerCase()))
+    .map((palabra) => palabra[0])
+    .join("");
 
-  const nombreEstablecimiento =
-    nombresTienda.split(" ")[0]?.charAt(0).toUpperCase() || "";
-
-  return nombreEstablecimiento;
+  return iniciales.toUpperCase().slice(0, 2);
 });
 
 
@@ -126,10 +115,10 @@ const form = useForm({
   ciudad: authStore.ciudadResidencia || "No encontrado",
   barrio: authStore.barrioResidencia || "No encontrado",
   ruta_foto_establecimiento: authStore.rutaFotoEstablecimiento,
-  nombre_tienda: authStore.nombreTienda,
+  nombre_establecimiento: authStore.nombreEstablecimiento,
   telefono_establecimiento: authStore.telefonoEstablecimiento,
   email_establecimiento: authStore.emailEstablecimiento,
-  tipo_tienda: authStore.tipoEstablecimiento,
+  tipo_establecimiento: authStore.tipoEstablecimiento,
   direccion_establecimiento: authStore.direccionEstablecimiento || "No encontrado",
   ciudad_establecimiento: authStore.ciudadEstablecimiento || "No encontrado",
   barrio_establecimiento: authStore.barrioEstablecimiento || "No encontrado",
@@ -163,16 +152,16 @@ const inicialesNombreUsuario = computed(() => {
         <div class="contenido px-3 max-h-[90vh] w-full overflow-auto scrollbar-custom contenido-principal">
           <div class="options flex gap-1 items-center justify-center text-[14px] mb-10">
             <a :href="route('aplicacion.dashboard', { aplicacion, rol })"
-              class="text-mono-negro dark:text-mono-blanco dark:hover:text-universal-azul flex items-center gap-1"
-              :class="hoverTexto">
+              class="text-mono-negro dark:text-mono-blanco flex items-center gap-1 dark:hover:text-secondary"
+              >
               <span class="material-symbols-rounded text-[16px]">home</span>
               <p>Home</p>
             </a>
             <span
               class="material-symbols-rounded text-[18px] text-mono-negro dark:text-mono-blanco">chevron_right</span>
             <a :href="route('aplicacion.miPerfil', { aplicacion, rol })"
-              class="text-mono-negro dark:text-mono-blanco dark:hover:text-universal-azul flex items-center gap-1"
-              :class="hoverTexto">
+              class="text-mono-negro dark:text-mono-blanco flex items-center gap-1 dark:hover:text-secondary"
+            >
               <span class="material-symbols-rounded text-[16px]">crown</span>
               <p>Mi perfil</p>
             </a>
@@ -187,7 +176,7 @@ const inicialesNombreUsuario = computed(() => {
           <form @submit.prevent="submit">
             <div class="editarMiPerfil w-full min-h-[78dvh]">
               <div class="rounded-[15px] cajaUsuario p-5 bg-mono-blanco_opacity dark:bg-secundary-opacity">
-                <div class="w-full h-[130px] rounded-md opacity-50" :class="authStore.bgColor"></div>
+                <div class="w-full h-[130px] rounded-md opacity-50 bg-primary"></div>
 
                 <div class="flex gap-2 items-center">
                   <div
@@ -204,7 +193,7 @@ const inicialesNombreUsuario = computed(() => {
                           <button @click="seleccionarFoto('usuario')"
                             class="cursor-pointer bg-white p-3 rounded-full shadow-md hover:bg-gray-200 transition"
                             title="Cambiar foto">
-                            <span class="material-symbols-rounded text-2xl" :class="[textoClase]">edit</span>
+                            <span class="material-symbols-rounded text-2xl text-primary">edit</span>
                           </button>
 
                         </div>
@@ -221,7 +210,7 @@ const inicialesNombreUsuario = computed(() => {
                           <button @click="seleccionarFoto('usuario')"
                             class="cursor-pointer bg-white p-3 rounded-full shadow-md hover:bg-gray-200 transition"
                             title="Añadir foto">
-                            <span class="material-symbols-rounded text-2xl" :class="[textoClase]">add_a_photo</span>
+                            <span class="material-symbols-rounded text-2xl text-primary">add_a_photo</span>
                           </button>
 
                         </div>
@@ -247,7 +236,7 @@ const inicialesNombreUsuario = computed(() => {
 
                     <div class="flex justify-between items-center -mt-1">
                       <p class="text-[18 px] text-secundary-light font-normal flex items-center gap-1"><span
-                          class="material-symbols-rounded" :class="[textoClase]">key</span> {{
+                          class="material-symbols-rounded text-primary">key</span> {{
                             authStore.google_id || authStore.idUsuario }}</p>
 
                       <div class="flex items-center gap-1">
@@ -284,16 +273,16 @@ const inicialesNombreUsuario = computed(() => {
 
                       <div
                         class="w-[100%] p-[3px] flex items-center gap-[8px] transition-all rounded-[5px] border-[1px] border-secundary-ligh"
-                        t :class="{ 'border-universal-naranja': form.errors.primer_nombre }">
+                         :class="{ 'border-semaforo-rojo': form.errors.primer_nombre }">
                         <span
-                          class="material-symbols-rounded text-universal-naranja text-[20px] pl-[5px]">format_italic</span>
+                          class="material-symbols-rounded text-primary text-[20px] pl-[5px]">format_italic</span>
 
                         <input type="text"
                           class="2xl:w-full outline-none border-none font-normal bg-transparent dark:text-mono-blanco"
                           placeholder="Ej: Juan" v-model="form.primer_nombre" @blur="handleBlur(form, 'primer_nombre')"
                           @input="(e) => handleInput(e, form, 'primer_nombre')" />
                       </div>
-                      <span v-if="form.errors.primer_nombre" class="2xl:text-sm text-universal-naranja">
+                      <span v-if="form.errors.primer_nombre" class="2xl:text-sm text-primary">
                         {{ form.errors.primer_nombre }}
                       </span>
                     </div>
@@ -311,11 +300,11 @@ const inicialesNombreUsuario = computed(() => {
 
                       <div
                         class="w-[100%] p-[3px] flex items-center gap-[8px] transition-all rounded-[5px] border-[1px] border-secundary-ligh"
-                        t :class="{
-                          'border-universal-naranja': form.errors.segundo_nombre,
+                       :class="{
+                          'border-semaforo-rojo': form.errors.segundo_nombre,
                         }">
                         <span
-                          class="material-symbols-rounded text-universal-naranja text-[20px] pl-[5px]">format_italic</span>
+                          class="material-symbols-rounded text-primary text-[20px] pl-[5px]">format_italic</span>
 
                         <input type="text"
                           class="2xl:w-full outline-none border-none font-normal bg-transparent dark:text-mono-blanco"
@@ -323,7 +312,7 @@ const inicialesNombreUsuario = computed(() => {
                           @blur="handleBlur(form, 'segundo_nombre')"
                           @input="(e) => handleInput(e, form, 'segundo_nombre')" />
                       </div>
-                      <span v-if="form.errors.segundo_nombre" class="2xl:text-sm text-universal-naranja">
+                      <span v-if="form.errors.segundo_nombre" class="2xl:text-sm text-primary">
                         {{ form.errors.segundo_nombre }}
                       </span>
                     </div>
@@ -346,10 +335,10 @@ const inicialesNombreUsuario = computed(() => {
                       <div
                         class="w-[100%] p-[3px] flex items-center gap-[8px] transition-all rounded-[5px] border-[1px] border-secundary-ligh"
                         t :class="{
-                          'border-universal-naranja': form.errors.primer_apellido,
+                          'border-semaforo-rojo': form.errors.primer_apellido,
                         }">
                         <span
-                          class="material-symbols-rounded text-universal-naranja text-[20px] pl-[5px]">format_italic</span>
+                          class="material-symbols-rounded text-primary text-[20px] pl-[5px]">format_italic</span>
 
                         <input type="text"
                           class="2xl:w-full outline-none border-none font-normal bg-transparent dark:text-mono-blanco"
@@ -357,7 +346,7 @@ const inicialesNombreUsuario = computed(() => {
                           @blur="handleBlur(form, 'primer_apellido')"
                           @input="(e) => handleInput(e, form, 'primer_apellido')" />
                       </div>
-                      <span v-if="form.errors.primer_apellido" class="2xl:text-sm text-universal-naranja">
+                      <span v-if="form.errors.primer_apellido" class="2xl:text-sm text-primary">
                         {{ form.errors.primer_apellido }}
                       </span>
                     </div>
@@ -376,10 +365,10 @@ const inicialesNombreUsuario = computed(() => {
                       <div
                         class="w-[100%] p-[3px] flex items-center gap-[8px] transition-all rounded-[5px] border-[1px] border-secundary-ligh"
                         t :class="{
-                          'border-universal-naranja': form.errors.segundo_apellido,
+                          'border-semaforo-rojo': form.errors.segundo_apellido,
                         }">
                         <span
-                          class="material-symbols-rounded text-universal-naranja text-[20px] pl-[5px]">format_italic</span>
+                          class="material-symbols-rounded text-primary text-[20px] pl-[5px]">format_italic</span>
 
                         <input type="text"
                           class="2xl:w-full outline-none border-none font-normal bg-transparent dark:text-mono-blanco"
@@ -387,7 +376,7 @@ const inicialesNombreUsuario = computed(() => {
                           @blur="handleBlur(form, 'segundo_apellido')"
                           @input="(e) => handleInput(e, form, 'segundo_apellido')" />
                       </div>
-                      <span v-if="form.errors.segundo_apellido" class="2xl:text-sm text-universal-naranja">
+                      <span v-if="form.errors.segundo_apellido" class="2xl:text-sm text-primary">
                         {{ form.errors.segundo_apellido }}
                       </span>
                     </div>
@@ -435,16 +424,16 @@ const inicialesNombreUsuario = computed(() => {
                       <div
                         class="w-[100%] p-[3px] flex items-center gap-[8px] transition-all rounded-[5px] border-[1px] border-secundary-ligh"
                         t :class="{
-                          'border-universal-naranja': form.errors.telefono,
+                          'border-semaforo-rojo': form.errors.telefono,
                         }">
-                        <span class="material-symbols-rounded text-universal-naranja text-[20px] pl-[5px]">pin</span>
+                        <span class="material-symbols-rounded text-primary text-[20px] pl-[5px]">pin</span>
 
                         <input type="number"
                           class="2xl:w-full outline-none border-none font-normal bg-transparent dark:text-mono-blanco"
                           placeholder="Ej: Guarnizo" v-model="form.telefono" @blur="handleBlur(form, 'telefono')"
                           @input="(e) => handleInput(e, form, 'telefono')" />
                       </div>
-                      <span v-if="form.errors.telefono" class="2xl:text-sm text-universal-naranja">
+                      <span v-if="form.errors.telefono" class="2xl:text-sm text-primary">
                         {{ form.errors.telefono }}
                       </span>
                     </div>
@@ -494,9 +483,9 @@ const inicialesNombreUsuario = computed(() => {
                       <div
                         class="w-[100%] p-[3px] flex items-center gap-[8px] transition-all rounded-[5px] border-[1px] border-secundary-ligh"
                         t :class="{
-                          'border-universal-naranja': form.errors.numero_documento,
+                          'border-semaforo-rojo': form.errors.numero_documento,
                         }">
-                        <span class="material-symbols-rounded text-universal-naranja text-[20px] pl-[5px]">pin</span>
+                        <span class="material-symbols-rounded text-primary text-[20px] pl-[5px]">pin</span>
 
                         <input type="number"
                           class="2xl:w-full outline-none border-none font-normal bg-transparent dark:text-mono-blanco"
@@ -504,7 +493,7 @@ const inicialesNombreUsuario = computed(() => {
                           @blur="handleBlur(form, 'numero_documento')"
                           @input="(e) => handleInput(e, form, 'numero_documento')" />
                       </div>
-                      <span v-if="form.errors.numero_documento" class="2xl:text-sm text-universal-naranja">
+                      <span v-if="form.errors.numero_documento" class="2xl:text-sm text-primary">
                         {{ form.errors.numero_documento }}
                       </span>
                     </div>
@@ -526,16 +515,16 @@ const inicialesNombreUsuario = computed(() => {
 
                       <div
                         class="w-[100%] p-[3px] flex items-center gap-[8px] transition-all rounded-[5px] border-[1px] border-secundary-ligh"
-                        :class="{ 'border-universal-naranja': form.errors.direccion }">
+                        :class="{ 'border-semaforo-rojo': form.errors.direccion }">
                         <span
-                          class="material-symbols-rounded text-universal-naranja text-[20px] pl-[5px]">format_italic</span>
+                          class="material-symbols-rounded text-primary text-[20px] pl-[5px]">format_italic</span>
 
                         <input type="text"
                           class="2xl:w-full outline-none border-none font-normal bg-transparent dark:text-mono-blanco"
                           placeholder="Ej: Juan" v-model="form.direccion" @blur="handleBlur(form, 'direccion')"
                           @input="(e) => handleInput(e, form, 'direccion')" />
                       </div>
-                      <span v-if="form.errors.direccion" class="2xl:text-sm text-universal-naranja">
+                      <span v-if="form.errors.direccion" class="2xl:text-sm text-primary">
                         {{ form.errors.direccion }}
                       </span>
                     </div>
@@ -553,16 +542,16 @@ const inicialesNombreUsuario = computed(() => {
 
                       <div
                         class="w-[100%] p-[3px] flex items-center gap-[8px] transition-all rounded-[5px] border-[1px] border-secundary-ligh"
-                        :class="{ 'border-universal-naranja': form.errors.ciudad }">
+                        :class="{ 'border-semaforo-rojo': form.errors.ciudad }">
                         <span
-                          class="material-symbols-rounded text-universal-naranja text-[20px] pl-[5px]">format_italic</span>
+                          class="material-symbols-rounded text-primary text-[20px] pl-[5px]">format_italic</span>
 
                         <input type="text"
                           class="2xl:w-full outline-none border-none font-normal bg-transparent dark:text-mono-blanco"
                           placeholder="Ej: Juan" v-model="form.ciudad" @blur="handleBlur(form, 'ciudad')"
                           @input="(e) => handleInput(e, form, 'ciudad')" />
                       </div>
-                      <span v-if="form.errors.ciudad" class="2xl:text-sm text-universal-naranja">
+                      <span v-if="form.errors.ciudad" class="2xl:text-sm text-primary">
                         {{ form.errors.ciudad }}
                       </span>
                     </div>
@@ -580,16 +569,16 @@ const inicialesNombreUsuario = computed(() => {
 
                       <div
                         class="w-[100%] p-[3px] flex items-center gap-[8px] transition-all rounded-[5px] border-[1px] border-secundary-ligh"
-                        :class="{ 'border-universal-naranja': form.errors.barrio }">
+                        :class="{ 'border-semaforo-rojo': form.errors.barrio }">
                         <span
-                          class="material-symbols-rounded text-universal-naranja text-[20px] pl-[5px]">format_italic</span>
+                          class="material-symbols-rounded text-primary text-[20px] pl-[5px]">format_italic</span>
 
                         <input type="text"
                           class="2xl:w-full outline-none border-none font-normal bg-transparent dark:text-mono-blanco"
                           placeholder="Ej: Juan" v-model="form.barrio" @blur="handleBlur(form, 'barrio')"
                           @input="(e) => handleInput(e, form, 'barrio')" />
                       </div>
-                      <span v-if="form.errors.barrio" class="2xl:text-sm text-universal-naranja">
+                      <span v-if="form.errors.barrio" class="2xl:text-sm text-primary">
                         {{ form.errors.barrio }}
                       </span>
                     </div>
@@ -615,9 +604,9 @@ const inicialesNombreUsuario = computed(() => {
                       <div
                         class="w-[100%] p-[3px] flex items-center gap-[8px] transition-all rounded-[5px] border-[1px] border-secundary-ligh"
                         t :class="{
-                          'border-universal-naranja': form.errors.email,
+                          'border-semaforo-rojo': form.errors.email,
                         }">
-                        <span class="material-symbols-rounded text-universal-naranja text-[20px] pl-[5px]">pin</span>
+                        <span class="material-symbols-rounded text-primary text-[20px] pl-[5px]">pin</span>
 
                         <input type="email"
                           class="2xl:w-full outline-none border-none font-normal bg-transparent dark:text-mono-blanco"
@@ -625,7 +614,7 @@ const inicialesNombreUsuario = computed(() => {
                           @blur="handleBlur(form, 'email')"
                           @input="(e) => handleInput(e, form, 'email')" />
                       </div>
-                      <span v-if="form.errors.email" class="2xl:text-sm text-universal-naranja">
+                      <span v-if="form.errors.email" class="2xl:text-sm text-primary">
                         {{ form.errors.email }}
                       </span>
                     </div>
@@ -666,8 +655,8 @@ const inicialesNombreUsuario = computed(() => {
                 <h4 class="text-[45px] font-medium text-secundary-default dark:text-mono-blanco">
                   ¡Uy!, Cambio de look
                 </h4>
-                <button type="submit" :disabled="form.processing" :class="bgClase"
-                  class="flex items-center gap-1 p-2 rounded-lg">
+                <button type="submit" :disabled="form.processing"
+                  class="flex items-center gap-1 p-2 rounded-lg bg-primary shadow-[0_8px_20px] shadow-primary">
                   <span v-if="form.processing">Actualizando...</span>
                   <span v-else>Estoy seguro, actualizar</span>
                   <span class="material-symbols-rounded text-[20px]">check_circle</span>
@@ -675,7 +664,7 @@ const inicialesNombreUsuario = computed(() => {
               </div>
 
               <div class="rounded-[15px] p-5 cajaTienda dark:bg-secundary-opacity bg-mono-blanco_opacity">
-                <div class="w-full h-[130px] rounded-md opacity-50" :class="authStore.bgColor"></div>
+                <div class="w-full h-[130px] rounded-md opacity-50 bg-primary"></div>
 
                 <div class="flex gap-2 items-center">
                   <div
@@ -689,10 +678,10 @@ const inicialesNombreUsuario = computed(() => {
                         <div
                           class="absolute inset-0 bg-black/40 rounded-[18px] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
 
-                          <button @click="seleccionarFoto('tienda')"
+                          <button @click="seleccionarFoto('establecimiento')"
                             class="cursor-pointer bg-white p-3 rounded-full shadow-md hover:bg-gray-200 transition"
-                            title="Cambiar foto">
-                            <span class="material-symbols-rounded text-2xl" :class="[textoClase]">edit</span>
+                            title="Cambiar foto establecimiento">
+                            <span class="material-symbols-rounded text-2xl text-primary">edit</span>
                           </button>
 
                         </div>
@@ -700,28 +689,28 @@ const inicialesNombreUsuario = computed(() => {
                     </template>
 
                     <template v-else>
-                      <div :class="bgClase"
-                        class="relative flex justify-center rounded-[18px] items-center group w-[160px] h-[160px]">
-                        <p class="text-[60px] font-semibold">{{ inicialesNombreTienda }}</p>
+                      <div 
+                        class="relative flex justify-center rounded-[18px] items-center group w-[160px] h-[160px] bg-primary shadow-[0_8px_20px] shadow-primary">
+                        <p class="text-[60px] font-semibold">{{ inicialesNombreEstablecimiento }}</p>
                         <div
                           class="absolute inset-0 bg-black/40 rounded-[18px] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
 
-                          <button @click="seleccionarFoto('tienda')"
+                          <button @click="seleccionarFoto('establecimiento')"
                             class="cursor-pointer bg-white p-3 rounded-full shadow-md hover:bg-gray-200 transition"
-                            title="Añadir foto">
-                            <span class="material-symbols-rounded text-2xl" :class="[textoClase]">add_a_photo</span>
+                            title="Añadir foto establecimiento">
+                            <span class="material-symbols-rounded text-2xl text-primary">add_a_photo</span>
                           </button>
 
                         </div>
                       </div>
                     </template>
 
-                    <input ref="inputFotoTienda" type="file" accept="image/*"
-                      @change="manejarSubidaDeFoto($event, 'tienda')" class="hidden" />
+                    <input ref="inputFotoEstablecimiento" type="file" accept="image/*"
+                      @change="manejarSubidaDeFoto($event, 'establecimiento')" class="hidden" />
                   </div>
 
                   <div class="nombreTimeReal">
-                    <p class="text-[32px] font-medium flex items-center gap-1">{{ authStore.nombreTienda }}
+                    <p class="text-[32px] font-medium flex items-center gap-1">{{ authStore.nombreEstablecimiento }}
                     <div class="grid place-items-center" v-if="authStore.google_id === null">
                       <span class="material-symbols-rounded  text-gray-700">verified_off</span>
                     </div>
@@ -733,13 +722,13 @@ const inicialesNombreUsuario = computed(() => {
 
                     <div class="flex justify-between gap-5 items-center -mt-1">
                       <p class="text-[18 px] text-secundary-light font-normal flex items-center gap-1"><span
-                          class="material-symbols-rounded" :class="[textoClase]">key</span> {{
-                            authStore.tokenTienda || authStore.tienda_id }}</p>
+                          class="material-symbols-rounded text-primary">key</span> {{
+                            authStore.tokenEstablecimiento || authStore.establecimiento_id }}</p>
 
                       <div class="flex items-center gap-1">
-                        <div class="w-3 h-3 rounded-full" :class="getEstadoClass(authStore.estadoTienda)"></div>
+                        <div class="w-3 h-3 rounded-full" :class="getEstadoClass(authStore.estadoEstablecimiento)"></div>
                         <span class="text-secundary-default dark:text-mono-blanco">{{
-                          authStore.estadoTienda
+                          authStore.estadoEstablecimiento
                         }}</span>
                       </div>
 
@@ -763,24 +752,24 @@ const inicialesNombreUsuario = computed(() => {
                           Nombre establecimiento:
                         </p>
                         <p class="2xl:text-[10px] xl:text-[12px] text-[8px] text-secundary-light">
-                          {{ form.nombre_tienda.length }} /
+                          {{ form.nombre_establecimiento.length }} /
                           {{ limitesCaracteres.nombre_tienda }}
                         </p>
                       </div>
 
                       <div
                         class="w-[100%] p-[3px] flex items-center gap-[8px] transition-all rounded-[5px] border-[1px] border-secundary-ligh"
-                        t :class="{ 'border-universal-naranja': form.errors.nombre_tienda }">
+                        t :class="{ 'border-semaforo-rojo': form.errors.nombre_establecimiento }">
                         <span
-                          class="material-symbols-rounded text-universal-naranja text-[20px] pl-[5px]">format_italic</span>
+                          class="material-symbols-rounded text-primary text-[20px] pl-[5px]">format_italic</span>
 
                         <input type="text"
                           class="2xl:w-full outline-none border-none font-normal bg-transparent dark:text-mono-blanco"
-                          placeholder="Ej: Juan" v-model="form.nombre_tienda" @blur="handleBlur(form, 'nombre_tienda')"
-                          @input="(e) => handleInput(e, form, 'nombre_tienda')" />
+                          placeholder="Ej: Juan" v-model="form.nombre_establecimiento" @blur="handleBlur(form, 'nombre_establecimiento')"
+                          @input="(e) => handleInput(e, form, 'nombre_establecimiento')" />
                       </div>
-                      <span v-if="form.errors.nombre_tienda" class="2xl:text-sm text-universal-naranja">
-                        {{ form.errors.nombre_tienda }}
+                      <span v-if="form.errors.nombre_establecimiento" class="2xl:text-sm text-primary">
+                        {{ form.errors.nombre_establecimiento }}
                       </span>
                     </div>
                     <div class="2xl:w-[50%] xl:w-[50%] w-full">
@@ -789,24 +778,24 @@ const inicialesNombreUsuario = computed(() => {
                           Tipo establecimiento:
                         </p>
                         <p class="2xl:text-[10px] xl:text-[12px] text-[8px] text-secundary-light">
-                          {{ form.tipo_tienda.length }} /
+                          {{ form.tipo_establecimiento.length }} /
                           {{ limitesCaracteres.tipo_tienda }}
                         </p>
                       </div>
 
                       <div
                         class="w-[100%] p-[3px] flex items-center gap-[8px] transition-all rounded-[5px] border-[1px] border-secundary-ligh"
-                        t :class="{ 'border-universal-naranja': form.errors.tipo_tienda }">
+                        t :class="{ 'border-semaforo-rojo': form.errors.tipo_establecimiento }">
                         <span
-                          class="material-symbols-rounded text-universal-naranja text-[20px] pl-[5px]">category</span>
+                          class="material-symbols-rounded text-primary text-[20px] pl-[5px]">category</span>
 
                         <input type="text"
                           class="2xl:w-full outline-none border-none font-normal bg-transparent dark:text-mono-blanco"
-                          placeholder="Ej: Juan" v-model="form.tipo_tienda" @blur="handleBlur(form, 'tipo_tienda')"
-                          @input="(e) => handleInput(e, form, 'tipo_tienda')" />
+                          placeholder="Ej: Juan" v-model="form.tipo_establecimiento" @blur="handleBlur(form, 'tipo_establecimiento')"
+                          @input="(e) => handleInput(e, form, 'tipo_establecimiento')" />
                       </div>
-                      <span v-if="form.errors.tipo" class="2xl:text-sm text-universal-naranja">
-                        {{ form.errors.tipo_tienda }}
+                      <span v-if="form.errors.tipo" class="2xl:text-sm text-primary">
+                        {{ form.errors.tipo_establecimiento }}
                       </span>
                     </div>
                   </div>
@@ -829,16 +818,16 @@ const inicialesNombreUsuario = computed(() => {
                       <div
                         class="w-[100%] p-[3px] flex items-center gap-[8px] transition-all rounded-[5px] border-[1px] border-secundary-ligh"
                         t :class="{
-                          'border-universal-naranja': form.errors.telefono_establecimiento,
+                          'border-semaforo-rojo': form.errors.telefono_establecimiento,
                         }">
-                        <span class="material-symbols-rounded text-universal-naranja text-[20px] pl-[5px]">pin</span>
+                        <span class="material-symbols-rounded text-primary text-[20px] pl-[5px]">pin</span>
 
                         <input type="number"
                           class="2xl:w-full outline-none border-none font-normal bg-transparent dark:text-mono-blanco"
                           placeholder="Ej: Guarnizo" v-model="form.telefono_establecimiento" @blur="handleBlur(form, 'telefono_establecimiento')"
                           @input="(e) => handleInput(e, form, 'telefono_establecimiento')" />
                       </div>
-                      <span v-if="form.errors.telefono_establecimiento" class="2xl:text-sm text-universal-naranja">
+                      <span v-if="form.errors.telefono_establecimiento" class="2xl:text-sm text-primary">
                         {{ form.errors.telefono_establecimiento }}
                       </span>
                     </div>
@@ -856,9 +845,9 @@ const inicialesNombreUsuario = computed(() => {
                       <div
                         class="w-[100%] p-[3px] flex items-center gap-[8px] transition-all rounded-[5px] border-[1px] border-secundary-ligh"
                         t :class="{
-                          'border-universal-naranja': form.errors.email_establecimiento,
+                          'border-semaforo-rojo': form.errors.email_establecimiento,
                         }">
-                        <span class="material-symbols-rounded text-universal-naranja text-[20px] pl-[5px]">email</span>
+                        <span class="material-symbols-rounded text-primary text-[20px] pl-[5px]">email</span>
 
                         <input type="email"
                           class="2xl:w-full outline-none border-none font-normal bg-transparent dark:text-mono-blanco"
@@ -866,7 +855,7 @@ const inicialesNombreUsuario = computed(() => {
                           @blur="handleBlur(form, 'email_establecimiento')"
                           @input="(e) => handleInput(e, form, 'email_establecimiento')" />
                       </div>
-                      <span v-if="form.errors.email_establecimiento" class="2xl:text-sm text-universal-naranja">
+                      <span v-if="form.errors.email_establecimiento" class="2xl:text-sm text-primary">
                         {{ form.errors.email_establecimiento }}
                       </span>
                     </div>
@@ -890,9 +879,9 @@ const inicialesNombreUsuario = computed(() => {
 
                       <div
                         class="w-[100%] p-[3px] flex items-center gap-[8px] transition-all rounded-[5px] border-[1px] border-secundary-ligh"
-                        :class="{ 'border-universal-naranja': form.errors.direccion_establecimiento }">
+                        :class="{ 'border-semaforo-rojo': form.errors.direccion_establecimiento }">
                         <span
-                          class="material-symbols-rounded text-universal-naranja text-[20px] pl-[5px]">format_italic</span>
+                          class="material-symbols-rounded text-primary text-[20px] pl-[5px]">format_italic</span>
 
                         <input type="text"
                           class="2xl:w-full outline-none border-none font-normal bg-transparent dark:text-mono-blanco"
@@ -900,7 +889,7 @@ const inicialesNombreUsuario = computed(() => {
                           @blur="handleBlur(form, 'direccion_establecimiento')"
                           @input="(e) => handleInput(e, form, 'direccion_establecimiento')" />
                       </div>
-                      <span v-if="form.errors.direccion_establecimiento" class="2xl:text-sm text-universal-naranja">
+                      <span v-if="form.errors.direccion_establecimiento" class="2xl:text-sm text-primary">
                         {{ form.errors.direccion_establecimiento }}
                       </span>
                     </div>
@@ -918,16 +907,16 @@ const inicialesNombreUsuario = computed(() => {
 
                       <div
                         class="w-[100%] p-[3px] flex items-center gap-[8px] transition-all rounded-[5px] border-[1px] border-secundary-ligh"
-                        :class="{ 'border-universal-naranja': form.errors.ciudad_establecimiento }">
+                        :class="{ 'border-semaforo-rojo': form.errors.ciudad_establecimiento }">
                         <span
-                          class="material-symbols-rounded text-universal-naranja text-[20px] pl-[5px]">format_italic</span>
+                          class="material-symbols-rounded text-primary text-[20px] pl-[5px]">format_italic</span>
 
                         <input type="text"
                           class="2xl:w-full outline-none border-none font-normal bg-transparent dark:text-mono-blanco"
                           placeholder="Ej: Juan" v-model="form.ciudad_establecimiento" @blur="handleBlur(form, 'ciudad_establecimiento')"
                           @input="(e) => handleInput(e, form, 'ciudad_establecimiento')" />
                       </div>
-                      <span v-if="form.errors.ciudad_establecimiento" class="2xl:text-sm text-universal-naranja">
+                      <span v-if="form.errors.ciudad_establecimiento" class="2xl:text-sm text-primary">
                         {{ form.errors.ciudad_establecimiento }}
                       </span>
                     </div>
@@ -945,16 +934,16 @@ const inicialesNombreUsuario = computed(() => {
 
                       <div
                         class="w-[100%] p-[3px] flex items-center gap-[8px] transition-all rounded-[5px] border-[1px] border-secundary-ligh"
-                        :class="{ 'border-universal-naranja': form.errors.barrio_establecimiento }">
+                        :class="{ 'border-semaforo-rojo': form.errors.barrio_establecimiento }">
                         <span
-                          class="material-symbols-rounded text-universal-naranja text-[20px] pl-[5px]">format_italic</span>
+                          class="material-symbols-rounded text-primary text-[20px] pl-[5px]">format_italic</span>
 
                         <input type="text"
                           class="2xl:w-full outline-none border-none font-normal bg-transparent dark:text-mono-blanco"
                           placeholder="Ej: Juan" v-model="form.barrio_establecimiento" @blur="handleBlur(form, 'barrio_establecimiento')"
                           @input="(e) => handleInput(e, form, 'barrio_establecimiento')" />
                       </div>
-                      <span v-if="form.errors.barrio_establecimiento" class="2xl:text-sm text-universal-naranja">
+                      <span v-if="form.errors.barrio_establecimiento" class="2xl:text-sm text-primary">
                         {{ form.errors.barrio_establecimiento }}
                       </span>
                     </div>
