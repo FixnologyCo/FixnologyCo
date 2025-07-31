@@ -61,7 +61,7 @@ class UsuariosFixController extends Controller
         return Inertia::render('Apps/' . ucfirst($aplicacion) . '/' . ucfirst($rol) . '/Usuarios/GestorUsuarios', [
             
             'usuario' => $usuario,
-            'usuarios' => $usuariosDelEstablecimiento,
+            'usuariosDelEstablecimiento' => $usuariosDelEstablecimiento,
         ]);
     }
 

@@ -258,19 +258,6 @@ if (fecha.getHours() < 12) {
     </div>
 
     <div class="flex gap-2 items-center">
-      <div class="search flex items-center gap-1">
-        <span
-          class="material-symbols-rounded border dark:border-secundary-light border-mono-negro rounded-full p-2 dark:text-secundary-light text-mono-negro font-medium text-[16px]"
-          >search</span
-        >
-        <input
-          type="search"
-          placeholder="Buscar..."
-          name=""
-          id=""
-          class="outline-none dark:text-secundary-light text-mono-negro font-medium text-[14px] bg-transparent border dark:border-secundary-light border-mono-negro rounded-full px-3 py-1"
-        />
-      </div>
       <a :href="route('aplicacion.miPerfil', { aplicacion, rol })">
         <div
           class="user h-[30px] w-[30px] rounded-full overflow-hidden flex items-center justify-center cursor-pointer hover:bg-primary hover:shadow-[0px_4px_20px] hover:shadow-primary"
