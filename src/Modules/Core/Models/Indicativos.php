@@ -16,7 +16,7 @@ class Indicativos extends Model
         'zona_horaria',
     ];
 
-    public function perfilUsuario()
+       public function perfil_usuario()
     {
         return $this->hasMany(PerfilUsuario::class);
     }

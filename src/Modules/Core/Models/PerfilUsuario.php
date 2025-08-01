@@ -51,9 +51,9 @@ class PerfilUsuario extends Model
 
 
 
-    public function indicativo()
+public function indicativo()
     {
-        return $this->belongsTo(Indicativos::class);
+        return $this->belongsTo(Indicativos::class, 'indicativo_id');
     }
 
 

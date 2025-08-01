@@ -46,7 +46,6 @@ class PerfilEmpleado extends Model
         // ANÁLISIS Y CORRECCIÓN: Correcto.
         return $this->belongsTo(Establecimientos::class, 'establecimiento_id');
     }
-
     public function rol()
     {
         // ANÁLISIS Y CORRECCIÓN: Correcto.

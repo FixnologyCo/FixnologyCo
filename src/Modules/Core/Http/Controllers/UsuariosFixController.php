@@ -15,11 +15,11 @@ class UsuariosFixController extends Controller
 
     public function show($aplicacion, $rol, Request $request)
     {
-       
+
         $usuario = Auth::user()->load([
 
             'perfilUsuario' => function ($query) {
-                $query->with(['rol']);
+                $query->with(['rol', 'estado', 'indicativo']);
             },
 
             'perfilEmpleado' => function ($query) {
@@ -55,14 +55,35 @@ class UsuariosFixController extends Controller
         $usuariosDelEstablecimiento = User::whereHas('perfilEmpleado', function ($query) use ($idEstablecimiento) {
             $query->where('establecimiento_id', $idEstablecimiento);
         })
-        ->with(['perfilUsuario.rol', 'perfilEmpleado'])
-        ->get();
+            ->with([
+                'perfilUsuario' => function ($query) {
+                    $query->with(['rol', 'estado', 'indicativo']);
+                },
+                // ¡AQUÍ ESTÁ EL CAMBIO CLAVE!
+                'perfilEmpleado' => function ($query) {
+                    // Cargamos el establecimiento Y sus facturas a través del perfil del empleado
+                    $query->with(['estado', 'medioPago', 'establecimientos.facturas.estado']);
+                },
+                // Se elimina la relación 'establecimientos' que causa el conflicto
+            ])
+            ->get();
+        // 1. Obtener los IDs de usuarios con sesión activa
+        $activeSessionUserIds = DB::table(config('session.table'))
+            ->whereNotNull('user_id')
+            ->pluck('user_id')
+            ->unique();
+
+        $usuariosDelEstablecimiento->map(function ($usuario) use ($activeSessionUserIds) {
+            $usuario->tiene_sesion_activa = $activeSessionUserIds->contains($usuario->id);
+            return $usuario;
+        });
 
         return Inertia::render('Apps/' . ucfirst($aplicacion) . '/' . ucfirst($rol) . '/Usuarios/GestorUsuarios', [
-            
+
             'usuario' => $usuario,
             'usuariosDelEstablecimiento' => $usuariosDelEstablecimiento,
         ]);
     }
+
 
 }

@@ -9,6 +9,7 @@ use Core\Models\Estados;
 use Core\Models\PerfilEmpleado;
 use Core\Models\PerfilUsuario;
 use Core\Models\Roles;
+use Core\Models\Indicativos;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -85,4 +86,6 @@ class User extends Authenticatable
         // Se usa un método en lugar de la propiedad mágica para evitar conflictos.
         return $this->belongsTo(Roles::class, 'rol_id');
     }
+
+    
 }

@@ -267,6 +267,15 @@ if (fecha.getHours() < 12) {
           </span>
         </div>
       </a>
+      <a :href="route('aplicacion.miPerfil', { aplicacion, rol })">
+        <div
+          class="user h-[30px] w-[30px] rounded-full overflow-hidden flex items-center justify-center cursor-pointer hover:bg-primary hover:shadow-[0px_4px_20px] hover:shadow-primary"
+        >
+          <span class="material-symbols-rounded text-[20px] text-mono-blanco">
+            history
+          </span>
+        </div>
+      </a>
       <button
         @click="animarCambioTema"
         class="flex items-center justify-center gap-2 h-[35px] w-[35px] rounded-full border border-secundary-light text-sm transition-all duration-500 ease-in-out relative overflow-hidden"
@@ -281,21 +290,12 @@ if (fecha.getHours() < 12) {
         >
           {{ modoOscuro ? "light_mode" : "dark_mode" }}
         </span>
-        <!-- destello -->
+
         <span
           v-if="animando"
           class="absolute inset-0 bg-mono-blanco/10 backdrop-blur-sm animate-ping z-0 rounded-md"
         ></span>
       </button>
-
-      <!-- <a :href="route('aplicacion.historial', { aplicacion, rol })">
-                <div class="user h-[30px] w-[30px] rounded-full overflow-hidden flex items-center justify-center cursor-pointer"
-                    :class="[currentRoute === historialRoute ? [bgClase] : 'bg-transparent' , hoverClase]">
-                    <span class="material-symbols-rounded text-[20px] dark:text-mono-blanco">
-                        history
-                    </span>
-                </div>
-            </a> -->
     </div>
   </header>
 </template>

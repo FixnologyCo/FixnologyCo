@@ -6,12 +6,11 @@ export const useAuthStore = defineStore("auth", {
     }),
 
     getters: {
-        // --- GETTERS BASE (AUXILIARES) ---
-        // Estos getters simplifican el acceso y proporcionan seguridad.
+
         isAuthenticated: (state) => !!state.user,
         perfilUsuario: (state) => state.user?.perfil_usuario || null,
         perfilEmpleado: (state) => state.user?.perfil_empleado || null,
-        // CORREGIDO: Se usa el nombre 'snake_case' que envía Laravel.
+      
         establecimientoAsignado: (state) => state.user?.establecimiento_asignado || null,
         aplicacionWeb() { return this.establecimientoAsignado?.aplicacion_web || null; },
 
@@ -36,7 +35,7 @@ export const useAuthStore = defineStore("auth", {
             if (!this.perfilUsuario) return "";
             return `${this.primerNombre || ''} ${this.segundoNombre || ''} ${this.primerApellido || ''}`.replace(/\s+/g, ' ').trim();
         },
-        indicativo() { return this.perfilUsuario?.indicativo?.codigo_pais || null; },
+        indicativo() { return this.user?.perfil_usuario?.indicativo?.codigo_pais || null; },
         indicativo_id() { return this.perfilUsuario?.indicativo?.id || null; },
         telefono() { return this.perfilUsuario?.telefono || null; },
         telefonoCompleto() {
