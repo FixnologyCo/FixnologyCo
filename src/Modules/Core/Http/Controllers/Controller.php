@@ -11,8 +11,8 @@ class Controller
     {
         $user = auth()->user()->load([
             'rol',
-            'establecimientos.aplicacion.membresia.estado',   
-            'establecimientos.pagosMembresia',
+            'establecimiento.aplicacion.membresia.estado',
+            'establecimiento.pagosMembresia',
         ]);
 
         // Verifica si el rol está permitido
@@ -24,8 +24,8 @@ class Controller
             return redirect()->route('login.auth')->with('error', 'No tienes permisos para acceder a esta sección.');
         }
 
-        // Verifica que la establecimientos exista y que el nombre coincida
-        if (!$user->establecimientos || $user->establecimientos->aplicacion->nombre_app !== $aplicacion) {
+        // Verifica que la establecimiento exista y que el nombre coincida
+        if (!$user->establecimiento || $user->establecimiento->aplicacion->nombre_app !== $aplicacion) {
             abort(404);
         }
 

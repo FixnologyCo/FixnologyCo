@@ -14,6 +14,7 @@ class CreateMediosPagoTable extends Migration
             $table->unsignedBigInteger('estado_id')->default(1);
             $table->string('forma_pago')->nullable(false);
             $table->timestamps();
+             $table->softDeletes();
 
 
             $table->foreign('estado_id')->references('id')->on('estados')->onDelete('cascade');

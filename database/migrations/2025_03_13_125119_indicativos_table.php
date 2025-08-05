@@ -17,6 +17,7 @@ return new class extends Migration {
             $table->string('codigo_pais');
             $table->string('zona_horaria');
             $table->timestamps();
+             $table->softDeletes();
 
         });
 

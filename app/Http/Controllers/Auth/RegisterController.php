@@ -4,112 +4,121 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use Carbon\Carbon;
 use Core\Models\establecimientos;
 use Core\Models\FacturacionMembresias;
 use Core\Models\PerfilEmpleado;
 use Core\Models\PerfilUsuario;
 use Core\Models\TokensAcceso;
-use Core\Models\TipoDocumento;
-use Core\Models\AplicacionesWeb;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB; // Importante para usar transacciones
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
-use Laravel\Socialite\Facades\Socialite;
 
 class RegisterController extends Controller
 {
     // ✅ Mostrar formulario de registro
     public function show()
     {
-
-
-        return Inertia::render('Core/Auth/Registro', [
-
-        ]);
+        return Inertia::render('Core/Auth/Registro');
     }
 
-    // ✅ Lógica de registro
+    // ✅ Lógica de registro mejorada
     public function register(Request $request)
     {
-
-        // ✅ Validación de datos
+        // --- 1. VALIDACIÓN MEJORADA ---
         $request->validate([
             'primer_nombre' => 'required|string|max:25',
             'primer_apellido' => 'required|string|max:25',
             'numero_documento' => 'required|string|max:15|unique:usuarios,numero_documento',
             'password' => 'required|string|min:4',
-
-
         ], [
-            'primer_nombre.required' => 'El nombre es requeridos.',
-            'primer_apellido.required' => 'El apellido es requeridos.',
+            'primer_nombre.required' => 'El nombre es requerido.',
+            'primer_apellido.required' => 'El apellido es requerido.',
             'numero_documento.required' => 'El número de documento es requerido.',
-            'numero_documento.unique' => 'Oh, oh. Este documento ya existe',
+            'numero_documento.unique' => 'Oh, oh. Este documento ya existe.',
+          
             'password.required' => 'La contraseña es requerida.',
-            'password.min' => 'La contraseña debe ser minimo de 4 caracteres.',
-            'password.confirmed' => 'Las contraseñas no coinciden.',
-
+            'password.min' => 'La contraseña debe tener al menos 4 caracteres.',
         ]);
 
-        // ✅ Crear cliente
-        $usuario = User::create([
-            'numero_documento' => $request->numero_documento,
-            'password' => Hash::make($request->password),
-            'estado_id' => 1,
+        // --- 2. TRANSACCIÓN DE BASE DE DATOS ---
+        // Esto asegura que si algo falla, todas las operaciones se revierten.
+        try {
+            DB::beginTransaction();
 
-        ]);
+            // ✅ Crear Usuario
+            $usuario = User::create([
+                'numero_documento' => $request->numero_documento,
+                'password' => Hash::make($request->password),
+                'estado_id' => 1, // Por defecto: Activo
+            ]);
 
-        $perfil_usuario = PerfilUsuario::create([
-            'primer_nombre' => $request->primer_nombre,
-            'primer_apellido' => $request->primer_apellido,
-            'usuario_id' => $usuario->id
-        ]);
+            // ✅ Crear Perfil de Usuario con valores por defecto
+            $perfilUsuario = PerfilUsuario::create([
+                'usuario_id' => $usuario->id,
+                'primer_nombre' => $request->primer_nombre,
+                'primer_apellido' => $request->primer_apellido,
+                'telefono' => $request->telefono ?? '0000000000', 
+                'indicativo_id' => 1, 
+                'rol_id' => 1,
+                'estado_id' => 1,
+                'ruta_foto' => 'https://placehold.co/400x400/f05235/FFFFFF?text='.$request->primer_nombre,
+            ]);
 
-        $establecimientos = establecimientos::create([
-            'estado_id' => 1,
-            'aplicacion_web_id' => 1,
-            'propietario_id' => $usuario->id,
-            'nombre_establecimientos' => 'establecimiento de ' . $perfil_usuario->primer_nombre,
-            'ruta_foto_establecimientos' => 'https://imgmedia.larepublica.pe/640x959/larepublica/original/2025/01/07/677d743f33031862432cca4d.webp'
-        ]);
+            // ✅ Crear Establecimiento por defecto
+            $establecimiento = establecimientos::create([
+                'propietario_id' => $usuario->id,
+                'estado_id' => 1,
+                'aplicacion_web_id' => 1,
+                'nombre_establecimiento' => 'Establecimiento de ' . $perfilUsuario->primer_nombre,
+                'ruta_foto_establecimiento' => 'https://placehold.co/400x400/f05235/FFFFFF?text=Mi tienda',
+            ]);
 
-        $perfil_empleado = PerfilEmpleado::create([
-            'estado_id' => 1,
-            'usuario_id' => $usuario->id,
-            'establecimiento_id' => $establecimientos->id,
-            'rol_id' => 1,
-            'medio_pago_id' => 1
-        ]);
+            // ✅ Crear Perfil de Empleado para el propietario
+            PerfilEmpleado::create([
+                'usuario_id' => $usuario->id,
+                'establecimiento_id' => $establecimiento->id,
+                'rol_id' => 1, 
+                'cargo' => 'Propietario', 
+                'estado_id' => 1,
+                'medio_pago_id' => 1,
+            ]);
 
+            // ✅ Crear Token de Activación
+            $token = TokensAcceso::create([
+                'establecimiento_id' => $establecimiento->id,
+                'token_activacion' => Str::uuid(),
+                'estado_id' => 2,
+            ]);
 
-        $usuario->update(['id_propietario' => $establecimientos->id]);
+            // ✅ Vincular Token al Establecimiento
+            $establecimiento->update(['token_id' => $token->id]);
 
-        $token = TokensAcceso::create([
-            'estado_id' => 2,
-            'token_activacion' => Str::uuid(),
-            'establecimiento_id' => $establecimientos->id,
-        ]);
+            // ✅ Crear Factura de Membresía inicial (ej. prueba gratuita)
+            FacturacionMembresias::create([
+                'cliente_id' => $usuario->id,
+                'establecimiento_id' => $establecimiento->id,
+                'aplicacion_web_id' => $establecimiento->aplicacion_web_id,
+                'monto_total' => 50000,
+                'dias_restantes' => 5, 
+                'estado_id' => 16, 
+                'medio_pago_id' => 8,
+            ]);
 
-        // ✅ Actualizar el id_token en la establecimientos para que quede vinculado
-        $establecimientos->update(['token_id' => $token->id]);
+           
+            DB::commit();
 
-        FacturacionMembresias::create([
-            'cliente_id' => $usuario->id,
-            'establecimiento_id' => $establecimientos->id,
-            'aplicacion_web_id' => $establecimientos->aplicacion_web_id,
-            'estado_id' => 16,
-            'medio_pago_id' => 8,
-            'monto_total' => 50000,
-            'dias_restantes' => 5,
-        ]);
+            
+            return redirect()->route('login.auth')->with('success', '¡Registro exitoso! Revisa tu correo para activar tu cuenta.');
 
-        // ✅ Guarda el mensaje en la sesión y redirige a login con Inertia
-        return redirect()->route('login.auth')->with('success', 'Registro exitoso, Activa el token y ¡empecemos!');
+        } catch (Exception $e) {
+           
+            DB::rollBack();
 
+            
+            return back()->with('error', 'Ocurrió un error inesperado durante el registro. Por favor, inténtalo de nuevo.');
+        }
     }
-
- 
 }

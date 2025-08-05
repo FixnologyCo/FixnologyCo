@@ -17,6 +17,7 @@ return new class extends Migration {
             $table->string('secondary');
             $table->string('icono')->default('function');
             $table->timestamps();
+             $table->softDeletes();
         });
 
         // Seeder

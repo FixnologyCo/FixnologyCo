@@ -20,6 +20,7 @@ return new class extends Migration {
             $table->boolean('ver')->nullable(false);
 
             $table->timestamps();
+             $table->softDeletes();
 
 
             $table->foreign('estado_id')->references('id')->on('estados')->onDelete('cascade');

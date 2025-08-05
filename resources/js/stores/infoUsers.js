@@ -1,7 +1,8 @@
 import { defineStore } from "pinia";
 
-export const useAuthStore = defineStore("auth", {
+export const useInfoUser = defineStore("infoUser", {
     state: () => ({
+       
         user: null,
     }),
 
@@ -10,6 +11,7 @@ export const useAuthStore = defineStore("auth", {
         isAuthenticated: (state) => !!state.user,
         perfilUsuario: (state) => state.user?.perfil_usuario || null,
         perfilEmpleado: (state) => state.user?.perfil_empleado || null,
+        establecimiento: (state) => state.user?.establecimiento || null,
       
         establecimientoAsignado: (state) => state.user?.establecimiento_asignado || null,
         aplicacionWeb() { return this.establecimientoAsignado?.aplicacion_web || null; },
@@ -120,12 +122,11 @@ export const useAuthStore = defineStore("auth", {
     },
 
     actions: {
-        setUser(user) {
-            this.user = user;
+        setUser(newUser) {
+            this.user = newUser;
         },
         clearUser() {
             this.user = null;
         },
     },
-
 });

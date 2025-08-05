@@ -58,19 +58,6 @@ const tabs = [
   { label: "Membresía" },
   { label: "Ajustes avanzados" },
 ];
-
-const fotoUsuario = computed(() => {
-  const ruta = authStore.rutaFoto;
-
-  if (ruta && ruta !== "Sin foto") {
-    if (ruta.startsWith("http")) {
-      return ruta;
-    }
-    return `/storage/${ruta}`;
-  }
-
-  return "Sin foto";
-});
 </script>
 
 <template>

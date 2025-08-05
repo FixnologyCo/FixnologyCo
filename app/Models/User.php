@@ -13,10 +13,11 @@ use Core\Models\Indicativos;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\SoftDeletes; // 1. Importar
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, SoftDeletes;
 
     protected $table = 'usuarios';
     protected $fillable = ['id', 'numero_documento', 'password', 'estado_id', 'google_id'];
@@ -50,7 +51,7 @@ class User extends Authenticatable
      * ANÁLISIS Y CORRECCIÓN: El nombre de la relación DEBE ser plural ('establecimientos')
      * porque el tipo de relación es hasMany (tiene MUCHOS). Esta era una fuente principal de errores.
      */
-    public function establecimientos()
+    public function establecimiento()
     {
         return $this->hasOne(Establecimientos::class, 'propietario_id');
     }

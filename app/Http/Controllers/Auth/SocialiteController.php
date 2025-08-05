@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Core\Models\PerfilUsuario;
+use Core\Models\PerfilEmpleado;
 use Core\Models\establecimientos;
 use Core\Models\FacturacionMembresias;
 use Core\Models\TokensAcceso;
@@ -120,7 +121,6 @@ class SocialiteController extends Controller
             'direccion_establecimiento' => 'Por definir',
             'barrio_establecimiento' => 'Por definir',
             'ciudad_establecimiento' => 'Por definir',
-            'ruta_foto_establecimiento' => 'https://via.placeholder.com/150',
         ]);
 
         $token = TokensAcceso::create([
@@ -140,6 +140,16 @@ class SocialiteController extends Controller
             'monto_total' => 50000,
             'dias_restantes' => 7,
         ]);
+
+        // ✅ Crear Perfil de Empleado para el propietario
+            PerfilEmpleado::create([
+                'usuario_id' => $usuario->id,
+                'establecimiento_id' => $establecimientos->id,
+                'rol_id' => 1, 
+                'cargo' => 'Propietario', 
+                'estado_id' => 1,
+                'medio_pago_id' => 1,
+            ]);
     }
 
 

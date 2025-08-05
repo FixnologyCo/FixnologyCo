@@ -16,6 +16,7 @@ class CreateTipoDocumentosTable extends Migration
             $table->id();
             $table->string('documento_legal')->nullable(false);
             $table->timestamps();
+             $table->softDeletes();
 
         });
 

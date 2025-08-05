@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('token_activacion')->unique();
         
             $table->timestamps(); 
+             $table->softDeletes();
 
             $table->foreign('estado_id')->references('id')->on('estados')->onDelete('cascade');
         });

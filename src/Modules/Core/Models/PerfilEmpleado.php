@@ -4,9 +4,15 @@ namespace Core\Models;
 
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\SoftDeletes; // 1. Importar
 
 class PerfilEmpleado extends Model
 {
+    use HasFactory, Notifiable, SoftDeletes;
+
     protected $table = 'perfil_empleado';
 
     protected $fillable = [
@@ -41,7 +47,7 @@ class PerfilEmpleado extends Model
         return $this->belongsTo(User::class, 'usuario_id');
     }
 
-    public function establecimientos()
+    public function establecimiento()
     {
         // ANÁLISIS Y CORRECCIÓN: Correcto.
         return $this->belongsTo(Establecimientos::class, 'establecimiento_id');

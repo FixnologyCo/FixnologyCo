@@ -23,6 +23,7 @@ return new class extends Migration
             $table->text('descripcion_corta')->nullable(); 
         
             $table->timestamps(); 
+             $table->softDeletes();
     
             $table->foreign('estado_id')->references('id')->on('estados')->onDelete('cascade');
             $table->foreign('estilo_id')->references('id')->on('estilos_app')->onDelete('cascade');

@@ -44,7 +44,7 @@ class MiPerfilController extends Controller
                 ]);
             },
 
-            'establecimientos' => function ($query) {
+            'establecimiento' => function ($query) {
                 $query->with([
                     'token.estado',
                     'propietario',
@@ -90,7 +90,7 @@ class MiPerfilController extends Controller
                 ]);
             },
 
-            'establecimientos' => function ($query) {
+            'establecimiento' => function ($query) {
                 $query->with([
                     'token.estado',
                     'propietario',
@@ -171,10 +171,10 @@ class MiPerfilController extends Controller
         $user = $request->user();
 
 
-        $establecimientos = $user->establecimientos()->first();
+        $establecimiento = $user->establecimiento()->first();
 
 
-        if (!$establecimientos) {
+        if (!$establecimiento) {
             return redirect()->route('aplicacion.miPerfil.editarMiPerfil', [
                 'aplicacion' => $aplicacion,
                 'rol' => $rol,
@@ -182,14 +182,14 @@ class MiPerfilController extends Controller
         }
 
 
-        $directory = 'fotosEstablecimientos/' . $establecimientos->id;
+        $directory = 'fotosEstablecimientos/' . $establecimiento->id;
 
         Storage::disk('public')->deleteDirectory($directory);
 
         $path = $request->file('photo')->store($directory, 'public');
 
 
-        $establecimientos->forceFill([
+        $establecimiento->forceFill([
             'ruta_foto_establecimiento' => $path,
         ])->save();
 
@@ -206,7 +206,7 @@ class MiPerfilController extends Controller
         // 1. Obtén el usuario y sus relaciones
         $user = $request->user();
         $perfilUsuario = $user->perfilUsuario;
-        $establecimientos = $user->establecimientos()->first();
+        $establecimiento = $user->establecimiento()->first();
 
         // 2. Valida TODOS los campos que vienen del formulario
         $validatedData = $request->validate([
@@ -256,8 +256,8 @@ class MiPerfilController extends Controller
         ]);
 
         // 5. Actualiza la tabla `establecimientoss`
-        if ($establecimientos) {
-            $establecimientos->update([
+        if ($establecimiento) {
+            $establecimiento->update([
                 'nombre_establecimiento' => $validatedData['nombre_establecimiento'],
                 'tipo_establecimiento' => $validatedData['tipo_establecimiento'],
                 'telefono_establecimiento' => $validatedData['telefono_establecimiento'],

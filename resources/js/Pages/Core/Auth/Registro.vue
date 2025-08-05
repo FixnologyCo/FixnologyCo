@@ -30,6 +30,7 @@ const form = useForm({
   primer_nombre: "",
   primer_apellido: "",
   id_tipo_documento: 1,
+  id_codigo_pais: 1,
   numero_documento: "",
   password: "",
   password_confirm: "",

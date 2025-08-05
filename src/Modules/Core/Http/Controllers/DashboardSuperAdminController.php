@@ -41,7 +41,7 @@ class DashboardSuperAdminController extends Controller
                 ]);
             },
 
-            'establecimientos' => function ($query) {
+            'establecimiento' => function ($query) {
                 $query->with([
                     'token.estado',
                     'propietario',

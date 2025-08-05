@@ -17,6 +17,7 @@ class CreateEstadosTable extends Migration
             $table->string('tipo_estado', 255)->nullable(false);
             $table->string('categoria_estado', 255)->nullable();
             $table->timestamps();
+             $table->softDeletes();
         });
 
         // Insertar datos iniciales

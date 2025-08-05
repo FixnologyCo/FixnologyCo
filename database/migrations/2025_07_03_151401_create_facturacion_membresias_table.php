@@ -23,6 +23,7 @@ return new class extends Migration {
 
             $table->timestamp('fecha_pago')->default(DB::raw('CURRENT_TIMESTAMP'))->useCurrentOnUpdate();
             $table->timestamps();
+             $table->softDeletes();
 
             $table->foreignId('created_by')->nullable()->constrained('usuarios')->onDelete('set null');
             $table->foreignId('updated_by')->nullable()->constrained('usuarios')->onDelete('set null');
