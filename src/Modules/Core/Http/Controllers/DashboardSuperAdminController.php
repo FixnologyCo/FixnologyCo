@@ -13,14 +13,7 @@ use function Laravel\Prompts\alert;
 
 class DashboardSuperAdminController extends Controller
 {
-    /**
-     * Muestra el dashboard para la aplicación y rol especificados.
-     *
-     * @param  string  $aplicacion
-     * @param  string  $rol
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Inertia\Response
-     */
+    
     public function show($aplicacion, $rol, Request $request)
     {
         $usuario = Auth::user()->load([
@@ -58,8 +51,10 @@ class DashboardSuperAdminController extends Controller
             abort(403, 'No tienes permisos para acceder a esta sección.');
         }
 
+        
         return Inertia::render('Apps/' . ucfirst($aplicacion) . '/' . ucfirst($rol) . '/Dashboard/Dashboard', [
             'usuario' => $usuario,
+            
         ]);
     }
 

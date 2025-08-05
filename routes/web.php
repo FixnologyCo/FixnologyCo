@@ -7,9 +7,6 @@ $routesPath = __DIR__ . '/web';
 foreach (File::allFiles($routesPath) as $routeFile) {
     require_once $routeFile->getPathname();
 }
-Route::get('/login', function () {
-    return redirect()->route('login.auth');
-})->name('login');
 
 // En routes/web.php
 Route::get('/ping', function () {
