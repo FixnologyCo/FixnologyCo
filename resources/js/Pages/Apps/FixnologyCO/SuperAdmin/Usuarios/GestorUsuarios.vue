@@ -146,6 +146,8 @@ function highlightMatch(text) {
     return `<mark class="bg-primary text-white rounded">${match}</mark>`;
   });
 }
+
+const viewMode = ref('list'); 
 </script>
 
 <template>
@@ -199,14 +201,15 @@ function highlightMatch(text) {
                     </div>
                   </div>
                   <div class="flex items-center gap-3 rounded-xl bg-mono-negro_opacity_medio">
-                    <div class="">
-                      <button
-                        class="material-symbols-rounded p-2 text-[18px] border border-transparent hover:text-primary hover:border-primary rounded-xl">
+                    <div>
+                      <button @click="viewMode = 'list'"
+                        class="material-symbols-rounded p-2 text-[18px] rounded-xl transition-colors"
+                        :class="viewMode === 'list' ? 'bg-primary text-white' : 'border border-transparent hover:border-primary'">
                         lists
                       </button>
-
-                      <button
-                        class="material-symbols-rounded p-2 text-[18px] border border-transparent hover:text-primary hover:border-primary rounded-xl">
+                      <button @click="viewMode = 'grid'"
+                        class="material-symbols-rounded p-2 text-[18px] rounded-xl transition-colors"
+                        :class="viewMode === 'grid' ? 'bg-primary text-white' : 'border border-transparent hover:border-primary'">
                         grid_view
                       </button>
                     </div>
@@ -229,14 +232,18 @@ function highlightMatch(text) {
                     </div>
                   </div>
                 </div>
-                <div class="cardsUsuarios my-3 min-h-[75dvh] max-h-[80dvh] overflow-auto scrollbar-custom">
+                <div :class="{
+                  'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4': viewMode === 'grid',
+                }" class="cardsUsuarios my-3 min-h-[75dvh] max-h-[80dvh] overflow-auto scrollbar-custom">
                   <div v-if="filteredUsers.length === 0" class="text-center text-gray-400 mt-10">
                     <p class="text-lg">
                       No se encontraron usuarios que coincidan con tu búsqueda.
                     </p>
                   </div>
-                  <div v-for="usuario in filteredUsers" :key="usuario.id"
-                    class="contCard hover:bg-mono-blanco_opacity hover:cursor-pointer my-2 flex items-center gap-5 justify-between bg-mono-negro_opacity_medio backdrop-blur-xl p-3 rounded-[10px]">
+                  <div v-for="usuario in filteredUsers" :key="usuario.id" :class="{
+                    'my-2 flex items-center gap-5 justify-between': viewMode === 'list',
+                    'flex flex-col gap-3': viewMode === 'grid',
+                  }" class="contCard hover:bg-mono-blanco_opacity hover:cursor-pointer my-2 flex items-center gap-5 justify-between bg-mono-negro_opacity_medio backdrop-blur-xl p-3 rounded-[10px]">
                     <div class="flex items-center relative w-[70%]">
                       <div class="w-3.5 border-2 h-3.5 absolute -top-1 -left-1 z-10 shadowM rounded-full" :class="usuario.tiene_sesion_activa
                         ? 'bg-semaforo-verde'
@@ -248,7 +255,7 @@ function highlightMatch(text) {
                           class="relative h-[100px] w-[115px] rounded-[10px] overflow-hidden flex items-center justify-center text-mono-blanco bg-primary shadow-[0px_8px_20px] shadow-primary">
                           <span class="text-[25px] font-bold">{{
                             getInitials(usuario)
-                            }}</span>
+                          }}</span>
                         </div>
                       </template>
 
@@ -445,7 +452,7 @@ function highlightMatch(text) {
                           class="relative h-[100px] w-[115px] rounded-[10px] overflow-hidden flex items-center justify-center text-mono-blanco bg-primary shadow-[0px_8px_20px] shadow-primary">
                           <span class="text-[25px] font-bold">{{
                             getInitials(usuario)
-                            }}</span>
+                          }}</span>
                         </div>
                       </template>
 
@@ -561,7 +568,7 @@ function highlightMatch(text) {
       </SidebarSuperAdmin>
       <ModalDetallesUsuario :is-open="isModalOpen" @close="closeUserDetailsModal" />
       <ModalCrearUsuario :is-open="isModalOpenCrearUser" :establecimientosDisponibles="establecimientosDisponibles"
-        @close="closeUserCreationModal"/>
+        @close="closeUserCreationModal" />
       <ModalPapeleraUsuario :is-open="isModalOpenPapelera" @close="closePapeleraModal"
         :usuarios-en-papelera="usuariosEnPapelera" />
     </div>
