@@ -26,7 +26,7 @@ class UsuariosFixController extends Controller
 {
     use AuthorizesRequests;
 
-   public function show($aplicacion, $rol, Request $request)
+    public function show($aplicacion, $rol, Request $request)
     {
         $usuarioAutenticado = Auth::user()->load(['perfilUsuario.rol', 'establecimientoAsignado.aplicacionWeb.estilo']);
 
@@ -42,10 +42,95 @@ class UsuariosFixController extends Controller
             'establecimiento' => fn($q) => $q->with(['token.estado', 'propietario', 'facturas.estado', 'facturas.medioPago']),
         ];
 
-        // --- 2. OBTENER LISTAS DE USUARIOS ---
-        $todosLosUsuarios = User::with($relationsToLoad)->get();
-        // ... (tu lógica para $misEmpleados y $usuariosEnPapelera)
+        $idEstablecimiento = $usuarioAutenticado->establecimientoAsignado->id ?? null;
+        $misEmpleados = collect();
 
+        if ($idEstablecimiento) {
+            $misEmpleados = User::whereHas('perfilEmpleado', function ($query) use ($idEstablecimiento) {
+                $query->where('establecimiento_id', $idEstablecimiento);
+            })
+                ->where('id', '!=', $usuarioAutenticado->id) // Excluirse a sí mismo de la lista de empleados
+                ->with([
+                    'perfilUsuario' => function ($query) {
+                        $query->with(['indicativo', 'tipoDocumento', 'estado', 'rol']);
+                    },
+
+                    'perfilEmpleado' => function ($query) {
+                        $query->with(['estado', 'medioPago']);
+                    },
+
+                    'establecimientoAsignado' => function ($query) {
+                        $query->with([
+                            'aplicacionWeb' => function ($subQuery) {
+                                $subQuery->with(['estilo', 'estado', 'membresia.estado']);
+                            }
+                        ]);
+                    },
+
+                    'establecimiento' => function ($query) {
+                        $query->with([
+                            'token.estado',
+                            'propietario',
+                            'facturas' => function ($subQuery) {
+                                $subQuery->with(['estado', 'medioPago']);
+                            }
+                        ]);
+                    }
+                ])
+                ->get();
+        }
+
+        $todosLosUsuarios = User::with([
+            'perfilUsuario' => function ($query) {
+                $query->with(['indicativo', 'tipoDocumento', 'estado', 'rol']);
+            },
+
+            'perfilEmpleado' => function ($query) {
+                $query->with(['estado', 'medioPago']);
+            },
+
+            'establecimientoAsignado' => function ($query) {
+                $query->with([
+                    'aplicacionWeb' => function ($subQuery) {
+                        $subQuery->with(['estilo', 'estado', 'membresia.estado']);
+                    },
+                    'facturas' => function ($subQuery) {
+                        $subQuery->with(['estado', 'medioPago']);
+                    },
+                    'token.estado',
+                    'propietario',
+                ]);
+            },
+
+            'establecimiento' => function ($query) {
+                $query->with([
+                    'facturas' => function ($subQuery) {
+                        $subQuery->with(['estado', 'medioPago']);
+                    }
+                ]);
+            }
+        ])
+            ->get();
+
+        // --- PREPARAR RELACIONES COMUNES PARA CARGAR ---
+        $relationsToLoad = [
+            'perfilUsuario' => fn($q) => $q->with(['indicativo', 'tipoDocumento', 'estado', 'rol']),
+            'perfilEmpleado' => fn($q) => $q->with(['estado', 'medioPago', 'establecimiento']),
+            'establecimiento' => fn($q) => $q->with(['facturas.estado', 'facturas.medioPago']),
+            'establecimientoAsignado'
+        ];
+
+        // --- ✅ OBTENER USUARIOS EN LA PAPELERA ---
+        // Usamos onlyTrashed() para obtener solo los eliminados suavemente
+        // Y cargamos las mismas relaciones para que el modal tenga datos que mostrar
+        $usuariosEnPapelera = User::onlyTrashed()->with($relationsToLoad)->get();
+        $activeSessionUserIds = DB::table(config('session.table'))
+            ->whereNotNull('user_id')
+            ->pluck('user_id')
+            ->unique();
+        $establecimientosDisponibles = Establecimientos::distinct()->pluck('nombre_establecimiento');
+        $misEmpleados->each(fn($empleado) => $empleado->tiene_sesion_activa = $activeSessionUserIds->contains($empleado->id));
+        $todosLosUsuarios->each(fn($user) => $user->tiene_sesion_activa = $activeSessionUserIds->contains($user->id));
         // --- ✅ 3. OBTENER DATOS PARA LOS FILTROS ---
         $estados = Estados::whereIn('categoria_estado', ['General', 'Pagos'])->distinct()->pluck('tipo_estado');
         $aplicaciones = AplicacionesWeb::distinct()->pluck('nombre_app');
@@ -58,7 +143,10 @@ class UsuariosFixController extends Controller
         return Inertia::render('Apps/' . ucfirst($aplicacion) . '/' . ucfirst($rol) . '/Usuarios/GestorUsuarios', [
             'usuario' => $usuarioAutenticado,
             'todosLosUsuarios' => $todosLosUsuarios,
-            // ... (tus otras props: misEmpleados, etc.)
+            'establecimientosDisponibles' => $establecimientosDisponibles,
+            'usuariosEnPapelera' => $usuariosEnPapelera,
+            'misEmpleados' => $misEmpleados,
+
             'filtrosDisponibles' => [
                 'estados' => $estados,
                 'aplicaciones' => $aplicaciones,

@@ -23,12 +23,14 @@ import { formatCOP } from "@/Utils/formateoMoneda";
 const { getEstadoClass } = useEstadoClass();
 const props = defineProps({
   todosLosUsuarios: { type: Array, required: true },
-  misEmpleados: { type: Array, required: true },
+  misEmpleados: { type: Array, default: () => [] },
   usuariosEnPapelera: { type: Array },
   establecimientosDisponibles: { type: Array },
-  filtrosDisponibles: { type: Object }, // <-- Nueva prop para los filtros
+  filtrosDisponibles: { type: Object },
+  usuariosEnPapelera: { type: Array },
 });
 const page = usePage();
+console.log(props.misEmpleados);
 
 const usuario = authStore.user;
 const aplicacion = authStore.aplicacion;
@@ -725,15 +727,114 @@ function bulkDeleteSelectedUsers() {
                   <div
                     class="contador border border-secundary-light rounded-md px-2 py-1 text-[12px]"
                   >
-                    {{ misEmpleados.length }} Total usuarios
+                    {{ filteredUsers.length }} Total
                   </div>
                 </div>
                 <div
-                  class="contenidoFiltro bg-secundary-opacity rounded-lg border border-secundary-light py-2 px-3 mt-3"
+                  class="contenidoFiltro bg-secundary-opacity rounded-lg border border-secundary-light p-3 mt-3 space-y-4"
                 >
-                  <label for="" class="text-[14px] text-secundary-light"
-                    >Estado cliente</label
-                  >
+                  <!-- Filtro por Estado -->
+                  <div>
+                    <label for="filtro-estado" class="text-[14px] text-secundary-light"
+                      >Estado cliente</label
+                    >
+                    <select
+                      v-model="filters.estado"
+                      id="filtro-estado"
+                      class="mt-1 block w-full bg-gray-800 border-gray-700 rounded-md shadow-sm focus:ring-primary focus:border-primary text-sm"
+                    >
+                      <option value="all">Todos los Estados</option>
+                      <option
+                        v-for="estado in filtrosDisponibles.estados"
+                        :key="estado"
+                        :value="estado"
+                      >
+                        {{ estado }}
+                      </option>
+                    </select>
+                  </div>
+                  <!-- Filtro por Orden -->
+                  <div>
+                    <label for="filtro-orden" class="text-[14px] text-secundary-light"
+                      >Ordenar por Nombre</label
+                    >
+                    <select
+                      v-model="filters.orden"
+                      id="filtro-orden"
+                      class="mt-1 block w-full bg-gray-800 border-gray-700 rounded-md shadow-sm focus:ring-primary focus:border-primary text-sm"
+                    >
+                      <option value="a-z">A-Z</option>
+                      <option value="z-a">Z-A</option>
+                    </select>
+                  </div>
+                  <!-- Filtro por Aplicación -->
+                  <div>
+                    <label for="filtro-app" class="text-[14px] text-secundary-light"
+                      >Aplicación</label
+                    >
+                    <select
+                      v-model="filters.aplicacion"
+                      id="filtro-app"
+                      class="mt-1 block w-full bg-gray-800 border-gray-700 rounded-md shadow-sm focus:ring-primary focus:border-primary text-sm"
+                    >
+                      <option value="all">Todas las Apps</option>
+                      <option
+                        v-for="app in filtrosDisponibles.aplicaciones"
+                        :key="app"
+                        :value="app"
+                      >
+                        {{ app }}
+                      </option>
+                    </select>
+                  </div>
+                  <!-- Filtro por Membresía -->
+                  <div>
+                    <label for="filtro-membresia" class="text-[14px] text-secundary-light"
+                      >Membresía</label
+                    >
+                    <select
+                      v-model="filters.membresia"
+                      id="filtro-membresia"
+                      class="mt-1 block w-full bg-gray-800 border-gray-700 rounded-md shadow-sm focus:ring-primary focus:border-primary text-sm"
+                    >
+                      <option value="all">Todas las Membresías</option>
+                      <option
+                        v-for="mem in filtrosDisponibles.membresias"
+                        :key="mem"
+                        :value="mem"
+                      >
+                        {{ mem }}
+                      </option>
+                    </select>
+                  </div>
+                  <!-- Filtro por Ciudad -->
+                  <div>
+                    <label for="filtro-ciudad" class="text-[14px] text-secundary-light"
+                      >Ciudad</label
+                    >
+                    <select
+                      v-model="filters.ciudad"
+                      id="filtro-ciudad"
+                      class="mt-1 block w-full bg-gray-800 border-gray-700 rounded-md shadow-sm focus:ring-primary focus:border-primary text-sm"
+                    >
+                      <option value="all">Todas las Ciudades</option>
+                      <option
+                        v-for="ciudad in filtrosDisponibles.ciudades"
+                        :key="ciudad"
+                        :value="ciudad"
+                      >
+                        {{ ciudad }}
+                      </option>
+                    </select>
+                  </div>
+                  <div v-if="isAnyFilterActive">
+                    <button
+                      @click="resetFilters"
+                      class="w-full mt-2 py-2 px-4 text-sm font-medium text-gray-300 bg-gray-700/50 rounded-md hover:bg-gray-700 transition-colors"
+                    >
+                      Restablecer Filtros
+                    </button>
+                  </div>
                 </div>
               </div>
               <div class="contenido w-[80%]">
@@ -747,6 +848,7 @@ function bulkDeleteSelectedUsers() {
                       name="search"
                       placeholder="Buscar usuario"
                       id=""
+                      v-model="searchTerm"
                       class="bg-transparent outline-none w-full"
                     />
                     <p>|</p>
@@ -758,15 +860,37 @@ function bulkDeleteSelectedUsers() {
                   <div
                     class="flex items-center gap-3 rounded-xl bg-mono-negro_opacity_medio"
                   >
-                    <div class="">
+                    <div>
                       <button
-                        class="material-symbols-rounded p-2 text-[18px] border border-transparent hover:text-primary hover:border-primary rounded-xl"
+                        @click="viewMode = 'table'"
+                        class="material-symbols-rounded p-2 text-[18px] rounded-xl transition-colors"
+                        :class="
+                          viewMode === 'table'
+                            ? 'bg-primary text-white'
+                            : 'border border-transparent hover:border-primary'
+                        "
+                      >
+                        table
+                      </button>
+                      <button
+                        @click="viewMode = 'list'"
+                        class="material-symbols-rounded p-2 text-[18px] rounded-xl transition-colors"
+                        :class="
+                          viewMode === 'list'
+                            ? 'bg-primary text-white'
+                            : 'border border-transparent hover:border-primary'
+                        "
                       >
                         lists
                       </button>
-
                       <button
-                        class="material-symbols-rounded p-2 text-[18px] border border-transparent hover:text-primary hover:border-primary rounded-xl"
+                        @click="viewMode = 'grid'"
+                        class="material-symbols-rounded p-2 text-[18px] rounded-xl transition-colors"
+                        :class="
+                          viewMode === 'grid'
+                            ? 'bg-primary text-white'
+                            : 'border border-transparent hover:border-primary'
+                        "
                       >
                         grid_view
                       </button>
@@ -777,9 +901,38 @@ function bulkDeleteSelectedUsers() {
                       class="flex gap-2 items-center rounded-xl bg-mono-negro_opacity_medio"
                     >
                       <button
-                        class="material-symbols-rounded p-2 text-[18px] border border-secundary-light hover:text-primary hover:border-primary rounded-xl"
+                        @click="toggleSelectionMode"
+                        class="relative material-symbols-rounded p-2 text-[18px] rounded-xl transition-colors"
+                        :class="
+                          isSelectionModeActive
+                            ? 'bg-primary text-white'
+                            : 'border border-secundary-light hover:border-primary'
+                        "
                       >
                         atr
+                        <p
+                          v-if="hasSelectedUsers"
+                          class="absolute bg-mono-blanco text-primary text-[14px] w-4 h-4 flex justify-center items-center font-semibold rounded-full -top-2 -right-1"
+                        >
+                          <span>{{ selectedUserIds.length }}</span>
+                        </p>
+                      </button>
+
+                      <Transition name="fade">
+                        <button
+                          v-if="hasSelectedUsers"
+                          @click="bulkDeleteSelectedUsers"
+                          class="material-symbols-rounded p-2 text-[18px] border border-semaforo-rojo bg-semaforo-rojo rounded-xl"
+                        >
+                          delete
+                        </button>
+                      </Transition>
+
+                      <button
+                        @click="openPapeleraModal()"
+                        class="material-symbols-rounded p-2 text-[18px] border border-secundary-light hover:text-primary hover:border-primary rounded-xl"
+                      >
+                        folder_delete
                       </button>
                       <button
                         @click="openUserCreationModal()"
@@ -791,173 +944,191 @@ function bulkDeleteSelectedUsers() {
                   </div>
                 </div>
                 <div
-                  class="cardsUsuarios my-3 min-h-[75dvh] max-h-[80dvh] overflow-auto scrollbar-custom"
+                  class="my-3 min-h-[75dvh] max-h-[80dvh] overflow-auto scrollbar-custom"
                 >
+                  <!-- Mensaje para cuando no hay resultados -->
                   <div
-                    v-for="usuario in misEmpleados"
-                    :key="usuario.id"
-                    @click="openUserDetailsModal(usuario)"
-                    class="contCard my-2 flex items-center gap-5 justify-between bg-mono-negro_opacity_medio backdrop-blur-xl p-3 rounded-[10px]"
+                    v-if="filteredUsers.length === 0"
+                    class="text-center text-gray-400 mt-10"
                   >
-                    <div class="flex items-center relative w-[70%]">
-                      <div
-                        class="w-3.5 border-2 h-3.5 absolute -top-1 -left-1 z-10 shadowM rounded-full"
-                        :class="
-                          usuario.tiene_sesion_activa
-                            ? 'bg-semaforo-verde'
-                            : 'bg-semaforo-rojo'
-                        "
-                      ></div>
+                    <p class="text-lg">
+                      No se encontraron usuarios que coincidan con tu búsqueda.
+                    </p>
+                  </div>
 
-                      <template v-if="!usuario.perfil_usuario.ruta_foto">
-                        <div
-                          class="relative h-[100px] w-[115px] rounded-[10px] overflow-hidden flex items-center justify-center text-mono-blanco bg-primary shadow-[0px_8px_20px] shadow-primary"
-                        >
-                          <span class="text-[25px] font-bold">{{
-                            getInitials(usuario)
-                          }}</span>
-                        </div>
-                      </template>
-
-                      <template v-else>
-                        <img
-                          :src="usuario.perfil_usuario.ruta_foto"
-                          class="border-2 rounded-[10px] w-[100px] h-[100px] object-cover shadowM"
-                        />
-                      </template>
-                      <div class="datosPersonales mx-3 w-[100%]">
-                        <div class="">
-                          <div class="flex items-center gap-2">
-                            <h3
-                              class="text-mono-negro font-semibold dark:text-mono-blanco text-[25px]"
-                            >
-                              {{ usuario.perfil_usuario.primer_nombre }}
-                              {{ usuario.perfil_usuario.segundo_nombre }}
-                              {{ usuario.perfil_usuario.primer_apellido }}
-                              {{ usuario.perfil_usuario.segundo_apellido }}
-                            </h3>
+                  <!-- ✅ VISTA DE TABLA -->
+                  <table
+                    v-else-if="viewMode === 'table'"
+                    class="w-full text-sm text-left text-gray-300"
+                  >
+                    <thead class="text-xs text-gray-200 uppercase bg-gray-700/50">
+                      <tr>
+                        <th v-if="isSelectionModeActive" class="px-2 py-3 w-4"></th>
+                        <th scope="col" class="px-6 py-3">Usuario</th>
+                        <th scope="col" class="px-6 py-3">Contacto</th>
+                        <th scope="col" class="px-6 py-3">Rol</th>
+                        <th scope="col" class="px-6 py-3">Establecimiento</th>
+                        <th scope="col" class="px-6 py-3">
+                          <span class="sr-only">Acciones</span>
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr
+                        v-for="usuario in misEmpleados"
+                        :key="usuario.id"
+                        @click="openUserDetailsModal(usuario)"
+                        class="border-b border-gray-700 hover:bg-gray-800/50 cursor-pointer"
+                      >
+                        <td v-if="isSelectionModeActive" class="px-2">
+                          <input
+                            type="checkbox"
+                            :value="usuario.id"
+                            v-model="selectedUserIds"
+                            @click.stop
+                            class="form-checkbox rounded bg-gray-700 border-gray-600 text-primary focus:ring-primary"
+                          />
+                        </td>
+                        <td class="px-6 py-4 font-medium text-white whitespace-nowrap">
+                          <div class="flex items-center gap-3">
+                            <img
+                              v-if="usuario.perfil_usuario.ruta_foto"
+                              :src="usuario.perfil_usuario.ruta_foto"
+                              alt="Foto"
+                              class="w-10 h-10 rounded-full object-cover"
+                            />
                             <div
-                              class="grid place-items-center"
-                              v-if="usuario.google_id === null"
+                              v-else
+                              class="w-10 h-10 rounded-full bg-primary flex items-center justify-center font-bold"
                             >
-                              <span
-                                class="material-symbols-rounded text-[18px] text-gray-700"
-                                >verified_off</span
-                              >
+                              {{ getInitials(usuario) }}
                             </div>
-                            <div class="" v-else>
-                              <span
-                                class="grid place-items-center material-symbols-rounded text-[18px] text-universal-azul_secundaria"
-                                >verified</span
-                              >
-                            </div>
-                          </div>
-                          <div class="flex justify-between items-center">
-                            <p class="flex items-center gap-1">
-                              <span
-                                class="material-symbols-rounded text-[18px] text-primary"
-                                >email</span
-                              >
-                              {{ usuario.perfil_usuario.correo }}
-                            </p>
-                            <p class="flex items-center gap-1">
-                              <span
-                                class="material-symbols-rounded text-[18px] text-primary"
-                                >map</span
-                              >{{ usuario.perfil_usuario.ciudad_residencia }},
-                              {{ usuario.perfil_usuario.barrio_residencia }}
-                            </p>
-                            <p class="flex items-center gap-1">
-                              <span
-                                class="material-symbols-rounded text-[18px] text-primary"
-                                >phone</span
-                              >
-                              {{ usuario.perfil_usuario.indicativo.codigo_pais }}
-                              {{ usuario.perfil_usuario.telefono }}
-                            </p>
-                          </div>
-                        </div>
-                        <div class="caract flex justify-between items-center">
-                          <p class="flex items-center gap-1">
                             <span
-                              class="material-symbols-rounded text-[18px] text-primary"
-                              >security</span
-                            >{{ usuario.perfil_usuario.rol.tipo_rol }}
-                          </p>
-                          <div
-                            class="px-2 py-1 text-[14px] rounded-md"
-                            :class="
-                              getEstadoClass(usuario.perfil_usuario.estado.tipo_estado)
-                            "
-                          >
-                            {{ usuario.perfil_usuario.estado.tipo_estado }}
+                              v-html="
+                                highlightMatch(
+                                  `${usuario.perfil_usuario.primer_nombre} ${usuario.perfil_usuario.primer_apellido}`
+                                )
+                              "
+                            ></span>
                           </div>
-                        </div>
-                      </div>
-                    </div>
-                    <p class="text-[50px] font-extralight">|</p>
-
-                    <div class="w-[25%]">
-                      <h3
-                        class="text-mono-negro font-semibold dark:text-mono-blanco text-[25px]"
-                      >
-                        {{
-                          usuario.establecimiento_asignado.nombre_establecimiento || null
-                        }}
-                      </h3>
-
-                      <div class="flex justify-between items-center">
-                        <p class="flex items-center gap-1">
-                          <span class="material-symbols-rounded text-[18px] text-primary"
-                            >work</span
-                          >
-                          {{ usuario.perfil_empleado.cargo }}
-                        </p>
-                      </div>
-
-                      <div
-                        v-if="
-                          usuario.establecimiento?.facturas &&
-                          usuario.establecimiento?.facturas.length > 0
-                        "
-                      >
-                        <p>
-                          <strong>Pago:</strong>
-                          {{
-                            formatFecha(usuario.establecimiento?.facturas[0].fecha_pago)
-                          }}
-                        </p>
-                        <p
-                          class="text-lg font-bold"
-                          :class="
-                            usuario.establecimiento?.facturas[0].estado.tipo_estado ===
-                            'Pagado'
-                              ? 'text-green-400'
-                              : 'text-red-400'
+                        </td>
+                        <td
+                          class="px-6 py-4"
+                          v-html="highlightMatch(usuario.perfil_usuario.correo)"
+                        ></td>
+                        <td
+                          class="px-6 py-4"
+                          v-html="highlightMatch(usuario.perfil_usuario.rol.tipo_rol)"
+                        ></td>
+                        <td
+                          class="px-6 py-4"
+                          v-html="
+                            highlightMatch(
+                              usuario.establecimiento_asignado?.nombre_establecimiento
+                            )
                           "
-                        >
-                          {{
-                            formatCOP(usuario.establecimiento?.facturas[0].monto_total)
-                          }}
-                        </p>
-                      </div>
+                        ></td>
+                        <td class="px-6 py-4 text-right">
+                          <button
+                            class="material-symbols-rounded p-1 text-gray-400 hover:text-primary"
+                          >
+                            more_vert
+                          </button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
 
-                      <div v-else>
-                        <div v-if="infoUserStore" class="text-sm text-gray-400 mt-2">
-                          {{ usuario.perfil_empleado.cargo }} -
-                          <strong class="text-primary font-semibold">
-                            {{ usuario.establecimiento_asignado.nombre_establecimiento }}
-                          </strong>
-                        </div>
-                        <div v-else class="text-sm text-gray-500">Sin Información :c</div>
-                      </div>
-                    </div>
-                    <div class="w-[4%] justify-end flex">
-                      <button
-                        class="material-symbols-rounded p-2 text-[18px] border border-transparent hover:text-primary hover:border-primary rounded-xl"
+                  <!-- ✅ VISTA DE LISTA Y CUADRÍCULA (GRID) -->
+                  <div
+                    v-else
+                    class="cardsUsuarios"
+                    :class="{
+                      'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4':
+                        viewMode === 'grid',
+                    }"
+                  >
+                    <div
+                      v-for="usuario in misEmpleados"
+                      :key="usuario.id"
+                      @click="openUserDetailsModal(usuario)"
+                      class="contCard hover:cursor-pointer bg-mono-negro_opacity_medio backdrop-blur-xl p-3 rounded-[10px] transition-all duration-300"
+                      :class="{
+                        'my-2 flex items-center gap-5 justify-between':
+                          viewMode === 'list',
+                        'flex flex-col gap-3': viewMode === 'grid',
+                      }"
+                    >
+                      <!-- Contenido de la tarjeta (se adapta automáticamente) -->
+                      <div
+                        class="flex relative"
+                        :class="{
+                          'w-[70%] items-center': viewMode === 'list',
+                          'w-full flex-col items-center text-center': viewMode === 'grid',
+                        }"
                       >
-                        info
-                      </button>
+                        <!-- ... (código del indicador de sesión) ... -->
+                        <div
+                          class="flex-shrink-0"
+                          :class="{ 'mb-4': viewMode === 'grid' }"
+                        >
+                          <!-- ... (código de la foto o iniciales) ... -->
+                        </div>
+                        <div
+                          class="datosPersonales w-full"
+                          :class="{ 'mx-3': viewMode === 'list' }"
+                        >
+                          <h3
+                            class="text-mono-negro font-semibold dark:text-mono-blanco text-lg"
+                            v-html="
+                              highlightMatch(
+                                `${usuario.perfil_usuario.primer_nombre} ${usuario.perfil_usuario.primer_apellido}`
+                              )
+                            "
+                          ></h3>
+                          <p
+                            class="text-sm text-gray-400"
+                            v-html="highlightMatch(usuario.perfil_usuario.correo)"
+                          ></p>
+                          <!-- ... (resto de los datos de la tarjeta) ... -->
+                        </div>
+                      </div>
+                      <p v-if="viewMode === 'list'" class="text-[50px] font-extralight">
+                        |
+                      </p>
+                      <div
+                        class="flex-shrink-0"
+                        :class="{
+                          'w-[25%]': viewMode === 'list',
+                          'w-full border-t border-gray-700 pt-3 text-center':
+                            viewMode === 'grid',
+                        }"
+                      >
+                        <h4
+                          class="font-semibold dark:text-mono-blanco text-md"
+                          v-html="
+                            highlightMatch(
+                              usuario.establecimiento_asignado?.nombre_establecimiento
+                            )
+                          "
+                        ></h4>
+                        <p
+                          class="text-sm text-gray-400"
+                          v-html="highlightMatch(usuario.perfil_empleado.cargo)"
+                        ></p>
+                        <div
+                          v-if="isSelectionModeActive"
+                          class="absolute top-2 left-2 z-20"
+                        >
+                          <input
+                            type="checkbox"
+                            :value="usuario.id"
+                            v-model="selectedUserIds"
+                            @click.stop
+                            class="form-checkbox h-5 w-5 rounded bg-gray-800 border-gray-600 text-primary focus:ring-primary"
+                          />
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -985,6 +1156,7 @@ function bulkDeleteSelectedUsers() {
 .fade-leave-active {
   transition: opacity 0.3s ease;
 }
+
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
