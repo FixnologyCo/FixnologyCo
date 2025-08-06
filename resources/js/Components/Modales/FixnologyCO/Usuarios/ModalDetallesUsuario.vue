@@ -6,6 +6,7 @@ import { formatFecha } from "@/Utils/date";
 import { formatCOP } from "@/Utils/formateoMoneda";
 import { useTiempo } from "@/Composables/useTiempo";
 import { router } from "@inertiajs/vue3";
+import dayjs from "dayjs";
 
 defineProps({
   isOpen: {
@@ -76,6 +77,43 @@ function eliminarUsuario() {
     );
   }
 }
+
+// 1. Obtiene el historial de facturas (todas menos la próxima)
+const historialFacturas = computed(() => {
+  // Ordenamos las facturas de la más reciente a la más antigua
+  return [...infoUserStore.facturas].sort((a, b) =>
+    dayjs(b.fecha_pago).diff(dayjs(a.fecha_pago))
+  );
+});
+
+// 2. Calcula la información de la próxima factura
+const proximaFactura = computed(() => {
+  if (infoUserStore.facturas.length === 0) {
+    return null; // No hay facturas, no hay próximo cobro
+  }
+
+  // Encontramos la última factura pagada
+  const ultimaFacturaPagada = historialFacturas.value.find(
+    (f) => f.estado.tipo_estado === "Pagado"
+  );
+
+  if (!ultimaFacturaPagada) {
+    // Si no hay ninguna pagada, podríamos mostrar la más reciente pendiente
+    return historialFacturas.value[0];
+  }
+
+  // Calculamos la fecha del próximo pago
+  const fechaUltimoPago = dayjs(ultimaFacturaPagada.fecha_pago);
+  const proximaFechaPago = fechaUltimoPago.add(infoUserStore.duracionMembresia, "day");
+
+  // Creamos un objeto "virtual" para la próxima factura
+  return {
+    fecha_pago: proximaFechaPago.toISOString(),
+    estado: { tipo_estado: "Pendiente" },
+    medio_pago: ultimaFacturaPagada.medio_pago,
+    monto_total: ultimaFacturaPagada.monto_total,
+  };
+});
 </script>
 
 <template>
@@ -256,12 +294,13 @@ function eliminarUsuario() {
                         Tu membresía finaliza en:
                       </h4>
                       <p
-                        class="font-semibold -mt-1 text-secundary-default dark:text-mono-blanco"
+                        class="font-semibold text-[25px] -mt-1 text-secundary-default dark:text-mono-blanco"
                       >
                         {{ diasRestantes
                         }}<span
                           class="text-[14px] text-secundary-default dark:text-mono-blanco"
-                          >Días</span
+                        >
+                          Días</span
                         >
                       </p>
                     </div>
@@ -272,7 +311,7 @@ function eliminarUsuario() {
                       <p
                         class="font-semibold -mt-1 text-secundary-default text-[25px] dark:text-mono-blanco"
                       >
-                        {{ tiempoActivo }} <span class="text-[14px]"></span>
+                        {{ tiempoActivo }}
                       </p>
                     </div>
                   </div>
@@ -632,70 +671,94 @@ function eliminarUsuario() {
                   </div>
                 </div>
                 <div
-                  class="rounded-[15px] p-3 div8 dark:bg-secundary-opacity bg-mono-blanco_opacity"
+                  class="rounded-[15px] p-4 div8 dark:bg-secundary-opacity bg-mono-blanco_opacity"
                 >
                   <div class="flex justify-between items-center">
-                    <h4 class="text-secundary-default dark:text-mono-blanco">
-                      Facturación de tu cuenta
+                    <h4
+                      class="text-secundary-default dark:text-mono-blanco font-semibold"
+                    >
+                      Facturación de la Cuenta
                     </h4>
-                    <span
-                      class="material-symbols-rounded text-[16px] text-primary cursor-pointer text-secundary-default dark:text-mono-blanco dark:hover:text-universal-azul_secundaria"
+                    <span class="material-symbols-rounded text-[16px] text-gray-500"
                       >info</span
                     >
                   </div>
 
-                  <div
-                    class="w-full p-3 h-[auto] rounded-md mt-4 outline-dashed outline-1 outline-semaforo-verde"
-                    :class="getEstadoClass(infoUserStore.estadoFactura)"
-                  >
-                    <div class="flex justify-between items-center">
-                      <p class="text-secundary-default dark:text-mono-blanco">
-                        {{ formatFecha(infoUserStore.fechaPago) }}
-                      </p>
-                      <button
-                        class="bg-semaforo-verde flex items-center text-[14px] gap-1 px-2 py-1 rounded-md shadow-verde hover:bg-semaforo-verde_opacity hover:text-semaforo-verde"
-                      >
-                        {{ infoUserStore.estadoFactura }}
-                      </button>
-                    </div>
-                    <div class="flex justify-between items-center mt-1">
-                      <p
-                        class="flex items-center gap-1 text-secundary-default dark:text-mono-blanco"
-                      >
-                        <span class="material-symbols-rounded text-[16px] text-primary"
-                          >account_balance_wallet</span
-                        >{{ infoUserStore.medioPagoFactura }}
-                      </p>
-                      <p>{{ formatCOP(infoUserStore.montoFactura) }}</p>
-                    </div>
-                  </div>
-                  <div class="flex justify-between items-center my-5">
-                    <h4 class="text-secundary-default dark:text-mono-blanco">
-                      Próximo cobro
-                    </h4>
-                    <span
-                      class="material-symbols-rounded text-[16px] text-primary cursor-pointer text-secundary-default dark:text-mono-blanco dark:hover:text-universal-azul_secundaria"
-                      >info</span
+                  <!-- Próximo Cobro -->
+                  <div class="mt-4">
+                    <h5 class="text-sm font-medium text-gray-400 mb-2">Próximo Cobro</h5>
+                    <div
+                      v-if="proximaFactura"
+                      class="w-full p-3 rounded-md bg-gray-800/50 outline-dashed outline-1 outline-gray-600"
                     >
-                  </div>
-                  <div
-                    class="w-full p-3 h-[auto] rounded-md mt-4 outline-dashed outline-1 outline-gray-400 bg-mono-negro_opacity_full dark:bg-gray-800"
-                  >
-                    <div class="flex justify-between items-center">
-                      <p class="">lunes 21 de julio de 4763 a las 12:27 pm</p>
-                      <button
-                        class="bg-gray-400 flex items-center text-[14px] gap-1 px-2 py-1 rounded-md shadowM"
-                      >
-                        Proceso
-                      </button>
+                      <div class="flex justify-between items-center">
+                        <p class="font-semibold text-gray-200">
+                          {{ formatFecha(proximaFactura.fecha_pago) }}
+                        </p>
+                        <span
+                          class="text-xs font-bold px-2 py-1 rounded-full"
+                          :class="getEstadoClass(proximaFactura.estado.tipo_estado)"
+                        >
+                          {{ proximaFactura.estado.tipo_estado }}
+                        </span>
+                      </div>
+                      <div class="flex justify-between items-center mt-1">
+                        <p class="flex items-center gap-1 text-sm text-gray-400">
+                          <span class="material-symbols-rounded text-[16px] text-primary"
+                            >credit_card</span
+                          >
+                          {{ proximaFactura.medio_pago.forma_pago }}
+                        </p>
+                        <p class="font-semibold text-lg text-white">
+                          {{ formatCOP(proximaFactura.monto_total) }}
+                        </p>
+                      </div>
                     </div>
-                    <div class="flex justify-between items-center mt-1">
-                      <p class="flex items-center gap-1">
-                        <span class="material-symbols-rounded text-[16px] text-primary"
-                          >account_balance_wallet</span
-                        >{{ infoUserStore.medioPagoFactura }}
-                      </p>
-                      <p>{{ formatCOP(infoUserStore.montoFactura) }}</p>
+                    <div v-else class="text-center py-4 text-gray-500 text-sm">
+                      No hay información de próximo cobro.
+                    </div>
+                  </div>
+
+                  <!-- Historial de Facturas -->
+                  <div class="mt-6">
+                    <h5 class="text-sm font-medium text-gray-400 mb-2">
+                      Historial de Pagos
+                    </h5>
+                    <div
+                      v-if="historialFacturas.length > 0"
+                      class="space-y-2 max-h-48 overflow-y-auto pr-2"
+                    >
+                      <div
+                        v-for="factura in historialFacturas"
+                        :key="factura.id"
+                        class="w-full p-2 rounded-md bg-gray-800/50"
+                      >
+                        <div class="flex justify-between items-center">
+                          <p class="text-sm text-gray-300">
+                            {{ formatFecha(factura.fecha_pago) }}
+                          </p>
+                          <span
+                            class="text-xs font-bold px-2 py-1 rounded-full"
+                            :class="getEstadoClass(factura.estado.tipo_estado)"
+                          >
+                            {{ factura.estado.tipo_estado }}
+                          </span>
+                        </div>
+                        <div class="flex justify-between items-center mt-1">
+                          <p class="flex items-center gap-1 text-xs text-gray-500">
+                            <span class="material-symbols-rounded text-[14px]"
+                              >credit_card</span
+                            >
+                            {{ factura.medio_pago.forma_pago }}
+                          </p>
+                          <p class="font-medium text-gray-200">
+                            {{ formatCOP(factura.monto_total) }}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    <div v-else class="text-center py-4 text-gray-500 text-sm">
+                      No hay historial de facturas.
                     </div>
                   </div>
                 </div>
@@ -714,14 +777,17 @@ function eliminarUsuario() {
 :deep(.modal-fade-leave-active) {
   transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
 :deep(.modal-fade-enter-from),
 :deep(.modal-fade-leave-to) {
   opacity: 0;
 }
+
 :deep(.modal-slide-enter-active),
 :deep(.modal-slide-leave-active) {
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
 :deep(.modal-slide-enter-from),
 :deep(.modal-slide-leave-to) {
   opacity: 0;

@@ -32,6 +32,7 @@ const props = defineProps({
     <MensajesLayout />
     <div class="">
       <h1 class="text-[30px] dark:text-mono-blanco text-mono-negro">Dashboard</h1>
+      <pre>{{ authStore.user.establecimiento.facturas[0].dias_restantes }}</pre>
     </div>
   </SidebarSuperAdmin>
 </template>

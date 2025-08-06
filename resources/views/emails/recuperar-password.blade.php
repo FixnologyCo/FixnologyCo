@@ -20,7 +20,7 @@
             </a>
         </p>
 
-        <p style="color:#f2f4f8;">Si no realizaste esta solicitud, puedes ignorar este mensaje.</p>
+        <p style="color:#f2f4f8;">Si no realizaste esta solicitud, puedes ignorar este mensaje o contactarnos tu seguridad es primero.</p>
         <p style="color: #f05235;">Este enlace expirará en 5 minutos por razones de seguridad.</p>
 
         <p style="color:#f2f4f8; margin-top: 30px; font-weight: bolder;">Gracias,<br>Equipo Fixnology Co</p>

@@ -199,7 +199,7 @@ const submit = () => {
                     :key="est.id"
                     :value="est.id"
                   >
-                    {{ est }}
+                    {{ est.nombre_establecimiento }}
                   </option>
                 </select>
                 <div

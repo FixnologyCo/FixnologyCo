@@ -108,7 +108,17 @@ export const useAuthStore = defineStore("auth", {
         montoFactura() { return this.user?.establecimientos?.facturas?.[0]?.monto_total || null; },
         diasRestantesMembresia() { return this.user?.establecimientos?.facturas?.[0]?.dias_restantes || null; },
         fechaPago() { return this.user?.establecimientos?.facturas?.[0]?.fecha_pago || null; },
-
+// --- DATOS DE FACTURACIÓN (MEJORADO) ---
+        // Devuelve el array completo de facturas para poder iterarlo
+        facturas(state) {
+            return this.user?.establecimiento?.facturas ||
+                this.user?.establecimiento_asignado?.facturas ||
+                [];
+        },
+        // Devuelve la duración en días de la membresía actual
+        duracionMembresia(state) {
+            return this.aplicacionWeb?.membresia?.duracion_membresia || 30; // Por defecto 30 días
+        },
         
         
         // --- DATOS DE ESTILO ---

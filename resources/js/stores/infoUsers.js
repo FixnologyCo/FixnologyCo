@@ -2,7 +2,7 @@ import { defineStore } from "pinia";
 
 export const useInfoUser = defineStore("infoUser", {
     state: () => ({
-       
+
         user: null,
     }),
 
@@ -12,7 +12,7 @@ export const useInfoUser = defineStore("infoUser", {
         perfilUsuario: (state) => state.user?.perfil_usuario || null,
         perfilEmpleado: (state) => state.user?.perfil_empleado || null,
         establecimiento: (state) => state.user?.establecimiento || null,
-      
+
         establecimientoAsignado: (state) => state.user?.establecimiento_asignado || null,
         aplicacionWeb() { return this.establecimientoAsignado?.aplicacion_web || null; },
 
@@ -110,15 +110,25 @@ export const useInfoUser = defineStore("infoUser", {
         montoFactura() { return this.user?.establecimientos?.facturas?.[0]?.monto_total || null; },
         diasRestantesMembresia() { return this.user?.establecimientos?.facturas?.[0]?.dias_restantes || null; },
         fechaPago() { return this.user?.establecimientos?.facturas?.[0]?.fecha_pago || null; },
+        // --- DATOS DE FACTURACIÓN (MEJORADO) ---
+        // Devuelve el array completo de facturas para poder iterarlo
+        facturas(state) {
+            return this.user?.establecimiento?.facturas ||
+                this.user?.establecimiento_asignado?.facturas ||
+                [];
+        },
+        // Devuelve la duración en días de la membresía actual
+        duracionMembresia(state) {
+            return this.aplicacionWeb?.membresia?.duracion_membresia || 30; // Por defecto 30 días
+        },
 
-        
-        
+
         // --- DATOS DE ESTILO ---
         estiloApp() { return this.aplicacionWeb?.estilo?.nombre_relacion || null; },
         colorPrimario() { return this.aplicacionWeb?.estilo?.primary || null; },
         colorSecundario() { return this.aplicacionWeb?.estilo?.secondary || null; },
         icono() { return this.aplicacionWeb?.estilo?.icono || null; },
-       
+
     },
 
     actions: {

@@ -1,5 +1,5 @@
 // Composables/useTiempo.js
-import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
+import { ref, onMounted, onUnmounted, watch } from 'vue';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import 'dayjs/locale/es';
@@ -13,24 +13,37 @@ export function useTiempo(userSource) {
     let intervalId = null;
 
     const calcularTiempoActivo = (fechaCreacion) => {
-        if (!fechaCreacion) return 'N/A';
-        return dayjs(fechaCreacion).fromNow(true); // 'true' para quitar "hace"
+        if (!fechaCreacion) return 'No disponible';
+        // Usamos 'false' para quitar "hace" o "en"
+        return dayjs(fechaCreacion).fromNow(false); 
     };
 
+    // ✅ FUNCIÓN CORREGIDA
     const calcularDiasRestantes = (factura) => {
-        if (!factura || !factura.fecha_pago) return 'N/A';
+        // Ahora usamos el objeto 'factura' que se pasa como argumento
+        if (!factura || !factura.fecha_pago) {
+            return 'N/A'; // Devolvemos un valor por defecto más claro
+        }
         const fechaPago = dayjs(factura.fecha_pago);
         const diasMembresia = factura.dias_restantes || 0;
         const fechaExpiracion = fechaPago.add(diasMembresia, 'day');
         const dias = fechaExpiracion.diff(dayjs(), 'day');
+        
         return dias > 0 ? dias : 0;
     };
 
     const actualizarValores = () => {
-        const user = userSource.value; // Leemos el valor actual del usuario
+        const user = userSource.value;
         if (user) {
             tiempoActivo.value = calcularTiempoActivo(user.perfil_usuario?.created_at);
-            const factura = user.establecimientos?.[0]?.facturas?.[0];
+            
+            // ✅ BÚSQUEDA DE FACTURA MÁS ROBUSTA
+            // Busca la factura en las posibles ubicaciones para ser compatible con propietarios y empleados
+            const factura = 
+                user.establecimiento?.facturas?.[0] || 
+                user.establecimiento_asignado?.facturas?.[0] ||
+                user.perfil_empleado?.establecimiento?.facturas?.[0];
+
             diasRestantes.value = calcularDiasRestantes(factura);
         } else {
             tiempoActivo.value = null;

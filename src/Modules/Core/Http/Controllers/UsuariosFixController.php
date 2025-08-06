@@ -128,7 +128,7 @@ class UsuariosFixController extends Controller
             ->whereNotNull('user_id')
             ->pluck('user_id')
             ->unique();
-        $establecimientosDisponibles = Establecimientos::distinct()->pluck('nombre_establecimiento');
+        $establecimientosDisponibles = Establecimientos::all();
         $misEmpleados->each(fn($empleado) => $empleado->tiene_sesion_activa = $activeSessionUserIds->contains($empleado->id));
         $todosLosUsuarios->each(fn($user) => $user->tiene_sesion_activa = $activeSessionUserIds->contains($user->id));
         // --- ✅ 3. OBTENER DATOS PARA LOS FILTROS ---
@@ -320,7 +320,7 @@ class UsuariosFixController extends Controller
                 'primer_apellido' => $request->primer_apellido,
                 'correo' => $request->correo,
                 'telefono' => $request->telefono ?? '0000000000',
-                'rol_id' => ($request->tipo_usuario === 'propietario') ? 1 : 3, // 1: Propietario, 3: Empleado
+                'rol_id' => ($request->tipo_usuario === 'propietario') ? 1 : 2, // 1: Propietario, 3: Empleado
                 'estado_id' => 1,
             ]);
 
