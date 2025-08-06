@@ -15,6 +15,8 @@ use Illuminate\Support\Facades\DB; // Importante para usar transacciones
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
+use App\Events\UserListUpdated;
+
 
 class RegisterController extends Controller
 {
@@ -38,7 +40,7 @@ class RegisterController extends Controller
             'primer_apellido.required' => 'El apellido es requerido.',
             'numero_documento.required' => 'El número de documento es requerido.',
             'numero_documento.unique' => 'Oh, oh. Este documento ya existe.',
-          
+
             'password.required' => 'La contraseña es requerida.',
             'password.min' => 'La contraseña debe tener al menos 4 caracteres.',
         ]);
@@ -60,11 +62,11 @@ class RegisterController extends Controller
                 'usuario_id' => $usuario->id,
                 'primer_nombre' => $request->primer_nombre,
                 'primer_apellido' => $request->primer_apellido,
-                'telefono' => $request->telefono ?? '0000000000', 
-                'indicativo_id' => 1, 
+                'telefono' => $request->telefono ?? '0000000000',
+                'indicativo_id' => 1,
                 'rol_id' => 1,
                 'estado_id' => 1,
-                'ruta_foto' => 'https://placehold.co/400x400/f05235/FFFFFF?text='.$request->primer_nombre,
+                'ruta_foto' => 'https://placehold.co/400x400/f05235/FFFFFF?text=' . $request->primer_nombre,
             ]);
 
             // ✅ Crear Establecimiento por defecto
@@ -80,8 +82,8 @@ class RegisterController extends Controller
             PerfilEmpleado::create([
                 'usuario_id' => $usuario->id,
                 'establecimiento_id' => $establecimiento->id,
-                'rol_id' => 1, 
-                'cargo' => 'Propietario', 
+                'rol_id' => 1,
+                'cargo' => 'Propietario',
                 'estado_id' => 1,
                 'medio_pago_id' => 1,
             ]);
@@ -102,22 +104,22 @@ class RegisterController extends Controller
                 'establecimiento_id' => $establecimiento->id,
                 'aplicacion_web_id' => $establecimiento->aplicacion_web_id,
                 'monto_total' => 50000,
-                'dias_restantes' => 5, 
-                'estado_id' => 16, 
+                'dias_restantes' => 5,
+                'estado_id' => 16,
                 'medio_pago_id' => 8,
             ]);
 
-           
-            DB::commit();
 
-            
+            DB::commit();
+            broadcast(new UserListUpdated())->toOthers();
+
             return redirect()->route('login.auth')->with('success', '¡Registro exitoso! Revisa tu correo para activar tu cuenta.');
 
         } catch (Exception $e) {
-           
+
             DB::rollBack();
 
-            
+
             return back()->with('error', 'Ocurrió un error inesperado durante el registro. Por favor, inténtalo de nuevo.');
         }
     }

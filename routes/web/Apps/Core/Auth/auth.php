@@ -38,5 +38,7 @@ Route::middleware('guest')->group(function () {
 // --- RUTAS PARA USUARIOS AUTENTICADOS ---
 Route::middleware('auth')->group(function () {
     // Esta es la ruta a la que redirige el middleware 'guest' y el login.
-    Route::get('/home', [HomeController::class, 'index'])->name('home'); 
+    Route::get('/home', [HomeController::class, 'index'])->name('home');
+    Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+
 });

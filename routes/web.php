@@ -8,15 +8,7 @@ foreach (File::allFiles($routesPath) as $routeFile) {
     require_once $routeFile->getPathname();
 }
 
-// En routes/web.php
 Route::get('/ping', function () {
     return response()->json(['status' => 'ok']);
 });
-
-use App\Events\EstadoActualizado;
-
-// Route::get('/test-broadcast', function () {
-//     broadcast(new EstadoActualizado('¡El estado de algo ha cambiado!'))->toOthers();
-//     return "¡Evento enviado!";
-// })->name('test-broadcast');
 

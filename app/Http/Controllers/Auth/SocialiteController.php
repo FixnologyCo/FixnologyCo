@@ -17,6 +17,8 @@ use Exception;
 use Log;
 use App\Http\Traits\Auth\ValidatesAndRedirectsUsers;
 use Illuminate\Http\Request;
+use App\Events\UserListUpdated;
+
 
 
 class SocialiteController extends Controller
@@ -94,6 +96,8 @@ class SocialiteController extends Controller
                 ]);
 
                 $this->crearEstructuraInicial($usuario, $perfil);
+                broadcast(new UserListUpdated())->toOthers();
+
 
                 return redirect()->route('login.auth')->with('success', '¡Tu cuenta ha sido creada con Google! Ahora contáctanos.');
             }
@@ -142,14 +146,14 @@ class SocialiteController extends Controller
         ]);
 
         // ✅ Crear Perfil de Empleado para el propietario
-            PerfilEmpleado::create([
-                'usuario_id' => $usuario->id,
-                'establecimiento_id' => $establecimientos->id,
-                'rol_id' => 1, 
-                'cargo' => 'Propietario', 
-                'estado_id' => 1,
-                'medio_pago_id' => 1,
-            ]);
+        PerfilEmpleado::create([
+            'usuario_id' => $usuario->id,
+            'establecimiento_id' => $establecimientos->id,
+            'rol_id' => 1,
+            'cargo' => 'Propietario',
+            'estado_id' => 1,
+            'medio_pago_id' => 1,
+        ]);
     }
 
 

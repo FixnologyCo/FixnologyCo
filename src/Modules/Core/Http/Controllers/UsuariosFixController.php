@@ -17,6 +17,7 @@ use Core\Models\TokensAcceso;
 use Exception;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use App\Events\UserListUpdated;
 
 class UsuariosFixController extends Controller
 {
@@ -24,115 +25,48 @@ class UsuariosFixController extends Controller
 
     public function show($aplicacion, $rol, Request $request)
     {
-
         $usuarioAutenticado = Auth::user()->load(['perfilUsuario.rol', 'establecimientoAsignado.aplicacionWeb.estilo']);
-
 
         if (!in_array($usuarioAutenticado->perfilUsuario->rol->id, [4])) {
             abort(403, 'No tienes permisos para acceder a esta sección.');
         }
 
-
-        $idEstablecimiento = $usuarioAutenticado->establecimientoAsignado->id ?? null;
-        $misEmpleados = collect();
-
-        if ($idEstablecimiento) {
-            $misEmpleados = User::whereHas('perfilEmpleado', function ($query) use ($idEstablecimiento) {
-                $query->where('establecimiento_id', $idEstablecimiento);
-            })
-                ->where('id', '!=', $usuarioAutenticado->id) // Excluirse a sí mismo de la lista de empleados
-                ->with([
-                    'perfilUsuario' => function ($query) {
-                        $query->with(['indicativo', 'tipoDocumento', 'estado', 'rol']);
-                    },
-
-                    'perfilEmpleado' => function ($query) {
-                        $query->with(['estado', 'medioPago']);
-                    },
-
-                    'establecimientoAsignado' => function ($query) {
-                        $query->with([
-                            'aplicacionWeb' => function ($subQuery) {
-                                $subQuery->with(['estilo', 'estado', 'membresia.estado']);
-                            }
-                        ]);
-                    },
-
-                    'establecimiento' => function ($query) {
-                        $query->with([
-                            'token.estado',
-                            'propietario',
-                            'facturas' => function ($subQuery) {
-                                $subQuery->with(['estado', 'medioPago']);
-                            }
-                        ]);
-                    }
-                ])
-                ->get();
-        }
-
-        $todosLosUsuarios = User::with([
-            'perfilUsuario' => function ($query) {
-                $query->with(['indicativo', 'tipoDocumento', 'estado', 'rol']);
-            },
-
-            'perfilEmpleado' => function ($query) {
-                $query->with(['estado', 'medioPago']);
-            },
-
-            'establecimientoAsignado' => function ($query) {
-                $query->with([
-                    'aplicacionWeb' => function ($subQuery) {
-                        $subQuery->with(['estilo', 'estado', 'membresia.estado']);
-                    },
-                    'facturas' => function ($subQuery) {
-                        $subQuery->with(['estado', 'medioPago']);
-                    },
-                    'token.estado',
-                    'propietario',
-                ]);
-            },
-
-            'establecimiento' => function ($query) {
-                $query->with([
-                    'facturas' => function ($subQuery) {
-                        $subQuery->with(['estado', 'medioPago']);
-                    }
-                ]);
-            }
-        ])
-            ->get();
-
-        // --- PREPARAR RELACIONES COMUNES PARA CARGAR ---
+        // --- 1. DEFINIMOS LAS RELACIONES A CARGAR UNA SOLA VEZ (LA CLAVE DE LA CONSISTENCIA) ---
         $relationsToLoad = [
             'perfilUsuario' => fn($q) => $q->with(['indicativo', 'tipoDocumento', 'estado', 'rol']),
-            'perfilEmpleado' => fn($q) => $q->with(['estado', 'medioPago', 'establecimiento']),
-            'establecimiento' => fn($q) => $q->with(['facturas.estado', 'facturas.medioPago']),
-            'establecimientoAsignado'
+            'perfilEmpleado' => fn($q) => $q->with(['estado', 'medioPago']),
+            'establecimientoAsignado.aplicacionWeb.membresia.estado',
+            'establecimiento' => fn($q) => $q->with(['token.estado', 'propietario', 'facturas.estado', 'facturas.medioPago']),
         ];
 
-        // --- ✅ OBTENER USUARIOS EN LA PAPELERA ---
-        // Usamos onlyTrashed() para obtener solo los eliminados suavemente
-        // Y cargamos las mismas relaciones para que el modal tenga datos que mostrar
+        // --- 2. OBTENEMOS TODAS LAS LISTAS USANDO LAS MISMAS RELACIONES ---
+        $idEstablecimiento = $usuarioAutenticado->establecimientoAsignado->id ?? null;
+
+        $misEmpleados = $idEstablecimiento ? User::whereHas('perfilEmpleado', fn($q) => $q->where('establecimiento_id', $idEstablecimiento))
+            ->where('id', '!=', $usuarioAutenticado->id)
+            ->with($relationsToLoad)
+            ->get() : collect();
+
+        $todosLosUsuarios = User::with($relationsToLoad)->get();
         $usuariosEnPapelera = User::onlyTrashed()->with($relationsToLoad)->get();
 
-
-        $activeSessionUserIds = DB::table(config('session.table'))
-            ->whereNotNull('user_id')
-            ->pluck('user_id')
-            ->unique();
-
-
-        $misEmpleados->each(fn($empleado) => $empleado->tiene_sesion_activa = $activeSessionUserIds->contains($empleado->id));
-        $todosLosUsuarios->each(fn($user) => $user->tiene_sesion_activa = $activeSessionUserIds->contains($user->id));
+        // Para el selector, solo necesitamos la lista básica de establecimientos
         $establecimientosDisponibles = Establecimientos::all();
 
+        // --- 3. LÓGICA DE SESIÓN ACTIVA ---
+        $activeSessionUserIds = DB::table(config('session.table'))
+            ->whereNotNull('user_id')->pluck('user_id')->unique();
+
+        $todosLosUsuarios->each(fn($u) => $u->tiene_sesion_activa = $activeSessionUserIds->contains($u->id));
+        $misEmpleados->each(fn($u) => $u->tiene_sesion_activa = $activeSessionUserIds->contains($u->id));
+
+        // --- 4. DEVOLVEMOS LOS DATOS CRUDOS A INERTIA ---
         return Inertia::render('Apps/' . ucfirst($aplicacion) . '/' . ucfirst($rol) . '/Usuarios/GestorUsuarios', [
-            'usuario' => $usuarioAutenticado, // El usuario que ha iniciado sesión
+            'usuario' => $usuarioAutenticado,
             'misEmpleados' => $misEmpleados,
             'todosLosUsuarios' => $todosLosUsuarios,
-            'usuariosEnPapelera' => $usuariosEnPapelera, // <-- Nueva prop
-            'establecimientosDisponibles' => $establecimientosDisponibles
+            'usuariosEnPapelera' => $usuariosEnPapelera,
+            'establecimientosDisponibles' => $establecimientosDisponibles,
         ]);
     }
 
@@ -193,6 +127,7 @@ class UsuariosFixController extends Controller
         // El método restore() quitará la fecha de 'deleted_at'
         $usuarioARestaurar->restore();
 
+
         return redirect()->back()->with('success', 'Usuario restaurado correctamente.');
     }
 
@@ -251,6 +186,7 @@ class UsuariosFixController extends Controller
             $usuarioAEliminar->forceDelete();
 
             DB::commit();
+            // ✅ Despacha el evento al enviar a la papelera
 
             return redirect()->back()->with('success', 'Usuario y todos sus datos han sido eliminados permanentemente.');
 
@@ -351,6 +287,9 @@ class UsuariosFixController extends Controller
             }
 
             DB::commit();
+            broadcast(new UserListUpdated())->toOthers();
+
+
             return redirect()->back()->with('success', 'Usuario creado con éxito.');
 
         } catch (\Exception $e) {
