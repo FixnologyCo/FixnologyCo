@@ -30,6 +30,8 @@ Route::post('/usuarios/{id}/restaurar', [UsuariosFixController::class, 'restore'
 Route::delete('/usuarios/{id}/permanente', [UsuariosFixController::class, 'forceDestroy'])->name('usuarios.forceDestroy');
 // routes/web.php
 Route::post('/usuarios', [UsuariosFixController::class, 'store'])->name('usuarios.store');
+// routes/web.php (dentro del grupo de middleware 'auth')
+Route::post('/usuarios/bulk-destroy', [UsuariosFixController::class, 'bulkDestroy'])->name('usuarios.bulkDestroy');
 });
 
 

@@ -161,7 +161,12 @@ onMounted(() => {
     ".ListaUsuariosActualizados",
     (e) => {
       router.reload({
-        only: ["todosLosUsuarios", "misEmpleados", "usuariosEnPapelera"],
+        only: [
+          "todosLosUsuarios",
+          "misEmpleados",
+          "usuariosEnPapelera",
+          "establecimientosDisponibles",
+        ],
         preserveState: true,
         preserveScroll: true,
       });
@@ -172,6 +177,46 @@ onMounted(() => {
 onUnmounted(() => {
   window.Echo.leave("UsuariosActualizados");
 });
+
+// --- ESTADO PARA LA SELECCIÓN MÚLTIPLE ---
+const isSelectionModeActive = ref(false);
+const selectedUserIds = ref([]);
+
+// Propiedad computada para saber si hay usuarios seleccionados
+const hasSelectedUsers = computed(() => selectedUserIds.value.length > 0);
+
+function toggleSelectionMode() {
+  isSelectionModeActive.value = !isSelectionModeActive.value;
+  // Si desactivamos el modo, limpiamos la selección
+  if (!isSelectionModeActive.value) {
+    selectedUserIds.value = [];
+  }
+}
+
+function bulkDeleteSelectedUsers() {
+  if (!hasSelectedUsers.value) return;
+
+  if (
+    confirm(
+      `¿Estás seguro de que quieres enviar ${selectedUserIds.value.length} usuario(s) a la papelera?`
+    )
+  ) {
+    router.post(
+      route("usuarios.bulkDestroy"),
+      {
+        ids: selectedUserIds.value,
+      },
+      {
+        onSuccess: () => {
+          // Limpiamos y desactivamos el modo de selección después de la acción
+          selectedUserIds.value = [];
+          isSelectionModeActive.value = false;
+        },
+        preserveScroll: true,
+      }
+    );
+  }
+}
 </script>
 
 <template>
@@ -284,10 +329,32 @@ onUnmounted(() => {
                       class="flex gap-2 items-center rounded-xl bg-mono-negro_opacity_medio"
                     >
                       <button
-                        class="material-symbols-rounded p-2 text-[18px] border border-secundary-light hover:text-primary hover:border-primary rounded-xl"
+                        @click="toggleSelectionMode"
+                        class="relative material-symbols-rounded p-2 text-[18px] rounded-xl transition-colors"
+                        :class="
+                          isSelectionModeActive
+                            ? 'bg-primary text-white'
+                            : 'border border-secundary-light hover:border-primary'
+                        "
                       >
                         atr
+                        <p
+                          v-if="hasSelectedUsers"
+                          class="absolute bg-mono-blanco text-primary text-[14px] w-4 h-4 flex justify-center items-center font-semibold rounded-full -top-2 -right-1"
+                        >
+                          <span>{{ selectedUserIds.length }}</span>
+                        </p>
                       </button>
+
+                      <Transition name="fade">
+                        <button
+                          v-if="hasSelectedUsers"
+                          @click="bulkDeleteSelectedUsers"
+                          class="material-symbols-rounded p-2 text-[18px] border border-semaforo-rojo bg-semaforo-rojo rounded-xl"
+                        >
+                          delete
+                        </button>
+                      </Transition>
 
                       <button
                         @click="openPapeleraModal()"
@@ -324,6 +391,7 @@ onUnmounted(() => {
                   >
                     <thead class="text-xs text-gray-200 uppercase bg-gray-700/50">
                       <tr>
+                        <th v-if="isSelectionModeActive" class="px-2 py-3 w-4"></th>
                         <th scope="col" class="px-6 py-3">Usuario</th>
                         <th scope="col" class="px-6 py-3">Contacto</th>
                         <th scope="col" class="px-6 py-3">Rol</th>
@@ -340,6 +408,15 @@ onUnmounted(() => {
                         @click="openUserDetailsModal(usuario)"
                         class="border-b border-gray-700 hover:bg-gray-800/50 cursor-pointer"
                       >
+                        <td v-if="isSelectionModeActive" class="px-2">
+                          <input
+                            type="checkbox"
+                            :value="usuario.id"
+                            v-model="selectedUserIds"
+                            @click.stop
+                            class="form-checkbox rounded bg-gray-700 border-gray-600 text-primary focus:ring-primary"
+                          />
+                        </td>
                         <td class="px-6 py-4 font-medium text-white whitespace-nowrap">
                           <div class="flex items-center gap-3">
                             <img
@@ -467,6 +544,18 @@ onUnmounted(() => {
                           class="text-sm text-gray-400"
                           v-html="highlightMatch(usuario.perfil_empleado.cargo)"
                         ></p>
+                        <div
+                          v-if="isSelectionModeActive"
+                          class="absolute top-2 left-2 z-20"
+                        >
+                          <input
+                            type="checkbox"
+                            :value="usuario.id"
+                            v-model="selectedUserIds"
+                            @click.stop
+                            class="form-checkbox h-5 w-5 rounded bg-gray-800 border-gray-600 text-primary focus:ring-primary"
+                          />
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -736,3 +825,13 @@ onUnmounted(() => {
     </div>
   </div>
 </template>
+<style scoped>
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+</style>

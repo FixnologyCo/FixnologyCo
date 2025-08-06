@@ -298,4 +298,36 @@ class UsuariosFixController extends Controller
             return back()->with('error', 'Ocurrió un error al crear el usuario.');
         }
     }
+
+    public function bulkDestroy(Request $request)
+    {
+        // 1. Validar que recibimos un array de IDs
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:usuarios,id', // Valida que cada ID exista en la tabla de usuarios
+        ]);
+
+        // 2. Autorización
+        if (Auth::user()->perfilUsuario->rol_id !== 4) {
+            abort(403, 'No tienes permisos para esta acción.');
+        }
+
+        $idsAEliminar = $request->input('ids');
+        $authId = Auth::id();
+
+        // 3. Filtrar para que el usuario no pueda eliminarse a sí mismo
+        $filteredIds = collect($idsAEliminar)->reject(function ($id) use ($authId) {
+            return $id == $authId;
+        });
+
+        if ($filteredIds->isNotEmpty()) {
+            // 4. Eliminar en lote
+            User::whereIn('id', $filteredIds)->delete();
+
+            // 5. Despachar el evento para la actualización en tiempo real
+            broadcast(new UserListUpdated())->toOthers();
+        }
+
+        return redirect()->back()->with('success', 'Usuarios seleccionados enviados a la papelera.');
+    }
 }
