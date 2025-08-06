@@ -22,16 +22,11 @@ import { formatCOP } from "@/Utils/formateoMoneda";
 
 const { getEstadoClass } = useEstadoClass();
 const props = defineProps({
-  misEmpleados: {
-    type: Array,
-    required: true,
-  },
-  todosLosUsuarios: {
-    type: Array,
-    required: true,
-  },
-  usuariosEnPapelera: Array, // <-- Nueva prop
-  establecimientosDisponibles: Array,
+  todosLosUsuarios: { type: Array, required: true },
+  misEmpleados: { type: Array, required: true },
+  usuariosEnPapelera: { type: Array },
+  establecimientosDisponibles: { type: Array },
+  filtrosDisponibles: { type: Object }, // <-- Nueva prop para los filtros
 });
 const page = usePage();
 
@@ -96,36 +91,97 @@ function closePapeleraModal() {
 }
 
 const searchTerm = ref("");
+const filters = ref({
+  estado: "all",
+  orden: "a-z",
+  aplicacion: "all",
+  membresia: "all",
+  ciudad: "all",
+});
+
+const isAnyFilterActive = computed(() => {
+  const { estado, orden, aplicacion, membresia, ciudad } = filters.value;
+  return (
+    estado !== "all" ||
+    orden !== "a-z" ||
+    aplicacion !== "all" ||
+    membresia !== "all" ||
+    ciudad !== "all"
+  );
+});
+
+// ✅ Función para restablecer los filtros a su estado inicial
+function resetFilters() {
+  filters.value = {
+    estado: "all",
+    orden: "a-z",
+    aplicacion: "all",
+    membresia: "all",
+    ciudad: "all",
+  };
+}
 
 // ✅ PROPIEDAD COMPUTADA MEJORADA PARA FILTRAR TODOS LOS CAMPOS
 const filteredUsers = computed(() => {
-  if (!searchTerm.value.trim()) {
-    return props.todosLosUsuarios; // Si no hay búsqueda, muestra todos
+  let users = props.todosLosUsuarios;
+
+  // 1. Aplicar filtro de búsqueda
+  if (searchTerm.value.trim()) {
+    const lowerCaseSearch = searchTerm.value.toLowerCase();
+    users = users.filter((usuario) => {
+      const searchableContent = [
+        usuario.perfil_usuario?.primer_nombre,
+        usuario.perfil_usuario?.primer_apellido,
+        usuario.perfil_usuario?.correo,
+        usuario.perfil_usuario?.telefono,
+        usuario.perfil_usuario?.rol?.tipo_rol,
+        usuario.perfil_empleado?.cargo,
+        usuario.establecimiento_asignado?.nombre_establecimiento,
+        usuario.numero_documento,
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+      return searchableContent.includes(lowerCaseSearch);
+    });
   }
 
-  const lowerCaseSearch = searchTerm.value.toLowerCase();
+  // 2. Aplicar filtros de selección
+  if (filters.value.estado !== "all") {
+    users = users.filter(
+      (u) => u.perfil_usuario?.estado?.tipo_estado === filters.value.estado
+    );
+  }
+  if (filters.value.aplicacion !== "all") {
+    users = users.filter(
+      (u) =>
+        u.establecimiento_asignado?.aplicacion_web?.nombre_app ===
+        filters.value.aplicacion
+    );
+  }
+  if (filters.value.membresia !== "all") {
+    users = users.filter(
+      (u) =>
+        u.establecimiento_asignado?.aplicacion_web?.membresia?.nombre_membresia ===
+        filters.value.membresia
+    );
+  }
+  if (filters.value.ciudad !== "all") {
+    users = users.filter(
+      (u) => u.perfil_usuario?.ciudad_residencia === filters.value.ciudad
+    );
+  }
 
-  return props.todosLosUsuarios.filter((usuario) => {
-    // Creamos una cadena de texto con todos los datos que queremos buscar
-    const searchableContent = [
-      usuario.perfil_usuario?.primer_nombre,
-      usuario.perfil_usuario?.primer_apellido,
-      usuario.perfil_usuario?.correo,
-      usuario.perfil_usuario?.telefono,
-      usuario.perfil_usuario?.barrio_residencia,
-      usuario.perfil_usuario?.ciudad_residencia,
-      usuario.perfil_usuario?.rol?.tipo_rol,
-      usuario.perfil_usuario?.estado?.tipo_estado,
-      usuario.perfil_empleado?.cargo,
-      usuario.establecimiento_asignado?.nombre_establecimiento,
-      usuario.numero_documento,
-    ]
-      .join(" ") // Unimos todo en un solo string separado por espacios
-      .toLowerCase(); // Convertimos todo a minúsculas
-
-    // Devolvemos true si la cadena de contenido incluye el término de búsqueda
-    return searchableContent.includes(lowerCaseSearch);
+  // 3. Aplicar orden
+  users.sort((a, b) => {
+    const nameA = (a.perfil_usuario?.primer_nombre || "").toLowerCase();
+    const nameB = (b.perfil_usuario?.primer_nombre || "").toLowerCase();
+    return filters.value.orden === "a-z"
+      ? nameA.localeCompare(nameB)
+      : nameB.localeCompare(nameA);
   });
+
+  return users;
 });
 
 // ✅ FUNCIÓN DE RESALTADO MEJORADA Y MÁS SEGURA
@@ -250,19 +306,118 @@ function bulkDeleteSelectedUsers() {
             <div v-if="activeTab === 0" class="flex gap-5 w-full max-h-[80dvh]">
               <div class="filtro w-[20%]">
                 <div class="header flex items-center justify-between">
-                  <h1 class="text-[30px] font-bold">Fixgis</h1>
+                  <h1 class="text-[30px] font-bold">Filtros</h1>
                   <div
                     class="contador border border-secundary-light rounded-md px-2 py-1 text-[12px]"
                   >
-                    {{ todosLosUsuarios.length }} Total usuarios
+                    {{ filteredUsers.length }} Resultados
                   </div>
                 </div>
                 <div
-                  class="contenidoFiltro bg-secundary-opacity rounded-lg border border-secundary-light py-2 px-3 mt-3"
+                  class="contenidoFiltro bg-secundary-opacity rounded-lg border border-secundary-light p-3 mt-3 space-y-4"
                 >
-                  <label for="" class="text-[14px] text-secundary-light"
-                    >Estado cliente</label
-                  >
+                  <!-- Filtro por Estado -->
+                  <div>
+                    <label for="filtro-estado" class="text-[14px] text-secundary-light"
+                      >Estado cliente</label
+                    >
+                    <select
+                      v-model="filters.estado"
+                      id="filtro-estado"
+                      class="mt-1 block w-full bg-gray-800 border-gray-700 rounded-md shadow-sm focus:ring-primary focus:border-primary text-sm"
+                    >
+                      <option value="all">Todos los Estados</option>
+                      <option
+                        v-for="estado in filtrosDisponibles.estados"
+                        :key="estado"
+                        :value="estado"
+                      >
+                        {{ estado }}
+                      </option>
+                    </select>
+                  </div>
+                  <!-- Filtro por Orden -->
+                  <div>
+                    <label for="filtro-orden" class="text-[14px] text-secundary-light"
+                      >Ordenar por Nombre</label
+                    >
+                    <select
+                      v-model="filters.orden"
+                      id="filtro-orden"
+                      class="mt-1 block w-full bg-gray-800 border-gray-700 rounded-md shadow-sm focus:ring-primary focus:border-primary text-sm"
+                    >
+                      <option value="a-z">A-Z</option>
+                      <option value="z-a">Z-A</option>
+                    </select>
+                  </div>
+                  <!-- Filtro por Aplicación -->
+                  <div>
+                    <label for="filtro-app" class="text-[14px] text-secundary-light"
+                      >Aplicación</label
+                    >
+                    <select
+                      v-model="filters.aplicacion"
+                      id="filtro-app"
+                      class="mt-1 block w-full bg-gray-800 border-gray-700 rounded-md shadow-sm focus:ring-primary focus:border-primary text-sm"
+                    >
+                      <option value="all">Todas las Apps</option>
+                      <option
+                        v-for="app in filtrosDisponibles.aplicaciones"
+                        :key="app"
+                        :value="app"
+                      >
+                        {{ app }}
+                      </option>
+                    </select>
+                  </div>
+                  <!-- Filtro por Membresía -->
+                  <div>
+                    <label for="filtro-membresia" class="text-[14px] text-secundary-light"
+                      >Membresía</label
+                    >
+                    <select
+                      v-model="filters.membresia"
+                      id="filtro-membresia"
+                      class="mt-1 block w-full bg-gray-800 border-gray-700 rounded-md shadow-sm focus:ring-primary focus:border-primary text-sm"
+                    >
+                      <option value="all">Todas las Membresías</option>
+                      <option
+                        v-for="mem in filtrosDisponibles.membresias"
+                        :key="mem"
+                        :value="mem"
+                      >
+                        {{ mem }}
+                      </option>
+                    </select>
+                  </div>
+                  <!-- Filtro por Ciudad -->
+                  <div>
+                    <label for="filtro-ciudad" class="text-[14px] text-secundary-light"
+                      >Ciudad</label
+                    >
+                    <select
+                      v-model="filters.ciudad"
+                      id="filtro-ciudad"
+                      class="mt-1 block w-full bg-gray-800 border-gray-700 rounded-md shadow-sm focus:ring-primary focus:border-primary text-sm"
+                    >
+                      <option value="all">Todas las Ciudades</option>
+                      <option
+                        v-for="ciudad in filtrosDisponibles.ciudades"
+                        :key="ciudad"
+                        :value="ciudad"
+                      >
+                        {{ ciudad }}
+                      </option>
+                    </select>
+                  </div>
+                  <div v-if="isAnyFilterActive">
+                    <button
+                      @click="resetFilters"
+                      class="w-full mt-2 py-2 px-4 text-sm font-medium text-gray-300 bg-gray-700/50 rounded-md hover:bg-gray-700 transition-colors"
+                    >
+                      Restablecer Filtros
+                    </button>
+                  </div>
                 </div>
               </div>
               <div class="contenido w-[80%]">

@@ -3,6 +3,9 @@
 namespace Core\Http\Controllers;
 
 use App\Models\User;
+use Core\Models\AplicacionesWeb;
+use Core\Models\Estados;
+use Core\Models\Membresias;
 use Core\Models\PerfilEmpleado;
 use Core\Models\PerfilUsuario;
 use Core\Models\FacturacionMembresias;
@@ -23,7 +26,7 @@ class UsuariosFixController extends Controller
 {
     use AuthorizesRequests;
 
-    public function show($aplicacion, $rol, Request $request)
+   public function show($aplicacion, $rol, Request $request)
     {
         $usuarioAutenticado = Auth::user()->load(['perfilUsuario.rol', 'establecimientoAsignado.aplicacionWeb.estilo']);
 
@@ -31,42 +34,37 @@ class UsuariosFixController extends Controller
             abort(403, 'No tienes permisos para acceder a esta sección.');
         }
 
-        // --- 1. DEFINIMOS LAS RELACIONES A CARGAR UNA SOLA VEZ (LA CLAVE DE LA CONSISTENCIA) ---
+        // --- 1. PREPARAR RELACIONES COMUNES PARA CARGAR ---
         $relationsToLoad = [
             'perfilUsuario' => fn($q) => $q->with(['indicativo', 'tipoDocumento', 'estado', 'rol']),
-            'perfilEmpleado' => fn($q) => $q->with(['estado', 'medioPago']),
+            'perfilEmpleado' => fn($q) => $q->with(['estado', 'medioPago', 'establecimiento']),
             'establecimientoAsignado.aplicacionWeb.membresia.estado',
             'establecimiento' => fn($q) => $q->with(['token.estado', 'propietario', 'facturas.estado', 'facturas.medioPago']),
         ];
 
-        // --- 2. OBTENEMOS TODAS LAS LISTAS USANDO LAS MISMAS RELACIONES ---
-        $idEstablecimiento = $usuarioAutenticado->establecimientoAsignado->id ?? null;
-
-        $misEmpleados = $idEstablecimiento ? User::whereHas('perfilEmpleado', fn($q) => $q->where('establecimiento_id', $idEstablecimiento))
-            ->where('id', '!=', $usuarioAutenticado->id)
-            ->with($relationsToLoad)
-            ->get() : collect();
-
+        // --- 2. OBTENER LISTAS DE USUARIOS ---
         $todosLosUsuarios = User::with($relationsToLoad)->get();
-        $usuariosEnPapelera = User::onlyTrashed()->with($relationsToLoad)->get();
+        // ... (tu lógica para $misEmpleados y $usuariosEnPapelera)
 
-        // Para el selector, solo necesitamos la lista básica de establecimientos
-        $establecimientosDisponibles = Establecimientos::all();
+        // --- ✅ 3. OBTENER DATOS PARA LOS FILTROS ---
+        $estados = Estados::whereIn('categoria_estado', ['General', 'Pagos'])->distinct()->pluck('tipo_estado');
+        $aplicaciones = AplicacionesWeb::distinct()->pluck('nombre_app');
+        $membresias = Membresias::distinct()->pluck('nombre_membresia');
+        $ciudades = PerfilUsuario::whereNotNull('ciudad_residencia')->distinct()->pluck('ciudad_residencia');
 
-        // --- 3. LÓGICA DE SESIÓN ACTIVA ---
-        $activeSessionUserIds = DB::table(config('session.table'))
-            ->whereNotNull('user_id')->pluck('user_id')->unique();
+        // ... (tu lógica de sesión activa)
 
-        $todosLosUsuarios->each(fn($u) => $u->tiene_sesion_activa = $activeSessionUserIds->contains($u->id));
-        $misEmpleados->each(fn($u) => $u->tiene_sesion_activa = $activeSessionUserIds->contains($u->id));
-
-        // --- 4. DEVOLVEMOS LOS DATOS CRUDOS A INERTIA ---
+        // --- 4. DEVOLVER TODO A LA VISTA ---
         return Inertia::render('Apps/' . ucfirst($aplicacion) . '/' . ucfirst($rol) . '/Usuarios/GestorUsuarios', [
             'usuario' => $usuarioAutenticado,
-            'misEmpleados' => $misEmpleados,
             'todosLosUsuarios' => $todosLosUsuarios,
-            'usuariosEnPapelera' => $usuariosEnPapelera,
-            'establecimientosDisponibles' => $establecimientosDisponibles,
+            // ... (tus otras props: misEmpleados, etc.)
+            'filtrosDisponibles' => [
+                'estados' => $estados,
+                'aplicaciones' => $aplicaciones,
+                'membresias' => $membresias,
+                'ciudades' => $ciudades,
+            ],
         ]);
     }
 
