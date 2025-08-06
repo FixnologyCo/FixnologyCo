@@ -1,26 +1,28 @@
 <script setup>
-import { Head, usePage, router } from "@inertiajs/vue3";
+import { Head, router } from "@inertiajs/vue3";
 import { route } from "ziggy-js";
 import { ref, onMounted, onUnmounted, computed, watch } from "vue";
-import "dayjs/locale/es";
 import SidebarSuperAdmin from "@/Components/Sidebar/FixnologyCO/Sidebar.vue";
-import MensajesLayout from "@/Layouts/MensajesLayout.vue";
-import { formatFecha, formatFechaShort } from "@/Utils/date";
-import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import { useAuthStore } from "@/stores/auth";
-import { useInfoUser } from "@/stores/infoUsers"; // 1. Importa la tienda
 import ModalDetallesUsuario from "@/Components/Modales/FixnologyCO/Usuarios/ModalDetallesUsuario.vue";
 import ModalCrearUsuario from "@/Components/Modales/FixnologyCO/Usuarios/ModalCrearUsuario.vue";
 import ModalPapeleraUsuario from "@/Components/Modales/FixnologyCO/Usuarios/ModalPapeleraUsuario.vue";
-const authStore = useAuthStore();
-const infoUserStore = useInfoUser();
-defineOptions({
-  layout: AuthenticatedLayout,
-});
+import vistasDatos from "@/Components/Shared/buttons/vistasDatos.vue";
+import barraBusqueda from "@/Components/Shared/barraBusqueda/barraBusqueda.vue";
+import MensajesLayout from "@/Layouts/MensajesLayout.vue";
 import useEstadoClass from "@/Composables/useEstado";
-import { formatCOP } from "@/Utils/formateoMoneda";
+import {
+  getInicialesEstablecimiento,
+  getInicialesUsuario,
+} from "@/Utils/inicialesNombres";
 
-const { getEstadoClass } = useEstadoClass();
+import { formatCOP } from "@/Utils/formateoMoneda";
+import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
+import { useAuthStore } from "@/stores/auth";
+import { useInfoUser } from "@/stores/infoUsers";
+import "dayjs/locale/es";
+import BtnPrimario from "@/Components/Shared/buttons/btnPrimario.vue";
+import BtnSecundario from "@/Components/Shared/buttons/btnSecundario.vue";
+
 const props = defineProps({
   todosLosUsuarios: { type: Array, required: true },
   misEmpleados: { type: Array, default: () => [] },
@@ -29,43 +31,19 @@ const props = defineProps({
   filtrosDisponibles: { type: Object },
   usuariosEnPapelera: { type: Array },
 });
-const page = usePage();
-console.log(props.misEmpleados);
 
-const usuario = authStore.user;
-const aplicacion = authStore.aplicacion;
-const rol = authStore.rol;
-
-// Crea una lista de establecimientos únicos para el selector
-const listaEstablecimientos = computed(() => {
-  const establecimientos = props.todosLosUsuarios
-    .map((u) => u.establecimiento_propietario)
-    .filter((est) => est != null);
-
-  // Elimina duplicados
-  return [...new Map(establecimientos.map((item) => [item["id"], item])).values()];
+const authStore = useAuthStore();
+const infoUserStore = useInfoUser();
+defineOptions({
+  layout: AuthenticatedLayout,
 });
-function getInitials(usuario) {
-  if (!usuario || !usuario.perfil_usuario) {
-    return "";
-  }
 
-  const primerNombre = usuario.perfil_usuario.primer_nombre || "";
-  const primerApellido = usuario.perfil_usuario.primer_apellido || "";
+const { getEstadoClass } = useEstadoClass();
 
-  const inicialNombre = primerNombre.charAt(0).toUpperCase();
-  const inicialApellido = primerApellido.charAt(0).toUpperCase();
-
-  // Devuelve las dos iniciales solo si ambas existen
-  return inicialNombre && inicialApellido
-    ? `${inicialNombre}${inicialApellido}`
-    : inicialNombre;
-}
 const activeTab = ref(0);
 const tabs = [{ label: "Clientes Fix" }, { label: "Colaboradores" }];
 
 const isModalOpen = ref(false);
-
 function openUserDetailsModal(usuario) {
   infoUserStore.setUser(usuario);
   isModalOpen.value = true;
@@ -75,7 +53,6 @@ function closeUserDetailsModal() {
 }
 
 const isModalOpenCrearUser = ref(false);
-
 function openUserCreationModal() {
   isModalOpenCrearUser.value = true;
 }
@@ -84,7 +61,6 @@ function closeUserCreationModal() {
 }
 
 const isModalOpenPapelera = ref(false);
-
 function openPapeleraModal() {
   isModalOpenPapelera.value = true;
 }
@@ -92,7 +68,6 @@ function closePapeleraModal() {
   isModalOpenPapelera.value = false;
 }
 
-const searchTerm = ref("");
 const filters = ref({
   estado: "all",
   orden: "reciente",
@@ -102,7 +77,7 @@ const filters = ref({
 });
 
 const isAnyFilterActive = computed(() => {
-  const { estado, orden, antiguedad, aplicacion, membresia, ciudad } = filters.value;
+  const { estado, orden, aplicacion, membresia, ciudad } = filters.value;
   return (
     estado !== "all" ||
     orden !== "reciente" ||
@@ -111,8 +86,6 @@ const isAnyFilterActive = computed(() => {
     ciudad !== "all"
   );
 });
-
-// ✅ Función para restablecer los filtros a su estado inicial
 function resetFilters() {
   filters.value = {
     estado: "all",
@@ -122,12 +95,10 @@ function resetFilters() {
     ciudad: "all",
   };
 }
-
-// ✅ PROPIEDAD COMPUTADA MEJORADA PARA FILTRAR TODOS LOS CAMPOS
+const searchTerm = ref("");
 const filteredUsers = computed(() => {
   let users = props.todosLosUsuarios;
 
-  // 1. Aplicar filtro de búsqueda
   if (searchTerm.value.trim()) {
     const lowerCaseSearch = searchTerm.value.toLowerCase();
     users = users.filter((usuario) => {
@@ -148,7 +119,6 @@ const filteredUsers = computed(() => {
     });
   }
 
-  // 2. Aplicar filtros de selección
   if (filters.value.estado !== "all") {
     users = users.filter(
       (u) => u.perfil_usuario?.estado?.tipo_estado === filters.value.estado
@@ -174,7 +144,6 @@ const filteredUsers = computed(() => {
     );
   }
 
-  // ✅ 3. APLICAR ORDEN MEJORADO
   users.sort((a, b) => {
     switch (filters.value.orden) {
       case "a-z":
@@ -186,51 +155,37 @@ const filteredUsers = computed(() => {
           a.perfil_usuario?.primer_nombre || ""
         );
       case "antiguo":
-        // Compara fechas de la más antigua a la más nueva
         return (
           new Date(a.perfil_usuario?.created_at) - new Date(b.perfil_usuario?.created_at)
         );
       case "reciente":
       default:
-        // Compara fechas de la más nueva a la más antigua
         return (
           new Date(b.perfil_usuario?.created_at) - new Date(a.perfil_usuario?.created_at)
         );
     }
   });
-
   return users;
 });
 
-// ✅ FUNCIÓN DE RESALTADO MEJORADA Y MÁS SEGURA
+const viewMode = ref(localStorage.getItem("userViewMode") || "list");
+
+watch(viewMode, (newValue) => {
+  localStorage.setItem("userViewMode", newValue);
+});
+
 function highlightMatch(text) {
-  // Si el texto es nulo o no hay búsqueda, devolvemos el texto original
   if (text === null || !searchTerm.value.trim()) {
     return text;
   }
-
-  // Convertimos a string para asegurar que el método .replace funcione
   const textString = String(text);
-
-  // Usamos una expresión regular para encontrar todas las coincidencias (global 'g')
-  // sin importar mayúsculas/minúsculas (insensible 'i')
   const regex = new RegExp(searchTerm.value, "gi");
-
   return textString.replace(regex, (match) => {
     return `<mark class="bg-primary text-white rounded">${match}</mark>`;
   });
 }
 
-const viewMode = ref(localStorage.getItem("userViewMode") || "list");
-
-// b) Observa los cambios en 'viewMode' y guarda el nuevo valor en localStorage.
-watch(viewMode, (newValue) => {
-  localStorage.setItem("userViewMode", newValue);
-});
-
-// Escuchamos los eventos cuando el componente se monta en la página
 onMounted(() => {
-  // Nos conectamos al canal privado 'user-updates'
   window.Echo.private("UsuariosActualizados").listen(
     ".ListaUsuariosActualizados",
     (e) => {
@@ -252,16 +207,12 @@ onUnmounted(() => {
   window.Echo.leave("UsuariosActualizados");
 });
 
-// --- ESTADO PARA LA SELECCIÓN MÚLTIPLE ---
 const isSelectionModeActive = ref(false);
 const selectedUserIds = ref([]);
-
-// Propiedad computada para saber si hay usuarios seleccionados
 const hasSelectedUsers = computed(() => selectedUserIds.value.length > 0);
 
 function toggleSelectionMode() {
   isSelectionModeActive.value = !isSelectionModeActive.value;
-  // Si desactivamos el modo, limpiamos la selección
   if (!isSelectionModeActive.value) {
     selectedUserIds.value = [];
   }
@@ -282,7 +233,6 @@ function bulkDeleteSelectedUsers() {
       },
       {
         onSuccess: () => {
-          // Limpiamos y desactivamos el modo de selección después de la acción
           selectedUserIds.value = [];
           isSelectionModeActive.value = false;
         },
@@ -442,107 +392,57 @@ function bulkDeleteSelectedUsers() {
               </div>
               <div class="contenido w-[80%]">
                 <div class="header flex items-end justify-between">
-                  <div
-                    class="flex items-center gap-2 border p-2 rounded-xl bg-mono-negro_opacity_medio backdrop-blur-xl w-[70%]"
-                  >
-                    <span class="material-symbols-rounded">explore</span>
-                    <input
-                      type="search"
-                      name="search"
-                      placeholder="Buscar usuario"
-                      id=""
-                      v-model="searchTerm"
-                      class="bg-transparent outline-none w-full"
-                    />
-                    <p>|</p>
-                    <div class="flex gap-1 text-[12px] hover:text-primary cursor-pointer">
-                      <span class="material-symbols-rounded text-[16px]">ar_on_you</span>
-                      <p>Escanear</p>
-                    </div>
-                  </div>
+                  <barraBusqueda v-model:searchTerm="searchTerm" />
                   <div
                     class="flex items-center gap-3 rounded-xl bg-mono-negro_opacity_medio"
                   >
-                    <div>
-                      <button
-                        @click="viewMode = 'table'"
-                        class="material-symbols-rounded p-2 text-[18px] rounded-xl transition-colors"
-                        :class="
-                          viewMode === 'table'
-                            ? 'bg-primary text-white'
-                            : 'border border-transparent hover:border-primary'
-                        "
-                      >
-                        table
-                      </button>
-                      <button
-                        @click="viewMode = 'list'"
-                        class="material-symbols-rounded p-2 text-[18px] rounded-xl transition-colors"
-                        :class="
-                          viewMode === 'list'
-                            ? 'bg-primary text-white'
-                            : 'border border-transparent hover:border-primary'
-                        "
-                      >
-                        lists
-                      </button>
-                      <button
-                        @click="viewMode = 'grid'"
-                        class="material-symbols-rounded p-2 text-[18px] rounded-xl transition-colors"
-                        :class="
-                          viewMode === 'grid'
-                            ? 'bg-primary text-white'
-                            : 'border border-transparent hover:border-primary'
-                        "
-                      >
-                        grid_view
-                      </button>
-                    </div>
+                    <vistasDatos v-model:viewMode="viewMode" />
 
                     <div class="text-[30px]">|</div>
                     <div
                       class="flex gap-2 items-center rounded-xl bg-mono-negro_opacity_medio"
                     >
-                      <button
-                        @click="toggleSelectionMode"
-                        class="relative material-symbols-rounded p-2 text-[18px] rounded-xl transition-colors"
-                        :class="
-                          isSelectionModeActive
-                            ? 'bg-primary text-white'
-                            : 'border border-secundary-light hover:border-primary'
-                        "
+                      <div class="" v-if="selectedUserIds.length === 0">
+                        <BtnSecundario
+                          @click="toggleSelectionMode"
+                          class="material-symbols-rounded hover:-translate-y-1"
+                          :class="
+                            isSelectionModeActive
+                              ? 'bg-secondary border-secondary hover:border-secondary hover:text-mono-blanco text-mono-blanco '
+                              : 'border border-secundary-light hover:border-primary '
+                          "
+                        >
+                          atr</BtnSecundario
+                        >
+                      </div>
+
+                      <BtnSecundario
+                        name="fade"
+                        v-if="hasSelectedUsers"
+                        @click="bulkDeleteSelectedUsers"
+                        class="relative material-symbols-rounded bg-semaforo-rojo border-semaforo-rojo hover:text-mono-blanco hover:-translate-y-1"
                       >
-                        atr
+                        delete
                         <p
                           v-if="hasSelectedUsers"
-                          class="absolute bg-mono-blanco text-primary text-[14px] w-4 h-4 flex justify-center items-center font-semibold rounded-full -top-2 -right-1"
+                          class="absolute bg-mono-blanco text-semaforo-rojo text-[12px] w-4 h-4 flex justify-center items-center font-semibold rounded-full -top-2 -right-1"
                         >
                           <span>{{ selectedUserIds.length }}</span>
                         </p>
-                      </button>
+                      </BtnSecundario>
 
-                      <Transition name="fade">
-                        <button
-                          v-if="hasSelectedUsers"
-                          @click="bulkDeleteSelectedUsers"
-                          class="material-symbols-rounded p-2 text-[18px] border border-semaforo-rojo bg-semaforo-rojo rounded-xl"
-                        >
-                          delete
-                        </button>
-                      </Transition>
-
-                      <button
+                      <BtnSecundario
                         @click="openPapeleraModal()"
-                        class="material-symbols-rounded p-2 text-[18px] border border-secundary-light hover:text-primary hover:border-primary rounded-xl"
+                        class="material-symbols-rounded"
                       >
-                        folder_delete
-                      </button>
-                      <button
-                        @click="openUserCreationModal()"
-                        class="py-2 px-5 text-[14px] bg-primary shadow-[0_5px_20px] shadow-primary rounded-xl"
+                        auto_delete</BtnSecundario
                       >
-                        Agregar cliente
-                      </button>
+                      <BtnPrimario @click="openUserCreationModal()"
+                        ><span>Crear cliente</span
+                        ><span class="material-symbols-rounded text-[16px]"
+                          >people</span
+                        ></BtnPrimario
+                      >
                     </div>
                   </div>
                 </div>
@@ -604,7 +504,7 @@ function bulkDeleteSelectedUsers() {
                               v-else
                               class="w-10 h-10 rounded-full bg-primary flex items-center justify-center font-bold"
                             >
-                              {{ getInitials(usuario) }}
+                              {{ getInicialesUsuario(usuario) }}
                             </div>
                             <span
                               v-html="
@@ -631,6 +531,7 @@ function bulkDeleteSelectedUsers() {
                             )
                           "
                         ></td>
+                        <td>{{ getInicialesEstablecimiento(usuario) }}</td>
                         <td class="px-6 py-4 text-right">
                           <button
                             class="material-symbols-rounded p-1 text-gray-400 hover:text-primary"
