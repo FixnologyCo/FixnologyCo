@@ -95,17 +95,17 @@ function closePapeleraModal() {
 const searchTerm = ref("");
 const filters = ref({
   estado: "all",
-  orden: "a-z",
+  orden: "reciente",
   aplicacion: "all",
   membresia: "all",
   ciudad: "all",
 });
 
 const isAnyFilterActive = computed(() => {
-  const { estado, orden, aplicacion, membresia, ciudad } = filters.value;
+  const { estado, orden, antiguedad, aplicacion, membresia, ciudad } = filters.value;
   return (
     estado !== "all" ||
-    orden !== "a-z" ||
+    orden !== "reciente" ||
     aplicacion !== "all" ||
     membresia !== "all" ||
     ciudad !== "all"
@@ -116,7 +116,7 @@ const isAnyFilterActive = computed(() => {
 function resetFilters() {
   filters.value = {
     estado: "all",
-    orden: "a-z",
+    orden: "reciente",
     aplicacion: "all",
     membresia: "all",
     ciudad: "all",
@@ -174,13 +174,29 @@ const filteredUsers = computed(() => {
     );
   }
 
-  // 3. Aplicar orden
+  // ✅ 3. APLICAR ORDEN MEJORADO
   users.sort((a, b) => {
-    const nameA = (a.perfil_usuario?.primer_nombre || "").toLowerCase();
-    const nameB = (b.perfil_usuario?.primer_nombre || "").toLowerCase();
-    return filters.value.orden === "a-z"
-      ? nameA.localeCompare(nameB)
-      : nameB.localeCompare(nameA);
+    switch (filters.value.orden) {
+      case "a-z":
+        return (a.perfil_usuario?.primer_nombre || "").localeCompare(
+          b.perfil_usuario?.primer_nombre || ""
+        );
+      case "z-a":
+        return (b.perfil_usuario?.primer_nombre || "").localeCompare(
+          a.perfil_usuario?.primer_nombre || ""
+        );
+      case "antiguo":
+        // Compara fechas de la más antigua a la más nueva
+        return (
+          new Date(a.perfil_usuario?.created_at) - new Date(b.perfil_usuario?.created_at)
+        );
+      case "reciente":
+      default:
+        // Compara fechas de la más nueva a la más antigua
+        return (
+          new Date(b.perfil_usuario?.created_at) - new Date(a.perfil_usuario?.created_at)
+        );
+    }
   });
 
   return users;
@@ -341,15 +357,17 @@ function bulkDeleteSelectedUsers() {
                   <!-- Filtro por Orden -->
                   <div>
                     <label for="filtro-orden" class="text-[14px] text-secundary-light"
-                      >Ordenar por Nombre</label
+                      >Ordenar por</label
                     >
                     <select
                       v-model="filters.orden"
                       id="filtro-orden"
                       class="mt-1 block w-full bg-gray-800 border-gray-700 rounded-md shadow-sm focus:ring-primary focus:border-primary text-sm"
                     >
-                      <option value="a-z">A-Z</option>
-                      <option value="z-a">Z-A</option>
+                      <option value="reciente">Más Recientes</option>
+                      <option value="antiguo">Más Antiguos</option>
+                      <option value="a-z">Nombre (A-Z)</option>
+                      <option value="z-a">Nombre (Z-A)</option>
                     </select>
                   </div>
                   <!-- Filtro por Aplicación -->
