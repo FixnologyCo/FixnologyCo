@@ -24,8 +24,7 @@ const { getEstadoClass } = useEstadoClass();
 </script>
 
 <template>
-  <div class="cardsUsuarios">
-    <!-- Tu código de v-for para la vista de lista va aquí, sin cambios -->
+  <TransitionGroup tag="div" name="list" class="cardsUsuarios">
     <div
       v-for="usuario in users"
       :key="usuario.id"
@@ -262,6 +261,22 @@ const { getEstadoClass } = useEstadoClass();
           info</BtnSecundario
         >
       </div>
-    </div>
-  </div>
+    </div></TransitionGroup
+  >
 </template>
+<style scoped>
+/* ✅ 2. Añade estas clases para la animación de la lista */
+.list-move,
+.list-enter-active,
+.list-leave-active {
+  transition: all 0.4s ease;
+}
+.list-enter-from,
+.list-leave-to {
+  opacity: 0;
+  transform: translateY(20px);
+}
+.list-leave-active {
+  position: absolute;
+}
+</style>

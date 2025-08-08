@@ -41,7 +41,8 @@ const emit = defineEmits(["openDetails"]);
           <th v-if="isSelectionModeActive" class="px-4 py-4"></th>
         </tr>
       </thead>
-      <tbody>
+
+      <TransitionGroup tag="tbody" name="list">
         <tr
           v-for="usuario in users"
           :key="usuario.id"
@@ -272,9 +273,27 @@ const emit = defineEmits(["openDetails"]);
                 ></div>
               </label>
             </div>
-          </td>
-        </tr>
-      </tbody>
+          </td></tr
+      ></TransitionGroup>
     </table>
   </div>
 </template>
+<style scoped>
+/* ✅ 2. Añade estas clases para la animación de la lista */
+.list-move, /* aplica transiciones al mover elementos */
+.list-enter-active,
+.list-leave-active {
+  transition: all 0.4s ease;
+}
+
+.list-enter-from,
+.list-leave-to {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+/* asegura que los elementos que se van no afecten el layout */
+.list-leave-active {
+  position: absolute;
+}
+</style>

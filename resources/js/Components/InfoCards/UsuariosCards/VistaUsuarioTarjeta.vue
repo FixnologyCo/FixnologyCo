@@ -23,7 +23,11 @@ const { getEstadoClass } = useEstadoClass();
 </script>
 
 <template>
-  <div class="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-3 p-3">
+  <TransitionGroup
+    tag="div"
+    name="list"
+    class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4"
+  >
     <div
       v-for="usuario in users"
       :key="usuario.id"
@@ -227,6 +231,22 @@ const { getEstadoClass } = useEstadoClass();
           info</BtnSecundario
         >
       </div>
-    </div>
-  </div>
+    </div></TransitionGroup
+  >
 </template>
+<style scoped>
+/* ✅ 2. Añade estas clases para la animación de la lista */
+.list-move,
+.list-enter-active,
+.list-leave-active {
+  transition: all 0.4s ease;
+}
+.list-enter-from,
+.list-leave-to {
+  opacity: 0;
+  transform: translateY(20px);
+}
+.list-leave-active {
+  position: absolute;
+}
+</style>
