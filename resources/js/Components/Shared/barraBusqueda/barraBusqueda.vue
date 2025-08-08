@@ -3,7 +3,7 @@ const searchTerm = defineModel("searchTerm");
 </script>
 <template>
   <div
-    class="flex items-center gap-2 border p-1 rounded-md bg-mono-negro_opacity_medio backdrop-blur-xl w-[70%]"
+    class="flex items-center gap-2 border p-1 rounded-md bg-mono-negro_opacity_medio backdrop-blur-xl w-full"
   >
     <span class="material-symbols-rounded text-[18px]">explore</span>
     <input
@@ -21,3 +21,4 @@ const searchTerm = defineModel("searchTerm");
     </div> -->
   </div>
 </template>
+    

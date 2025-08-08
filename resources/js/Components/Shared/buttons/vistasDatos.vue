@@ -5,9 +5,7 @@ const viewMode = defineModel("viewMode");
 </script>
 
 <template>
-  <div>
-    <!-- 2. Los botones ahora leen y actualizan el 'viewMode' que viene del padre. -->
-
+  <div class="flex items-center gap-1">
     <BtnSecundario
       @click="viewMode = 'table'"
       class="material-symbols-rounded border hover:-translate-y-1"
@@ -19,27 +17,27 @@ const viewMode = defineModel("viewMode");
     >
       table</BtnSecundario
     >
-    <button
+    <BtnSecundario
       @click="viewMode = 'list'"
-      class="material-symbols-rounded p-2 text-[18px] rounded-xl transition-colors"
+      class="material-symbols-rounded border hover:-translate-y-1"
       :class="
         viewMode === 'list'
-          ? 'bg-primary text-white'
-          : 'border border-transparent hover:border-primary'
+          ? 'bg-secondary border-secondary text-mono-blanco hover:border-secondary hover:text-mono-blanco'
+          : 'border-transparent'
       "
     >
-      lists
-    </button>
-    <button
+      list</BtnSecundario
+    >
+   <BtnSecundario
       @click="viewMode = 'grid'"
-      class="material-symbols-rounded p-2 text-[18px] rounded-xl transition-colors"
+      class="material-symbols-rounded border hover:-translate-y-1"
       :class="
         viewMode === 'grid'
-          ? 'bg-primary text-white'
-          : 'border border-transparent hover:border-primary'
+          ? 'bg-secondary border-secondary text-mono-blanco hover:border-secondary hover:text-mono-blanco'
+          : 'border-transparent'
       "
     >
-      grid_view
-    </button>
+      grid_view</BtnSecundario
+    >
   </div>
 </template>
