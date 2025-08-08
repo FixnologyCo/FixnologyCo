@@ -773,24 +773,43 @@ const proximaFactura = computed(() => {
 </template>
 
 <style scoped>
-:deep(.modal-fade-enter-active),
-:deep(.modal-fade-leave-active) {
-  transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+.input-field {
+  @apply mt-1 block w-full bg-gray-800 border-gray-700 rounded-md shadow-sm focus:ring-primary focus:border-primary text-white;
+}
+.error-message {
+  @apply text-red-500 text-xs mt-1;
 }
 
-:deep(.modal-fade-enter-from),
-:deep(.modal-fade-leave-to) {
+/* Transición para el modal completo */
+.modal-fade-enter-active,
+.modal-fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+.modal-fade-enter-from,
+.modal-fade-leave-to {
+  opacity: 0;
+}
+.modal-slide-enter-active,
+.modal-slide-leave-active {
+  transition: all 0.3s ease-out;
+}
+.modal-slide-enter-from,
+.modal-slide-leave-to {
+  transform: translateY(20px);
   opacity: 0;
 }
 
-:deep(.modal-slide-enter-active),
-:deep(.modal-slide-leave-active) {
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+/* Transición para los pasos del formulario */
+.slide-fade-enter-active,
+.slide-fade-leave-active {
+  transition: all 0.25s ease-out;
 }
-
-:deep(.modal-slide-enter-from),
-:deep(.modal-slide-leave-to) {
+.slide-fade-enter-from {
   opacity: 0;
-  transform: translateY(30px) scale(0.97);
+  transform: translateX(30px);
+}
+.slide-fade-leave-to {
+  opacity: 0;
+  transform: translateX(-30px);
 }
 </style>
