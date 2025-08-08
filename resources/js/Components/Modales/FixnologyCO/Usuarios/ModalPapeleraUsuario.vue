@@ -145,10 +145,20 @@ function eliminarPermanentemente(usuario) {
 </template>
 <style scoped>
 .input-field {
-  @apply mt-1 block w-full bg-gray-800 border-gray-700 rounded-md shadow-sm focus:ring-primary focus:border-primary text-white;
+  margin-top: 0.25rem;
+  display: block;
+  width: 100%;
+  background-color: #1f2937; /* bg-gray-800 */
+  border-color: #374151; /* border-gray-700 */
+  border-radius: 0.375rem; /* rounded-md */
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05); /* shadow-sm */
+  color: #fff; /* text-white */
 }
+
 .error-message {
-  @apply text-red-500 text-xs mt-1;
+  color: #ef4444; /* text-red-500 */
+  font-size: 0.75rem; /* text-xs */
+  margin-top: 0.25rem; /* mt-1 */
 }
 
 /* Transición para el modal completo */
