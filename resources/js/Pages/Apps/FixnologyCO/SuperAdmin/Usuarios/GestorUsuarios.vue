@@ -334,15 +334,16 @@ const rol = authStore.rol;
                       No se encontraron usuarios que coincidan con tu búsqueda.
                     </p>
                   </div>
-                  <component
-                    v-else
-                    :is="currentViewComponent"
-                    :users="filteredUsers"
-                    :is-selection-mode-active="isSelectionModeActive"
-                    :highlight-match="highlightMatch"
-                    v-model:selectedUserIds="selectedUserIds"
-                    @open-details="openUserDetailsModal"
-                  />
+                  <Transition v-else name="view-change" mode="out-in">
+                    <component
+                      :is="currentViewComponent"
+                      :users="filteredUsers"
+                      :is-selection-mode-active="isSelectionModeActive"
+                      :highlight-match="highlightMatch"
+                      v-model:selectedUserIds="selectedUserIds"
+                      @open-details="openUserDetailsModal"
+                      :key="viewMode"
+                  /></Transition>
                 </div>
               </div>
             </div>
@@ -363,3 +364,20 @@ const rol = authStore.rol;
     </div>
   </div>
 </template>
+<style scoped>
+/* Transición para el cambio entre vistas (tabla, lista, grid) */
+.view-change-enter-active,
+.view-change-leave-active {
+  transition: all 0.2s ease-out;
+}
+
+.view-change-enter-from {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.view-change-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+</style>
