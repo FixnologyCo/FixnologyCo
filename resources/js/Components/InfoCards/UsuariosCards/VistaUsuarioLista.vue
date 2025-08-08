@@ -15,7 +15,8 @@ defineProps({
   isSelectionModeActive: Boolean,
   selectedUserIds: Array,
   highlightMatch: Function,
-  getInitials: Function,
+  getInicialesUsuario: Function,
+  getEstadoClass: Function,
 });
 const selected = defineModel("selectedUserIds");
 const emit = defineEmits(["openDetails"]);
@@ -129,7 +130,7 @@ const { getEstadoClass } = useEstadoClass();
             class="text-secundary-light text-[14px]"
             v-html="
               highlightMatch(
-                `${usuario.establecimiento_asignado.aplicacion_web.membresia.nombre_membresia}`
+                `${usuario.establecimiento_asignado.facturas[0].dias_restantes} Días`
               )
             "
           ></p>

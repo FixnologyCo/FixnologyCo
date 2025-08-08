@@ -23,61 +23,209 @@ const { getEstadoClass } = useEstadoClass();
 </script>
 
 <template>
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+  <div class="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-3 p-3">
     <div
       v-for="usuario in users"
       :key="usuario.id"
-      class="contCard relative bg-mono-negro_opacity_medio backdrop-blur-xl p-3 rounded-[10px] flex flex-col gap-3 transition-all duration-300"
+      class="contCard hover:cursor-pointer group relative border-2 backdrop-blur-xl p-3 rounded-[40px] flex flex-col items-center justify-center gap-3 transition-all duration-300"
     >
-      <div v-if="isSelectionModeActive" class="absolute top-2 left-2 z-20">
-        <input
-          type="checkbox"
-          :value="usuario.id"
-          v-model="selected"
-          @click.stop
-          class="form-checkbox h-5 w-5 rounded bg-gray-800 border-gray-600 text-primary focus:ring-primary"
-        />
-      </div>
       <div
-        @click="isSelectionModeActive ? null : emit('openDetails', usuario)"
-        class="w-full h-full flex flex-col items-center text-center gap-3"
-        :class="{ 'cursor-pointer': !isSelectionModeActive }"
+        class="flex justify-center items-center foto w-[auto] h-[auto] rounded-[30px] backdrop-blur-lg"
       >
-        <!-- Contenido de la tarjeta adaptado para la vista de cuadrícula -->
-        <div class="relative flex-shrink-0">
+        <template v-if="getFotoUrlCompleta(usuario)">
+          <div class="relative group w-[230px] h-[230px]">
+            <img
+              :src="getFotoUrlCompleta(usuario)"
+              class="rounded-[30px] w-full h-full object-cover shadow-lg"
+            />
+          </div>
+        </template>
+
+        <template v-else>
           <div
-            class="w-3.5 h-3.5 absolute -top-1 -left-1 z-10 border-2 border-gray-900 rounded-full"
-            :class="
-              usuario.tiene_sesion_activa ? 'bg-semaforo-verde' : 'bg-semaforo-rojo'
-            "
-          ></div>
-          <img
-            v-if="usuario.perfil_usuario.ruta_foto"
-            :src="usuario.perfil_usuario.ruta_foto"
-            alt="Foto"
-            class="w-24 h-24 rounded-full object-cover shadow-lg"
-          />
-          <div
-            v-else
-            class="w-24 h-24 rounded-full bg-primary flex items-center justify-center font-bold text-3xl"
+            class="relative group bg-mono-negro_opacity_full rounded-[30px] w-[230px] h-[230px]"
           >
-            {{ getInicialesUsuario(usuario) }}
+            <p
+              class="h-full w-full flex justify-center items-center text-[50px] font-semibold rounded-[30px]"
+            >
+              {{ getInicialesUsuario(usuario) }}
+            </p>
+          </div>
+        </template>
+      </div>
+      <div class="relative nombre flex gap-1 items-center">
+        <div
+          class="h-2 w-2 rounded-full"
+          :class="
+            usuario.tiene_sesion_activa === true
+              ? 'bg-semaforo-verde shadow-[0px_10px_20px] shadow-semaforo-verde'
+              : 'bg-semaforo-rojo shadow-[0px_10px_20px] shadow-semaforo-rojo'
+          "
+        ></div>
+        <h2
+          class="text-[22px] font-bold"
+          v-html="
+            highlightMatch(
+              `${usuario.perfil_usuario.primer_nombre} ${usuario.perfil_usuario.primer_apellido} `
+            )
+          "
+        ></h2>
+        <div class="grid place-items-center" v-if="usuario.google_id === null">
+          <span class="material-symbols-rounded text-[18px] text-gray-700"
+            >verified_off</span
+          >
+        </div>
+        <div
+          class="grid place-items-center text-secundary-default dark:text-mono-blanco"
+          v-else
+        >
+          <span class="material-symbols-rounded text-[18px] text-secondary"
+            >verified</span
+          >
+        </div>
+      </div>
+      <div class="-mt-4 text-center">
+        <p
+          class="text-secundary-light text-[14px]"
+          v-html="highlightMatch(`${usuario.perfil_usuario.correo}`)"
+        ></p>
+        <p
+          class="text-secundary-light text-[14px]"
+          v-html="
+            highlightMatch(
+              `${usuario.perfil_usuario.indicativo.codigo_pais} ${usuario.perfil_usuario.telefono}`
+            )
+          "
+        ></p>
+      </div>
+      <div class="flex -mt-2 gap-2 items-center">
+        <div
+          class="grid place-content-center foto w-[40px] h-[40px] rounded-[10px] bg-mono-blanco_opacity dark:bg-secundary-opacity backdrop-blur-lg"
+        >
+          <template v-if="getFotoEstablecimientoUrlCompleta(usuario)">
+            <div class="relative group w-[40px] h-[40px]">
+              <img
+                :src="getFotoEstablecimientoUrlCompleta(usuario)"
+                class="rounded-[10px] border shadowM w-full h-full object-cover shadow-lg"
+              />
+            </div>
+          </template>
+
+          <template v-else>
+            <div class="relative group w-[40px] h-[40px]">
+              <p
+                class="h-full w-full flex justify-center items-center text-[20px] font-semibold border shadowM rounded-[10px]"
+              >
+                {{ getInicialesEstablecimiento(usuario) }}
+              </p>
+            </div>
+          </template>
+        </div>
+        <div class="detalles">
+          <div class="nombre flex gap-1 items-center">
+            <h2
+              class="text-[20px] font-medium"
+              v-html="
+                highlightMatch(
+                  `${usuario.establecimiento_asignado.nombre_establecimiento}`
+                )
+              "
+            ></h2>
+          </div>
+          <div class="flex -mt-2 justify-between items-end">
+            <p
+              class="text-secundary-light text-[14px]"
+              v-html="
+                highlightMatch(`${usuario.establecimiento_asignado.tipo_establecimiento}`)
+              "
+            ></p>
           </div>
         </div>
-        <div class="datosPersonales w-full">
-          <h3
-            class="font-semibold dark:text-mono-blanco text-lg"
-            v-html="
-              highlightMatch(
-                `${usuario.perfil_usuario.primer_nombre} ${usuario.perfil_usuario.primer_apellido}`
-              )
-            "
-          ></h3>
-          <p
-            class="text-sm text-gray-400"
-            v-html="highlightMatch(usuario.perfil_usuario.correo)"
-          ></p>
+      </div>
+      <div class="flex justify-between items-center gap-3">
+        <p
+          class="text-secundary-light text-[12px]"
+          v-html="
+            highlightMatch(
+              `${usuario.establecimiento_asignado.aplicacion_web.nombre_app}`
+            )
+          "
+        ></p>
+        <p
+          class="text-secundary-light text-[12px]"
+          v-html="
+            highlightMatch(
+              `${usuario.establecimiento_asignado.aplicacion_web.membresia.nombre_membresia}`
+            )
+          "
+        ></p>
+        <p
+          class="text-secundary-light text-[12px]"
+          v-html="
+            highlightMatch(
+              `${usuario.establecimiento_asignado.facturas[0].dias_restantes} Días`
+            )
+          "
+        ></p>
+      </div>
+      <div
+        v-if="
+          usuario.establecimiento?.facturas &&
+          usuario.establecimiento?.facturas.length > 0
+        "
+      >
+        <p
+          class="p-1 rounded-md text-[14px] font-bold"
+          :class="
+            getEstadoClass(
+              usuario.establecimiento_asignado?.facturas[0].estado.tipo_estado
+            )
+          "
+          v-html="
+            highlightMatch(
+              formatCOP(`${usuario.establecimiento_asignado?.facturas[0].monto_total}`)
+            )
+          "
+        ></p>
+      </div>
+
+      <div v-else>
+        <div v-if="usuario" class="text-sm text-gray-400 mt-2">
+          {{ usuario?.perfil_empleado?.cargo }} -
+          <strong class="text-primary font-semibold">
+            {{ usuario.establecimiento_asignado?.nombre_establecimiento }}
+          </strong>
         </div>
+        <div v-else class="text-sm text-gray-500">Sin Información :c</div>
+      </div>
+
+      <div
+        class="absolute left-0 top-0 flex justify-center items-center"
+        v-if="isSelectionModeActive"
+      >
+        <label class="relative flex justify-center items-center cursor-pointer group">
+          <input
+            class="peer sr-only"
+            type="checkbox"
+            :value="usuario.id"
+            v-model="selected"
+            @click.stop
+          />
+          <div
+            class="w-5 h-5 rounded-md bg-white border-2 border-primary transition-all duration-300 ease-in-out peer-checked:bg-gradient-to-br from-primary to-secondary peer-checked:border-0 peer-checked:rotate-12 after:content-[''] after:absolute after:top-1/2 after:left-1/2 after:-translate-x-1/2 after:-translate-y-1/2 after:w-4 after:h-4 after:opacity-0 after:bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmZmZmYiIHN0cm9rZS13aWR0aD0iMyIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cG9seWxpbmUgcG9pbnRzPSIyMCA2IDkgMTcgNCAxMiI+PC9wb2x5bGluZT48L3N2Zz4=')] after:bg-contain after:bg-no-repeat peer-checked:after:opacity-100 after:transition-opacity after:duration-300 hover:shadow-[0_0_15px_rgba(168,85,247,0.5)]"
+          ></div>
+        </label>
+      </div>
+      <div
+        class="absolute -left-4 -top-5 opacity-0 group-hover:opacity-100 group-hover:cursor-pointer"
+        v-else
+      >
+        <BtnSecundario
+          @click="isSelectionModeActive ? null : emit('openDetails', usuario)"
+          class="material-symbols-rounded border-none hover:text-primary hover:-translate-y-1"
+        >
+          info</BtnSecundario
+        >
       </div>
     </div>
   </div>
