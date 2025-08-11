@@ -3,7 +3,7 @@ import { defineProps, defineEmits } from "vue";
 import { router } from "@inertiajs/vue3";
 import { formatFecha } from "@/Utils/date";
 
-// 1. Recibimos la lista de usuarios eliminados como una prop
+
 const props = defineProps({
   isOpen: {
     type: Boolean,
