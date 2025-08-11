@@ -3,6 +3,7 @@ import { defineProps, defineEmits, ref, computed } from "vue";
 import { useForm } from "@inertiajs/vue3";
 import InputTexto from "@/Components/Shared/inputs/InputTexto.vue";
 import { handleBlur, handleInput, limitesCaracteres } from "@/Utils/formateoInputs";
+import BtnPrimario from "@/Components/Shared/buttons/btnPrimario.vue";
 
 const props = defineProps({
   isOpen: {
@@ -28,6 +29,7 @@ const progressPercentage = computed(() => {
 const form = useForm({
   tipo_usuario: "propietario",
   primer_nombre: "",
+  segundo_nombre: "",
   primer_apellido: "",
   correo: "",
   numero_documento: "",
@@ -105,14 +107,6 @@ const submit = () => {
           </div>
 
           <!-- Encabezado -->
-          <div class="py-4 flex justify-between items-center flex-shrink-0">
-            <h3 class="text-xl font-semibold text-gray-100 flex items-center">
-              <span class="material-symbols-rounded align-middle mr-2 text-primary"
-                >person_add</span
-              >
-              Crear Nuevo Usuario
-            </h3>
-          </div>
 
           <!-- Cuerpo del Formulario con Transición -->
           <div class="overflow-hidden">
@@ -120,9 +114,13 @@ const submit = () => {
               <div :key="currentStep" class="space-y-4">
                 <!-- PASO 1: DATOS PERSONALES -->
                 <div v-if="currentStep === 1">
-                  <h4 class="font-semibold text-lg mb-4 text-primary">
-                    Datos de la Cuenta
+                  <h4 class="font-semibold text-[35px] text-mono-blanco">
+                    Datos personales del usuario
                   </h4>
+                  <p class="text-[16px] text-secundary-light -mt-2 mb-4">
+                    Ingresa correctamente los datos del usuario para obtener un registro
+                    éxitoso.
+                  </p>
                   <div class="space-y-4">
                     <div
                       class="2xl:flex 2xl:flex-row 2xl:justify-between 2xl:items-center 2xl:gap-2 xl:flex xl:flex-row xl:justify-between xl:items-center xl:gap-2 gap-3 flex flex-col items-center"
@@ -132,67 +130,46 @@ const submit = () => {
                         label="Primer nombre:"
                         icon="format_italic"
                         placeholder="Ej: Juan"
-                        :maxLength="limitesCaracteres.primer_nombre"
+                        :maxLength="limitesCaracteres.nombresUsuario"
                         :error="form.errors.primer_nombre"
                         @blur="handleBlur(form, 'primer_nombre')"
                         @input="(e) => handleInput(e, form, 'primer_nombre')"
                       />
 
                       <InputTexto
+                        v-model="form.segundo_nombre"
+                        label="Segundo nombre:"
+                        icon="format_italic"
+                        placeholder="Opcional*"
+                        :maxLength="limitesCaracteres.nombresUsuario"
+                        :error="form.errors.segundo_nombre"
+                        @blur="handleBlur(form, 'segundo_nombre')"
+                        @input="(e) => handleInput(e, form, 'segundo_nombre')"
+                      />
+                    </div>
+                    <div
+                      class="2xl:flex 2xl:flex-row 2xl:justify-between 2xl:items-center 2xl:gap-2 xl:flex xl:flex-row xl:justify-between xl:items-center xl:gap-2 gap-3 flex flex-col items-center"
+                    >
+                      <InputTexto
                         v-model="form.primer_apellido"
                         label="Primer apellido:"
                         icon="format_italic"
-                        placeholder="Ej: Guarnizo"
-                        :maxLength="limitesCaracteres.primer_apellido"
+                        placeholder="Ej: Medina"
+                        :maxLength="limitesCaracteres.nombresUsuario"
                         :error="form.errors.primer_apellido"
                         @blur="handleBlur(form, 'primer_apellido')"
+                        @input="(e) => handleInput(e, form, 'primer_apellido')"
                       />
-                    </div>
-                    <div>
-                      <label for="correo" class="block text-sm font-medium text-gray-400"
-                        >Correo Electrónico</label
-                      >
-                      <input
-                        v-model="form.correo"
-                        type="email"
-                        id="correo"
-                        class="input-field"
+
+                      <InputTexto
+                        v-model="form.segundo_apellido"
+                        label="Segundo apellido:"
+                        icon="format_italic"
+                        placeholder="Opcional*"
+                        :maxLength="limitesCaracteres.nombresUsuario"
+                        :error="form.errors.segundo_nombre"
+                        @blur="handleBlur(form, 'segundo_nombre')"
                       />
-                      <div v-if="form.errors.correo" class="error-message">
-                        {{ form.errors.correo }}
-                      </div>
-                    </div>
-                    <div>
-                      <label
-                        for="numero_documento"
-                        class="block text-sm font-medium text-gray-400"
-                        >Número de Documento</label
-                      >
-                      <input
-                        v-model="form.numero_documento"
-                        type="text"
-                        id="numero_documento"
-                        class="input-field"
-                      />
-                      <div v-if="form.errors.numero_documento" class="error-message">
-                        {{ form.errors.numero_documento }}
-                      </div>
-                    </div>
-                    <div>
-                      <label
-                        for="password"
-                        class="block text-sm font-medium text-gray-400"
-                        >Contraseña</label
-                      >
-                      <input
-                        v-model="form.password"
-                        type="password"
-                        id="password"
-                        class="input-field"
-                      />
-                      <div v-if="form.errors.password" class="error-message">
-                        {{ form.errors.password }}
-                      </div>
                     </div>
                   </div>
                 </div>
@@ -320,26 +297,20 @@ const submit = () => {
           </div>
 
           <!-- Pie del Modal -->
-          <div
-            class="px-6 py-4 bg-gray-800/50 flex justify-between items-center flex-shrink-0"
-          >
-            <button
-              v-if="currentStep > 1"
-              type="button"
-              @click="prevStep"
-              class="text-gray-300 rounded-md py-2 px-4 hover:bg-gray-700 transition-colors"
-            >
-              Atrás
-            </button>
+          <div class="mt-5 flex justify-between items-center flex-shrink-0">
+            <BtnSecundario v-if="currentStep > 1" @click="prevStep">
+              BtnSecundario
+            </BtnSecundario>
             <div v-else></div>
-            <button
+
+            <BtnPrimario
               v-if="currentStep < totalSteps"
-              type="button"
               @click="nextStep"
-              class="bg-primary text-white rounded-md shadow-sm py-2 px-4 hover:bg-opacity-90 transition-colors"
+              class="w-[50%]"
             >
               Siguiente
-            </button>
+            </BtnPrimario>
+
             <button
               v-else
               type="submit"

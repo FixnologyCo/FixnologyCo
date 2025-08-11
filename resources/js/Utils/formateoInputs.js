@@ -1,6 +1,8 @@
 // ✅ Límites de caracteres para cada campo
 export const limitesCaracteres = {
   // inputs usuarios
+  nombresUsuario: 25,
+  apellidosUsuario: 25,
   ruta_foto: 60,
   primer_nombre: 25,
   segundo_nombre: 25,
