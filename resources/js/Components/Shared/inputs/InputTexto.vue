@@ -32,10 +32,9 @@ const inputContainerClass = computed(() => {
     </div>
 
     <div :class="inputContainerClass">
-      <span
-        class="material-symbols-rounded text-universal-naranja text-[20px] pl-[5px]"
-        >{{ icon }}</span
-      >
+      <span class="material-symbols-rounded text-primary text-[20px] pl-[5px]">{{
+        icon
+      }}</span>
       <input
         :type="type"
         :placeholder="placeholder"

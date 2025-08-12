@@ -7,6 +7,7 @@ use App\Events\UserListUpdated;
 use App\Http\Controllers\Controller;
 use Core\Models\AplicacionesWeb;
 use Core\Models\Estados;
+use Core\Models\Indicativos;
 use Core\Models\Membresias;
 use Core\Models\PerfilEmpleado;
 use Core\Models\PerfilUsuario;
@@ -122,6 +123,13 @@ class UsuariosFixController extends Controller
             ->unique();
 
         $establecimientosDisponibles = Establecimientos::all();
+       // ✅ 2. OBTÉN LA LISTA DE INDICATIVOS
+        $indicativosDisponibles = Indicativos::all()->map(function ($indicativo) {
+            return [
+                'id' => $indicativo->id,
+                'text' => "{$indicativo->pais} ({$indicativo->codigo_pais})",
+            ];
+        });
         $misEmpleados->each(fn($empleado) => $empleado->tiene_sesion_activa = $activeSessionUserIds->contains($empleado->id));
         $todosLosUsuarios->each(fn($user) => $user->tiene_sesion_activa = $activeSessionUserIds->contains($user->id));
         $estados = Estados::whereIn('categoria_estado', ['General', 'Pagos'])->distinct()->pluck('tipo_estado');
@@ -133,6 +141,7 @@ class UsuariosFixController extends Controller
             'usuario' => $usuarioAutenticado,
             'todosLosUsuarios' => $todosLosUsuarios,
             'establecimientosDisponibles' => $establecimientosDisponibles,
+            'indicativosDisponibles' => $indicativosDisponibles,
             'usuariosEnPapelera' => $usuariosEnPapelera,
             'misEmpleados' => $misEmpleados,
             'filtrosDisponibles' => [

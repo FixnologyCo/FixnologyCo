@@ -4,6 +4,7 @@ import { useForm } from "@inertiajs/vue3";
 import InputTexto from "@/Components/Shared/inputs/InputTexto.vue";
 import { handleBlur, handleInput, limitesCaracteres } from "@/Utils/formateoInputs";
 import BtnPrimario from "@/Components/Shared/buttons/btnPrimario.vue";
+import Selects from "@/Components/Shared/inputs/Selects.vue";
 
 const props = defineProps({
   isOpen: {
@@ -14,6 +15,8 @@ const props = defineProps({
     type: Array,
     default: () => [],
   },
+  ciudadesDisponibles: { type: Array, default: () => [] },
+  indicativosDisponibles: { type: Array, default: () => [] },
 });
 
 const emit = defineEmits(["close"]);
@@ -31,6 +34,9 @@ const form = useForm({
   primer_nombre: "",
   segundo_nombre: "",
   primer_apellido: "",
+  segundo_apellido: "",
+  ciudad_residencia: "",
+  indicativo_id: "",
   correo: "",
   numero_documento: "",
   password: "",
@@ -129,6 +135,7 @@ const submit = () => {
                         v-model="form.primer_nombre"
                         label="Primer nombre:"
                         icon="format_italic"
+                        type="text"
                         placeholder="Ej: Juan"
                         :maxLength="limitesCaracteres.nombresUsuario"
                         :error="form.errors.primer_nombre"
@@ -140,6 +147,7 @@ const submit = () => {
                         v-model="form.segundo_nombre"
                         label="Segundo nombre:"
                         icon="format_italic"
+                        type="text"
                         placeholder="Opcional*"
                         :maxLength="limitesCaracteres.nombresUsuario"
                         :error="form.errors.segundo_nombre"
@@ -154,6 +162,7 @@ const submit = () => {
                         v-model="form.primer_apellido"
                         label="Primer apellido:"
                         icon="format_italic"
+                        type="text"
                         placeholder="Ej: Medina"
                         :maxLength="limitesCaracteres.nombresUsuario"
                         :error="form.errors.primer_apellido"
@@ -165,7 +174,46 @@ const submit = () => {
                         v-model="form.segundo_apellido"
                         label="Segundo apellido:"
                         icon="format_italic"
+                        type="text"
                         placeholder="Opcional*"
+                        :maxLength="limitesCaracteres.nombresUsuario"
+                        :error="form.errors.segundo_nombre"
+                        @blur="handleBlur(form, 'segundo_nombre')"
+                      />
+                    </div>
+
+                    <div
+                      class="2xl:flex 2xl:flex-row 2xl:justify-between 2xl:items-center 2xl:gap-2 xl:flex xl:flex-row xl:justify-between xl:items-center xl:gap-2 gap-3 flex flex-col items-center"
+                    >
+                      <div class="flex gap-2 items-center w-full">
+                        <Selects
+                          v-model="form.indicativo_id"
+                          :options="props.indicativosDisponibles"
+                          :error="form.errors.indicativo_id"
+                          label="Indicativo:"
+                          placeholder="Selecciona un indicativo"
+                          id="indicativo"
+                        />
+
+                        <InputTexto
+                          v-model="form.telefono"
+                          label="Número celular:"
+                          icon="phone"
+                          type="number"
+                          placeholder="316511****"
+                          :maxLength="limitesCaracteres.telefono"
+                          :error="form.errors.telefono"
+                          @blur="handleBlur(form, 'telefono')"
+                          @input="(e) => handleInput(e, form, 'telefono')"
+                        />
+                      </div>
+
+                      <InputTexto
+                        v-model="form.correo"
+                        label="Correo electrónico:"
+                        icon="email"
+                        type="email"
+                        placeholder="example@dominio.com"
                         :maxLength="limitesCaracteres.nombresUsuario"
                         :error="form.errors.segundo_nombre"
                         @blur="handleBlur(form, 'segundo_nombre')"
@@ -268,29 +316,7 @@ const submit = () => {
                 <div v-if="currentStep === 3">
                   <div
                     class="2xl:flex 2xl:flex-row 2xl:justify-between 2xl:items-center 2xl:gap-2 xl:flex xl:flex-row xl:justify-between xl:items-center xl:gap-2 gap-3 flex flex-col items-center"
-                  >
-                    <!-- 2. Reemplaza el bloque del primer nombre -->
-                    <InputTexto
-                      v-model="form.primer_nombre"
-                      label="Primer nombre:"
-                      icon="format_italic"
-                      placeholder="Ej: Juan"
-                      :maxLength="limitesCaracteres.primer_nombre"
-                      :error="form.errors.primer_nombre"
-                      @blur="handleBlur(form, 'primer_nombre')"
-                    />
-
-                    <!-- 3. Reemplaza el bloque del primer apellido -->
-                    <InputTexto
-                      v-model="form.primer_apellido"
-                      label="Primer apellido:"
-                      icon="format_italic"
-                      placeholder="Ej: Guarnizo"
-                      :maxLength="limitesCaracteres.primer_apellido"
-                      :error="form.errors.primer_apellido"
-                      @blur="handleBlur(form, 'primer_apellido')"
-                    />
-                  </div>
+                  ></div>
                 </div>
               </div>
             </Transition>
@@ -298,9 +324,9 @@ const submit = () => {
 
           <!-- Pie del Modal -->
           <div class="mt-5 flex justify-between items-center flex-shrink-0">
-            <BtnSecundario v-if="currentStep > 1" @click="prevStep">
+            <BtnPrimario v-if="currentStep > 1" @click="prevStep">
               BtnSecundario
-            </BtnSecundario>
+            </BtnPrimario>
             <div v-else></div>
 
             <BtnPrimario

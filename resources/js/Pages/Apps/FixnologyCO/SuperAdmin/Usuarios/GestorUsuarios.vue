@@ -25,6 +25,7 @@ const props = defineProps({
   misEmpleados: { type: Array, default: () => [] },
   usuariosEnPapelera: { type: Array },
   establecimientosDisponibles: { type: Array },
+  indicativosDisponibles: { type: Array },
   filtrosDisponibles: { type: Object },
   usuariosEnPapelera: { type: Array },
 });
@@ -354,6 +355,7 @@ const rol = authStore.rol;
       <ModalCrearUsuario
         :is-open="isModalOpenCrearUser"
         :establecimientosDisponibles="establecimientosDisponibles"
+        :indicativosDisponibles="indicativosDisponibles"
         @close="closeUserCreationModal"
       />
       <ModalPapeleraUsuario
