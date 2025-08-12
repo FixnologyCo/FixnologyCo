@@ -17,7 +17,7 @@ const emit = defineEmits(["blur", "input"]);
 const inputContainerClass = computed(() => {
   return [
     "w-full p-[3px] flex items-center gap-[8px] transition-all rounded-[5px] border-[1px]",
-    props.error ? "border-universal-naranja" : "border-secundary-light",
+    props.error ? "border-semaforo-rojo" : "border-secundary-light",
   ];
 });
 </script>

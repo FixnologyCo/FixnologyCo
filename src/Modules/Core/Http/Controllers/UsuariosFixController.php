@@ -13,6 +13,8 @@ use Core\Models\PerfilEmpleado;
 use Core\Models\PerfilUsuario;
 use Core\Models\FacturacionMembresias;
 use Core\Models\Establecimientos;
+use Core\Models\Roles;
+use Core\Models\TipoDocumento;
 use Core\Models\TokensAcceso;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
@@ -27,7 +29,8 @@ class UsuariosFixController extends Controller
 {
     use AuthorizesRequests;
 
-    public function show($aplicacion, $rol, Request $request)
+
+    public function show($aplicacion, $rol, Request $request): mixed
     {
         $usuarioAutenticado = Auth::user()->load(['perfilUsuario.rol', 'establecimientoAsignado.aplicacionWeb.estilo']);
 
@@ -38,53 +41,46 @@ class UsuariosFixController extends Controller
             return redirect()->route('login.auth')->with('error', 'No tienes permisos para acceder, lo siento :c');
         }
 
-        $idEstablecimiento = $usuarioAutenticado->establecimientoAsignado->id ?? null;
-        $misEmpleados = collect();
 
-        if ($idEstablecimiento) {
-            $misEmpleados = User::whereHas('perfilEmpleado', function ($query) use ($idEstablecimiento) {
-                $query->where('establecimiento_id', $idEstablecimiento);
-            })
-                ->where('id', '!=', $usuarioAutenticado->id)
-                ->with([
-                    'perfilUsuario' => function ($query) {
-                        $query->with(['indicativo', 'tipoDocumento', 'estado', 'rol']);
-                    },
+        $misEmpleados = $this->getMisEmpleados($usuarioAutenticado);
+        $todosLosUsuarios = $this->getTodosLosUsuarios();
+        $usuariosEnPapelera = $this->getUsuariosEnPapelera();
+        $establecimientosDisponibles = $this->getEstablecimientosDisponibles();
+        $filtrosDisponibles = $this->getDatosParaFiltros();
+        $indicativosDisponibles = $this->getIndicativosDisponibles();
+        $tipoDocumentoDisponibles = $this->getTipoDocumentoDisponibles();
+        $rolesDisponibles = $this->getRolesDisponibles();
+        $appsDisponibles = $this->getAppsDisponibles();
+        $generosDisponibles = $this->getGenerosDisponibles();
 
-                    'perfilEmpleado' => function ($query) {
-                        $query->with(['estado', 'medioPago']);
-                    },
 
-                    'establecimientoAsignado' => function ($query) {
-                        $query->with([
-                            'aplicacionWeb' => function ($subQuery) {
-                                $subQuery->with(['estilo', 'estado', 'membresia.estado']);
-                            }
-                        ]);
-                    },
+        $activeSessionUserIds = DB::table(config('session.table'))
+            ->whereNotNull('user_id')->pluck('user_id')->unique();
 
-                    'establecimiento' => function ($query) {
-                        $query->with([
-                            'token.estado',
-                            'propietario',
-                            'facturas' => function ($subQuery) {
-                                $subQuery->with(['estado', 'medioPago']);
-                            }
-                        ]);
-                    }
-                ])
-                ->get();
-        }
+        $todosLosUsuarios->each(fn($u) => $u->tiene_sesion_activa = $activeSessionUserIds->contains($u->id));
+        $misEmpleados->each(fn($u) => $u->tiene_sesion_activa = $activeSessionUserIds->contains($u->id));
 
-        $todosLosUsuarios = User::with([
-            'perfilUsuario' => function ($query) {
-                $query->with(['indicativo', 'tipoDocumento', 'estado', 'rol']);
-            },
 
-            'perfilEmpleado' => function ($query) {
-                $query->with(['estado', 'medioPago']);
-            },
+        return Inertia::render('Apps/' . ucfirst($aplicacion) . '/' . ucfirst($rol) . '/Usuarios/GestorUsuarios', [
+            'usuario' => $usuarioAutenticado,
+            'misEmpleados' => $misEmpleados,
+            'todosLosUsuarios' => $todosLosUsuarios,
+            'usuariosEnPapelera' => $usuariosEnPapelera,
+            'establecimientosDisponibles' => $establecimientosDisponibles,
+            'indicativosDisponibles' => $indicativosDisponibles,
+            'tipoDocumentoDisponibles' => $tipoDocumentoDisponibles,
+            'rolesDisponibles' => $rolesDisponibles,
+            'filtrosDisponibles' => $filtrosDisponibles,
+            'generosDisponibles' => $generosDisponibles,
+            'appsDisponibles' => $appsDisponibles
+        ]);
+    }
 
+    private function getRelationsToLoad(): array
+    {
+        return [
+            'perfilUsuario' => fn($q) => $q->with(['indicativo', 'tipoDocumento', 'estado', 'rol']),
+            'perfilEmpleado' => fn($q) => $q->with(['estado', 'medioPago']),
             'establecimientoAsignado' => function ($query) {
                 $query->with([
                     'aplicacionWeb' => function ($subQuery) {
@@ -97,61 +93,115 @@ class UsuariosFixController extends Controller
                     'propietario',
                 ]);
             },
-
-            'establecimiento' => function ($query) {
-                $query->with([
-                    'facturas' => function ($subQuery) {
-                        $subQuery->with(['estado', 'medioPago']);
-                    }
-                ]);
-            }
-        ])
-            ->get();
-
-        $relationsToLoad = [
-            'perfilUsuario' => fn($q) => $q->with(['indicativo', 'tipoDocumento', 'estado', 'rol']),
-            'perfilEmpleado' => fn($q) => $q->with(['estado', 'medioPago', 'establecimiento']),
-            'establecimiento' => fn($q) => $q->with(['facturas.estado', 'facturas.medioPago']),
-            'establecimientoAsignado'
+            'establecimiento' => fn($q) => $q->with(['token.estado', 'propietario', 'facturas.estado', 'facturas.medioPago']),
         ];
+    }
 
-        $usuariosEnPapelera = User::onlyTrashed()->with($relationsToLoad)->get();
+    private function getMisEmpleados(User $usuarioAutenticado)
+    {
+        $idEstablecimiento = $usuarioAutenticado->establecimientoAsignado->id ?? null;
 
-        $activeSessionUserIds = DB::table(config('session.table'))
-            ->whereNotNull('user_id')
-            ->pluck('user_id')
-            ->unique();
+        if (!$idEstablecimiento) {
+            return collect(); // Devuelve una colección vacía si no hay establecimiento
+        }
 
-        $establecimientosDisponibles = Establecimientos::all();
-       // ✅ 2. OBTÉN LA LISTA DE INDICATIVOS
-        $indicativosDisponibles = Indicativos::all()->map(function ($indicativo) {
+        return User::whereHas('perfilEmpleado', fn($q) => $q->where('establecimiento_id', $idEstablecimiento))
+            ->where('id', '!=', $usuarioAutenticado->id)
+            ->with($this->getRelationsToLoad())
+            ->get();
+    }
+
+    private function getTodosLosUsuarios()
+    {
+        return User::with($this->getRelationsToLoad())->get();
+    }
+
+    private function getUsuariosEnPapelera()
+    {
+        return User::onlyTrashed()->with($this->getRelationsToLoad())->get();
+    }
+
+    private function getEstablecimientosDisponibles()
+    {
+         return Establecimientos::all()->map(function ($e) {
+            return [
+                'id' => $e->id,
+                'text' => $e->nombre_establecimiento
+            ];
+        });
+    }
+
+    private function getDatosParaFiltros(): array
+    {
+        return [
+            'estados' => Estados::whereIn('categoria_estado', ['General', 'Pagos'])->distinct()->pluck('tipo_estado'),
+            'aplicaciones' => AplicacionesWeb::distinct()->pluck('nombre_app'),
+            'membresias' => Membresias::distinct()->pluck('nombre_membresia'),
+            'ciudades' => PerfilUsuario::whereNotNull('ciudad_residencia')->distinct()->pluck('ciudad_residencia'),
+        ];
+    }
+
+    private function getIndicativosDisponibles()
+    {
+        return Indicativos::all()->map(function ($indicativo) {
             return [
                 'id' => $indicativo->id,
                 'text' => "{$indicativo->pais} ({$indicativo->codigo_pais})",
             ];
         });
-        $misEmpleados->each(fn($empleado) => $empleado->tiene_sesion_activa = $activeSessionUserIds->contains($empleado->id));
-        $todosLosUsuarios->each(fn($user) => $user->tiene_sesion_activa = $activeSessionUserIds->contains($user->id));
-        $estados = Estados::whereIn('categoria_estado', ['General', 'Pagos'])->distinct()->pluck('tipo_estado');
-        $aplicaciones = AplicacionesWeb::distinct()->pluck('nombre_app');
-        $membresias = Membresias::distinct()->pluck('nombre_membresia');
-        $ciudades = PerfilUsuario::whereNotNull('ciudad_residencia')->distinct()->pluck('ciudad_residencia');
-
-        return Inertia::render('Apps/' . ucfirst($aplicacion) . '/' . ucfirst($rol) . '/Usuarios/GestorUsuarios', [
-            'usuario' => $usuarioAutenticado,
-            'todosLosUsuarios' => $todosLosUsuarios,
-            'establecimientosDisponibles' => $establecimientosDisponibles,
-            'indicativosDisponibles' => $indicativosDisponibles,
-            'usuariosEnPapelera' => $usuariosEnPapelera,
-            'misEmpleados' => $misEmpleados,
-            'filtrosDisponibles' => [
-                'estados' => $estados,
-                'aplicaciones' => $aplicaciones,
-                'membresias' => $membresias,
-                'ciudades' => $ciudades,
-            ],
-        ]);
     }
+
+    private function getTipoDocumentoDisponibles()
+    {
+        return TipoDocumento::all()->map(function ($tipoDocumento) {
+            return [
+                'id' => $tipoDocumento->id,
+                'text' => $tipoDocumento->documento_legal
+            ];
+        });
+    }
+
+    private function getRolesDisponibles()
+    {
+        return Roles::all()->map(function ($rol) {
+            return [
+                'id' => $rol->id,
+                'text' => $rol->tipo_rol
+            ];
+        });
+    }
+
+    private function getGenerosDisponibles()
+    {
+        return [
+            ['id' => 'Masculino', 'text' => 'Masculino'],
+            ['id' => 'Femenino', 'text' => 'Femenino'],
+            ['id' => 'Otro', 'text' => 'Otro'],
+        ];
+    }
+
+    private function getAppsDisponibles()
+{
+    
+    $aplicaciones = AplicacionesWeb::with('membresia')->get();
+
+    
+    $aplicacionesOrdenadas = $aplicaciones->sortBy(function ($app) {
+        
+        return $app->membresia->nombre_membresia ?? 'Sin nombre'; 
+    });
+
+    return $aplicacionesOrdenadas->map(function ($app) {
+       
+        $nombreMembresia = $app->membresia->nombre_membresia ?? 'Sin Membresía';
+        
+        return [
+            'id' => $app->id,
+            'text' => "{$app->nombre_app} - {$nombreMembresia}"
+        ];
+    })->values(); 
+}
+
 
     public function destroy(User $usuarioAEliminar)
     {
@@ -172,34 +222,36 @@ class UsuariosFixController extends Controller
         $usuarioAutenticado = Auth::user()->load(['perfilUsuario.rol']);
 
         $usuariosEnPapelera = User::onlyTrashed()
-            ->with(['perfilUsuario' => function ($query) {
-                $query->with(['indicativo', 'tipoDocumento', 'estado', 'rol']);
-            },
+            ->with([
+                'perfilUsuario' => function ($query) {
+                    $query->with(['indicativo', 'tipoDocumento', 'estado', 'rol']);
+                },
 
-            'perfilEmpleado' => function ($query) {
-                $query->with(['estado', 'medioPago']);
-            },
+                'perfilEmpleado' => function ($query) {
+                    $query->with(['estado', 'medioPago']);
+                },
 
-            'establecimientoAsignado' => function ($query) {
-                $query->with([
-                    'aplicacionWeb' => function ($subQuery) {
-                        $subQuery->with(['estilo', 'estado', 'membresia.estado']);
-                    },
-                    'facturas' => function ($subQuery) {
-                        $subQuery->with(['estado', 'medioPago']);
-                    },
-                    'token.estado',
-                    'propietario',
-                ]);
-            },
+                'establecimientoAsignado' => function ($query) {
+                    $query->with([
+                        'aplicacionWeb' => function ($subQuery) {
+                            $subQuery->with(['estilo', 'estado', 'membresia.estado']);
+                        },
+                        'facturas' => function ($subQuery) {
+                            $subQuery->with(['estado', 'medioPago']);
+                        },
+                        'token.estado',
+                        'propietario',
+                    ]);
+                },
 
-            'establecimiento' => function ($query) {
-                $query->with([
-                    'facturas' => function ($subQuery) {
-                        $subQuery->with(['estado', 'medioPago']);
-                    }
-                ]);
-            }])
+                'establecimiento' => function ($query) {
+                    $query->with([
+                        'facturas' => function ($subQuery) {
+                            $subQuery->with(['estado', 'medioPago']);
+                        }
+                    ]);
+                }
+            ])
             ->get();
 
         return Inertia::render('Apps/' . ucfirst($aplicacion) . '/' . ucfirst($rol) . '/Usuarios/Papelera', [
@@ -222,7 +274,6 @@ class UsuariosFixController extends Controller
         return redirect()->back()->with('success', 'Usuario restaurado correctamente.');
     }
 
-   
     public function forceDestroy($id)
     {
         $usuarioAEliminar = User::withTrashed()->findOrFail($id);
@@ -243,13 +294,13 @@ class UsuariosFixController extends Controller
             FacturacionMembresias::where('cliente_id', $usuarioAEliminar->id)->forceDelete();
 
             if ($establecimiento = $usuarioAEliminar->establecimiento) {
-                
-                
+
+
                 $empleadosAEliminar = User::whereHas('perfilEmpleado', function ($query) use ($establecimiento) {
                     $query->where('establecimiento_id', $establecimiento->id);
                 })->where('id', '!=', $usuarioAEliminar->id)->get();
 
-                
+
                 foreach ($empleadosAEliminar as $empleado) {
                     // Eliminar las dependencias de cada empleado
                     FacturacionMembresias::where('cliente_id', $empleado->id)->forceDelete();
@@ -260,10 +311,10 @@ class UsuariosFixController extends Controller
 
                 $establecimiento->facturas()->forceDelete();
                 $establecimiento->token()->forceDelete();
-                
+
                 $establecimiento->forceDelete();
             }
-            
+
             if ($usuarioAEliminar->perfilEmpleado) {
                 $usuarioAEliminar->perfilEmpleado->forceDelete();
             }
@@ -282,12 +333,36 @@ class UsuariosFixController extends Controller
         }
     }
 
+    public function bulkDestroy(Request $request)
+    {
+
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:usuarios,id',
+        ]);
+
+        if (Auth::user()->perfilUsuario->rol_id !== 4) {
+            return redirect()->with('error', 'No tienes permisos para realizar esta acción, lo siento :c');
+        }
+
+        $idsAEliminar = $request->input('ids');
+        $authId = Auth::id();
+
+        $filteredIds = collect($idsAEliminar)->reject(function ($id) use ($authId) {
+            return $id == $authId;
+        });
+
+        if ($filteredIds->isNotEmpty()) {
+            User::whereIn('id', $filteredIds)->delete();
+        }
+
+        return redirect()->back()->with('success', 'Usuarios seleccionados enviados a la papelera.');
+    }
 
     public function store(Request $request)
     {
-        
+
         $request->validate([
-            'tipo_usuario' => 'required|in:propietario,empleado',
             'primer_nombre' => 'required|string|max:255',
             'primer_apellido' => 'required|string|max:255',
             'correo' => 'required|email|unique:perfil_usuario,correo',
@@ -307,22 +382,29 @@ class UsuariosFixController extends Controller
 
             PerfilUsuario::create([
                 'usuario_id' => $usuario->id,
-                'indicativo_id' => 1,
+                'indicativo_id' => $request->indicativo_id,
                 'primer_nombre' => $request->primer_nombre,
+                'segundo_nombre' => $request->segundo_nombre ?? '',
                 'primer_apellido' => $request->primer_apellido,
+                'segundo_apellido' => $request->segundo_apellido ?? '',
+                'direccion_residencia' =>$request->direccion_residencia ?? '',
+                'barrio_residencia' =>$request->barrio_residencia ?? '',
+                'ciudad_residencia' =>$request->ciudad_residencia ?? '',
                 'correo' => $request->correo,
-                'telefono' => $request->telefono ?? '0000000000',
-                'rol_id' => ($request->tipo_usuario === 'propietario') ? 1 : 2, // 1: Propietario, 3: Empleado
+                'telefono' => $request->telefono,
+                'rol_id' =>$request->rol_id, 
+                'genero' =>$request->genero, 
                 'estado_id' => 1,
             ]);
 
-          
-            if ($request->tipo_usuario === 'propietario') {
+
+            if ($request->rol_id === 1) {
                 $establecimiento = establecimientos::create([
                     'propietario_id' => $usuario->id,
                     'nombre_establecimiento' => 'Tienda de ' . $request->primer_nombre,
                     'estado_id' => 1,
-                    'aplicacion_web_id' => 1,
+                    'aplicacion_web_id' => $request->aplicacion_id,
+                    'tipo_establecimiento' => $request->tipo_establecimiento
                 ]);
 
                 $token = TokensAcceso::create([
@@ -336,7 +418,7 @@ class UsuariosFixController extends Controller
                 FacturacionMembresias::create([
                     'cliente_id' => $usuario->id,
                     'establecimiento_id' => $establecimiento->id,
-                    'aplicacion_web_id' => 1,
+                    'aplicacion_web_id' => $establecimiento->aplicacion_web_id,
                     'monto_total' => 50000,
                     'dias_restantes' => 5,
                     'estado_id' => 16,
@@ -346,8 +428,8 @@ class UsuariosFixController extends Controller
                 PerfilEmpleado::create([
                     'usuario_id' => $usuario->id,
                     'establecimiento_id' => $establecimiento->id,
-                    'rol_id' => 1,
-                    'cargo' => 'Propietario',
+                    'rol_id' => $request->rol_id,
+                    'cargo' => 'Administrador',
                     'estado_id' => 1,
                 ]);
 
@@ -370,31 +452,5 @@ class UsuariosFixController extends Controller
             \Log::error('Error al crear usuario: ' . $e->getMessage());
             return back()->with('error', 'Ocurrió un error al crear el usuario.');
         }
-    }
-
-    public function bulkDestroy(Request $request)
-    {
-        
-        $request->validate([
-            'ids' => 'required|array',
-            'ids.*' => 'exists:usuarios,id',
-        ]);
-
-        if (Auth::user()->perfilUsuario->rol_id !== 4) {
-            return redirect()->with('error', 'No tienes permisos para realizar esta acción, lo siento :c');
-        }
-
-        $idsAEliminar = $request->input('ids');
-        $authId = Auth::id();
-
-        $filteredIds = collect($idsAEliminar)->reject(function ($id) use ($authId) {
-            return $id == $authId;
-        });
-
-        if ($filteredIds->isNotEmpty()) {
-            User::whereIn('id', $filteredIds)->delete();
-        }
-
-        return redirect()->back()->with('success', 'Usuarios seleccionados enviados a la papelera.');
     }
 }

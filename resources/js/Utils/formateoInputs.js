@@ -3,23 +3,24 @@ export const limitesCaracteres = {
   // inputs usuarios
   nombresUsuario: 25,
   apellidosUsuario: 25,
-  
+  numero_documento: 20,
+  telefono: 10,
+  email: 60,
+  direccion: 40,
+  tipo_establecimiento:20,
+  cargo:15,
+
   ruta_foto: 60,
   primer_nombre: 25,
   segundo_nombre: 25,
   primer_apellido: 25,
   segundo_apellido: 25,
   id_tipo_documento: 2,
-  numero_documento: 20,
   indicativo: 4,
-  telefono: 10,
-  email: 60,
   genero: 25,
-  direccion: 60,
   password: 30,
   password_confirm: 30,
   nombre_tienda: 20,
-  tipo_tienda:60,
 
   // inputs app
   descripcion_app: 100,

@@ -5,6 +5,11 @@ import InputTexto from "@/Components/Shared/inputs/InputTexto.vue";
 import { handleBlur, handleInput, limitesCaracteres } from "@/Utils/formateoInputs";
 import BtnPrimario from "@/Components/Shared/buttons/btnPrimario.vue";
 import Selects from "@/Components/Shared/inputs/Selects.vue";
+import BtnSecundario from "@/Components/Shared/buttons/btnSecundario.vue";
+import {
+  getInicialesEstablecimiento,
+  getInicialesUsuario,
+} from "@/Utils/inicialesNombres";
 
 const props = defineProps({
   isOpen: {
@@ -17,31 +22,63 @@ const props = defineProps({
   },
   ciudadesDisponibles: { type: Array, default: () => [] },
   indicativosDisponibles: { type: Array, default: () => [] },
+  tipoDocumentoDisponibles: { type: Array, default: () => [] },
+  rolesDisponibles: { type: Array, default: () => [] },
+  generosDisponibles: { type: Array, default: () => [] },
+  appsDisponibles: { type: Array, default: () => [] },
 });
 
 const emit = defineEmits(["close"]);
 
 // --- LÓGICA DE PASOS ---
 const currentStep = ref(1);
-const totalSteps = 4;
+const totalSteps = 2;
 
 const progressPercentage = computed(() => {
   return ((currentStep.value - 1) / (totalSteps - 1)) * 100;
 });
 
 const form = useForm({
-  tipo_usuario: "propietario",
   primer_nombre: "",
   segundo_nombre: "",
   primer_apellido: "",
   segundo_apellido: "",
-  ciudad_residencia: "",
   indicativo_id: "",
+  telefono: "",
   correo: "",
+  ciudad_residencia: "",
+  barrio_residencia: "",
+  direccion_residencia: "",
+  tipo_documento_id: "",
   numero_documento: "",
   password: "",
-  establecimiento_id: null,
+  rol_id: "",
+  genero: "",
+  establecimiento_id: "",
   cargo: "",
+  membresia_id: "",
+  aplicacion_id: "",
+  tipo_establecimiento: "",
+});
+
+const inicialesDelFormulario = computed(() => {
+  const nombre = form.primer_nombre || "";
+  const apellido = form.primer_apellido || "";
+
+  const inicialNombre = nombre ? nombre.charAt(0).toUpperCase() : "";
+  const inicialApellido = apellido ? apellido.charAt(0).toUpperCase() : "";
+
+  return `${inicialNombre}${inicialApellido}`;
+});
+
+const inicialesDeTiendaDelFormulario = computed(() => {
+  const prefijo = "Tienda de";
+  const nombre = form.primer_nombre || "";
+
+  const inicialPrefijo = prefijo ? prefijo.charAt(0).toUpperCase() : "";
+  const inicialNombre = nombre ? nombre.charAt(0).toUpperCase() : "";
+
+  return `${inicialPrefijo}${inicialNombre}`;
 });
 
 function nextStep() {
@@ -49,9 +86,17 @@ function nextStep() {
   const fieldsToValidate = [
     "primer_nombre",
     "primer_apellido",
+    "indicativo_id",
+    "telefono",
     "correo",
+    "ciudad_residencia",
+    "barrio_residencia",
+    "direccion_residencia",
+    "tipo_documento_id",
     "numero_documento",
     "password",
+    "rol_id",
+    "genero",
   ];
   let hasErrors = false;
   fieldsToValidate.forEach((field) => {
@@ -215,8 +260,105 @@ const submit = () => {
                         type="email"
                         placeholder="example@dominio.com"
                         :maxLength="limitesCaracteres.nombresUsuario"
-                        :error="form.errors.segundo_nombre"
-                        @blur="handleBlur(form, 'segundo_nombre')"
+                        :error="form.errors.correo"
+                        @blur="handleBlur(form, 'correo')"
+                      />
+                    </div>
+
+                    <div
+                      class="2xl:flex 2xl:flex-row 2xl:justify-between 2xl:items-center 2xl:gap-2 xl:flex xl:flex-row xl:justify-between xl:items-center xl:gap-2 gap-3 flex flex-col items-center"
+                    >
+                      <div class="w-full flex items-center gap-2">
+                        <InputTexto
+                          v-model="form.ciudad_residencia"
+                          label="Ciudad residencia:"
+                          icon="map"
+                          type="text"
+                          placeholder="Bogotá D.C."
+                          :maxLength="limitesCaracteres.direccion"
+                          :error="form.errors.ciudad_residencia"
+                          @blur="handleBlur(form, 'ciudad_residencia')"
+                          @input="(e) => handleInput(e, form, 'ciudad_residencia')"
+                        />
+
+                        <InputTexto
+                          v-model="form.barrio_residencia"
+                          label="Barrio residencia:"
+                          icon="distance"
+                          type="text"
+                          placeholder="Luna Park"
+                          :maxLength="limitesCaracteres.direccion"
+                          :error="form.errors.barrio_residencia"
+                          @blur="handleBlur(form, 'barrio_residencia')"
+                          @input="(e) => handleInput(e, form, 'barrio_residencia')"
+                        />
+                      </div>
+
+                      <InputTexto
+                        v-model="form.direccion_residencia"
+                        label="Dirección residencia:"
+                        icon="format_italic"
+                        type="text"
+                        placeholder="Calle 1a #2b-3 sur"
+                        :maxLength="limitesCaracteres.direccion"
+                        :error="form.errors.direccion_residencia"
+                        @blur="handleBlur(form, 'direccion_residencia')"
+                      />
+                    </div>
+                    <div
+                      class="2xl:flex 2xl:flex-row 2xl:justify-between 2xl:items-center 2xl:gap-2 xl:flex xl:flex-row xl:justify-between xl:items-center xl:gap-2 gap-3 flex flex-col items-center"
+                    >
+                      <div class="flex gap-2 items-center w-full">
+                        <Selects
+                          v-model="form.tipo_documento_id"
+                          :options="props.tipoDocumentoDisponibles"
+                          :error="form.errors.tipo_documento_id"
+                          label="Tipo documento:"
+                          placeholder="Selecciona el tipo"
+                          id="tipo_documento_id"
+                        />
+
+                        <InputTexto
+                          v-model="form.numero_documento"
+                          label="Número documento:"
+                          icon="pin"
+                          type="number"
+                          placeholder="10135****"
+                          :maxLength="limitesCaracteres.numero_documento"
+                          :error="form.errors.numero_documento"
+                          @blur="handleBlur(form, 'numero_documento')"
+                          @input="(e) => handleInput(e, form, 'numero_documento')"
+                        />
+                      </div>
+                      <InputTexto
+                        v-model="form.password"
+                        label="Contraseña:"
+                        icon="password"
+                        type="password"
+                        placeholder="Genera una aleatoriamente"
+                        :maxLength="limitesCaracteres.password"
+                        :error="form.errors.password"
+                        @blur="handleBlur(form, 'password')"
+                      />
+                    </div>
+                    <div
+                      class="2xl:flex 2xl:flex-row 2xl:justify-between 2xl:items-center 2xl:gap-2 xl:flex xl:flex-row xl:justify-between xl:items-center xl:gap-2 gap-3 flex flex-col items-center"
+                    >
+                      <Selects
+                        v-model="form.rol_id"
+                        :options="props.rolesDisponibles"
+                        :error="form.errors.rol_id"
+                        label="Rol del usuario:"
+                        placeholder="Escoje tus funciones"
+                        id="rol_id"
+                      />
+                      <Selects
+                        v-model="form.genero"
+                        :options="props.generosDisponibles"
+                        :error="form.errors.genero"
+                        label="Género:"
+                        placeholder="Selecciona tu genero"
+                        id="genero"
                       />
                     </div>
                   </div>
@@ -224,127 +366,194 @@ const submit = () => {
 
                 <!-- PASO 2: TIPO DE USUARIO Y DATOS DE EMPLEADO -->
                 <div v-if="currentStep === 2">
-                  <h4 class="font-semibold text-lg mb-4 text-primary">Tipo de Usuario</h4>
-                  <div class="space-y-3">
-                    <label
-                      class="flex items-center p-3 rounded-md transition-colors"
-                      :class="
-                        form.tipo_usuario === 'propietario'
-                          ? 'bg-primary/10 border border-primary'
-                          : 'bg-gray-800/50 border border-transparent hover:border-gray-700'
-                      "
-                    >
-                      <input
-                        type="radio"
-                        v-model="form.tipo_usuario"
-                        value="propietario"
-                        class="form-radio text-primary focus:ring-primary bg-gray-700 border-gray-600"
-                      />
-                      <span class="ml-3">
-                        <span class="font-semibold">Nuevo Propietario</span>
-                        <p class="text-xs text-gray-400">
-                          Creará su propio establecimiento y facturación.
-                        </p>
-                      </span>
-                    </label>
-                    <label
-                      class="flex items-center p-3 rounded-md transition-colors"
-                      :class="
-                        form.tipo_usuario === 'empleado'
-                          ? 'bg-primary/10 border border-primary'
-                          : 'bg-gray-800/50 border border-transparent hover:border-gray-700'
-                      "
-                    >
-                      <input
-                        type="radio"
-                        v-model="form.tipo_usuario"
-                        value="empleado"
-                        class="form-radio text-primary focus:ring-primary bg-gray-700 border-gray-600"
-                      />
-                      <span class="ml-3">
-                        <span class="font-semibold">Empleado de Tienda Existente</span>
-                        <p class="text-xs text-gray-400">
-                          Será asignado a una tienda que ya existe.
-                        </p>
-                      </span>
-                    </label>
-                    <div
-                      v-if="form.tipo_usuario === 'empleado'"
-                      class="space-y-4 pt-4 border-t border-gray-700/50"
-                    >
-                      <div>
-                        <label
-                          for="establecimiento_id"
-                          class="block text-sm font-medium text-gray-400"
-                          >Asignar a Establecimiento</label
+                  <h4 class="font-semibold text-[35px] text-mono-blanco">
+                    Estás a un paso de finalizar
+                  </h4>
+
+                  <div class="space-y-4">
+                    <div class="" v-if="form.rol_id === 1">
+                      <h5 class="font-semibold text-[25px] text-mono-blanco">
+                        ¡Sensacional!
+                      </h5>
+                      <p class="text-[16px] text-secundary-light -mt-2 mb-4">
+                        Vas a crear un nuevo Fixgi
+                      </p>
+                      <div
+                        class="contCard relative my-2 flex items-center gap-5 justify-between border backdrop-blur-xl p-3 rounded-[10px]"
+                      >
+                        <div
+                          class="grid place-content-center foto w-[75px] h-[75px] rounded-[10px] bg-mono-blanco_opacity dark:bg-secundary-opacity backdrop-blur-lg"
                         >
-                        <select
-                          v-model="form.establecimiento_id"
-                          id="establecimiento_id"
-                          class="input-field"
+                          <div class="relative group w-[75px] h-[75px]">
+                            <p
+                              class="h-full w-full flex justify-center items-center text-[20px] text-mono-blanco font-semibold border-2 rounded-[10px]"
+                            >
+                              {{ inicialesDelFormulario || "??" }}
+                            </p>
+                          </div>
+                        </div>
+                        <div class="detalles w-[40%]">
+                          <div class="nombre flex gap-1 items-center">
+                            <h2 class="text-[20px] font-medium">
+                              {{ form.primer_nombre }}
+                              {{ form.segundo_nombre }}
+                              {{ form.primer_apellido }}
+                              {{ form.segundo_apellido }}
+                            </h2>
+                          </div>
+                          <div class="flex -mt-2 justify-between items-end">
+                            <p class="text-secundary-light text-[14px]">
+                              {{ form.correo }}
+                            </p>
+                            <p class="text-secundary-light text-[14px]">
+                              {{ form.indicativo_id }} {{ form.telefono }}
+                            </p>
+                          </div>
+                          <div class="flex justify-between items-center">
+                            <div class="flex items-center gap-1">
+                              <div
+                                class="w-3 h-2 rounded-full bg-semaforo-verde shadow-[0px_10px_20px] shadow-semaforo-verde"
+                              ></div>
+                              <span class="text-secundary-light text-[14px]">Activo</span>
+                            </div>
+                            <p class="text-secundary-light text-[14px]">
+                              {{ form.barrio_residencia }}, {{ form.ciudad_residencia }}
+                            </p>
+                          </div>
+                        </div>
+                        <p class="text-[50px] font-thin">|</p>
+                        <div
+                          class="grid place-content-center foto w-[60px] h-[60px] rounded-[10px] bg-mono-blanco_opacity dark:bg-secundary-opacity backdrop-blur-lg"
                         >
-                          <option :value="null" disabled>Selecciona una tienda</option>
-                          <option
-                            v-for="est in establecimientosDisponibles"
-                            :key="est.id"
-                            :value="est.id"
-                          >
-                            {{ est.nombre_establecimiento }}
-                          </option>
-                        </select>
-                        <div v-if="form.errors.establecimiento_id" class="error-message">
-                          {{ form.errors.establecimiento_id }}
+                          <div class="relative group w-[60px] h-[60px]">
+                            <p
+                              class="h-full w-full flex justify-center items-center text-[20px] text-mono-blanco font-semibold border-2 rounded-[10px]"
+                            >
+                              {{ inicialesDeTiendaDelFormulario || "??" }}
+                            </p>
+                          </div>
+                        </div>
+                        <div class="detalles w-[40%]">
+                          <div class="nombre flex gap-1 items-center">
+                            <h2 class="text-[20px] font-medium">
+                              Tienda de {{ form.primer_nombre }}
+                            </h2>
+                          </div>
+                          <div class="flex -mt-2 justify-between items-end">
+                            <p class="text-secundary-light text-[14px]">
+                              {{ form.tipo_establecimiento }}
+                            </p>
+                          </div>
+                          <div class="flex justify-between items-center">
+                            <div class="flex items-center gap-1">
+                              <div
+                                class="w-3 h-2 rounded-full bg-semaforo-verde shadow-[0px_10px_20px] shadow-semaforo-verde"
+                              ></div>
+                              <span class="text-secundary-light text-[14px]">Activo</span>
+                            </div>
+                            <p class="text-secundary-light text-[14px]">
+                              {{ form.aplicacion_id }} - {{ form.membresia_id }}
+                            </p>
+                          </div>
                         </div>
                       </div>
-                      <div>
-                        <label for="cargo" class="block text-sm font-medium text-gray-400"
-                          >Cargo del Empleado</label
-                        >
-                        <input
-                          v-model="form.cargo"
-                          type="text"
-                          id="cargo"
-                          class="input-field"
+                      <div
+                        class="2xl:flex 2xl:flex-row 2xl:justify-between 2xl:items-center 2xl:gap-2 xl:flex xl:flex-row xl:justify-between xl:items-center xl:gap-2 gap-3 flex flex-col items-center"
+                      >
+                        <Selects
+                          v-model="form.aplicacion_id"
+                          :options="props.appsDisponibles"
+                          :error="form.errors.aplicacion_id"
+                          label="Aplicación web:"
+                          placeholder="Elije la app"
+                          id="aplicacion_id"
                         />
-                        <div v-if="form.errors.cargo" class="error-message">
-                          {{ form.errors.cargo }}
+
+                        <InputTexto
+                          v-model="form.tipo_establecimiento"
+                          label="Tipo establecimiento:"
+                          icon="category"
+                          type="text"
+                          placeholder="Ingresa el tipo de comercio"
+                          :maxLength="limitesCaracteres.tipo_establecimiento"
+                          :error="form.errors.tipo_establecimiento"
+                          @blur="handleBlur(form, 'tipo_establecimiento')"
+                        />
+                      </div>
+                    </div>
+
+                    <div class="" v-else>
+                      <div class="" v-if="form.rol_id === 3">
+                        <h5 class="font-semibold text-[25px] text-mono-blanco">
+                          ¡Añade fieles!
+                        </h5>
+                        <p class="text-[16px] text-secundary-light -mt-2 mb-4">
+                          Vas añadir clientes a un establecimiento
+                        </p>
+                      </div>
+
+                      <div v-if="form.rol_id === 2 || form.rol_id === 4">
+                        <h5 class="font-semibold text-[25px] text-mono-blanco">
+                          ¡Alimentemos esos establecimiento!
+                        </h5>
+                        <p class="text-[16px] text-secundary-light -mt-2 mb-4">
+                          Vas a crear un empleado a un establecimiento
+                        </p>
+
+                        <div
+                          class="2xl:flex 2xl:flex-row 2xl:justify-between 2xl:items-center 2xl:gap-2 xl:flex xl:flex-row xl:justify-between xl:items-center xl:gap-2 gap-3 flex flex-col items-center"
+                        >
+                          <Selects
+                            v-model="form.establecimiento_id"
+                            :options="props.establecimientosDisponibles"
+                            :error="form.errors.establecimiento_id"
+                            label="Selecciona un establecimiento:"
+                            placeholder="Elije el lugar"
+                            id="establecimiento_id"
+                          />
+
+                          <InputTexto
+                            v-model="form.cargo"
+                            label="Escríbe su cargo:"
+                            icon="work"
+                            type="text"
+                            placeholder="Ingresa su posición"
+                            :maxLength="limitesCaracteres.cargo"
+                            :error="form.errors.cargo"
+                            @blur="handleBlur(form, 'cargo')"
+                          />
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
-                <div v-if="currentStep === 3">
-                  <div
-                    class="2xl:flex 2xl:flex-row 2xl:justify-between 2xl:items-center 2xl:gap-2 xl:flex xl:flex-row xl:justify-between xl:items-center xl:gap-2 gap-3 flex flex-col items-center"
-                  ></div>
                 </div>
               </div>
             </Transition>
           </div>
 
           <!-- Pie del Modal -->
-          <div class="mt-5 flex justify-between items-center flex-shrink-0">
-            <BtnPrimario v-if="currentStep > 1" @click="prevStep">
-              BtnSecundario
-            </BtnPrimario>
+          <div class="mt-5 flex gap-3 justify-between items-center flex-shrink-0">
+            <BtnSecundario
+              v-if="currentStep > 1"
+              type="button"
+              @click="prevStep"
+              class="w-[50%] py-3 px-5"
+            >
+              <p class="text-[14px]">Atrás</p>
+            </BtnSecundario>
             <div v-else></div>
-
             <BtnPrimario
               v-if="currentStep < totalSteps"
+              type="button"
               @click="nextStep"
               class="w-[50%]"
             >
               Siguiente
             </BtnPrimario>
 
-            <button
-              v-else
-              type="submit"
-              :disabled="form.processing"
-              class="bg-green-600 text-white rounded-md shadow-sm py-2 px-4 hover:bg-green-500 disabled:opacity-50 transition-colors"
+            <BtnPrimario class="w-[50%]" v-else type="submit" :disabled="form.processing"
+              >Finalizar</BtnPrimario
             >
-              Crear Usuario
-            </button>
           </div>
         </form>
       </Transition>

@@ -26,8 +26,12 @@ const props = defineProps({
   usuariosEnPapelera: { type: Array },
   establecimientosDisponibles: { type: Array },
   indicativosDisponibles: { type: Array },
+  tipoDocumentoDisponibles: { type: Array },
   filtrosDisponibles: { type: Object },
   usuariosEnPapelera: { type: Array },
+  rolesDisponibles: { type: Array },
+  generosDisponibles: { type: Array },
+  appsDisponibles: { type: Array },
 });
 
 const authStore = useAuthStore();
@@ -356,6 +360,10 @@ const rol = authStore.rol;
         :is-open="isModalOpenCrearUser"
         :establecimientosDisponibles="establecimientosDisponibles"
         :indicativosDisponibles="indicativosDisponibles"
+        :tipoDocumentoDisponibles="tipoDocumentoDisponibles"
+        :rolesDisponibles="rolesDisponibles"
+        :generosDisponibles="generosDisponibles"
+        :appsDisponibles="appsDisponibles"
         @close="closeUserCreationModal"
       />
       <ModalPapeleraUsuario
