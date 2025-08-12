@@ -3,7 +3,6 @@ import { defineProps, defineEmits } from "vue";
 import { router } from "@inertiajs/vue3";
 import { formatFecha } from "@/Utils/date";
 
-
 const props = defineProps({
   isOpen: {
     type: Boolean,
@@ -55,30 +54,24 @@ function eliminarPermanentemente(usuario) {
   <Transition name="modal-fade" appear>
     <div
       v-if="isOpen"
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 backdrop-blur-sm"
-      @click.self="$emit('close')"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-mono-negro_opacity_full backdrop-blur-sm"
     >
+      <button
+        type="button"
+        @click="$emit('close')"
+        class="absolute top-5 right-5 text-gray-400 hover:text-white focus:outline-none"
+      >
+        <span class="material-symbols-rounded text-[30px]">close</span>
+      </button>
       <Transition name="modal-slide" appear>
         <div
-          class="relative bg-gray-900 rounded-xl shadow-lg w-full max-w-4xl text-gray-300 overflow-hidden"
+          class="relative bg-mono-negro rounded-xl shadow-lg w-full max-w-[65%] border border-secundary-light text-gray-300 flex flex-col p-5 overflow-auto"
         >
           <!-- Encabezado -->
-          <div
-            class="px-6 py-4 border-b border-gray-800 flex justify-between items-center"
-          >
-            <h3 class="text-xl font-semibold text-gray-100 flex items-center">
-              <span class="material-symbols-rounded align-middle mr-2 text-primary"
-                >delete</span
-              >
-              Papelera de Usuarios
-            </h3>
-            <button
-              @click="$emit('close')"
-              class="text-gray-400 hover:text-white focus:outline-none"
-            >
-              <span class="material-symbols-rounded align-middle">close</span>
-            </button>
-          </div>
+          <h4 class="font-semibold text-[35px] text-mono-blanco">Papelera de usuarios</h4>
+          <p class="text-[16px] text-secundary-light -mt-2 mb-4">
+            Aqui aparecerán todos los usuarios que eliminaste.
+          </p>
 
           <!-- Contenido y Tabla -->
           <div class="p-6 max-h-[70vh] overflow-y-auto">
@@ -127,16 +120,6 @@ function eliminarPermanentemente(usuario) {
               <span class="material-symbols-rounded text-5xl">recycling</span>
               <p class="mt-2">La papelera está vacía.</p>
             </div>
-          </div>
-
-          <!-- Pie del Modal -->
-          <div class="px-6 py-3 bg-gray-800 text-right">
-            <button
-              @click="$emit('close')"
-              class="bg-primary text-white rounded-md shadow-sm py-2 px-4 hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
-            >
-              Cerrar
-            </button>
           </div>
         </div>
       </Transition>
