@@ -8,17 +8,17 @@ import ModalCrearUsuario from "@/Components/Modales/FixnologyCO/Usuarios/ModalCr
 import ModalPapeleraUsuario from "@/Components/Modales/FixnologyCO/Usuarios/ModalPapeleraUsuario.vue";
 import vistasDatos from "@/Components/Shared/buttons/vistasDatos.vue";
 import barraBusqueda from "@/Components/Shared/barraBusqueda/barraBusqueda.vue";
+import BtnPrimario from "@/Components/Shared/buttons/btnPrimario.vue";
+import BtnSecundario from "@/Components/Shared/buttons/btnSecundario.vue";
+import VistaUsuarioLista from "@/Components/InfoCards/UsuariosCards/VistaUsuarioLista.vue";
+import VistaUsuarioTabla from "@/Components/InfoCards/UsuariosCards/VistaUsuarioTabla.vue";
+import VistaUsuarioTarjeta from "@/Components/InfoCards/UsuariosCards/VistaUsuarioTarjeta.vue";
+import FiltroUsuarios from "@/Components/Shared/Filtros/FiltroUsuarios.vue";
 import MensajesLayout from "@/Layouts/MensajesLayout.vue";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import { useAuthStore } from "@/stores/auth";
 import { useInfoUser } from "@/stores/infoUsers";
 import "dayjs/locale/es";
-import BtnPrimario from "@/Components/Shared/buttons/btnPrimario.vue";
-import BtnSecundario from "@/Components/Shared/buttons/btnSecundario.vue";
-import VistaUsuarioTabla from "@/Components/InfoCards/UsuariosCards/VistaUsuarioTabla.vue";
-import VistaUsuarioLista from "@/Components/InfoCards/UsuariosCards/VistaUsuarioLista.vue";
-import VistaUsuarioTarjeta from "@/Components/InfoCards/UsuariosCards/VistaUsuarioTarjeta.vue";
-import FiltroUsuarios from "@/Components/Shared/Filtros/FiltroUsuarios.vue";
 
 const props = defineProps({
   todosLosUsuarios: { type: Array, required: true },
@@ -375,7 +375,6 @@ const rol = authStore.rol;
   </div>
 </template>
 <style scoped>
-/* Transición para el cambio entre vistas (tabla, lista, grid) */
 .view-change-enter-active,
 .view-change-leave-active {
   transition: all 0.2s ease-out;

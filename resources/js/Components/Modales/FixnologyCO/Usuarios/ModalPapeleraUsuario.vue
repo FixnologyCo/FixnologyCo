@@ -27,7 +27,6 @@ const props = defineProps({
 
 defineEmits(["close"]);
 
-// 2. Función para restaurar un usuario
 function restaurarUsuario(usuario) {
   if (
     confirm(
@@ -38,16 +37,13 @@ function restaurarUsuario(usuario) {
       route("usuarios.restore", { id: usuario.id }),
       {},
       {
-        preserveScroll: true, // Evita que la página salte
-        onSuccess: () => {
-          // Opcional: podrías emitir un evento para notificar al padre que la lista cambió
-        },
+        preserveScroll: true,
+        onSuccess: () => {},
       }
     );
   }
 }
 
-// 3. Función para eliminar un usuario permanentemente
 function eliminarPermanentemente(usuario) {
   if (
     confirm(

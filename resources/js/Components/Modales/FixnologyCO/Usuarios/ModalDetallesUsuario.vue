@@ -1,11 +1,11 @@
 <script setup>
 import { defineProps, defineEmits, computed, ref } from "vue";
-import { useInfoUser } from "@/stores/infoUsers";
 import useEstadoClass from "@/Composables/useEstado";
+import { useTiempo } from "@/Composables/useTiempo";
 import { formatFecha } from "@/Utils/date";
 import { formatCOP } from "@/Utils/formateoMoneda";
-import { useTiempo } from "@/Composables/useTiempo";
 import { router } from "@inertiajs/vue3";
+import { useInfoUser } from "@/stores/infoUsers";
 import dayjs from "dayjs";
 
 defineProps({
@@ -19,15 +19,9 @@ const emit = defineEmits(["close"]);
 const infoUserStore = useInfoUser();
 const { getEstadoClass } = useEstadoClass();
 
-// 1. Creamos una propiedad computada que siempre refleje el usuario de la tienda.
-//    Esto es una fuente de datos reactiva.
 const usuarioSeleccionado = computed(() => infoUserStore.user);
 
-// 2. Llamamos a useTiempo UNA SOLA VEZ, pasándole la fuente reactiva.
-//    El composable se encargará del resto.
 const { tiempoActivo, diasRestantes } = useTiempo(usuarioSeleccionado);
-
-// --- El resto de tus computed properties pueden usar la tienda directamente ---
 
 const inicialesNombreUsuario = computed(() => {
   const nombres = infoUserStore.primerNombre || "";
@@ -52,24 +46,18 @@ const activeTab = ref(0);
 const tabs = [{ label: "Información general" }, { label: "Editar usuario" }];
 
 function eliminarUsuario() {
-  // 1. Mostramos una ventana de confirmación nativa del navegador.
-  //    (Para una mejor experiencia, podrías reemplazar esto con un modal de confirmación).
   if (
     confirm(
       `¿Estás seguro de que quieres eliminar a ${infoUserStore.nombreCompleto}? Esta acción no se puede deshacer.`
     )
   ) {
-    // 2. Usamos el router de Inertia para enviar una petición DELETE.
     router.delete(
       route("usuarios.destroy", { usuarioAEliminar: infoUserStore.idUsuario }),
       {
         onSuccess: () => {
-          // 3. Si la eliminación es exitosa, cerramos el modal.
-          //    Inertia recargará la página y mostrará el mensaje de éxito.
           emit("close");
         },
         onError: (errors) => {
-          // Opcional: Manejar errores, por ejemplo, mostrando una notificación.
           console.error("Error al eliminar:", errors);
           alert("No se pudo eliminar el usuario.");
         },
@@ -78,35 +66,28 @@ function eliminarUsuario() {
   }
 }
 
-// 1. Obtiene el historial de facturas (todas menos la próxima)
 const historialFacturas = computed(() => {
-  // Ordenamos las facturas de la más reciente a la más antigua
   return [...infoUserStore.facturas].sort((a, b) =>
     dayjs(b.fecha_pago).diff(dayjs(a.fecha_pago))
   );
 });
 
-// 2. Calcula la información de la próxima factura
 const proximaFactura = computed(() => {
   if (infoUserStore.facturas.length === 0) {
-    return null; // No hay facturas, no hay próximo cobro
+    return null;
   }
 
-  // Encontramos la última factura pagada
   const ultimaFacturaPagada = historialFacturas.value.find(
     (f) => f.estado.tipo_estado === "Pagado"
   );
 
   if (!ultimaFacturaPagada) {
-    // Si no hay ninguna pagada, podríamos mostrar la más reciente pendiente
     return historialFacturas.value[0];
   }
-
-  // Calculamos la fecha del próximo pago
+  o;
   const fechaUltimoPago = dayjs(ultimaFacturaPagada.fecha_pago);
   const proximaFechaPago = fechaUltimoPago.add(infoUserStore.duracionMembresia, "day");
 
-  // Creamos un objeto "virtual" para la próxima factura
   return {
     fecha_pago: proximaFechaPago.toISOString(),
     estado: { tipo_estado: "Pendiente" },

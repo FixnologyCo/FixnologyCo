@@ -1,8 +1,8 @@
 <script setup>
 import { defineProps, defineEmits, ref, computed } from "vue";
 import { useForm } from "@inertiajs/vue3";
-import InputTexto from "@/Components/Shared/inputs/InputTexto.vue";
 import { handleBlur, handleInput, limitesCaracteres } from "@/Utils/formateoInputs";
+import InputTexto from "@/Components/Shared/inputs/InputTexto.vue";
 import BtnPrimario from "@/Components/Shared/buttons/btnPrimario.vue";
 import Selects from "@/Components/Shared/inputs/Selects.vue";
 import BtnSecundario from "@/Components/Shared/buttons/btnSecundario.vue";

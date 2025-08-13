@@ -7,6 +7,7 @@ import SidebarSuperAdmin from "@/Components/Sidebar/FixnologyCO/Sidebar.vue";
 import MensajesLayout from "@/Layouts/MensajesLayout.vue";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import { useAuthStore } from "@/stores/auth";
+import ConfirmacionesPop from "@/Components/Modales/Confirmaciones/ConfirmacionesPop.vue";
 const authStore = useAuthStore();
 defineOptions({
   layout: AuthenticatedLayout,
@@ -23,6 +24,14 @@ const props = defineProps({
     required: true,
   },
 });
+
+const isModalConfirmated = ref(false);
+function openConfirmatedModal() {
+  isModalConfirmated.value = true;
+}
+function closeConfirmatedModal() {
+  isModalConfirmated.value = false;
+}
 </script>
 
 <template>
@@ -33,5 +42,7 @@ const props = defineProps({
     <div class="">
       <h1 class="text-[30px] dark:text-mono-blanco text-mono-negro">Dashboard</h1>
     </div>
+    <button @click="openConfirmatedModal()">confirmacion</button>
   </SidebarSuperAdmin>
+  <ConfirmacionesPop :is-open="isModalConfirmated" @close="closeConfirmatedModal" />
 </template>
