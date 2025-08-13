@@ -2,6 +2,17 @@
 import { defineProps, defineEmits } from "vue";
 import { router } from "@inertiajs/vue3";
 import { formatFecha } from "@/Utils/date";
+import {
+  getFotoEstablecimientoUrlCompleta,
+  getFotoUrlCompleta,
+} from "@/Utils/ImagenUsuarios";
+import {
+  getInicialesEstablecimiento,
+  getInicialesUsuario,
+} from "@/Utils/inicialesNombres";
+import { formatCOP } from "@/Utils/formateoMoneda";
+import useEstadoClass from "@/Composables/useEstado";
+const { getEstadoClass } = useEstadoClass();
 
 const props = defineProps({
   isOpen: {
@@ -48,6 +59,22 @@ function eliminarPermanentemente(usuario) {
     });
   }
 }
+
+function vaciarPapelera() {
+  if (
+    confirm(
+      "¿Estás seguro de que quieres vaciar toda la papelera? Esta acción es irreversible."
+    )
+  ) {
+    router.post(
+      route("usuarios.emptyTrash"),
+      {},
+      {
+        preserveScroll: true,
+      }
+    );
+  }
+}
 </script>
 
 <template>
@@ -65,39 +92,174 @@ function eliminarPermanentemente(usuario) {
       </button>
       <Transition name="modal-slide" appear>
         <div
-          class="relative bg-mono-negro rounded-xl shadow-lg w-full max-w-[65%] border border-secundary-light text-gray-300 flex flex-col p-5 overflow-auto"
+          class="relative bg-mono-negro rounded-lg h-auto max-h-[80%] w-full max-w-[80%] border border-secundary-light text-mono-blanco p-5 overflow-auto"
         >
-          <!-- Encabezado -->
-          <h4 class="font-semibold text-[35px] text-mono-blanco">Papelera de usuarios</h4>
-          <p class="text-[16px] text-secundary-light -mt-2 mb-4">
-            Aqui aparecerán todos los usuarios que eliminaste.
-          </p>
-
-          <!-- Contenido y Tabla -->
-          <div class="p-6 max-h-[70vh] overflow-y-auto">
+          <div class="max-h-[70vh] overflow-y-auto">
             <div v-if="usuariosEnPapelera.length > 0">
-              <table class="w-full text-sm text-left text-gray-400">
-                <thead class="text-xs text-gray-400 uppercase bg-gray-800">
+              <h4 class="font-semibold text-[35px] text-mono-blanco">
+                Papelera de usuarios
+              </h4>
+              <div class="flex justify-between items-center">
+                <p class="text-[16px] text-secundary-light -mt-2 mb-4">
+                  Aqui aparecerán todos los usuarios que eliminaste.
+                </p>
+                <div class="flex gap-2 items-center">
+                  <p
+                    class="text-[14px] border border-secundary-light px-3 rounded-md text-secundary-light"
+                  >
+                    <span class="text-[20px] font-medium">{{
+                      usuariosEnPapelera.length
+                    }}</span>
+                    Total
+                  </p>
+                  <button
+                    @click="vaciarPapelera"
+                    class="flex items-center justify-center hover:-translate-y-1 text-[14px] border border-semaforo-rojo p-1 rounded-md text-semaforo-rojo"
+                  >
+                    <span class="material-symbols-rounded">delete_sweep</span>
+                  </button>
+                </div>
+              </div>
+
+              <table class="w-full text-left text-mono-blanco">
+                <thead class="text-xs uppercase">
                   <tr>
-                    <th scope="col" class="px-4 py-3">Nombre</th>
-                    <th scope="col" class="px-4 py-3">Correo</th>
-                    <th scope="col" class="px-4 py-3">Fecha de Eliminación</th>
-                    <th scope="col" class="px-4 py-3 text-right">Acciones</th>
+                    <th scope="col" class="p-4 font-semibold">Usuario</th>
+
+                    <th scope="col" class="font-semibold">Teléfono</th>
+                    <th scope="col" class="font-semibold">Locación</th>
+                    <th scope="col" class="font-semibold">Paquete</th>
+
+                    <th scope="col" class="font-semibold">Estado Factura</th>
+                    <th scope="col" class="font-semibold">Fecha eliminación</th>
+                    <th scope="col" class="font-semibold">Acciones</th>
                   </tr>
                 </thead>
-                <tbody>
+
+                <TransitionGroup tag="tbody" name="list">
                   <tr
                     v-for="usuario in usuariosEnPapelera"
                     :key="usuario.id"
-                    class="border-b border-gray-800 hover:bg-gray-800/50"
+                    class="group hover:bg-mono-blanco_opacity"
                   >
-                    <td class="px-4 py-3 font-medium text-gray-200">
-                      {{ usuario.perfil_usuario.primer_nombre }}
-                      {{ usuario.perfil_usuario.primer_apellido }}
+                    <td class="flex items-center w-full py-1">
+                      <div
+                        class="mr-2 ml-4 my-1 grid place-content-center foto w-[50px] h-[50px] rounded-[10px] bg-mono-blanco_opacity dark:bg-secundary-opacity backdrop-blur-lg"
+                      >
+                        <template v-if="getFotoUrlCompleta(usuario)">
+                          <div class="relative group w-[50px] h-[50px]">
+                            <img
+                              :src="getFotoUrlCompleta(usuario)"
+                              class="rounded-[10px] border-2 w-full h-full object-cover shadow-lg"
+                            />
+                          </div>
+                        </template>
+
+                        <template v-else>
+                          <div class="relative group w-[50px] h-[50px]">
+                            <p
+                              class="h-full w-full flex justify-center items-center text-[20px] font-semibold border-2 rounded-[10px]"
+                            >
+                              {{ getInicialesUsuario(usuario) }}
+                            </p>
+                          </div>
+                        </template>
+                      </div>
+                      <div class="detalles">
+                        <div class="nombre flex gap-1 items-center">
+                          <h2 class="text-[18px] font-medium">
+                            {{ usuario.perfil_usuario.primer_nombre }}
+                            {{ usuario.perfil_usuario.segundo_nombre }}
+                            {{ usuario.perfil_usuario.primer_apellido }}
+                            {{ usuario.perfil_usuario.segundo_apellido }}
+                          </h2>
+                          <div
+                            class="grid place-items-center"
+                            v-if="usuario.google_id === null"
+                          >
+                            <span
+                              class="material-symbols-rounded text-[18px] text-gray-700"
+                              >verified_off</span
+                            >
+                          </div>
+                          <div
+                            class="grid place-items-center text-secundary-default dark:text-mono-blanco"
+                            v-else
+                          >
+                            <span
+                              class="material-symbols-rounded text-[18px] text-secondary"
+                              >verified</span
+                            >
+                          </div>
+                        </div>
+                        <div class="flex -mt-2 justify-between items-end">
+                          <p class="text-secundary-light text-[14px]">
+                            {{ usuario.establecimiento_asignado.nombre_establecimiento }}
+                          </p>
+                        </div>
+                      </div>
                     </td>
-                    <td class="px-4 py-3">{{ usuario.perfil_usuario.correo }}</td>
-                    <td class="px-4 py-3">{{ formatFecha(usuario.deleted_at) }}</td>
-                    <td class="px-4 py-3 flex justify-end gap-2">
+
+                    <td>
+                      <p class="text-secundary-light text-[14px]">
+                        ({{ usuario.perfil_usuario.indicativo.codigo_pais }})
+                        {{ usuario.perfil_usuario.telefono }}
+                      </p>
+                    </td>
+
+                    <td>
+                      <p class="text-secundary-light text-[14px]">
+                        {{ usuario.perfil_usuario.barrio_residencia }},
+                        {{ usuario.perfil_usuario.ciudad_residencia }}
+                      </p>
+                    </td>
+
+                    <td>
+                      <p class="text-secundary-light text-[14px]">
+                        {{ usuario.establecimiento_asignado.aplicacion_web.nombre_app }} -
+                        {{
+                          usuario.establecimiento_asignado.aplicacion_web.membresia
+                            .nombre_membresia
+                        }}
+                      </p>
+                    </td>
+
+                    <td class="text-center pr-4">
+                      <div
+                        v-if="
+                          usuario.establecimiento?.facturas &&
+                          usuario.establecimiento?.facturas.length > 0
+                        "
+                      >
+                        <p
+                          class="p-1 w-full rounded-md text-[14px] font-bold"
+                          :class="
+                            getEstadoClass(
+                              usuario.establecimiento_asignado?.facturas[0].estado
+                                .tipo_estado
+                            )
+                          "
+                        >
+                          {{
+                            usuario.establecimiento_asignado?.facturas[0].estado
+                              .tipo_estado
+                          }}
+                        </p>
+                      </div>
+
+                      <div v-else>
+                        <div v-if="usuario" class="text-sm text-gray-400 mt-2">
+                          No posee
+                        </div>
+                        <div v-else class="text-sm text-gray-500">Sin Información :c</div>
+                      </div>
+                    </td>
+
+                    <td class="text-secundary-light text-[14px]">
+                      {{ formatFecha(usuario.deleted_at) }}
+                    </td>
+
+                    <td class="flex gap-2">
                       <button
                         @click="restaurarUsuario(usuario)"
                         class="font-medium text-green-500 hover:underline"
@@ -112,13 +274,14 @@ function eliminarPermanentemente(usuario) {
                       </button>
                     </td>
                   </tr>
-                </tbody>
+                </TransitionGroup>
               </table>
             </div>
-            <!-- Mensaje si la papelera está vacía -->
-            <div v-else class="text-center py-10 text-gray-500">
+
+            <div v-else class="text-center py-10 text-secundary-light">
               <span class="material-symbols-rounded text-5xl">recycling</span>
               <p class="mt-2">La papelera está vacía.</p>
+              <p>Aqui aparecerán todos los usuarios que eliminaste.</p>
             </div>
           </div>
         </div>

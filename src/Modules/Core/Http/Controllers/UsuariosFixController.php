@@ -274,13 +274,12 @@ class UsuariosFixController extends Controller
         return redirect()->back()->with('success', 'Usuario restaurado correctamente.');
     }
 
-    public function forceDestroy($id)
+   public function forceDestroy($id)
     {
         $usuarioAEliminar = User::withTrashed()->findOrFail($id);
 
-        // --- Autorización ---
         if (Auth::user()->perfilUsuario->rol_id !== 4) {
-            return back()->with('error', 'No tienes permisos para realizar esta acción.');
+            return back()->with('error', 'No tienes permisos para esta acción.');
         }
         if ($usuarioAEliminar->id === Auth::id()) {
             return back()->with('error', 'Acción no permitida.');
@@ -288,49 +287,93 @@ class UsuariosFixController extends Controller
 
         try {
             DB::beginTransaction();
-
-            $usuarioAEliminar->load(['perfilUsuario', 'perfilEmpleado', 'establecimiento']);
-
-            FacturacionMembresias::where('cliente_id', $usuarioAEliminar->id)->forceDelete();
-
-            if ($establecimiento = $usuarioAEliminar->establecimiento) {
-
-
-                $empleadosAEliminar = User::whereHas('perfilEmpleado', function ($query) use ($establecimiento) {
-                    $query->where('establecimiento_id', $establecimiento->id);
-                })->where('id', '!=', $usuarioAEliminar->id)->get();
-
-
-                foreach ($empleadosAEliminar as $empleado) {
-                    // Eliminar las dependencias de cada empleado
-                    FacturacionMembresias::where('cliente_id', $empleado->id)->forceDelete();
-                    $empleado->perfilEmpleado()->forceDelete();
-                    $empleado->perfilUsuario()->forceDelete();
-                    $empleado->forceDelete();
-                }
-
-                $establecimiento->facturas()->forceDelete();
-                $establecimiento->token()->forceDelete();
-
-                $establecimiento->forceDelete();
-            }
-
-            if ($usuarioAEliminar->perfilEmpleado) {
-                $usuarioAEliminar->perfilEmpleado->forceDelete();
-            }
-            if ($usuarioAEliminar->perfilUsuario) {
-                $usuarioAEliminar->perfilUsuario->forceDelete();
-            }
-
-            $usuarioAEliminar->forceDelete();
-
+            // Llama al método privado que contiene la lógica de borrado
+            $this->_forceDeleteUser($usuarioAEliminar);
             DB::commit();
-            return redirect()->back()->with('success', 'Usuario, su establecimiento y todos sus empleados han sido eliminados permanentemente.');
-
+            return redirect()->back()->with('success', 'Usuario eliminado permanentemente.');
         } catch (Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Ocurrió un error inesperado al eliminar el usuario. No se realizaron cambios.');
+            \Log::error('Error al eliminar usuario ID ' . $id . ': ' . $e->getMessage());
+            return back()->with('error', 'Ocurrió un error al eliminar el usuario.');
         }
+    }
+
+    /**
+     * Vacía toda la papelera, eliminando permanentemente todos los usuarios.
+     */
+    public function emptyTrash()
+    {
+        if (Auth::user()->perfilUsuario->rol_id !== 4) {
+            return back()->with('error', 'No tienes permisos para esta acción.');
+        }
+
+        // 1. Obtener todos los usuarios en la papelera
+        $usuariosEnPapelera = User::onlyTrashed()->get();
+
+        if ($usuariosEnPapelera->isEmpty()) {
+            return back()->with('info', 'La papelera ya está vacía.');
+        }
+
+        // 2. Iterar y eliminar cada uno usando la lógica refactorizada
+        try {
+            DB::beginTransaction();
+            foreach ($usuariosEnPapelera as $usuario) {
+                // Se asegura de no eliminar al usuario autenticado si estuviera en la papelera
+                if ($usuario->id !== Auth::id()) {
+                    $this->_forceDeleteUser($usuario);
+                }
+            }
+            DB::commit();
+            return redirect()->back()->with('success', 'La papelera ha sido vaciada correctamente.');
+        } catch (Exception $e) {
+            DB::rollBack();
+            \Log::error('Error al vaciar la papelera: ' . $e->getMessage());
+            return back()->with('error', 'Ocurrió un error al vaciar la papelera.');
+        }
+    }
+
+    /**
+     * Lógica de borrado encapsulada para ser reutilizada.
+     * @param User $usuarioAEliminar
+     */
+    private function _forceDeleteUser(User $usuarioAEliminar)
+    {
+        // Carga las relaciones necesarias para el borrado en cascada
+        $usuarioAEliminar->load(['perfilUsuario', 'perfilEmpleado', 'establecimiento']);
+
+        // Eliminar facturas donde el usuario es el cliente
+        FacturacionMembresias::where('cliente_id', $usuarioAEliminar->id)->forceDelete();
+
+        // Si el usuario es propietario de un establecimiento
+        if ($establecimiento = $usuarioAEliminar->establecimiento) {
+            // Encuentra y elimina a todos los empleados de ese establecimiento
+            $empleadosAEliminar = User::whereHas('perfilEmpleado', function ($query) use ($establecimiento) {
+                $query->where('establecimiento_id', $establecimiento->id);
+            })->where('id', '!=', $usuarioAEliminar->id)->get();
+
+            foreach ($empleadosAEliminar as $empleado) {
+                FacturacionMembresias::where('cliente_id', $empleado->id)->forceDelete();
+                $empleado->perfilEmpleado()->forceDelete();
+                $empleado->perfilUsuario()->forceDelete();
+                $empleado->forceDelete();
+            }
+
+            // Elimina las dependencias del establecimiento
+            $establecimiento->facturas()->forceDelete();
+            $establecimiento->token()->forceDelete();
+            $establecimiento->forceDelete();
+        }
+
+        // Elimina los perfiles del usuario principal
+        if ($usuarioAEliminar->perfilEmpleado) {
+            $usuarioAEliminar->perfilEmpleado->forceDelete();
+        }
+        if ($usuarioAEliminar->perfilUsuario) {
+            $usuarioAEliminar->perfilUsuario->forceDelete();
+        }
+
+        // Finalmente, elimina el usuario
+        $usuarioAEliminar->forceDelete();
     }
 
     public function bulkDestroy(Request $request)

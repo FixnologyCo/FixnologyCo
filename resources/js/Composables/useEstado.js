@@ -3,7 +3,7 @@ export default function useEstadoClass() {
     if (estado === 'Inactivo' || estado === 'Pendiente') return 'bg-semaforo-rojo shadow-rojo';
     if (estado === 'Suspendido') return 'bg-semaforo-amarillo shadow-amarillo';
     if (estado === 'Activo' || estado === 'Estable') return 'bg-semaforo-verde shadow-verde';
-    if ( estado === 'Pagado') return 'bg-semaforo-verde_opacity ';
+    if ( estado === 'Pagado') return 'bg-semaforo-verde_opacity border border-semaforo-verde ';
     return '';
   };
 

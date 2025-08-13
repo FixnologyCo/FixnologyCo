@@ -6,10 +6,6 @@ import { handleBlur, handleInput, limitesCaracteres } from "@/Utils/formateoInpu
 import BtnPrimario from "@/Components/Shared/buttons/btnPrimario.vue";
 import Selects from "@/Components/Shared/inputs/Selects.vue";
 import BtnSecundario from "@/Components/Shared/buttons/btnSecundario.vue";
-import {
-  getInicialesEstablecimiento,
-  getInicialesUsuario,
-} from "@/Utils/inicialesNombres";
 
 const props = defineProps({
   isOpen: {
