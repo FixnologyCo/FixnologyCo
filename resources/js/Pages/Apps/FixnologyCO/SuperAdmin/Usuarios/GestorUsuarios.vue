@@ -19,6 +19,7 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import { useAuthStore } from "@/stores/auth";
 import { useInfoUser } from "@/stores/infoUsers";
 import "dayjs/locale/es";
+import ConfirmacionesPop from "@/Components/Modales/Confirmaciones/ConfirmacionesPop.vue";
 
 const props = defineProps({
   todosLosUsuarios: { type: Array, required: true },
@@ -199,28 +200,68 @@ function toggleSelectionMode() {
   }
 }
 
-function bulkDeleteSelectedUsers() {
-  if (!hasSelectedUsers.value) return;
+// --- 2. LÓGICA PARA EL MODAL DE CONFIRMACIÓN ---
+const confirmationState = ref({
+  isOpen: false,
+  title: "",
+  message: "",
+  icon: "help",
+  iconBgClass: "bg-gray-700",
+  confirmText: "Confirmar",
+  onConfirm: () => {},
+});
 
-  if (
-    confirm(
-      `¿Estás seguro de que quieres enviar ${selectedUserIds.value.length} usuario(s) a la papelera?`
-    )
-  ) {
-    router.post(
-      route("usuarios.bulkDestroy"),
-      {
-        ids: selectedUserIds.value,
-      },
-      {
-        onSuccess: () => {
-          selectedUserIds.value = [];
-          isSelectionModeActive.value = false;
+function openConfirmationModal({
+  title,
+  message,
+  onConfirm,
+  icon = "help",
+  iconBgClass = "bg-gray-700",
+  confirmText = "Confirmar",
+}) {
+  confirmationState.value = {
+    isOpen: true,
+    title,
+    message,
+    icon,
+    iconBgClass,
+    confirmText,
+    onConfirm,
+  };
+}
+
+function closeConfirmationModal() {
+  confirmationState.value.isOpen = false;
+}
+
+function handleConfirm() {
+  confirmationState.value.onConfirm();
+  closeConfirmationModal();
+}
+
+function bulkDeleteSelectedUsers() {
+  openConfirmationModal({
+    title: "¿Estás seguro de enviar a la papelera?",
+    message: `¿Estás apunto de enviar ${selectedUserIds.value.length} usuario(s) a la papelera?`,
+    icon: "info",
+    iconBgClass: "bg-yellow-500/20 border-semaforo-amarillo",
+    confirmText: "Sí, envíar",
+    onConfirm: () => {
+      router.post(
+        route("usuarios.bulkDestroy"),
+        {
+          ids: selectedUserIds.value,
         },
-        preserveScroll: true,
-      }
-    );
-  }
+        {
+          onSuccess: () => {
+            selectedUserIds.value = [];
+            isSelectionModeActive.value = false;
+          },
+        },
+        { preserveScroll: true }
+      );
+    },
+  });
 }
 
 const viewMode = ref(localStorage.getItem("userViewMode") || "list");
@@ -370,6 +411,16 @@ const rol = authStore.rol;
         :is-open="isModalOpenPapelera"
         @close="closePapeleraModal"
         :usuarios-en-papelera="usuariosEnPapelera"
+      />
+      <ConfirmacionesPop
+        :is-open="confirmationState.isOpen"
+        :title="confirmationState.title"
+        :message="confirmationState.message"
+        :icon="confirmationState.icon"
+        :icon-bg-class="confirmationState.iconBgClass"
+        :confirm-text="confirmationState.confirmText"
+        @close="closeConfirmationModal"
+        @confirm="handleConfirm"
       />
     </div>
   </div>

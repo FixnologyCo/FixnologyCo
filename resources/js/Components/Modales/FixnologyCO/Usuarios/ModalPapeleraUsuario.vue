@@ -1,5 +1,5 @@
 <script setup>
-import { defineProps, defineEmits } from "vue";
+import { defineProps, defineEmits, ref } from "vue";
 import { router } from "@inertiajs/vue3";
 import { formatFecha } from "@/Utils/date";
 import {
@@ -12,6 +12,7 @@ import {
 } from "@/Utils/inicialesNombres";
 import { formatCOP } from "@/Utils/formateoMoneda";
 import useEstadoClass from "@/Composables/useEstado";
+import ConfirmacionesPop from "../../Confirmaciones/ConfirmacionesPop.vue";
 const { getEstadoClass } = useEstadoClass();
 
 const props = defineProps({
@@ -27,49 +28,90 @@ const props = defineProps({
 
 defineEmits(["close"]);
 
+// --- 2. LÓGICA PARA EL MODAL DE CONFIRMACIÓN ---
+const confirmationState = ref({
+  isOpen: false,
+  title: "",
+  message: "",
+  icon: "help",
+  iconBgClass: "bg-gray-700",
+  confirmText: "Confirmar",
+  onConfirm: () => {},
+});
+
+function openConfirmationModal({
+  title,
+  message,
+  onConfirm,
+  icon = "help",
+  iconBgClass = "bg-gray-700",
+  confirmText = "Confirmar",
+}) {
+  confirmationState.value = {
+    isOpen: true,
+    title,
+    message,
+    icon,
+    iconBgClass,
+    confirmText,
+    onConfirm,
+  };
+}
+
+function closeConfirmationModal() {
+  confirmationState.value.isOpen = false;
+}
+
+function handleConfirm() {
+  confirmationState.value.onConfirm();
+  closeConfirmationModal();
+}
+
+// --- 3. FUNCIONES DE ACCIÓN ACTUALIZADAS ---
 function restaurarUsuario(usuario) {
-  if (
-    confirm(
-      `¿Estás seguro de que quieres restaurar a ${usuario.perfil_usuario.primer_nombre}?`
-    )
-  ) {
-    router.post(
-      route("usuarios.restore", { id: usuario.id }),
-      {},
-      {
-        preserveScroll: true,
-        onSuccess: () => {},
-      }
-    );
-  }
+  openConfirmationModal({
+    title: "¿Restaurar Usuario?",
+    message: `Estás a punto de restaurar a ${usuario.perfil_usuario.primer_nombre}. ¿Continuar?`,
+    icon: "restore_from_trash",
+    iconBgClass: "bg-green-500/20 border-semaforo-verde",
+    confirmText: "Sí, restaurar",
+    onConfirm: () => {
+      router.post(
+        route("usuarios.restore", { id: usuario.id }),
+        {},
+        { preserveScroll: true }
+      );
+    },
+  });
 }
 
 function eliminarPermanentemente(usuario) {
-  if (
-    confirm(
-      `¡ADVERTENCIA! Esta acción es irreversible y eliminará todos los datos de ${usuario.perfil_usuario.primer_nombre}. ¿Continuar?`
-    )
-  ) {
-    router.delete(route("usuarios.forceDestroy", { id: usuario.id }), {
-      preserveScroll: true,
-    });
-  }
+  openConfirmationModal({
+    title: "¿Eliminar Permanentemente?",
+    message: `¡Advertencia! Esta acción es irreversible y eliminará todos los datos de ${usuario.perfil_usuario.primer_nombre}.`,
+    icon: "delete_forever",
+    iconBgClass: "bg-red-500/20 border-semaforo-rojo",
+    confirmText: "Sí, eliminar",
+    onConfirm: () => {
+      router.delete(route("usuarios.forceDestroy", { id: usuario.id }), {
+        preserveScroll: true,
+      });
+    },
+  });
 }
 
 function vaciarPapelera() {
-  if (
-    confirm(
-      "¿Estás seguro de que quieres vaciar toda la papelera? Esta acción es irreversible."
-    )
-  ) {
-    router.post(
-      route("usuarios.emptyTrash"),
-      {},
-      {
-        preserveScroll: true,
-      }
-    );
-  }
+  openConfirmationModal({
+    title: "¿Vaciar toda la Papelera?",
+    message:
+      "Esta acción eliminará permanentemente a todos los usuarios en la papelera y no se puede deshacer.",
+    icon: "delete_sweep",
+    iconBgClass: "bg-red-500/20 border-semaforo-rojo",
+    confirmText: "Sí, vaciar todo",
+    onConfirm: () => {
+      router.post(route("usuarios.emptyTrash"), {}, { preserveScroll: true });
+    },
+  });
 }
 </script>
 
@@ -284,23 +326,42 @@ function vaciarPapelera() {
       </Transition>
     </div>
   </Transition>
+
+  <ConfirmacionesPop
+    :is-open="confirmationState.isOpen"
+    :title="confirmationState.title"
+    :message="confirmationState.message"
+    :icon="confirmationState.icon"
+    :icon-bg-class="confirmationState.iconBgClass"
+    :confirm-text="confirmationState.confirmText"
+    @close="closeConfirmationModal"
+    @confirm="handleConfirm"
+  />
 </template>
 <style scoped>
 .input-field {
   margin-top: 0.25rem;
   display: block;
   width: 100%;
-  background-color: #1f2937; /* bg-gray-800 */
-  border-color: #374151; /* border-gray-700 */
-  border-radius: 0.375rem; /* rounded-md */
-  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05); /* shadow-sm */
-  color: #fff; /* text-white */
+  background-color: #1f2937;
+  /* bg-gray-800 */
+  border-color: #374151;
+  /* border-gray-700 */
+  border-radius: 0.375rem;
+  /* rounded-md */
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  /* shadow-sm */
+  color: #fff;
+  /* text-white */
 }
 
 .error-message {
-  color: #ef4444; /* text-red-500 */
-  font-size: 0.75rem; /* text-xs */
-  margin-top: 0.25rem; /* mt-1 */
+  color: #ef4444;
+  /* text-red-500 */
+  font-size: 0.75rem;
+  /* text-xs */
+  margin-top: 0.25rem;
+  /* mt-1 */
 }
 
 /* Transición para el modal completo */
@@ -308,14 +369,17 @@ function vaciarPapelera() {
 .modal-fade-leave-active {
   transition: opacity 0.3s ease;
 }
+
 .modal-fade-enter-from,
 .modal-fade-leave-to {
   opacity: 0;
 }
+
 .modal-slide-enter-active,
 .modal-slide-leave-active {
   transition: all 0.3s ease-out;
 }
+
 .modal-slide-enter-from,
 .modal-slide-leave-to {
   transform: translateY(20px);
@@ -327,10 +391,12 @@ function vaciarPapelera() {
 .slide-fade-leave-active {
   transition: all 0.25s ease-out;
 }
+
 .slide-fade-enter-from {
   opacity: 0;
   transform: translateX(30px);
 }
+
 .slide-fade-leave-to {
   opacity: 0;
   transform: translateX(-30px);

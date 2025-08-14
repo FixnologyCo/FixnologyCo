@@ -3,25 +3,23 @@ import BtnPrimario from "@/Components/Shared/buttons/btnPrimario.vue";
 import BtnSecundario from "@/Components/Shared/buttons/btnSecundario.vue";
 import { computed } from "vue";
 
-const model = defineModel();
-
-const props = defineProps({
-  label: { type: String, required: true },
-  parrafo: { type: String, required: true },
-  icon: { type: String, default: "edit" },
-  isOpen: {
-    type: Boolean,
-    required: true,
-  },
+defineProps({
+  isOpen: { type: Boolean, required: true },
+  title: { type: String, required: true },
+  message: { type: String, required: true },
+  icon: { type: String, default: "help" },
+  confirmText: { type: String, default: "Confirmar" },
+  cancelText: { type: String, default: "Cancelar" },
+  iconBgClass: { type: String, default: "bg-gray-700" },
 });
 
-const emit = defineEmits(["blur", "input"]);
+const emit = defineEmits(["close", "confirm"]);
 </script>
 <template>
   <Transition name="modal-fade" appear>
     <div
       v-if="isOpen"
-      class="fixed inset-0 z-50 flex items-start py-[2%] justify-center bg-mono-negro_opacity_full backdrop-blur-sm"
+      class="fixed inset-0 z-50 flex items-center py-[2%] justify-center bg-transparent backdrop-blur-sm"
     >
       <button
         type="button"
@@ -34,15 +32,16 @@ const emit = defineEmits(["blur", "input"]);
         >
           <div class="">
             <span
-              class="material-symbols-rounded bg-semaforo-rojo_opacity border border-semaforo-rojo p-4 rounded-lg"
-              >delete</span
+              :class="iconBgClass"
+              class="material-symbols-rounded border p-4 rounded-lg"
+              >{{ icon }}</span
             >
           </div>
-          <h4 class="font-semibold text-[35px] text-mono-blanco">
-            ¿Estás seguro de eliminar?
+          <h4 class="font-semibold text-[30px] text-mono-blanco">
+            {{ title }}
           </h4>
-          <p class="text-[16px] text-secundary-light -mt-2 mb-4">
-            Borraras todos sus jerarquías del usuario
+          <p class="text-[18px] text-secundary-light -mt-1 mb-4">
+            {{ message }}
           </p>
           <div class="mt-5 flex gap-3 justify-between items-center flex-shrink-0">
             <BtnSecundario
@@ -53,7 +52,9 @@ const emit = defineEmits(["blur", "input"]);
               <p class="text-[14px]">Cancelar</p>
             </BtnSecundario>
 
-            <BtnPrimario type="submit" class="w-[50%]"> Confirmar </BtnPrimario>
+            <BtnPrimario @click="emit('confirm')" type="submit" class="w-[50%]">
+              {{ confirmText }}
+            </BtnPrimario>
           </div>
         </div>
       </Transition>

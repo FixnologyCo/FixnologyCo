@@ -7,6 +7,7 @@ import { formatCOP } from "@/Utils/formateoMoneda";
 import { router } from "@inertiajs/vue3";
 import { useInfoUser } from "@/stores/infoUsers";
 import dayjs from "dayjs";
+import ConfirmacionesPop from "../../Confirmaciones/ConfirmacionesPop.vue";
 
 defineProps({
   isOpen: {
@@ -45,27 +46,67 @@ const inicialesNombreEstablecimiento = computed(() => {
 const activeTab = ref(0);
 const tabs = [{ label: "Información general" }, { label: "Editar usuario" }];
 
-function eliminarUsuario() {
-  if (
-    confirm(
-      `¿Estás seguro de que quieres eliminar a ${infoUserStore.nombreCompleto}? Esta acción no se puede deshacer.`
-    )
-  ) {
-    router.delete(
-      route("usuarios.destroy", { usuarioAEliminar: infoUserStore.idUsuario }),
-      {
-        onSuccess: () => {
-          emit("close");
-        },
-        onError: (errors) => {
-          console.error("Error al eliminar:", errors);
-          alert("No se pudo eliminar el usuario.");
-        },
-      }
-    );
-  }
+// --- 2. LÓGICA PARA EL MODAL DE CONFIRMACIÓN ---
+const confirmationState = ref({
+  isOpen: false,
+  title: "",
+  message: "",
+  icon: "help",
+  iconBgClass: "bg-gray-700",
+  confirmText: "Confirmar",
+  onConfirm: () => {},
+});
+
+function openConfirmationModal({
+  title,
+  message,
+  onConfirm,
+  icon = "help",
+  iconBgClass = "bg-gray-700",
+  confirmText = "Confirmar",
+}) {
+  confirmationState.value = {
+    isOpen: true,
+    title,
+    message,
+    icon,
+    iconBgClass,
+    confirmText,
+    onConfirm,
+  };
 }
 
+function closeConfirmationModal() {
+  confirmationState.value.isOpen = false;
+}
+
+function handleConfirm() {
+  confirmationState.value.onConfirm();
+  closeConfirmationModal();
+}
+
+function eliminarUsuario() {
+  openConfirmationModal({
+    title: "¿Estás seguro de enviar a la papelera?",
+    message: `Estás a punto de enviar a la papelera a ${infoUserStore.nombreCompleto}.`,
+    icon: "info",
+    iconBgClass: "bg-yellow-500/20 border-semaforo-amarillo",
+    confirmText: "Sí, enviar",
+    onConfirm: () => {
+      router.delete(
+        route("usuarios.destroy", {
+          usuarioAEliminar: infoUserStore.idUsuario,
+        }),
+        {
+          preserveScroll: true,
+          onSuccess: () => {
+            emit("close");
+          },
+        }
+      );
+    },
+  });
+}
 const historialFacturas = computed(() => {
   return [...infoUserStore.facturas].sort((a, b) =>
     dayjs(b.fecha_pago).diff(dayjs(a.fecha_pago))
@@ -84,7 +125,6 @@ const proximaFactura = computed(() => {
   if (!ultimaFacturaPagada) {
     return historialFacturas.value[0];
   }
-  o;
   const fechaUltimoPago = dayjs(ultimaFacturaPagada.fecha_pago);
   const proximaFechaPago = fechaUltimoPago.add(infoUserStore.duracionMembresia, "day");
 
@@ -751,6 +791,16 @@ const proximaFactura = computed(() => {
       </Transition>
     </div>
   </Transition>
+  <ConfirmacionesPop
+    :is-open="confirmationState.isOpen"
+    :title="confirmationState.title"
+    :message="confirmationState.message"
+    :icon="confirmationState.icon"
+    :icon-bg-class="confirmationState.iconBgClass"
+    :confirm-text="confirmationState.confirmText"
+    @close="closeConfirmationModal"
+    @confirm="handleConfirm"
+  />
 </template>
 
 <style scoped>
