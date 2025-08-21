@@ -17,9 +17,9 @@ export default defineConfig({
     resolve: {
         alias: {
             '@': path.resolve(__dirname, './resources/js'),
-            '@images': path.resolve(__dirname, 'resources/images'), // 👈 Alias para imágenes,
+            '@images': path.resolve(__dirname, 'resources/images'), 
             'events': path.resolve(__dirname, 'node_modules/events'),
-            'irc': path.resolve(__dirname, 'node_modules/ziggy'), // Si ziggy no depende de irc, solo quítalo
+            'irc': path.resolve(__dirname, 'node_modules/ziggy'), 
             'colors': path.resolve(__dirname, 'node_modules/colors'),
         }
     }

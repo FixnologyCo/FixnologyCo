@@ -396,7 +396,16 @@ const rol = authStore.rol;
           </div>
         </div>
       </SidebarSuperAdmin>
-      <ModalDetallesUsuario :is-open="isModalOpen" @close="closeUserDetailsModal" />
+      <ModalDetallesUsuario
+        :is-open="isModalOpen"
+        :establecimientosDisponibles="establecimientosDisponibles"
+        :indicativosDisponibles="indicativosDisponibles"
+        :tipoDocumentoDisponibles="tipoDocumentoDisponibles"
+        :rolesDisponibles="rolesDisponibles"
+        :generosDisponibles="generosDisponibles"
+        :appsDisponibles="appsDisponibles"
+        @close="closeUserDetailsModal"
+      />
       <ModalCrearUsuario
         :is-open="isModalOpenCrearUser"
         :establecimientosDisponibles="establecimientosDisponibles"

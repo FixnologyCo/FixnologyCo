@@ -4,16 +4,30 @@ import useEstadoClass from "@/Composables/useEstado";
 import { useTiempo } from "@/Composables/useTiempo";
 import { formatFecha } from "@/Utils/date";
 import { formatCOP } from "@/Utils/formateoMoneda";
-import { router } from "@inertiajs/vue3";
+import { router, useForm } from "@inertiajs/vue3";
 import { useInfoUser } from "@/stores/infoUsers";
 import dayjs from "dayjs";
 import ConfirmacionesPop from "../../Confirmaciones/ConfirmacionesPop.vue";
-
-defineProps({
+import { handleBlur, handleInput, limitesCaracteres } from "@/Utils/formateoInputs";
+import InputTexto from "@/Components/Shared/inputs/InputTexto.vue";
+import BtnPrimario from "@/Components/Shared/buttons/btnPrimario.vue";
+import Selects from "@/Components/Shared/inputs/Selects.vue";
+import BtnSecundario from "@/Components/Shared/buttons/btnSecundario.vue";
+const props = defineProps({
   isOpen: {
     type: Boolean,
     required: true,
   },
+  establecimientosDisponibles: {
+    type: Array,
+    default: () => [],
+  },
+  ciudadesDisponibles: { type: Array, default: () => [] },
+  indicativosDisponibles: { type: Array, default: () => [] },
+  tipoDocumentoDisponibles: { type: Array, default: () => [] },
+  rolesDisponibles: { type: Array, default: () => [] },
+  generosDisponibles: { type: Array, default: () => [] },
+  appsDisponibles: { type: Array, default: () => [] },
 });
 
 const emit = defineEmits(["close"]);
@@ -23,6 +37,29 @@ const { getEstadoClass } = useEstadoClass();
 const usuarioSeleccionado = computed(() => infoUserStore.user);
 
 const { tiempoActivo, diasRestantes } = useTiempo(usuarioSeleccionado);
+
+const form = useForm({
+  primer_nombre: "",
+  segundo_nombre: "",
+  primer_apellido: "",
+  segundo_apellido: "",
+  indicativo_id: "",
+  telefono: "",
+  correo: "",
+  ciudad_residencia: "",
+  barrio_residencia: "",
+  direccion_residencia: "",
+  tipo_documento_id: "",
+  numero_documento: "",
+  password: "",
+  rol_id: "",
+  genero: "",
+  establecimiento_id: "",
+  cargo: "",
+  membresia_id: "",
+  aplicacion_id: "",
+  tipo_establecimiento: "",
+});
 
 const inicialesNombreUsuario = computed(() => {
   const nombres = infoUserStore.primerNombre || "";
@@ -45,6 +82,38 @@ const inicialesNombreEstablecimiento = computed(() => {
 
 const activeTab = ref(0);
 const tabs = [{ label: "Información general" }, { label: "Editar usuario" }];
+
+// --- LÓGICA DE PASOS ---
+const currentStep = ref(1);
+const totalSteps = 2;
+
+const progressPercentage = computed(() => {
+  return ((currentStep.value - 1) / (totalSteps - 1)) * 100;
+});
+
+function nextStep() {
+  form.clearErrors();
+
+  if (currentStep.value < totalSteps) {
+    currentStep.value++;
+  }
+}
+function prevStep() {
+  if (currentStep.value > 1) {
+    currentStep.value--;
+  }
+}
+
+const submit = () => {
+  form.post(route("usuarios.store"), {
+    preserveScroll: true,
+    onSuccess: () => {
+      emit("close");
+      form.reset();
+      currentStep.value = 1;
+    },
+  });
+};
 
 // --- 2. LÓGICA PARA EL MODAL DE CONFIRMACIÓN ---
 const confirmationState = ref({
@@ -786,7 +855,397 @@ const proximaFactura = computed(() => {
               </div>
             </div>
           </div>
-          <div v-if="activeTab === 1"></div>
+          <div v-if="activeTab === 1" class="p-5">
+            <Transition name="modal-slide" appear>
+              <form
+                @submit.prevent="submit"
+                class="relative bg-mono-negro rounded-xl shadow-lg w-full border border-secundary-light text-gray-300 flex flex-col p-5"
+              >
+                <!-- Barra de Progreso -->
+                <div class="flex gap-1 items-center">
+                  <div class="w-full flex justify-between bg-gray-600 rounded-full h-1">
+                    <div
+                      class="bg-primary shadow-[0px_5px_24px] shadow-primary h-1 rounded-full transition-all duration-500 ease-out"
+                      :style="{ width: progressPercentage + '%' }"
+                    ></div>
+                  </div>
+                  <p class="text-[12px]">{{ Math.round(progressPercentage) }}%</p>
+                </div>
+
+                <!-- Encabezado -->
+
+                <!-- Cuerpo del Formulario con Transición -->
+                <div class="overflow-hidden">
+                  <Transition name="slide-fade" mode="out-in">
+                    <div :key="currentStep" class="space-y-4">
+                      <!-- PASO 1: DATOS PERSONALES -->
+                      <div v-if="currentStep === 1">
+                        <h4 class="font-semibold text-[35px] text-mono-blanco">
+                          Editar datos del usuario: {{ infoUserStore.nombreCompleto }}
+                        </h4>
+                        <p class="text-[16px] text-secundary-light -mt-2 mb-4">
+                          Ten en cuenta los cambios respectivos, lo que no cambiarás,
+                          déjalo tal cual y continúa.
+                        </p>
+                        <div class="space-y-4">
+                          <div
+                            class="2xl:flex 2xl:flex-row 2xl:justify-between 2xl:items-center 2xl:gap-2 xl:flex xl:flex-row xl:justify-between xl:items-center xl:gap-2 gap-3 flex flex-col items-center"
+                          >
+                            <InputTexto
+                              v-model="infoUserStore.primerNombre"
+                              label="Primer nombre:"
+                              icon="format_italic"
+                              type="text"
+                              placeholder="Ej: Juan"
+                              :maxLength="limitesCaracteres.nombresUsuario"
+                              :error="form.errors.primer_nombre"
+                              @blur="handleBlur(form, 'primer_nombre')"
+                              @input="(e) => handleInput(e, form, 'primer_nombre')"
+                            />
+
+                            <InputTexto
+                              v-model="infoUserStore.segundoNombre"
+                              label="Segundo nombre:"
+                              icon="format_italic"
+                              type="text"
+                              placeholder="Opcional*"
+                              :maxLength="limitesCaracteres.nombresUsuario"
+                              :error="form.errors.segundo_nombre"
+                              @blur="handleBlur(form, 'segundo_nombre')"
+                              @input="(e) => handleInput(e, form, 'segundo_nombre')"
+                            />
+
+                            <InputTexto
+                              v-model="infoUserStore.primerApellido"
+                              label="Primer apellido:"
+                              icon="format_italic"
+                              type="text"
+                              placeholder="Ej: Medina"
+                              :maxLength="limitesCaracteres.nombresUsuario"
+                              :error="form.errors.primer_apellido"
+                              @blur="handleBlur(form, 'primer_apellido')"
+                              @input="(e) => handleInput(e, form, 'primer_apellido')"
+                            />
+
+                            <InputTexto
+                              v-model="infoUserStore.segundoApellido"
+                              label="Segundo apellido:"
+                              icon="format_italic"
+                              type="text"
+                              placeholder="Opcional*"
+                              :maxLength="limitesCaracteres.nombresUsuario"
+                              :error="form.errors.segundo_nombre"
+                              @blur="handleBlur(form, 'segundo_nombre')"
+                            />
+                          </div>
+
+                          <div
+                            class="2xl:flex 2xl:flex-row 2xl:justify-between 2xl:items-center 2xl:gap-2 xl:flex xl:flex-row xl:justify-between xl:items-center xl:gap-2 gap-3 flex flex-col items-center"
+                          >
+                            <div class="flex gap-2 items-center w-full">
+                              <Selects
+                                v-model="infoUserStore.indicativo_id"
+                                :options="props.indicativosDisponibles"
+                                :error="form.errors.indicativo_id"
+                                label="Indicativo:"
+                                placeholder="Selecciona un indicativo"
+                                id="indicativo"
+                              />
+
+                              <InputTexto
+                                v-model="infoUserStore.telefono"
+                                label="Número celular:"
+                                icon="phone"
+                                type="number"
+                                placeholder="316511****"
+                                :maxLength="limitesCaracteres.telefono"
+                                :error="form.errors.telefono"
+                                @blur="handleBlur(form, 'telefono')"
+                                @input="(e) => handleInput(e, form, 'telefono')"
+                              />
+                            </div>
+
+                            <InputTexto
+                              v-model="infoUserStore.email"
+                              label="Correo electrónico:"
+                              icon="email"
+                              type="email"
+                              placeholder="example@dominio.com"
+                              :maxLength="limitesCaracteres.nombresUsuario"
+                              :error="form.errors.correo"
+                              @blur="handleBlur(form, 'correo')"
+                            />
+                          </div>
+
+                          <div
+                            class="2xl:flex 2xl:flex-row 2xl:justify-between 2xl:items-center 2xl:gap-2 xl:flex xl:flex-row xl:justify-between xl:items-center xl:gap-2 gap-3 flex flex-col items-center"
+                          >
+                            <div class="w-full flex items-center gap-2">
+                              <InputTexto
+                                v-model="infoUserStore.ciudadResidencia"
+                                label="Ciudad residencia:"
+                                icon="map"
+                                type="text"
+                                placeholder="Bogotá D.C."
+                                :maxLength="limitesCaracteres.direccion"
+                                :error="form.errors.ciudad_residencia"
+                                @blur="handleBlur(form, 'ciudad_residencia')"
+                                @input="(e) => handleInput(e, form, 'ciudad_residencia')"
+                              />
+
+                              <InputTexto
+                                v-model="infoUserStore.barrioResidencia"
+                                label="Barrio residencia:"
+                                icon="distance"
+                                type="text"
+                                placeholder="Luna Park"
+                                :maxLength="limitesCaracteres.direccion"
+                                :error="form.errors.barrio_residencia"
+                                @blur="handleBlur(form, 'barrio_residencia')"
+                                @input="(e) => handleInput(e, form, 'barrio_residencia')"
+                              />
+                            </div>
+
+                            <InputTexto
+                              v-model="infoUserStore.direccionResidencia"
+                              label="Dirección residencia:"
+                              icon="format_italic"
+                              type="text"
+                              placeholder="Calle 1a #2b-3 sur"
+                              :maxLength="limitesCaracteres.direccion"
+                              :error="form.errors.direccion_residencia"
+                              @blur="handleBlur(form, 'direccion_residencia')"
+                            />
+                          </div>
+                          <div
+                            class="2xl:flex 2xl:flex-row 2xl:justify-between 2xl:items-center 2xl:gap-2 xl:flex xl:flex-row xl:justify-between xl:items-center xl:gap-2 gap-3 flex flex-col items-center"
+                          >
+                            <div class="flex gap-2 items-center w-full">
+                              <Selects
+                                v-model="infoUserStore.tipoDocumento_id"
+                                :options="props.tipoDocumentoDisponibles"
+                                :error="form.errors.tipo_documento_id"
+                                label="Tipo documento:"
+                                placeholder="Selecciona el tipo"
+                                id="tipo_documento_id"
+                              />
+
+                              <InputTexto
+                                v-model="infoUserStore.numero_documento"
+                                label="Número documento:"
+                                icon="pin"
+                                type="number"
+                                placeholder="10135****"
+                                :maxLength="limitesCaracteres.numero_documento"
+                                :error="form.errors.numero_documento"
+                                @blur="handleBlur(form, 'numero_documento')"
+                                @input="(e) => handleInput(e, form, 'numero_documento')"
+                              />
+                            </div>
+                          </div>
+                          <div
+                            class="2xl:flex 2xl:flex-row 2xl:justify-between 2xl:items-center 2xl:gap-2 xl:flex xl:flex-row xl:justify-between xl:items-center xl:gap-2 gap-3 flex flex-col items-center"
+                          >
+                            <Selects
+                              v-model="infoUserStore.genero"
+                              :options="props.generosDisponibles"
+                              :error="form.errors.genero"
+                              label="Género:"
+                              placeholder="Selecciona tu genero"
+                              id="genero"
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- PASO 2: TIPO DE USUARIO Y DATOS DE EMPLEADO -->
+                      <div v-if="currentStep === 2">
+                        <h4 class="font-semibold text-[35px] text-mono-blanco">
+                          Editar datos de la tienda:
+                          {{ infoUserStore.nombreEstablecimiento }}
+                        </h4>
+                        <p class="text-[16px] text-secundary-light -mt-2 mb-4">
+                          Ten en cuenta los cambios respectivos, lo que no cambiarás,
+                          déjalo tal cual y continúa.
+                        </p>
+                        <div class="space-y-4">
+                          <div
+                            class="2xl:flex 2xl:flex-row 2xl:justify-between 2xl:items-center 2xl:gap-2 xl:flex xl:flex-row xl:justify-between xl:items-center xl:gap-2 gap-3 flex flex-col items-center"
+                          >
+                            <Selects
+                              v-model="infoUserStore.indicativo_id"
+                              :options="props.indicativosDisponibles"
+                              :error="form.errors.indicativo_id"
+                              label="Indicativo:"
+                              placeholder="Selecciona un indicativo"
+                              id="indicativo"
+                            />
+
+                            <InputTexto
+                              v-model="infoUserStore.nombreEstablecimiento"
+                              label="Nombre de tienda:"
+                              icon="format_italic"
+                              type="text"
+                              placeholder="Maruchan"
+                              :maxLength="limitesCaracteres.nombresUsuario"
+                              :error="form.errors.segundo_nombre"
+                              @blur="handleBlur(form, 'segundo_nombre')"
+                            />
+                          </div>
+
+                          <div
+                            class="2xl:flex 2xl:flex-row 2xl:justify-between 2xl:items-center 2xl:gap-2 xl:flex xl:flex-row xl:justify-between xl:items-center xl:gap-2 gap-3 flex flex-col items-center"
+                          >
+                            <div class="flex gap-2 items-center w-full">
+                              <Selects
+                                v-model="infoUserStore.indicativo_id"
+                                :options="props.indicativosDisponibles"
+                                :error="form.errors.indicativo_id"
+                                label="Indicativo:"
+                                placeholder="Selecciona un indicativo"
+                                id="indicativo"
+                              />
+
+                              <InputTexto
+                                v-model="infoUserStore.telefono"
+                                label="Número celular:"
+                                icon="phone"
+                                type="number"
+                                placeholder="316511****"
+                                :maxLength="limitesCaracteres.telefono"
+                                :error="form.errors.telefono"
+                                @blur="handleBlur(form, 'telefono')"
+                                @input="(e) => handleInput(e, form, 'telefono')"
+                              />
+                            </div>
+
+                            <InputTexto
+                              v-model="infoUserStore.email"
+                              label="Correo electrónico:"
+                              icon="email"
+                              type="email"
+                              placeholder="example@dominio.com"
+                              :maxLength="limitesCaracteres.nombresUsuario"
+                              :error="form.errors.correo"
+                              @blur="handleBlur(form, 'correo')"
+                            />
+                          </div>
+
+                          <div
+                            class="2xl:flex 2xl:flex-row 2xl:justify-between 2xl:items-center 2xl:gap-2 xl:flex xl:flex-row xl:justify-between xl:items-center xl:gap-2 gap-3 flex flex-col items-center"
+                          >
+                            <div class="w-full flex items-center gap-2">
+                              <InputTexto
+                                v-model="infoUserStore.ciudadResidencia"
+                                label="Ciudad residencia:"
+                                icon="map"
+                                type="text"
+                                placeholder="Bogotá D.C."
+                                :maxLength="limitesCaracteres.direccion"
+                                :error="form.errors.ciudad_residencia"
+                                @blur="handleBlur(form, 'ciudad_residencia')"
+                                @input="(e) => handleInput(e, form, 'ciudad_residencia')"
+                              />
+
+                              <InputTexto
+                                v-model="infoUserStore.barrioResidencia"
+                                label="Barrio residencia:"
+                                icon="distance"
+                                type="text"
+                                placeholder="Luna Park"
+                                :maxLength="limitesCaracteres.direccion"
+                                :error="form.errors.barrio_residencia"
+                                @blur="handleBlur(form, 'barrio_residencia')"
+                                @input="(e) => handleInput(e, form, 'barrio_residencia')"
+                              />
+                            </div>
+
+                            <InputTexto
+                              v-model="infoUserStore.direccionResidencia"
+                              label="Dirección residencia:"
+                              icon="format_italic"
+                              type="text"
+                              placeholder="Calle 1a #2b-3 sur"
+                              :maxLength="limitesCaracteres.direccion"
+                              :error="form.errors.direccion_residencia"
+                              @blur="handleBlur(form, 'direccion_residencia')"
+                            />
+                          </div>
+                          <div
+                            class="2xl:flex 2xl:flex-row 2xl:justify-between 2xl:items-center 2xl:gap-2 xl:flex xl:flex-row xl:justify-between xl:items-center xl:gap-2 gap-3 flex flex-col items-center"
+                          >
+                            <div class="flex gap-2 items-center w-full">
+                              <Selects
+                                v-model="infoUserStore.tipoDocumento_id"
+                                :options="props.tipoDocumentoDisponibles"
+                                :error="form.errors.tipo_documento_id"
+                                label="Tipo documento:"
+                                placeholder="Selecciona el tipo"
+                                id="tipo_documento_id"
+                              />
+
+                              <InputTexto
+                                v-model="infoUserStore.numero_documento"
+                                label="Número documento:"
+                                icon="pin"
+                                type="number"
+                                placeholder="10135****"
+                                :maxLength="limitesCaracteres.numero_documento"
+                                :error="form.errors.numero_documento"
+                                @blur="handleBlur(form, 'numero_documento')"
+                                @input="(e) => handleInput(e, form, 'numero_documento')"
+                              />
+                            </div>
+                          </div>
+                          <div
+                            class="2xl:flex 2xl:flex-row 2xl:justify-between 2xl:items-center 2xl:gap-2 xl:flex xl:flex-row xl:justify-between xl:items-center xl:gap-2 gap-3 flex flex-col items-center"
+                          >
+                            <Selects
+                              v-model="infoUserStore.genero"
+                              :options="props.generosDisponibles"
+                              :error="form.errors.genero"
+                              label="Género:"
+                              placeholder="Selecciona tu genero"
+                              id="genero"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </Transition>
+                </div>
+
+                <!-- Pie del Modal -->
+                <div class="mt-5 flex gap-3 justify-between items-center flex-shrink-0">
+                  <BtnSecundario
+                    v-if="currentStep > 1"
+                    type="button"
+                    @click="prevStep"
+                    class="w-[50%] py-3 px-5"
+                  >
+                    <p class="text-[14px]">Atrás</p>
+                  </BtnSecundario>
+                  <div v-else></div>
+                  <BtnPrimario
+                    v-if="currentStep < totalSteps"
+                    type="button"
+                    @click="nextStep"
+                    class="w-[50%]"
+                  >
+                    Siguiente
+                  </BtnPrimario>
+
+                  <BtnPrimario
+                    class="w-[50%]"
+                    v-else
+                    type="submit"
+                    :disabled="form.processing"
+                    >Finalizar</BtnPrimario
+                  >
+                </div>
+              </form>
+            </Transition>
+          </div>
         </div>
       </Transition>
     </div>
