@@ -6,6 +6,7 @@ import { formatFecha } from "@/Utils/date";
 import { formatCOP } from "@/Utils/formateoMoneda";
 import { router, useForm } from "@inertiajs/vue3";
 import { useInfoUser } from "@/stores/infoUsers";
+import { useAuthStore } from "@/stores/auth";
 import dayjs from "dayjs";
 import ConfirmacionesPop from "../../Confirmaciones/ConfirmacionesPop.vue";
 import { handleBlur, handleInput, limitesCaracteres } from "@/Utils/formateoInputs";
@@ -22,6 +23,10 @@ const props = defineProps({
     type: Array,
     default: () => [],
   },
+  authStore: {
+    type: Object,
+    required: true,
+  },
   ciudadesDisponibles: { type: Array, default: () => [] },
   indicativosDisponibles: { type: Array, default: () => [] },
   tipoDocumentoDisponibles: { type: Array, default: () => [] },
@@ -33,37 +38,40 @@ const props = defineProps({
 
 const emit = defineEmits(["close"]);
 const infoUserStore = useInfoUser();
+const authStore = useAuthStore();
+const aplicacion = authStore.aplicacion;
+const rol = authStore.rol;
 const { getEstadoClass } = useEstadoClass();
-
+const error = ref(null);
 const usuarioSeleccionado = computed(() => infoUserStore.user);
 
 const { tiempoActivo, diasRestantes } = useTiempo(usuarioSeleccionado);
 
 const keysToSync = [
-  "primerNombre",
-  "segundoNombre",
-  "primerApellido",
-  "segundoApellido",
+  "primer_nombre",
+  "segundo_nombre",
+  "primer_apellido",
+  "segundo_apellido",
   "indicativo_id",
   "telefono",
   "email",
-  "ciudadResidencia",
-  "barrioResidencia",
-  "direccionResidencia",
-  "tipoDocumento_id",
+  "ciudad_residencia",
+  "barrio_residencia",
+  "direccion_residencia",
+  "tipo_documento_id",
   "numero_documento",
   "rol_id",
   "genero",
-  "nombreEstablecimiento",
+  "nombre_establecimiento",
   "cargo",
-  "tipoEstablecimiento",
-  "telefonoEstablecimiento",
-  "emailEstablecimiento",
-  "ciudadEstablecimiento",
-  "barrioEstablecimiento",
-  "direccionEstablecimiento",
-  "tokenEstablecimiento",
-  "estadoToken_id",
+  "tipo_establecimiento",
+  "telefono_establecimiento",
+  "email_establecimiento",
+  "ciudad_establecimiento",
+  "barrio_establecimiento",
+  "direccion_establecimiento",
+  "token_activacion",
+  "estado_token_id",
   "aplicacion_id",
 ];
 
@@ -130,15 +138,26 @@ function prevStep() {
   }
 }
 
+// CORRECTO ✅
 const submit = () => {
-  form.post(route("usuarios.store"), {
-    preserveScroll: true,
-    onSuccess: () => {
-      emit("close");
-      form.reset();
-      currentStep.value = 1;
-    },
-  });
+  form.put(
+    // 1. Primer argumento: SOLO la URL con sus parámetros de ruta (si los necesita)
+    route("usuarios.actualizarPerfilUsuario", { aplicacion: aplicacion, rol: rol }),
+
+    // 2. Segundo argumento: UN objeto con TODAS las opciones de Inertia
+    {
+      preserveScroll: true,
+      onSuccess: () => {
+        emit("close");
+        form.reset();
+        currentStep.value = 1;
+      },
+      onError: (errors) => {
+        // Es una buena práctica añadir esto para ver los errores de validación en la consola
+        console.error("Errores del backend:", errors);
+      },
+    }
+  );
 };
 
 // --- 2. LÓGICA PARA EL MODAL DE CONFIRMACIÓN ---
@@ -202,6 +221,7 @@ function eliminarUsuario() {
     },
   });
 }
+
 const historialFacturas = computed(() => {
   return [...infoUserStore.facturas].sort((a, b) =>
     dayjs(b.fecha_pago).diff(dayjs(a.fecha_pago))
@@ -918,51 +938,51 @@ const proximaFactura = computed(() => {
                             class="2xl:flex 2xl:flex-row 2xl:justify-between 2xl:items-center 2xl:gap-2 xl:flex xl:flex-row xl:justify-between xl:items-center xl:gap-2 gap-3 flex flex-col items-center"
                           >
                             <InputTexto
-                              v-model="form.primerNombre"
+                              v-model="form.primer_nombre"
                               label="Primer nombre:"
                               icon="format_italic"
                               type="text"
                               placeholder="Ej: Juan"
                               :maxLength="limitesCaracteres.nombresUsuario"
-                              :error="form.errors.primerNombre"
-                              @blur="handleBlur(form, 'primerNombre')"
-                              @input="(e) => handleInput(e, form, 'primerNombre')"
+                              :error="form.errors.primer_nombre"
+                              @blur="handleBlur(form, 'primer_nombre')"
+                              @input="(e) => handleInput(e, form, 'primer_nombre')"
                             />
 
                             <InputTexto
-                              v-model="form.segundoNombre"
+                              v-model="form.segundo_nombre"
                               label="Segundo nombre:"
                               icon="format_italic"
                               type="text"
                               placeholder="Opcional*"
                               :maxLength="limitesCaracteres.nombresUsuario"
-                              :error="form.errors.segundoNombre"
-                              @blur="handleBlur(form, 'nombresUsuario')"
-                              @input="(e) => handleInput(e, form, 'segundoNombre')"
+                              :error="form.errors.segundo_nombre"
+                              @blur="handleBlur(form, 'segundo_nombre')"
+                              @input="(e) => handleInput(e, form, 'segundo_nombre')"
                             />
 
                             <InputTexto
-                              v-model="form.primerApellido"
+                              v-model="form.primer_apellido"
                               label="Primer apellido:"
                               icon="format_italic"
                               type="text"
                               placeholder="Ej: Medina"
                               :maxLength="limitesCaracteres.nombresUsuario"
-                              :error="form.errors.primerApellido"
-                              @blur="handleBlur(form, 'primerApellido')"
-                              @input="(e) => handleInput(e, form, 'primerApellido')"
+                              :error="form.errors.primer_apellido"
+                              @blur="handleBlur(form, 'primer_apellido')"
+                              @input="(e) => handleInput(e, form, 'primer_apellido')"
                             />
 
                             <InputTexto
-                              v-model="form.segundoApellido"
+                              v-model="form.segundo_apellido"
                               label="Segundo apellido:"
                               icon="format_italic"
                               type="text"
                               placeholder="Opcional*"
                               :maxLength="limitesCaracteres.nombresUsuario"
-                              :error="form.errors.segundoNombre"
-                              @blur="handleBlur(form, 'segundoNombre')"
-                              @input="(e) => handleInput(e, form, 'segundoApellido')"
+                              :error="form.errors.segundo_apellido"
+                              @blur="handleBlur(form, 'segundo_apellido')"
+                              @input="(e) => handleInput(e, form, 'segundo_apellido')"
                             />
                           </div>
 
@@ -1010,39 +1030,39 @@ const proximaFactura = computed(() => {
                           >
                             <div class="w-full flex items-center gap-2">
                               <InputTexto
-                                v-model="form.ciudadResidencia"
+                                v-model="form.ciudad_residencia"
                                 label="Ciudad residencia:"
                                 icon="map"
                                 type="text"
                                 placeholder="Bogotá D.C."
                                 :maxLength="limitesCaracteres.direccion"
-                                :error="form.errors.ciudadResidencia"
-                                @blur="handleBlur(form, 'ciudadResidencia')"
-                                @input="(e) => handleInput(e, form, 'ciudadResidencia')"
+                                :error="form.errors.ciudad_residencia"
+                                @blur="handleBlur(form, 'ciudad_residencia')"
+                                @input="(e) => handleInput(e, form, 'ciudad_residencia')"
                               />
 
                               <InputTexto
-                                v-model="form.barrioResidencia"
+                                v-model="form.barrio_residencia"
                                 label="Barrio residencia:"
                                 icon="distance"
                                 type="text"
                                 placeholder="Luna Park"
                                 :maxLength="limitesCaracteres.direccion"
-                                :error="form.errors.barrioResidencia"
-                                @blur="handleBlur(form, 'barrioResidencia')"
-                                @input="(e) => handleInput(e, form, 'barrioResidencia')"
+                                :error="form.errors.barrio_residencia"
+                                @blur="handleBlur(form, 'barrio_residencia')"
+                                @input="(e) => handleInput(e, form, 'barrio_residencia')"
                               />
                             </div>
 
                             <InputTexto
-                              v-model="form.direccionResidencia"
+                              v-model="form.direccion_residencia"
                               label="Dirección residencia:"
                               icon="format_italic"
                               type="text"
                               placeholder="Calle 1a #2b-3 sur"
                               :maxLength="limitesCaracteres.direccion"
-                              :error="form.errors.direccionResidencia"
-                              @blur="handleBlur(form, 'direccionResidencia')"
+                              :error="form.errors.direccion_residencia"
+                              @blur="handleBlur(form, 'direccion_residencia')"
                             />
                           </div>
                           <div
@@ -1050,12 +1070,12 @@ const proximaFactura = computed(() => {
                           >
                             <div class="flex gap-2 items-center w-full">
                               <Selects
-                                v-model="form.tipoDocumento_id"
+                                v-model="form.tipo_documento_id"
                                 :options="props.tipoDocumentoDisponibles"
-                                :error="form.errors.tipoDocumento_id"
+                                :error="form.errors.tipo_documento_id"
                                 label="Tipo documento:"
                                 placeholder="Selecciona el tipo"
-                                id="tipoDocumento_id"
+                                id="tipo_documento_id"
                               />
 
                               <InputTexto
@@ -1101,18 +1121,18 @@ const proximaFactura = computed(() => {
                             class="2xl:flex 2xl:flex-row 2xl:justify-between 2xl:items-center 2xl:gap-2 xl:flex xl:flex-row xl:justify-between xl:items-center xl:gap-2 gap-3 flex flex-col items-center"
                           >
                             <InputTexto
-                              v-model="form.nombreEstablecimiento"
+                              v-model="form.nombre_establecimiento"
                               label="Nombre de tienda:"
                               icon="format_italic"
                               type="text"
                               placeholder="Maruchan"
                               :maxLength="limitesCaracteres.nombresUsuario"
                               :error="form.errors.nombre_establecimiento"
-                              @blur="handleBlur(form, 'nombresUsuario')"
+                              @blur="handleBlur(form, 'nombre_establecimiento')"
                             />
 
                             <InputTexto
-                              v-model="form.tipoEstablecimiento"
+                              v-model="form.tipo_establecimiento"
                               label="Categoria del establecimiento:"
                               icon="format_italic"
                               type="text"
@@ -1128,7 +1148,7 @@ const proximaFactura = computed(() => {
                           >
                             <div class="flex gap-2 items-center w-full">
                               <InputTexto
-                                v-model="form.telefonoEstablecimiento"
+                                v-model="form.telefono_establecimiento"
                                 label="Número Corporativo:"
                                 icon="phone"
                                 type="number"
@@ -1141,7 +1161,7 @@ const proximaFactura = computed(() => {
                             </div>
 
                             <InputTexto
-                              v-model="form.emailEstablecimiento"
+                              v-model="form.email_establecimiento"
                               label="Correo electrónico:"
                               icon="email"
                               type="email"
@@ -1157,39 +1177,43 @@ const proximaFactura = computed(() => {
                           >
                             <div class="w-full flex items-center gap-2">
                               <InputTexto
-                                v-model="form.ciudadEstablecimiento"
+                                v-model="form.ciudad_establecimiento"
                                 label="Ciudad establecimiento:"
                                 icon="map"
                                 type="text"
                                 placeholder="Bogotá D.C."
                                 :maxLength="limitesCaracteres.direccion"
-                                :error="form.errors.ciudadResidencia"
-                                @blur="handleBlur(form, 'ciudadResidencia')"
-                                @input="(e) => handleInput(e, form, 'ciudadResidencia')"
+                                :error="form.errors.ciudad_establecimiento"
+                                @blur="handleBlur(form, 'ciudad_establecimiento')"
+                                @input="
+                                  (e) => handleInput(e, form, 'ciudad_establecimiento')
+                                "
                               />
 
                               <InputTexto
-                                v-model="form.barrioEstablecimiento"
+                                v-model="form.barrio_establecimiento"
                                 label="Barrio establecimiento:"
                                 icon="distance"
                                 type="text"
                                 placeholder="Luna Park"
                                 :maxLength="limitesCaracteres.direccion"
-                                :error="form.errors.barrioResidencia"
-                                @blur="handleBlur(form, 'barrioResidencia')"
-                                @input="(e) => handleInput(e, form, 'barrioResidencia')"
+                                :error="form.errors.barrio_establecimiento"
+                                @blur="handleBlur(form, 'barrio_establecimiento')"
+                                @input="
+                                  (e) => handleInput(e, form, 'barrio_establecimiento')
+                                "
                               />
                             </div>
 
                             <InputTexto
-                              v-model="form.direccionEstablecimiento"
+                              v-model="form.direccion_establecimiento"
                               label="Dirección establecimiento:"
                               icon="format_italic"
                               type="text"
                               placeholder="Calle 1a #2b-3 sur"
                               :maxLength="limitesCaracteres.direccion"
-                              :error="form.errors.direccionResidencia"
-                              @blur="handleBlur(form, 'direccionResidencia')"
+                              :error="form.errors.direccion_establecimiento"
+                              @blur="handleBlur(form, 'direccion_establecimiento')"
                             />
                           </div>
                           <div
@@ -1256,12 +1280,12 @@ const proximaFactura = computed(() => {
                             </div>
 
                             <Selects
-                              v-model="form.estadoToken_id"
+                              v-model="form.estado_token_id"
                               :options="props.estadosDisponibles"
-                              :error="form.errors.estadoToken_id"
+                              :error="form.errors.estado_token_id"
                               label="Estado del token:"
                               placeholder="Selecciona una app"
-                              id="estadoToken_id"
+                              id="estado_token_id"
                             />
                           </div>
                         </div>
@@ -1322,22 +1346,33 @@ const proximaFactura = computed(() => {
   margin-top: 0.25rem;
   display: block;
   width: 100%;
-  background-color: #1f2937; /* bg-gray-800 */
-  border: 1px solid #374151; /* border-gray-700 */
-  border-radius: 0.375rem; /* rounded-md */
-  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05); /* shadow-sm */
-  color: #fff; /* text-white */
+  background-color: #1f2937;
+  /* bg-gray-800 */
+  border: 1px solid #374151;
+  /* border-gray-700 */
+  border-radius: 0.375rem;
+  /* rounded-md */
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  /* shadow-sm */
+  color: #fff;
+  /* text-white */
 }
+
 .input-field:focus {
   outline: none;
-  border-color: #2563eb; /* focus:border-primary (blue-600) */
-  box-shadow: 0 0 0 2px #2563eb33; /* focus:ring-primary */
+  border-color: #2563eb;
+  /* focus:border-primary (blue-600) */
+  box-shadow: 0 0 0 2px #2563eb33;
+  /* focus:ring-primary */
 }
 
 .error-message {
-  color: #ef4444; /* Tailwind text-red-500 */
-  font-size: 0.75rem; /* Tailwind text-xs */
-  margin-top: 0.25rem; /* Tailwind mt-1 */
+  color: #ef4444;
+  /* Tailwind text-red-500 */
+  font-size: 0.75rem;
+  /* Tailwind text-xs */
+  margin-top: 0.25rem;
+  /* Tailwind mt-1 */
 }
 
 /* Transición para el modal completo */

@@ -447,28 +447,27 @@ class UsuariosFixController extends Controller
 
 
             if ($request->rol_id === 1) {
-                // --- INICIO DE LA LÓGICA CORRECTA ---
 
-                // 1. Buscamos la APLICACIÓN WEB que el usuario seleccionó en el formulario.
+
+
                 $aplicacion = AplicacionesWeb::find($request->aplicacion_id);
 
-                // 2. Validamos primero que esa aplicación exista.
+
                 if (!$aplicacion) {
                     DB::rollBack();
                     return back()->with('error', 'Error: La aplicación web seleccionada no es válida.');
                 }
 
-                // 3. A partir de la aplicación, buscamos la MEMBRESÍA que tiene asociada.
-                //    Usamos el ID de la membresía que está guardado en la tabla de aplicaciones.
+
                 $membresia = Membresias::find($aplicacion->membresia_id);
 
-                // 4. Validamos que la aplicación tenga una membresía correctamente configurada.
+
                 if (!$membresia) {
                     DB::rollBack();
                     return back()->with('error', 'Error: La aplicación seleccionada no tiene un plan de membresía válido asociado.');
                 }
 
-                // --- Con $aplicacion y $membresia encontrados, procedemos a crear los registros ---
+
 
                 $establecimiento = establecimientos::create([
                     'propietario_id' => $usuario->id,
@@ -491,9 +490,9 @@ class UsuariosFixController extends Controller
                     'cliente_id' => $usuario->id,
                     'establecimiento_id' => $establecimiento->id,
                     'aplicacion_web_id' => $request->aplicacion_id,
-                    'membresia_id' => $membresia->id, // Opcional pero recomendado
-                    'monto_total' => $membresia->precio_membresia,      // Dato correcto
-                    'dias_restantes' => $membresia->duracion_membresia, // Dato correcto
+                    'membresia_id' => $membresia->id,
+                    'monto_total' => $membresia->precio_membresia,
+                    'dias_restantes' => $membresia->duracion_membresia,
                     'estado_id' => 18,
                     'medio_pago_id' => 8,
                 ]);
@@ -525,5 +524,75 @@ class UsuariosFixController extends Controller
             \Log::error('Error al crear usuario: ' . $e->getMessage());
             return back()->with('error', 'Ocurrió un error al crear el usuario.');
         }
+    }
+
+     public function actualizarPerfilUsuario(Request $request)
+    {
+        $user = $request->user();
+        $perfilUsuario = $user->perfilUsuario;
+        $establecimiento = $user->establecimiento()->first();
+
+        $validatedData = $request->validate([
+            'primer_nombre' => 'sometimes|string|max:50',
+            'segundo_nombre' => 'sometimes|string|max:50',
+            'primer_apellido' => 'sometimes|string|max:50',
+            'segundo_apellido' => 'sometimes|string|max:50',
+            'indicativo_id' => 'sometimes|exists:indicativos,id',
+            'telefono' => 'sometimes|numeric|digits_between:7,15',
+            'tipo_documento_id' => 'sometimes|exists:tipo_documentos,id',
+            'numero_documento' => 'sometimes|string|max:20|unique:usuarios,numero_documento,' . $user->id,
+            'direccion' => 'sometimes|string|max:255',
+            'ciudad' => 'sometimes|string|max:100',
+            'barrio' => 'sometimes|string|max:100',
+            'email' => 'sometimes|email|max:60',
+            'genero' => 'sometimes|string|max:30',
+
+            'nombre_establecimiento' => 'sometimes|string|max:100',
+            'tipo_establecimiento' => 'sometimes|string|max:100',
+            'telefono_establecimiento' => 'sometimes|numeric|digits_between:7,15',
+            'ciudad_establecimiento' => 'sometimes|string|max:100',
+            'barrio_establecimiento' => 'sometimes|string|max:100',
+            'direccion_establecimiento' => 'sometimes|string|max:60',
+            'email_establecimiento' => 'sometimes|email|max:60',
+            'aplicacion_web_id' => 'sometimes|exists:aplicacion_web,id',
+            'estado_id' => 'sometimes|exists:estados,id',
+            'token_id' => 'sometimes|exists:token_accesos,id',
+
+        ]);
+
+        if ($perfilUsuario) {
+            $perfilUsuario->update([
+                'primer_nombre' => $validatedData['primer_nombre'],
+                'segundo_nombre' => $validatedData['segundo_nombre'],
+                'primer_apellido' => $validatedData['primer_apellido'],
+                'segundo_apellido' => $validatedData['segundo_apellido'],
+                'indicativo_id' => $validatedData['indicativo_id'],
+                'telefono' => $validatedData['telefono'],
+                'tipo_documento_id' => $validatedData['tipo_documento_id'],
+                'direccion_residencia' => $validatedData['direccion'],
+                'ciudad_residencia' => $validatedData['ciudad'],
+                'barrio_residencia' => $validatedData['barrio'],
+                'email' => $validatedData['email'],
+            ]);
+        }
+
+        $user->update([
+            'numero_documento' => $validatedData['numero_documento'],
+        ]);
+
+        if ($establecimiento) {
+            $establecimiento->update([
+                'nombre_establecimiento' => $validatedData['nombre_establecimiento'],
+                'tipo_establecimiento' => $validatedData['tipo_establecimiento'],
+                'telefono_establecimiento' => $validatedData['telefono_establecimiento'],
+                'email_establecimiento' => $validatedData['email_establecimiento'],
+                'direccion_establecimiento' => $validatedData['direccion_establecimiento'],
+                'ciudad_establecimiento' => $validatedData['ciudad_establecimiento'],
+                'barrio_establecimiento' => $validatedData['barrio_establecimiento'],
+
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Usuario modificado con éxito.');
     }
 }

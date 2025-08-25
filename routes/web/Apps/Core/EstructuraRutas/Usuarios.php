@@ -32,6 +32,11 @@ Route::delete('/usuarios/{id}/permanente', [UsuariosFixController::class, 'force
 Route::post('/usuarios/papelera/vaciar', [UsuariosFixController::class, 'emptyTrash'])->name('usuarios.emptyTrash');
 // routes/web.php
 Route::post('/usuarios', [UsuariosFixController::class, 'store'])->name('usuarios.store');
+
+ Route::put('/editarPerfilUsuario/actualizar', [UsuariosFixController::class, 'actualizarPerfilUsuario'])
+            ->name('usuarios.actualizarPerfilUsuario');
+
+
 // routes/web.php (dentro del grupo de middleware 'auth')
 Route::post('/usuarios/bulk-destroy', [UsuariosFixController::class, 'bulkDestroy'])->name('usuarios.bulkDestroy');
 });

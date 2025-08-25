@@ -406,6 +406,7 @@ const rol = authStore.rol;
         :generosDisponibles="generosDisponibles"
         :appsDisponibles="appsDisponibles"
         :estadosDisponibles="estadosDisponibles"
+        :authStore="authStore"
         @close="closeUserDetailsModal"
       />
       <ModalCrearUsuario

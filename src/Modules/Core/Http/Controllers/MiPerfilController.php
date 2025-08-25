@@ -199,7 +199,6 @@ class MiPerfilController extends Controller
         ])->with('success', '¡Foto del establecimiento actualizada con éxito!');
     }
 
-    // En tu MiPerfilController.php
 
     public function actualizarPerfilUsuario(Request $request, $aplicacion, $rol)
     {
