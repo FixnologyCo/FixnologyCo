@@ -52,6 +52,7 @@ class UsuariosFixController extends Controller
         $rolesDisponibles = $this->getRolesDisponibles();
         $appsDisponibles = $this->getAppsDisponibles();
         $generosDisponibles = $this->getGenerosDisponibles();
+        $estadosDisponibles = $this->getEstadosDisponibles();
 
 
         $activeSessionUserIds = DB::table(config('session.table'))
@@ -72,7 +73,8 @@ class UsuariosFixController extends Controller
             'rolesDisponibles' => $rolesDisponibles,
             'filtrosDisponibles' => $filtrosDisponibles,
             'generosDisponibles' => $generosDisponibles,
-            'appsDisponibles' => $appsDisponibles
+            'appsDisponibles' => $appsDisponibles,
+            'estadosDisponibles' => $estadosDisponibles
         ]);
     }
 
@@ -123,7 +125,7 @@ class UsuariosFixController extends Controller
 
     private function getEstablecimientosDisponibles()
     {
-         return Establecimientos::all()->map(function ($e) {
+        return Establecimientos::all()->map(function ($e) {
             return [
                 'id' => $e->id,
                 'text' => $e->nombre_establecimiento
@@ -143,7 +145,7 @@ class UsuariosFixController extends Controller
 
     private function getIndicativosDisponibles()
     {
-        return Indicativos::all()->map(function ($indicativo) {
+        return Indicativos::orderBy('pais', 'asc')->get()->map(function ($indicativo) {
             return [
                 'id' => $indicativo->id,
                 'text' => "{$indicativo->pais} ({$indicativo->codigo_pais})",
@@ -153,7 +155,7 @@ class UsuariosFixController extends Controller
 
     private function getTipoDocumentoDisponibles()
     {
-        return TipoDocumento::all()->map(function ($tipoDocumento) {
+        return TipoDocumento::orderBy('documento_legal', 'asc')->get()->map(function ($tipoDocumento) {
             return [
                 'id' => $tipoDocumento->id,
                 'text' => $tipoDocumento->documento_legal
@@ -163,7 +165,7 @@ class UsuariosFixController extends Controller
 
     private function getRolesDisponibles()
     {
-        return Roles::all()->map(function ($rol) {
+        return Roles::orderBy('tipo_rol', 'asc')->get()->map(function ($rol) {
             return [
                 'id' => $rol->id,
                 'text' => $rol->tipo_rol
@@ -174,34 +176,44 @@ class UsuariosFixController extends Controller
     private function getGenerosDisponibles()
     {
         return [
-            ['id' => 'Masculino', 'text' => 'Masculino'],
             ['id' => 'Femenino', 'text' => 'Femenino'],
+            ['id' => 'Masculino', 'text' => 'Masculino'],
             ['id' => 'Otro', 'text' => 'Otro'],
         ];
     }
 
     private function getAppsDisponibles()
-{
-    
-    $aplicaciones = AplicacionesWeb::with('membresia')->get();
+    {
 
-    
-    $aplicacionesOrdenadas = $aplicaciones->sortBy(function ($app) {
-        
-        return $app->membresia->nombre_membresia ?? 'Sin nombre'; 
-    });
+        $aplicaciones = AplicacionesWeb::with('membresia')->get();
 
-    return $aplicacionesOrdenadas->map(function ($app) {
-       
-        $nombreMembresia = $app->membresia->nombre_membresia ?? 'Sin Membresía';
-        
-        return [
-            'id' => $app->id,
-            'text' => "{$app->nombre_app} - {$nombreMembresia}"
-        ];
-    })->values(); 
-}
 
+        $aplicacionesOrdenadas = $aplicaciones->sortBy(function ($app) {
+
+            return $app->membresia->nombre_membresia ?? 'Sin nombre';
+        });
+
+        return $aplicacionesOrdenadas->map(function ($app) {
+
+            $nombreMembresia = $app->membresia->nombre_membresia ?? 'Sin Membresía';
+
+            return [
+                'id' => $app->id,
+                'text' => "{$app->nombre_app} - {$nombreMembresia}"
+            ];
+        })->values();
+    }
+
+    private function getEstadosDisponibles()
+    {
+
+        return Estados::orderBy('tipo_estado', 'asc')->get()->map(function ($estados) {
+            return [
+                'id' => $estados->id,
+                'text' => $estados->tipo_estado
+            ];
+        });
+    }
 
     public function destroy(User $usuarioAEliminar)
     {
@@ -274,7 +286,7 @@ class UsuariosFixController extends Controller
         return redirect()->back()->with('success', 'Usuario restaurado correctamente.');
     }
 
-   public function forceDestroy($id)
+    public function forceDestroy($id)
     {
         $usuarioAEliminar = User::withTrashed()->findOrFail($id);
 
@@ -298,9 +310,6 @@ class UsuariosFixController extends Controller
         }
     }
 
-    /**
-     * Vacía toda la papelera, eliminando permanentemente todos los usuarios.
-     */
     public function emptyTrash()
     {
         if (Auth::user()->perfilUsuario->rol_id !== 4) {
@@ -332,10 +341,6 @@ class UsuariosFixController extends Controller
         }
     }
 
-    /**
-     * Lógica de borrado encapsulada para ser reutilizada.
-     * @param User $usuarioAEliminar
-     */
     private function _forceDeleteUser(User $usuarioAEliminar)
     {
         // Carga las relaciones necesarias para el borrado en cascada
@@ -430,22 +435,46 @@ class UsuariosFixController extends Controller
                 'segundo_nombre' => $request->segundo_nombre ?? '',
                 'primer_apellido' => $request->primer_apellido,
                 'segundo_apellido' => $request->segundo_apellido ?? '',
-                'direccion_residencia' =>$request->direccion_residencia ?? '',
-                'barrio_residencia' =>$request->barrio_residencia ?? '',
-                'ciudad_residencia' =>$request->ciudad_residencia ?? '',
+                'direccion_residencia' => $request->direccion_residencia ?? '',
+                'barrio_residencia' => $request->barrio_residencia ?? '',
+                'ciudad_residencia' => $request->ciudad_residencia ?? '',
                 'correo' => $request->correo,
                 'telefono' => $request->telefono,
-                'rol_id' =>$request->rol_id, 
-                'genero' =>$request->genero, 
+                'rol_id' => $request->rol_id,
+                'genero' => $request->genero,
                 'estado_id' => 1,
             ]);
 
 
             if ($request->rol_id === 1) {
+                // --- INICIO DE LA LÓGICA CORRECTA ---
+
+                // 1. Buscamos la APLICACIÓN WEB que el usuario seleccionó en el formulario.
+                $aplicacion = AplicacionesWeb::find($request->aplicacion_id);
+
+                // 2. Validamos primero que esa aplicación exista.
+                if (!$aplicacion) {
+                    DB::rollBack();
+                    return back()->with('error', 'Error: La aplicación web seleccionada no es válida.');
+                }
+
+                // 3. A partir de la aplicación, buscamos la MEMBRESÍA que tiene asociada.
+                //    Usamos el ID de la membresía que está guardado en la tabla de aplicaciones.
+                $membresia = Membresias::find($aplicacion->membresia_id);
+
+                // 4. Validamos que la aplicación tenga una membresía correctamente configurada.
+                if (!$membresia) {
+                    DB::rollBack();
+                    return back()->with('error', 'Error: La aplicación seleccionada no tiene un plan de membresía válido asociado.');
+                }
+
+                // --- Con $aplicacion y $membresia encontrados, procedemos a crear los registros ---
+
                 $establecimiento = establecimientos::create([
                     'propietario_id' => $usuario->id,
                     'nombre_establecimiento' => 'Tienda de ' . $request->primer_nombre,
                     'estado_id' => 1,
+                    // Aquí usamos el ID de la aplicación que vino en el request
                     'aplicacion_web_id' => $request->aplicacion_id,
                     'tipo_establecimiento' => $request->tipo_establecimiento
                 ]);
@@ -453,7 +482,7 @@ class UsuariosFixController extends Controller
                 $token = TokensAcceso::create([
                     'establecimiento_id' => $establecimiento->id,
                     'token_activacion' => Str::uuid(),
-                    'estado_id' => 2,
+                    'estado_id' => 1,
                 ]);
 
                 $establecimiento->update(['token_id' => $token->id]);
@@ -461,10 +490,11 @@ class UsuariosFixController extends Controller
                 FacturacionMembresias::create([
                     'cliente_id' => $usuario->id,
                     'establecimiento_id' => $establecimiento->id,
-                    'aplicacion_web_id' => $establecimiento->aplicacion_web_id,
-                    'monto_total' => 50000,
-                    'dias_restantes' => 5,
-                    'estado_id' => 16,
+                    'aplicacion_web_id' => $request->aplicacion_id,
+                    'membresia_id' => $membresia->id, // Opcional pero recomendado
+                    'monto_total' => $membresia->precio_membresia,      // Dato correcto
+                    'dias_restantes' => $membresia->duracion_membresia, // Dato correcto
+                    'estado_id' => 18,
                     'medio_pago_id' => 8,
                 ]);
 
@@ -472,7 +502,7 @@ class UsuariosFixController extends Controller
                     'usuario_id' => $usuario->id,
                     'establecimiento_id' => $establecimiento->id,
                     'rol_id' => $request->rol_id,
-                    'cargo' => 'Administrador',
+                    'cargo' => $request->cargo,
                     'estado_id' => 1,
                 ]);
 

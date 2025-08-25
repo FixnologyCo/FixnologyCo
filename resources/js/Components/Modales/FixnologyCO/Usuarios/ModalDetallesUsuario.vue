@@ -1,5 +1,5 @@
 <script setup>
-import { defineProps, defineEmits, computed, ref } from "vue";
+import { defineProps, defineEmits, computed, ref, watch } from "vue";
 import useEstadoClass from "@/Composables/useEstado";
 import { useTiempo } from "@/Composables/useTiempo";
 import { formatFecha } from "@/Utils/date";
@@ -28,6 +28,7 @@ const props = defineProps({
   rolesDisponibles: { type: Array, default: () => [] },
   generosDisponibles: { type: Array, default: () => [] },
   appsDisponibles: { type: Array, default: () => [] },
+  estadosDisponibles: { type: Array, default: () => [] },
 });
 
 const emit = defineEmits(["close"]);
@@ -38,28 +39,54 @@ const usuarioSeleccionado = computed(() => infoUserStore.user);
 
 const { tiempoActivo, diasRestantes } = useTiempo(usuarioSeleccionado);
 
-const form = useForm({
-  primer_nombre: "",
-  segundo_nombre: "",
-  primer_apellido: "",
-  segundo_apellido: "",
-  indicativo_id: "",
-  telefono: "",
-  correo: "",
-  ciudad_residencia: "",
-  barrio_residencia: "",
-  direccion_residencia: "",
-  tipo_documento_id: "",
-  numero_documento: "",
-  password: "",
-  rol_id: "",
-  genero: "",
-  establecimiento_id: "",
-  cargo: "",
-  membresia_id: "",
-  aplicacion_id: "",
-  tipo_establecimiento: "",
+const keysToSync = [
+  "primerNombre",
+  "segundoNombre",
+  "primerApellido",
+  "segundoApellido",
+  "indicativo_id",
+  "telefono",
+  "email",
+  "ciudadResidencia",
+  "barrioResidencia",
+  "direccionResidencia",
+  "tipoDocumento_id",
+  "numero_documento",
+  "rol_id",
+  "genero",
+  "nombreEstablecimiento",
+  "cargo",
+  "tipoEstablecimiento",
+  "telefonoEstablecimiento",
+  "emailEstablecimiento",
+  "ciudadEstablecimiento",
+  "barrioEstablecimiento",
+  "direccionEstablecimiento",
+  "tokenEstablecimiento",
+  "estadoToken_id",
+  "aplicacion_id",
+];
+
+const initialData = {};
+keysToSync.forEach((key) => {
+  initialData[key] = infoUserStore[key];
 });
+
+const form = useForm({
+  ...initialData,
+});
+
+watch(
+  infoUserStore,
+  (newState) => {
+    keysToSync.forEach((key) => {
+      if (form[key] !== newState[key]) {
+        form[key] = newState[key];
+      }
+    });
+  },
+  { deep: true }
+);
 
 const inicialesNombreUsuario = computed(() => {
   const nombres = infoUserStore.primerNombre || "";
@@ -83,9 +110,8 @@ const inicialesNombreEstablecimiento = computed(() => {
 const activeTab = ref(0);
 const tabs = [{ label: "Información general" }, { label: "Editar usuario" }];
 
-// --- LÓGICA DE PASOS ---
 const currentStep = ref(1);
-const totalSteps = 2;
+const totalSteps = 3;
 
 const progressPercentage = computed(() => {
   return ((currentStep.value - 1) / (totalSteps - 1)) * 100;
@@ -892,50 +918,51 @@ const proximaFactura = computed(() => {
                             class="2xl:flex 2xl:flex-row 2xl:justify-between 2xl:items-center 2xl:gap-2 xl:flex xl:flex-row xl:justify-between xl:items-center xl:gap-2 gap-3 flex flex-col items-center"
                           >
                             <InputTexto
-                              v-model="infoUserStore.primerNombre"
+                              v-model="form.primerNombre"
                               label="Primer nombre:"
                               icon="format_italic"
                               type="text"
                               placeholder="Ej: Juan"
                               :maxLength="limitesCaracteres.nombresUsuario"
-                              :error="form.errors.primer_nombre"
-                              @blur="handleBlur(form, 'primer_nombre')"
-                              @input="(e) => handleInput(e, form, 'primer_nombre')"
+                              :error="form.errors.primerNombre"
+                              @blur="handleBlur(form, 'primerNombre')"
+                              @input="(e) => handleInput(e, form, 'primerNombre')"
                             />
 
                             <InputTexto
-                              v-model="infoUserStore.segundoNombre"
+                              v-model="form.segundoNombre"
                               label="Segundo nombre:"
                               icon="format_italic"
                               type="text"
                               placeholder="Opcional*"
                               :maxLength="limitesCaracteres.nombresUsuario"
-                              :error="form.errors.segundo_nombre"
-                              @blur="handleBlur(form, 'segundo_nombre')"
-                              @input="(e) => handleInput(e, form, 'segundo_nombre')"
+                              :error="form.errors.segundoNombre"
+                              @blur="handleBlur(form, 'nombresUsuario')"
+                              @input="(e) => handleInput(e, form, 'segundoNombre')"
                             />
 
                             <InputTexto
-                              v-model="infoUserStore.primerApellido"
+                              v-model="form.primerApellido"
                               label="Primer apellido:"
                               icon="format_italic"
                               type="text"
                               placeholder="Ej: Medina"
                               :maxLength="limitesCaracteres.nombresUsuario"
-                              :error="form.errors.primer_apellido"
-                              @blur="handleBlur(form, 'primer_apellido')"
-                              @input="(e) => handleInput(e, form, 'primer_apellido')"
+                              :error="form.errors.primerApellido"
+                              @blur="handleBlur(form, 'primerApellido')"
+                              @input="(e) => handleInput(e, form, 'primerApellido')"
                             />
 
                             <InputTexto
-                              v-model="infoUserStore.segundoApellido"
+                              v-model="form.segundoApellido"
                               label="Segundo apellido:"
                               icon="format_italic"
                               type="text"
                               placeholder="Opcional*"
                               :maxLength="limitesCaracteres.nombresUsuario"
-                              :error="form.errors.segundo_nombre"
-                              @blur="handleBlur(form, 'segundo_nombre')"
+                              :error="form.errors.segundoNombre"
+                              @blur="handleBlur(form, 'segundoNombre')"
+                              @input="(e) => handleInput(e, form, 'segundoApellido')"
                             />
                           </div>
 
@@ -944,7 +971,7 @@ const proximaFactura = computed(() => {
                           >
                             <div class="flex gap-2 items-center w-full">
                               <Selects
-                                v-model="infoUserStore.indicativo_id"
+                                v-model="form.indicativo_id"
                                 :options="props.indicativosDisponibles"
                                 :error="form.errors.indicativo_id"
                                 label="Indicativo:"
@@ -953,7 +980,7 @@ const proximaFactura = computed(() => {
                               />
 
                               <InputTexto
-                                v-model="infoUserStore.telefono"
+                                v-model="form.telefono"
                                 label="Número celular:"
                                 icon="phone"
                                 type="number"
@@ -966,14 +993,15 @@ const proximaFactura = computed(() => {
                             </div>
 
                             <InputTexto
-                              v-model="infoUserStore.email"
+                              v-model="form.email"
                               label="Correo electrónico:"
                               icon="email"
                               type="email"
                               placeholder="example@dominio.com"
-                              :maxLength="limitesCaracteres.nombresUsuario"
-                              :error="form.errors.correo"
-                              @blur="handleBlur(form, 'correo')"
+                              :maxLength="limitesCaracteres.email"
+                              :error="form.errors.email"
+                              @blur="handleBlur(form, 'email')"
+                              @input="(e) => handleInput(e, form, 'email')"
                             />
                           </div>
 
@@ -982,39 +1010,39 @@ const proximaFactura = computed(() => {
                           >
                             <div class="w-full flex items-center gap-2">
                               <InputTexto
-                                v-model="infoUserStore.ciudadResidencia"
+                                v-model="form.ciudadResidencia"
                                 label="Ciudad residencia:"
                                 icon="map"
                                 type="text"
                                 placeholder="Bogotá D.C."
                                 :maxLength="limitesCaracteres.direccion"
-                                :error="form.errors.ciudad_residencia"
-                                @blur="handleBlur(form, 'ciudad_residencia')"
-                                @input="(e) => handleInput(e, form, 'ciudad_residencia')"
+                                :error="form.errors.ciudadResidencia"
+                                @blur="handleBlur(form, 'ciudadResidencia')"
+                                @input="(e) => handleInput(e, form, 'ciudadResidencia')"
                               />
 
                               <InputTexto
-                                v-model="infoUserStore.barrioResidencia"
+                                v-model="form.barrioResidencia"
                                 label="Barrio residencia:"
                                 icon="distance"
                                 type="text"
                                 placeholder="Luna Park"
                                 :maxLength="limitesCaracteres.direccion"
-                                :error="form.errors.barrio_residencia"
-                                @blur="handleBlur(form, 'barrio_residencia')"
-                                @input="(e) => handleInput(e, form, 'barrio_residencia')"
+                                :error="form.errors.barrioResidencia"
+                                @blur="handleBlur(form, 'barrioResidencia')"
+                                @input="(e) => handleInput(e, form, 'barrioResidencia')"
                               />
                             </div>
 
                             <InputTexto
-                              v-model="infoUserStore.direccionResidencia"
+                              v-model="form.direccionResidencia"
                               label="Dirección residencia:"
                               icon="format_italic"
                               type="text"
                               placeholder="Calle 1a #2b-3 sur"
                               :maxLength="limitesCaracteres.direccion"
-                              :error="form.errors.direccion_residencia"
-                              @blur="handleBlur(form, 'direccion_residencia')"
+                              :error="form.errors.direccionResidencia"
+                              @blur="handleBlur(form, 'direccionResidencia')"
                             />
                           </div>
                           <div
@@ -1022,16 +1050,16 @@ const proximaFactura = computed(() => {
                           >
                             <div class="flex gap-2 items-center w-full">
                               <Selects
-                                v-model="infoUserStore.tipoDocumento_id"
+                                v-model="form.tipoDocumento_id"
                                 :options="props.tipoDocumentoDisponibles"
-                                :error="form.errors.tipo_documento_id"
+                                :error="form.errors.tipoDocumento_id"
                                 label="Tipo documento:"
                                 placeholder="Selecciona el tipo"
-                                id="tipo_documento_id"
+                                id="tipoDocumento_id"
                               />
 
                               <InputTexto
-                                v-model="infoUserStore.numero_documento"
+                                v-model="form.numero_documento"
                                 label="Número documento:"
                                 icon="pin"
                                 type="number"
@@ -1047,7 +1075,7 @@ const proximaFactura = computed(() => {
                             class="2xl:flex 2xl:flex-row 2xl:justify-between 2xl:items-center 2xl:gap-2 xl:flex xl:flex-row xl:justify-between xl:items-center xl:gap-2 gap-3 flex flex-col items-center"
                           >
                             <Selects
-                              v-model="infoUserStore.genero"
+                              v-model="form.genero"
                               :options="props.generosDisponibles"
                               :error="form.errors.genero"
                               label="Género:"
@@ -1072,24 +1100,26 @@ const proximaFactura = computed(() => {
                           <div
                             class="2xl:flex 2xl:flex-row 2xl:justify-between 2xl:items-center 2xl:gap-2 xl:flex xl:flex-row xl:justify-between xl:items-center xl:gap-2 gap-3 flex flex-col items-center"
                           >
-                            <Selects
-                              v-model="infoUserStore.indicativo_id"
-                              :options="props.indicativosDisponibles"
-                              :error="form.errors.indicativo_id"
-                              label="Indicativo:"
-                              placeholder="Selecciona un indicativo"
-                              id="indicativo"
-                            />
-
                             <InputTexto
-                              v-model="infoUserStore.nombreEstablecimiento"
+                              v-model="form.nombreEstablecimiento"
                               label="Nombre de tienda:"
                               icon="format_italic"
                               type="text"
                               placeholder="Maruchan"
                               :maxLength="limitesCaracteres.nombresUsuario"
-                              :error="form.errors.segundo_nombre"
-                              @blur="handleBlur(form, 'segundo_nombre')"
+                              :error="form.errors.nombre_establecimiento"
+                              @blur="handleBlur(form, 'nombresUsuario')"
+                            />
+
+                            <InputTexto
+                              v-model="form.tipoEstablecimiento"
+                              label="Categoria del establecimiento:"
+                              icon="format_italic"
+                              type="text"
+                              placeholder="TI"
+                              :maxLength="limitesCaracteres.tipo_establecimiento"
+                              :error="form.errors.tipo_establecimiento"
+                              @blur="handleBlur(form, 'tipo_establecimiento')"
                             />
                           </div>
 
@@ -1097,37 +1127,28 @@ const proximaFactura = computed(() => {
                             class="2xl:flex 2xl:flex-row 2xl:justify-between 2xl:items-center 2xl:gap-2 xl:flex xl:flex-row xl:justify-between xl:items-center xl:gap-2 gap-3 flex flex-col items-center"
                           >
                             <div class="flex gap-2 items-center w-full">
-                              <Selects
-                                v-model="infoUserStore.indicativo_id"
-                                :options="props.indicativosDisponibles"
-                                :error="form.errors.indicativo_id"
-                                label="Indicativo:"
-                                placeholder="Selecciona un indicativo"
-                                id="indicativo"
-                              />
-
                               <InputTexto
-                                v-model="infoUserStore.telefono"
-                                label="Número celular:"
+                                v-model="form.telefonoEstablecimiento"
+                                label="Número Corporativo:"
                                 icon="phone"
                                 type="number"
                                 placeholder="316511****"
                                 :maxLength="limitesCaracteres.telefono"
-                                :error="form.errors.telefono"
+                                :error="form.errors.telefono_establecimiento"
                                 @blur="handleBlur(form, 'telefono')"
                                 @input="(e) => handleInput(e, form, 'telefono')"
                               />
                             </div>
 
                             <InputTexto
-                              v-model="infoUserStore.email"
+                              v-model="form.emailEstablecimiento"
                               label="Correo electrónico:"
                               icon="email"
                               type="email"
                               placeholder="example@dominio.com"
                               :maxLength="limitesCaracteres.nombresUsuario"
-                              :error="form.errors.correo"
-                              @blur="handleBlur(form, 'correo')"
+                              :error="form.errors.email"
+                              @blur="handleBlur(form, 'email')"
                             />
                           </div>
 
@@ -1136,39 +1157,39 @@ const proximaFactura = computed(() => {
                           >
                             <div class="w-full flex items-center gap-2">
                               <InputTexto
-                                v-model="infoUserStore.ciudadResidencia"
-                                label="Ciudad residencia:"
+                                v-model="form.ciudadEstablecimiento"
+                                label="Ciudad establecimiento:"
                                 icon="map"
                                 type="text"
                                 placeholder="Bogotá D.C."
                                 :maxLength="limitesCaracteres.direccion"
-                                :error="form.errors.ciudad_residencia"
-                                @blur="handleBlur(form, 'ciudad_residencia')"
-                                @input="(e) => handleInput(e, form, 'ciudad_residencia')"
+                                :error="form.errors.ciudadResidencia"
+                                @blur="handleBlur(form, 'ciudadResidencia')"
+                                @input="(e) => handleInput(e, form, 'ciudadResidencia')"
                               />
 
                               <InputTexto
-                                v-model="infoUserStore.barrioResidencia"
-                                label="Barrio residencia:"
+                                v-model="form.barrioEstablecimiento"
+                                label="Barrio establecimiento:"
                                 icon="distance"
                                 type="text"
                                 placeholder="Luna Park"
                                 :maxLength="limitesCaracteres.direccion"
-                                :error="form.errors.barrio_residencia"
-                                @blur="handleBlur(form, 'barrio_residencia')"
-                                @input="(e) => handleInput(e, form, 'barrio_residencia')"
+                                :error="form.errors.barrioResidencia"
+                                @blur="handleBlur(form, 'barrioResidencia')"
+                                @input="(e) => handleInput(e, form, 'barrioResidencia')"
                               />
                             </div>
 
                             <InputTexto
-                              v-model="infoUserStore.direccionResidencia"
-                              label="Dirección residencia:"
+                              v-model="form.direccionEstablecimiento"
+                              label="Dirección establecimiento:"
                               icon="format_italic"
                               type="text"
                               placeholder="Calle 1a #2b-3 sur"
                               :maxLength="limitesCaracteres.direccion"
-                              :error="form.errors.direccion_residencia"
-                              @blur="handleBlur(form, 'direccion_residencia')"
+                              :error="form.errors.direccionResidencia"
+                              @blur="handleBlur(form, 'direccionResidencia')"
                             />
                           </div>
                           <div
@@ -1176,37 +1197,71 @@ const proximaFactura = computed(() => {
                           >
                             <div class="flex gap-2 items-center w-full">
                               <Selects
-                                v-model="infoUserStore.tipoDocumento_id"
-                                :options="props.tipoDocumentoDisponibles"
-                                :error="form.errors.tipo_documento_id"
-                                label="Tipo documento:"
-                                placeholder="Selecciona el tipo"
-                                id="tipo_documento_id"
+                                v-model="form.aplicacion_id"
+                                :options="props.appsDisponibles"
+                                :error="form.errors.aplicacion_id"
+                                label="Aplicación asignada:"
+                                placeholder="Selecciona una app"
+                                id="aplicacion_id"
                               />
-
-                              <InputTexto
-                                v-model="infoUserStore.numero_documento"
-                                label="Número documento:"
-                                icon="pin"
-                                type="number"
-                                placeholder="10135****"
-                                :maxLength="limitesCaracteres.numero_documento"
-                                :error="form.errors.numero_documento"
-                                @blur="handleBlur(form, 'numero_documento')"
-                                @input="(e) => handleInput(e, form, 'numero_documento')"
+                              <Selects
+                                v-model="infoUserStore.estadoIdEstablecimiento"
+                                :options="props.estadosDisponibles"
+                                :error="form.errors.estadosDisponibles"
+                                label="Estado tienda:"
+                                placeholder="Cambia el estado"
+                                id="estado"
                               />
                             </div>
                           </div>
+                        </div>
+                      </div>
+
+                      <!-- PASO 3: pagos y estado de factura -->
+                      <div v-if="currentStep === 3">
+                        <h4 class="font-semibold text-[35px] text-mono-blanco">
+                          Accesos a la app:
+                          {{ infoUserStore.aplicacion }}
+                        </h4>
+                        <p class="text-[16px] text-secundary-light -mt-2 mb-4">
+                          Ten en cuenta los cambios respectivos, lo que no cambiarás,
+                          déjalo tal cual y continúa.
+                        </p>
+                        <div class="space-y-4">
                           <div
                             class="2xl:flex 2xl:flex-row 2xl:justify-between 2xl:items-center 2xl:gap-2 xl:flex xl:flex-row xl:justify-between xl:items-center xl:gap-2 gap-3 flex flex-col items-center"
                           >
+                            <div class="w-full">
+                              <div
+                                class="contador-label flex items-center justify-between"
+                              >
+                                <label class="my-[5px] text-[14px] dark:text-mono-blanco"
+                                  >Token asignado:</label
+                                >
+                              </div>
+
+                              <div
+                                class="w-full p-[3px] flex items-center gap-[8px] transition-all rounded-[5px] border-secundary-light border-[1px]"
+                              >
+                                <span
+                                  class="material-symbols-rounded text-primary text-[20px] pl-[5px]"
+                                  >key</span
+                                >
+                                <p>{{ infoUserStore.tokenEstablecimiento }}</p>
+                              </div>
+
+                              <span v-if="error" class="text-sm text-universal-naranja">
+                                {{ error }}
+                              </span>
+                            </div>
+
                             <Selects
-                              v-model="infoUserStore.genero"
-                              :options="props.generosDisponibles"
-                              :error="form.errors.genero"
-                              label="Género:"
-                              placeholder="Selecciona tu genero"
-                              id="genero"
+                              v-model="form.estadoToken_id"
+                              :options="props.estadosDisponibles"
+                              :error="form.errors.estadoToken_id"
+                              label="Estado del token:"
+                              placeholder="Selecciona una app"
+                              id="estadoToken_id"
                             />
                           </div>
                         </div>
@@ -1264,10 +1319,25 @@ const proximaFactura = computed(() => {
 
 <style scoped>
 .input-field {
-  @apply mt-1 block w-full bg-gray-800 border-gray-700 rounded-md shadow-sm focus:ring-primary focus:border-primary text-white;
+  margin-top: 0.25rem;
+  display: block;
+  width: 100%;
+  background-color: #1f2937; /* bg-gray-800 */
+  border: 1px solid #374151; /* border-gray-700 */
+  border-radius: 0.375rem; /* rounded-md */
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05); /* shadow-sm */
+  color: #fff; /* text-white */
 }
+.input-field:focus {
+  outline: none;
+  border-color: #2563eb; /* focus:border-primary (blue-600) */
+  box-shadow: 0 0 0 2px #2563eb33; /* focus:ring-primary */
+}
+
 .error-message {
-  @apply text-red-500 text-xs mt-1;
+  color: #ef4444; /* Tailwind text-red-500 */
+  font-size: 0.75rem; /* Tailwind text-xs */
+  margin-top: 0.25rem; /* Tailwind mt-1 */
 }
 
 /* Transición para el modal completo */
@@ -1275,14 +1345,17 @@ const proximaFactura = computed(() => {
 .modal-fade-leave-active {
   transition: opacity 0.3s ease;
 }
+
 .modal-fade-enter-from,
 .modal-fade-leave-to {
   opacity: 0;
 }
+
 .modal-slide-enter-active,
 .modal-slide-leave-active {
   transition: all 0.3s ease-out;
 }
+
 .modal-slide-enter-from,
 .modal-slide-leave-to {
   transform: translateY(20px);
@@ -1294,10 +1367,12 @@ const proximaFactura = computed(() => {
 .slide-fade-leave-active {
   transition: all 0.25s ease-out;
 }
+
 .slide-fade-enter-from {
   opacity: 0;
   transform: translateX(30px);
 }
+
 .slide-fade-leave-to {
   opacity: 0;
   transform: translateX(-30px);

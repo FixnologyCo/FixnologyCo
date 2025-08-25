@@ -2,7 +2,6 @@
 export const limitesCaracteres = {
   // inputs usuarios
   nombresUsuario: 25,
-  apellidosUsuario: 25,
   numero_documento: 20,
   telefono: 10,
   email: 60,
@@ -46,6 +45,6 @@ export const handleBlur = (form, field) => {
 
 // ✅ Función para limitar caracteres y actualizar el valor
 export const handleInput = (event, form, field) => {
-  const maxCaracteres = limitesCaracteres[field] || 25
+  const maxCaracteres = limitesCaracteres[field] || 999
   form[field] = event.target.value.slice(0, maxCaracteres)
 }

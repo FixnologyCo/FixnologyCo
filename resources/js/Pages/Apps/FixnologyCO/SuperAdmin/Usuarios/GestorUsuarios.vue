@@ -33,6 +33,7 @@ const props = defineProps({
   rolesDisponibles: { type: Array },
   generosDisponibles: { type: Array },
   appsDisponibles: { type: Array },
+  estadosDisponibles: { type: Array },
 });
 
 const authStore = useAuthStore();
@@ -404,6 +405,7 @@ const rol = authStore.rol;
         :rolesDisponibles="rolesDisponibles"
         :generosDisponibles="generosDisponibles"
         :appsDisponibles="appsDisponibles"
+        :estadosDisponibles="estadosDisponibles"
         @close="closeUserDetailsModal"
       />
       <ModalCrearUsuario

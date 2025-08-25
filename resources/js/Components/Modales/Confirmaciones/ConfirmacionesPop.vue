@@ -28,21 +28,24 @@ const emit = defineEmits(["close", "confirm"]);
       ></button>
       <Transition name="modal-slide" appear>
         <div
-          class="relative text-center bg-mono-negro rounded-lg h-auto max-h-[80%] w-full max-w-[30%] border border-secundary-light text-mono-blanco p-5 overflow-auto scrollbar-custom"
+          class="relative text-center bg-mono-negro rounded-lg h-auto max-h-[80%] w-full max-w-[40%] border border-secundary-light text-mono-blanco p-5 overflow-auto scrollbar-custom"
         >
-          <div class="">
+          <div class="flex items-center gap-4">
             <span
               :class="iconBgClass"
-              class="material-symbols-rounded border p-4 rounded-lg"
+              class="material-symbols-rounded border p-4 rounded-xl flex justify-center items-center"
               >{{ icon }}</span
             >
+            <div class="text-left">
+              <h4 class="font-semibold text-[30px] text-mono-blanco">
+                {{ title }}
+              </h4>
+              <p class="text-[18px] text-secundary-light -mt-1 mb-4">
+                {{ message }}
+              </p>
+            </div>
           </div>
-          <h4 class="font-semibold text-[30px] text-mono-blanco">
-            {{ title }}
-          </h4>
-          <p class="text-[18px] text-secundary-light -mt-1 mb-4">
-            {{ message }}
-          </p>
+
           <div class="mt-5 flex gap-3 justify-between items-center flex-shrink-0">
             <BtnSecundario
               @click="$emit('close')"

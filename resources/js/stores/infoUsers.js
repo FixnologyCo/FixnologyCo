@@ -75,6 +75,7 @@ export const useInfoUser = defineStore("infoUser", {
         // --- DATOS DE ESTABLECIMIENTO ASIGNADO ---
         establecimiento_id() { return this.establecimientoAsignado?.id || null; },
         estadoEstablecimiento() { return this.establecimientoAsignado?.estado?.tipo_estado || null; },
+        estadoIdEstablecimiento() { return this.establecimientoAsignado?.estado?.id || null; },
         rutaFotoEstablecimiento() { return this.establecimientoAsignado?.ruta_foto_establecimiento || null; },
         fotoUrlCompletaEstablecimiento() {
             const ruta = this.rutaFotoEstablecimiento;
@@ -90,11 +91,13 @@ export const useInfoUser = defineStore("infoUser", {
         ciudadEstablecimiento() { return this.establecimientoAsignado?.ciudad_establecimiento || null; },
 
         // --- DATOS DE TOKEN ---
+        estadoToken_id() { return this.establecimientoAsignado?.token?.estado?.id || null; },
         estadoToken() { return this.establecimientoAsignado?.token?.estado?.tipo_estado || null; },
         tokenEstablecimiento() { return this.establecimientoAsignado?.token?.token_activacion || null; },
 
         // --- DATOS DE APP ---
         aplicacion() { return this.aplicacionWeb?.nombre_app || null; },
+        aplicacion_id() { return this.aplicacionWeb?.id || null; },
         categoriaApp() { return this.aplicacionWeb?.categoria_app || null; },
         descripcionApp() { return this.aplicacionWeb?.descripcion_app || null; },
         membresia() { return this.aplicacionWeb?.membresia?.nombre_membresia || null; },

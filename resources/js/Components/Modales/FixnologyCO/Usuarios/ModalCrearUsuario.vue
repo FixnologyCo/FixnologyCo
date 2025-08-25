@@ -220,6 +220,7 @@ const submit = () => {
                         :maxLength="limitesCaracteres.nombresUsuario"
                         :error="form.errors.segundo_nombre"
                         @blur="handleBlur(form, 'segundo_nombre')"
+                        @input="(e) => handleInput(e, form, 'segundo_apellido')"
                       />
                     </div>
 
