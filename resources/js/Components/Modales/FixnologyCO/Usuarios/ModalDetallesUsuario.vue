@@ -48,31 +48,34 @@ const usuarioSeleccionado = computed(() => infoUserStore.user);
 const { tiempoActivo, diasRestantes } = useTiempo(usuarioSeleccionado);
 
 const keysToSync = [
-  "primer_nombre",
-  "segundo_nombre",
-  "primer_apellido",
-  "segundo_apellido",
+  "primerNombre",
+  "segundoNombre",
+  "primerApellido",
+  "segundoApellido",
   "indicativo_id",
   "telefono",
   "email",
-  "ciudad_residencia",
-  "barrio_residencia",
-  "direccion_residencia",
-  "tipo_documento_id",
+  "ciudadResidencia",
+  "barrioResidencia",
+  "direccionResidencia",
+  "tipoDocumento_id",
   "numero_documento",
   "rol_id",
   "genero",
-  "nombre_establecimiento",
+  "nombreEstablecimiento",
   "cargo",
-  "tipo_establecimiento",
-  "telefono_establecimiento",
-  "email_establecimiento",
-  "ciudad_establecimiento",
-  "barrio_establecimiento",
-  "direccion_establecimiento",
-  "token_activacion",
-  "estado_token_id",
+  "tipoEstablecimiento",
+  "telefonoEstablecimiento",
+  "emailEstablecimiento",
+  "ciudadEstablecimiento",
+  "barrioEstablecimiento",
+  "direccionEstablecimiento",
+  "tokenEstablecimiento",
+  "estadoToken_id",
+  "estadoEmpleado_id",
+  "estadoUsuario_id",
   "aplicacion_id",
+  "estadoIdEstablecimiento",
 ];
 
 const initialData = {};
@@ -83,7 +86,6 @@ keysToSync.forEach((key) => {
 const form = useForm({
   ...initialData,
 });
-
 watch(
   infoUserStore,
   (newState) => {
@@ -142,7 +144,11 @@ function prevStep() {
 const submit = () => {
   form.put(
     // 1. Primer argumento: SOLO la URL con sus parámetros de ruta (si los necesita)
-    route("usuarios.actualizarPerfilUsuario", { aplicacion: aplicacion, rol: rol }),
+    route("usuarios.actualizarPerfilUsuario", {
+      user: infoUserStore.idUsuario,
+      aplicacion: aplicacion,
+      rol: rol,
+    }),
 
     // 2. Segundo argumento: UN objeto con TODAS las opciones de Inertia
     {
@@ -918,8 +924,6 @@ const proximaFactura = computed(() => {
                   <p class="text-[12px]">{{ Math.round(progressPercentage) }}%</p>
                 </div>
 
-                <!-- Encabezado -->
-
                 <!-- Cuerpo del Formulario con Transición -->
                 <div class="overflow-hidden">
                   <Transition name="slide-fade" mode="out-in">
@@ -938,7 +942,7 @@ const proximaFactura = computed(() => {
                             class="2xl:flex 2xl:flex-row 2xl:justify-between 2xl:items-center 2xl:gap-2 xl:flex xl:flex-row xl:justify-between xl:items-center xl:gap-2 gap-3 flex flex-col items-center"
                           >
                             <InputTexto
-                              v-model="form.primer_nombre"
+                              v-model="form.primerNombre"
                               label="Primer nombre:"
                               icon="format_italic"
                               type="text"
@@ -950,7 +954,7 @@ const proximaFactura = computed(() => {
                             />
 
                             <InputTexto
-                              v-model="form.segundo_nombre"
+                              v-model="form.segundoNombre"
                               label="Segundo nombre:"
                               icon="format_italic"
                               type="text"
@@ -962,7 +966,7 @@ const proximaFactura = computed(() => {
                             />
 
                             <InputTexto
-                              v-model="form.primer_apellido"
+                              v-model="form.primerApellido"
                               label="Primer apellido:"
                               icon="format_italic"
                               type="text"
@@ -974,7 +978,7 @@ const proximaFactura = computed(() => {
                             />
 
                             <InputTexto
-                              v-model="form.segundo_apellido"
+                              v-model="form.segundoApellido"
                               label="Segundo apellido:"
                               icon="format_italic"
                               type="text"
@@ -1030,7 +1034,7 @@ const proximaFactura = computed(() => {
                           >
                             <div class="w-full flex items-center gap-2">
                               <InputTexto
-                                v-model="form.ciudad_residencia"
+                                v-model="form.ciudadResidencia"
                                 label="Ciudad residencia:"
                                 icon="map"
                                 type="text"
@@ -1042,7 +1046,7 @@ const proximaFactura = computed(() => {
                               />
 
                               <InputTexto
-                                v-model="form.barrio_residencia"
+                                v-model="form.barrioResidencia"
                                 label="Barrio residencia:"
                                 icon="distance"
                                 type="text"
@@ -1055,7 +1059,7 @@ const proximaFactura = computed(() => {
                             </div>
 
                             <InputTexto
-                              v-model="form.direccion_residencia"
+                              v-model="form.direccionResidencia"
                               label="Dirección residencia:"
                               icon="format_italic"
                               type="text"
@@ -1070,7 +1074,7 @@ const proximaFactura = computed(() => {
                           >
                             <div class="flex gap-2 items-center w-full">
                               <Selects
-                                v-model="form.tipo_documento_id"
+                                v-model="form.tipoDocumento_id"
                                 :options="props.tipoDocumentoDisponibles"
                                 :error="form.errors.tipo_documento_id"
                                 label="Tipo documento:"
@@ -1078,17 +1082,30 @@ const proximaFactura = computed(() => {
                                 id="tipo_documento_id"
                               />
 
-                              <InputTexto
-                                v-model="form.numero_documento"
-                                label="Número documento:"
-                                icon="pin"
-                                type="number"
-                                placeholder="10135****"
-                                :maxLength="limitesCaracteres.numero_documento"
-                                :error="form.errors.numero_documento"
-                                @blur="handleBlur(form, 'numero_documento')"
-                                @input="(e) => handleInput(e, form, 'numero_documento')"
-                              />
+                              <div class="w-full">
+                                <div
+                                  class="contador-label flex items-center justify-between"
+                                >
+                                  <label
+                                    class="my-[5px] text-[14px] dark:text-mono-blanco"
+                                    >Documento de identidad:</label
+                                  >
+                                </div>
+
+                                <div
+                                  class="w-full p-[3px] flex items-center gap-[8px] transition-all rounded-[5px] border-secundary-light border-[1px]"
+                                >
+                                  <span
+                                    class="material-symbols-rounded text-primary text-[20px] pl-[5px]"
+                                    >key</span
+                                  >
+                                  <p>{{ infoUserStore.numero_documento }}</p>
+                                </div>
+
+                                <span v-if="error" class="text-sm text-universal-naranja">
+                                  {{ error }}
+                                </span>
+                              </div>
                             </div>
                           </div>
                           <div
@@ -1101,6 +1118,14 @@ const proximaFactura = computed(() => {
                               label="Género:"
                               placeholder="Selecciona tu genero"
                               id="genero"
+                            />
+                            <Selects
+                              v-model="form.estadoUsuario_id"
+                              :options="props.estadosDisponibles"
+                              :error="form.errors.estadoCliente_id"
+                              label="Estado usuario:"
+                              placeholder="Selecciona el tipo"
+                              id="estado_id"
                             />
                           </div>
                         </div>
@@ -1121,18 +1146,18 @@ const proximaFactura = computed(() => {
                             class="2xl:flex 2xl:flex-row 2xl:justify-between 2xl:items-center 2xl:gap-2 xl:flex xl:flex-row xl:justify-between xl:items-center xl:gap-2 gap-3 flex flex-col items-center"
                           >
                             <InputTexto
-                              v-model="form.nombre_establecimiento"
+                              v-model="form.nombreEstablecimiento"
                               label="Nombre de tienda:"
                               icon="format_italic"
                               type="text"
-                              placeholder="Maruchan"
+                              placeholder="CC Smit"
                               :maxLength="limitesCaracteres.nombresUsuario"
                               :error="form.errors.nombre_establecimiento"
                               @blur="handleBlur(form, 'nombre_establecimiento')"
                             />
 
                             <InputTexto
-                              v-model="form.tipo_establecimiento"
+                              v-model="form.tipoEstablecimiento"
                               label="Categoria del establecimiento:"
                               icon="format_italic"
                               type="text"
@@ -1148,7 +1173,7 @@ const proximaFactura = computed(() => {
                           >
                             <div class="flex gap-2 items-center w-full">
                               <InputTexto
-                                v-model="form.telefono_establecimiento"
+                                v-model="form.telefonoEstablecimiento"
                                 label="Número Corporativo:"
                                 icon="phone"
                                 type="number"
@@ -1161,7 +1186,7 @@ const proximaFactura = computed(() => {
                             </div>
 
                             <InputTexto
-                              v-model="form.email_establecimiento"
+                              v-model="form.emailEstablecimiento"
                               label="Correo electrónico:"
                               icon="email"
                               type="email"
@@ -1177,7 +1202,7 @@ const proximaFactura = computed(() => {
                           >
                             <div class="w-full flex items-center gap-2">
                               <InputTexto
-                                v-model="form.ciudad_establecimiento"
+                                v-model="form.ciudadEstablecimiento"
                                 label="Ciudad establecimiento:"
                                 icon="map"
                                 type="text"
@@ -1191,7 +1216,7 @@ const proximaFactura = computed(() => {
                               />
 
                               <InputTexto
-                                v-model="form.barrio_establecimiento"
+                                v-model="form.barrioEstablecimiento"
                                 label="Barrio establecimiento:"
                                 icon="distance"
                                 type="text"
@@ -1206,7 +1231,7 @@ const proximaFactura = computed(() => {
                             </div>
 
                             <InputTexto
-                              v-model="form.direccion_establecimiento"
+                              v-model="form.direccionEstablecimiento"
                               label="Dirección establecimiento:"
                               icon="format_italic"
                               type="text"
@@ -1229,7 +1254,7 @@ const proximaFactura = computed(() => {
                                 id="aplicacion_id"
                               />
                               <Selects
-                                v-model="infoUserStore.estadoIdEstablecimiento"
+                                v-model="form.estadoIdEstablecimiento"
                                 :options="props.estadosDisponibles"
                                 :error="form.errors.estadosDisponibles"
                                 label="Estado tienda:"
@@ -1237,6 +1262,18 @@ const proximaFactura = computed(() => {
                                 id="estado"
                               />
                             </div>
+                          </div>
+                          <div
+                            class="2xl:flex 2xl:flex-row 2xl:justify-between 2xl:items-center 2xl:gap-2 xl:flex xl:flex-row xl:justify-between xl:items-center xl:gap-2 gap-3 flex flex-col items-center"
+                          >
+                            <Selects
+                              v-model="form.rol_id"
+                              :options="props.rolesDisponibles"
+                              :error="form.errors.rol_id"
+                              label="Rol del usuario:"
+                              placeholder="Escoje tus funciones"
+                              id="rol_id"
+                            />
                           </div>
                         </div>
                       </div>
@@ -1280,7 +1317,7 @@ const proximaFactura = computed(() => {
                             </div>
 
                             <Selects
-                              v-model="form.estado_token_id"
+                              v-model="form.estadoToken_id"
                               :options="props.estadosDisponibles"
                               :error="form.errors.estado_token_id"
                               label="Estado del token:"

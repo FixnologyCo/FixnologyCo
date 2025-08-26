@@ -91,8 +91,16 @@ class SocialiteController extends Controller
                     'usuario_id' => $usuario->id,
                     'correo' => $googleEmail,
                     'primer_nombre' => $googleUser->user['given_name'] ?? 'Usuario',
-                    'primer_apellido' => $googleUser->user['family_name'] ?? 'NA',
+                    'segundo_nombre' => $googleUser->user['given_name'] ?? 'NA',
+                    'primer_apellido' => $googleUser->user['family_name'] ?? 'Apellido',
+                    'segundo_apellido' => $googleUser->user['family_name'] ?? 'NA',
+                    'telefono' => '0000000000',
+                    'indicativo_id' => 1,
                     'ruta_foto' => $highResAvatarUrl,
+                    'direccion_residencia' => 'Por definir',
+                    'barrio_residencia' => 'Por definir',
+                    'ciudad_residencia' => 'Por definir',
+                    'genero' => 'Otro'
                 ]);
 
                 $this->crearEstructuraInicial($usuario, $perfil);
@@ -119,8 +127,8 @@ class SocialiteController extends Controller
             'estado_id' => 1,
             'aplicacion_web_id' => 1, // Asumimos que siempre es la app 1
             'propietario_id' => $usuario->id,
-            'nombre_establecimiento' => 'establecimientos de ' . $perfil->primer_nombre,
-            'email_establecimiento' => 'establecimientos-' . $usuario->id . '@example.com',
+            'nombre_establecimiento' => 'establecimiento de ' . $perfil->primer_nombre,
+            'email_establecimiento' => 'establecimiento-' . $usuario->id . '@example.com',
             'telefono_establecimiento' => '0000000000',
             'direccion_establecimiento' => 'Por definir',
             'barrio_establecimiento' => 'Por definir',

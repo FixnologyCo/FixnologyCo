@@ -20,6 +20,7 @@ export const useInfoUser = defineStore("infoUser", {
         // Todos los getters ahora son seguros y usan los auxiliares para mayor claridad.
         idUsuario() { return this.perfilUsuario?.id || null; },
         google_id: (state) => state.user?.google_id || null,
+        estadoUsuario_id() { return this.perfilUsuario?.estado?.id || null; },
         estadoUsuario() { return this.perfilUsuario?.estado?.tipo_estado || null; },
         rol() { return this.perfilUsuario?.rol?.tipo_rol || null; },
         rol_id() { return this.perfilUsuario?.rol?.id || null; },
@@ -58,6 +59,7 @@ export const useInfoUser = defineStore("infoUser", {
         ActualizadoPor() { return this.perfilUsuario?.updated_by || null; },
 
         // --- DATOS DE EMPLEADO ---
+        estadoEmpleado_id() { return this.perfilEmpleado?.estado?.id || null; },
         estadoEmpleado() { return this.perfilEmpleado?.estado?.tipo_estado || null; },
         establecimientoIdAsignado() { return this.perfilEmpleado?.establecimiento_id || null; },
         medioPagoEmpleado() { return this.perfilEmpleado?.medio_pago?.forma_pago || null; },

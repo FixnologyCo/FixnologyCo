@@ -33,7 +33,7 @@ Route::post('/usuarios/papelera/vaciar', [UsuariosFixController::class, 'emptyTr
 // routes/web.php
 Route::post('/usuarios', [UsuariosFixController::class, 'store'])->name('usuarios.store');
 
- Route::put('/editarPerfilUsuario/actualizar', [UsuariosFixController::class, 'actualizarPerfilUsuario'])
+ Route::put('/editarPerfilUsuario/{user}/actualizar', [UsuariosFixController::class, 'actualizarPerfilUsuario'])
             ->name('usuarios.actualizarPerfilUsuario');
 
 
