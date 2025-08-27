@@ -19,7 +19,7 @@ const emit = defineEmits(["close", "confirm"]);
   <Transition name="modal-fade" appear>
     <div
       v-if="isOpen"
-      class="fixed inset-0 z-50 flex items-center py-[2%] justify-center bg-transparent backdrop-blur-sm"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-mono-negro_opacity_medio backdrop-blur-md"
     >
       <button
         type="button"
@@ -28,34 +28,30 @@ const emit = defineEmits(["close", "confirm"]);
       ></button>
       <Transition name="modal-slide" appear>
         <div
-          class="relative text-center bg-mono-negro rounded-lg h-auto max-h-[80%] w-full max-w-[40%] border border-secundary-light text-mono-blanco p-5 overflow-auto scrollbar-custom"
+          class="relative text-center bg-mono-negro rounded-2xl py-10 px-10 h-auto max-h-[80%] w-full max-w-[40%] border border-secundary-light text-mono-blanco overflow-auto scrollbar-custom"
         >
-          <div class="flex items-center gap-4">
+          <div class="flex items-center justify-center">
             <span
               :class="iconBgClass"
-              class="material-symbols-rounded border p-4 rounded-xl flex justify-center items-center"
+              class="material-symbols-rounded border p-5 mr-3 rounded-xl flex justify-center items-center"
               >{{ icon }}</span
             >
             <div class="text-left">
               <h4 class="font-semibold text-[30px] text-mono-blanco">
                 {{ title }}
               </h4>
-              <p class="text-[18px] text-secundary-light -mt-1 mb-4">
+              <p class="text-[18px] text-secundary-light -mt-1 text-justify">
                 {{ message }}
               </p>
             </div>
           </div>
 
-          <div class="mt-5 flex gap-3 justify-between items-center flex-shrink-0">
-            <BtnSecundario
-              @click="$emit('close')"
-              type="button"
-              class="w-[50%] py-3 px-5"
-            >
+          <div class="mt-8 flex gap-3 justify-center items-center flex-shrink-0">
+            <BtnSecundario @click="$emit('close')" type="button" class="w-auto py-3 px-5">
               <p class="text-[14px]">Cancelar</p>
             </BtnSecundario>
 
-            <BtnPrimario @click="emit('confirm')" type="submit" class="w-[50%]">
+            <BtnPrimario @click="emit('confirm')" type="submit" class="w-[70%]">
               {{ confirmText }}
             </BtnPrimario>
           </div>

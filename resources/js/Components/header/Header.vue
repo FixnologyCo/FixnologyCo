@@ -2,11 +2,11 @@
 import { ref, computed, onMounted, onUnmounted } from "vue";
 import { usePage, router } from "@inertiajs/vue3";
 import { route } from "ziggy-js";
-
 import { useTema } from "@/Composables/useTema";
 const { modoOscuro, animando, animarCambioTema, backgroundStyle } = useTema();
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import { useAuthStore } from "@/stores/auth";
+import ConfirmacionesPop from "../Modales/Confirmaciones/ConfirmacionesPop.vue";
 const authStore = useAuthStore();
 defineOptions({
   layout: AuthenticatedLayout,
@@ -51,13 +51,6 @@ const isMenuOpen = ref(false);
 
 const toggleMenu = () => {
   isMenuOpen.value = !isMenuOpen.value;
-};
-const logout = () => {
-  // ✅ PIDE AL STORE QUE DETENGA EL CONTADOR ANTES DE CERRAR SESIÓN
-  authStore.detenerContadorSesion();
-  router.visit(route("logout"), {
-    method: "post",
-  });
 };
 
 const nombreDia = ref("");
@@ -138,6 +131,60 @@ if (fecha.getHours() < 12) {
 } else {
   saludo.value = "¡Buenas noches!";
 }
+
+// --- 2. LÓGICA PARA EL MODAL DE CONFIRMACIÓN ---
+const confirmationState = ref({
+  isOpen: false,
+  title: "",
+  message: "",
+  icon: "help",
+  iconBgClass: "bg-gray-700",
+  confirmText: "Confirmar",
+  onConfirm: () => {},
+});
+
+function openConfirmationModal({
+  title,
+  message,
+  onConfirm,
+  icon = "help",
+  iconBgClass = "bg-gray-700",
+  confirmText = "Confirmar",
+}) {
+  confirmationState.value = {
+    isOpen: true,
+    title,
+    message,
+    icon,
+    iconBgClass,
+    confirmText,
+    onConfirm,
+  };
+}
+
+function closeConfirmationModal() {
+  confirmationState.value.isOpen = false;
+}
+
+function handleConfirm() {
+  confirmationState.value.onConfirm();
+  closeConfirmationModal();
+}
+
+const logout = () => {
+  openConfirmationModal({
+    title: "¿Estás seguro de cerrar sesión?",
+    message: "Estás a punto de cerrar sesión y regresar a la sección de login.",
+    icon: "info",
+    iconBgClass: "bg-yellow-500/20 border-semaforo-amarillo",
+    confirmText: "Sí, cerrar",
+    onConfirm: () => {
+      authStore.detenerContadorSesion();
+
+      router.post(route("logout"));
+    },
+  });
+};
 </script>
 
 <template>
@@ -308,4 +355,14 @@ if (fecha.getHours() < 12) {
       </button>
     </div>
   </header>
+  <ConfirmacionesPop
+    :is-open="confirmationState.isOpen"
+    :title="confirmationState.title"
+    :message="confirmationState.message"
+    :icon="confirmationState.icon"
+    :icon-bg-class="confirmationState.iconBgClass"
+    :confirm-text="confirmationState.confirmText"
+    @close="closeConfirmationModal"
+    @confirm="handleConfirm"
+  />
 </template>
