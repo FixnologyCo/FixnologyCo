@@ -4,13 +4,11 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\LinkRecuperacionController;
-use App\Http\Controllers\HomeController;
 
 // --- RUTAS PARA INVITADOS (USUARIOS SIN SESIÓN) ---
 Route::middleware('guest')->group(function () {
 
     Route::get('/login', fn() => redirect()->route('login.auth'))->name('login');
-
     Route::prefix('login')->group(function () {
         Route::get('/auth', [LoginController::class, 'show'])->name('login.auth');
         Route::post('/auth', [LoginController::class, 'login'])->name('login.post');

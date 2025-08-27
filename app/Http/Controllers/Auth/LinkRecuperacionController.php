@@ -25,7 +25,12 @@ class LinkRecuperacionController extends Controller
     {
         $request->validate(
             ['correo' => 'required|email|exists:perfil_usuario,correo'],
-            ['correo.required' => 'Debes ingresar un correo.']
+            [
+                'correo.required' => 'Debes ingresar un correo.', 
+                'correo.exists' => 'Oh, oh... Desconocemos ese correo.',
+                'correo.email' => 'Debe ser SÍ o SÍ un correo.',
+            ],
+
         );
 
         $perfil = PerfilUsuario::where('correo', $request->correo)->first();
@@ -51,7 +56,7 @@ class LinkRecuperacionController extends Controller
 
     public function showResetForm($token, Request $request)
     {
-        
+
         $resetRecord = DB::table('password_resets')->where('token', $token)->first();
 
         // Si el token no existe, redirigimos con un error
@@ -59,16 +64,16 @@ class LinkRecuperacionController extends Controller
             return redirect()->route('login.auth')->with('error', 'Este enlace de recuperación no es válido o ya fue utilizado.');
         }
 
-      
+
         $tokenCreatedAt = Carbon::parse($resetRecord->created_at);
         $minutesSinceCreation = $tokenCreatedAt->diffInMinutes(Carbon::now());
 
-    
+
         if ($minutesSinceCreation > 5) {
-          
+
             DB::table('password_resets')->where('token', $token)->delete();
 
-            return redirect()->route('login.auth') 
+            return redirect()->route('login.auth')
                 ->with('error', 'Tu enlace de recuperación ha expirado. Por favor, solicita uno nuevo.');
         }
 

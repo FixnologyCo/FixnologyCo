@@ -22,12 +22,14 @@ import MensajesLayout from "@/Layouts/MensajesLayout.vue";
 
 import logoFixDark from "/resources/images/Logo_160px_dark.svg";
 import logoFixWhite from "/resources/images/Logo_160px_white.svg";
+import InputTexto from "@/Components/Shared/inputs/InputTexto.vue";
+import { handleBlur, handleInput, limitesCaracteres } from "@/Utils/formateoInputs";
+import BtnPrimario from "@/Components/Shared/buttons/btnPrimario.vue";
 
 defineProps({});
 
 const form = useForm({
   correo: "",
-  password: "",
 });
 
 const submit = () => {
@@ -123,34 +125,17 @@ const { modoOscuro, animando, animarCambioTema } = useTema();
           <div
             class="2xl:flex 2xl:flex-row 2xl:justify-between 2xl:items-center 2xl:gap-2 xl:flex xl:flex-row xl:justify-between xl:items-center xl:gap-2 gap-3 flex flex-col items-center"
           >
-            <div class="2xl:w-[100%] xl:w-[100%] w-full">
-              <div class="contador-label flex items-center justify-between">
-                <p class="my-[5px] text-[14px] dark:text-mono-blanco">
-                  Correo electrónico vinculado:
-                </p>
-              </div>
-
-              <div
-                class="w-[100%] p-[3px] flex items-center gap-[8px] transition-all rounded-[5px] border-[1px] border-secundary-ligh"
-                t
-                :class="{ 'border-universal-naranja': form.errors.correo }"
-              >
-                <span
-                  class="material-symbols-rounded text-universal-naranja text-[20px] pl-[5px]"
-                  >email</span
-                >
-
-                <input
-                  type="text"
-                  class="2xl:w-full focus:outline-none focus:border-none font-normal bg-transparent dark:text-mono-blanco w-full"
-                  placeholder="Ingresa tu usuario"
-                  v-model="form.correo"
-                />
-              </div>
-              <span v-if="form.errors.correo" class="2xl:text-sm text-universal-naranja">
-                {{ form.errors.correo }}
-              </span>
-            </div>
+            <InputTexto
+              v-model="form.correo"
+              label="Ingresa correo vinculado:"
+              icon="email"
+              type="email"
+              placeholder="Debe ser el mismo que registraste anteriormente"
+              :maxLength="limitesCaracteres.email"
+              :error="form.errors.correo"
+              @blur="handleBlur(form, 'correo')"
+              @input="(e) => handleInput(e, form, 'correo')"
+            />
           </div>
 
           <a
@@ -159,13 +144,7 @@ const { modoOscuro, animando, animarCambioTema } = useTema();
             >Tengo problemas con la cuenta</a
           >
 
-          <button
-            type="submit"
-            class="flex items-center bg-universal-azul_secundaria px-4 py-2 rounded-md justify-center text-mono-blanco font-semibold shadowM hover:bg-universal-naranja"
-          >
-            ¡Buscar!
-            <span class="material-symbols-rounded bg-transparent">arrow_outward</span>
-          </button>
+          <BtnPrimario type="submit" class="w-[100%]"> ¡Enviar enlace! </BtnPrimario>
 
           <p class="text-[12px] mt-3 text-universal-naranja text-center">
             Versión Deimos 1.0.0

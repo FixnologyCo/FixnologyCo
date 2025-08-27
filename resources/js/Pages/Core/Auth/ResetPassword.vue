@@ -6,6 +6,8 @@ import { route } from "ziggy-js";
 import MensajesLayout from "@/Layouts/MensajesLayout.vue";
 import logoFixDark from "/resources/images/Logo_160px_dark.svg";
 import logoFixWhite from "/resources/images/Logo_160px_white.svg";
+import InputTexto from "@/Components/Shared/inputs/InputTexto.vue";
+import BtnPrimario from "@/Components/Shared/buttons/btnPrimario.vue";
 
 const props = defineProps({
   token: String,
@@ -16,7 +18,7 @@ const form = useForm({
   password: "",
   password_confirmation: "",
   token: props.token,
-  correo: props.correo, // <-- CORREGIDO
+  correo: props.correo,
 });
 
 const submit = () => {
@@ -117,89 +119,34 @@ const { modoOscuro, animando, animarCambioTema } = useTema();
           <div
             class="2xl:flex 2xl:flex-row 2xl:justify-between 2xl:items-center 2xl:gap-2 xl:flex xl:flex-row xl:justify-between xl:items-center xl:gap-2 gap-3 flex flex-col items-center"
           >
-            <div class="2xl:w-[50%] xl:w-[50%] w-full">
-              <div class="contador-label flex items-center justify-between">
-                <p class="my-[5px] text-[14px] dark:text-mono-blanco">Contraseña:</p>
-                <p class="2xl:text-[10px] xl:text-[12px] text-[8px] text-secundary-light">
-                  {{ form.password.length }} /
-                  {{ limitesCaracteres.password }}
-                </p>
-              </div>
+            <InputTexto
+              v-model="form.password"
+              label="Nueva contraseña:"
+              icon="password"
+              type="password"
+              placeholder="Ingresa una contraseña (Qué recuerdes)"
+              :maxLength="limitesCaracteres.password"
+              :error="form.errors.password"
+              @blur="handleBlur(form, 'password')"
+              @input="(e) => handleInput(e, form, 'password')"
+            />
 
-              <div
-                class="w-[100%] p-[3px] flex items-center gap-[8px] transition-all rounded-[5px] border-[1px] border-secundary-ligh"
-                t
-                :class="{ 'border-universal-naranja': form.errors.password }"
-              >
-                <span
-                  class="material-symbols-rounded text-universal-naranja text-[20px] pl-[5px]"
-                  >password</span
-                >
-
-                <input
-                  type="password"
-                  class="2xl:w-full focus:outline-none focus:border-none font-normal bg-transparent dark:text-mono-blanco"
-                  placeholder="Mínimo 8 caracteres"
-                  v-model="form.password"
-                  @blur="handleBlur(form, 'password')"
-                  @input="(e) => handleInput(e, form, 'password')"
-                />
-              </div>
-              <span
-                v-if="form.errors.password"
-                class="2xl:text-sm text-universal-naranja"
-              >
-                {{ form.errors.password }}
-              </span>
-            </div>
-
-            <div class="2xl:w-[50%] xl:w-[50%] w-full">
-              <div class="contador-label flex items-center justify-between">
-                <p class="my-[5px] text-[14px] dark:text-mono-blanco">
-                  Repite tu contraseña:
-                </p>
-                <p class="2xl:text-[10px] xl:text-[12px] text-[8px] text-secundary-light">
-                  {{ form.password_confirmation.length }} /
-                  {{ limitesCaracteres.password_confirm }}
-                </p>
-              </div>
-
-              <div
-                class="w-[100%] p-[3px] flex items-center gap-[8px] transition-all rounded-[5px] border-[1px] border-secundary-ligh"
-                t
-                :class="{ 'border-universal-naranja': form.errors.password_confirmation }"
-              >
-                <span
-                  class="material-symbols-rounded text-universal-naranja text-[20px] pl-[5px]"
-                  >password</span
-                >
-
-                <input
-                  type="password"
-                  class="2xl:w-full focus:outline-none focus:border-none font-normal bg-transparent dark:text-mono-blanco"
-                  placeholder="Debe ser igual a la anterior"
-                  v-model="form.password_confirmation"
-                  @blur="handleBlur(form, 'password_confirmation')"
-                  @input="(e) => handleInput(e, form, 'password_confirmation')"
-                />
-              </div>
-              <span
-                v-if="form.errors.password_confirmation"
-                class="2xl:text-sm text-universal-naranja"
-              >
-                {{ form.errors.password_confirmation }}
-              </span>
-            </div>
+            <InputTexto
+              v-model="form.password_confirmation"
+              label="Repite tu nueva contraseña:"
+              icon="password"
+              type="password"
+              placeholder="Debe ser igual que la anterior"
+              :maxLength="limitesCaracteres.password"
+              :error="form.errors.password_confirmation"
+              @blur="handleBlur(form, 'password_confirmation')"
+              @input="(e) => handleInput(e, form, 'password_confirmation')"
+            />
           </div>
 
-          <button
-            type="submit"
-            class="mt-2 flex items-center bg-universal-azul_secundaria px-4 py-2 rounded-md justify-center text-mono-blanco font-semibold shadowM hover:bg-universal-naranja"
-          >
-            Restablecer contraseña<span class="material-symbols-rounded bg-transparent"
-              >bolt</span
-            >
-          </button>
+          <BtnPrimario type="submit" class="w-[100%]">
+            ¡Restablecer contraseña!
+          </BtnPrimario>
 
           <p class="text-[12px] mt-3 text-universal-naranja text-center">
             Versión Deimos 1.0.0
