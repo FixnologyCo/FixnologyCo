@@ -63,7 +63,7 @@ const inicialesNombreEstablecimiento = computed(() => {
 
 <template>
   <div
-    class="dark:bg-[url('/resources/images/01.webp')] bg-[url('/resources/images/02.webp')] bg-cover w-full min-h-[100vh]"
+    class="dark:bg-gradient-to-br dark:from-gray-700 dark:to-slate-900 bg-gradient-to-br from-slate-200 to-slate-100 bg-cover w-full min-h-[100vh]"
   >
     <div class="p-4 flex backdrop-blur-md w-full min-h-[100vh] rounded-xl">
       <div class="sidebar pr-3 py-2" :class="[sidebarExpandido ? 'w-[12%]' : 'w-[45px]']">
