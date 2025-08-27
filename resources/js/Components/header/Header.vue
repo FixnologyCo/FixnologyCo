@@ -53,9 +53,10 @@ const toggleMenu = () => {
   isMenuOpen.value = !isMenuOpen.value;
 };
 const logout = () => {
+  // ✅ PIDE AL STORE QUE DETENGA EL CONTADOR ANTES DE CERRAR SESIÓN
+  authStore.detenerContadorSesion();
   router.visit(route("logout"), {
     method: "post",
-    preserveScroll: true,
   });
 };
 
@@ -111,6 +112,8 @@ function actualizarFechaHora() {
 }
 
 let clockInterval = null;
+
+// ✅ SOLO la lógica del reloj se queda en los hooks de este componente
 onMounted(() => {
   actualizarFechaHora();
   clockInterval = setInterval(actualizarFechaHora, 1000);
@@ -256,6 +259,13 @@ if (fecha.getHours() < 12) {
         </div>
       </div>
     </div>
+
+    <p
+      class="text-[12px] font-medium text-mono-negro dark:text-mono-blanco flex items-center"
+    >
+      <span class="material-symbols-rounded text-[13px] mr-1">timer</span>
+      {{ authStore.tiempoEnLinea }}
+    </p>
 
     <div class="flex gap-2 items-center">
       <a :href="route('aplicacion.miPerfil', { aplicacion, rol })">

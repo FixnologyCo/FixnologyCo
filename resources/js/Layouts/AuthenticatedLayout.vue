@@ -1,5 +1,5 @@
 <script setup>
-import { watch } from "vue";
+import { watch, onMounted, onUnmounted } from "vue";
 import { useAuthStore } from "@/stores/auth";
 
 const props = defineProps({
@@ -17,6 +17,14 @@ watch(
     immediate: true,
   }
 );
+
+onMounted(() => {
+  authStore.iniciarContadorSesion();
+});
+
+onUnmounted(() => {
+  authStore.detenerContadorSesion();
+});
 </script>
 
 <template>

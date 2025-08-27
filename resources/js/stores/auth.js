@@ -1,16 +1,22 @@
 import { defineStore } from "pinia";
+import { acceptHMRUpdate } from 'pinia';
 
 export const useAuthStore = defineStore("auth", {
     state: () => ({
         user: null,
+        tiempoEnLinea: 'Cargando actividad...',
+        intervaloContador: null,
+
     }),
 
     getters: {
 
         isAuthenticated: (state) => !!state.user,
+        // ✅ 1. AÑADE ESTOS NUEVOS ESTADOS PARA EL CONTADOR
+
         perfilUsuario: (state) => state.user?.perfil_usuario || null,
         perfilEmpleado: (state) => state.user?.perfil_empleado || null,
-      
+
         establecimientoAsignado: (state) => state.user?.establecimiento_asignado || null,
         aplicacionWeb() { return this.establecimientoAsignado?.aplicacion_web || null; },
 
@@ -108,7 +114,7 @@ export const useAuthStore = defineStore("auth", {
         montoFactura() { return this.user?.establecimientos?.facturas?.[0]?.monto_total || null; },
         diasRestantesMembresia() { return this.user?.establecimientos?.facturas?.[0]?.dias_restantes || null; },
         fechaPago() { return this.user?.establecimientos?.facturas?.[0]?.fecha_pago || null; },
-// --- DATOS DE FACTURACIÓN (MEJORADO) ---
+        // --- DATOS DE FACTURACIÓN (MEJORADO) ---
         // Devuelve el array completo de facturas para poder iterarlo
         facturas(state) {
             return this.user?.establecimiento?.facturas ||
@@ -119,14 +125,14 @@ export const useAuthStore = defineStore("auth", {
         duracionMembresia(state) {
             return this.aplicacionWeb?.membresia?.duracion_membresia || 30; // Por defecto 30 días
         },
-        
-        
+
+
         // --- DATOS DE ESTILO ---
         estiloApp() { return this.aplicacionWeb?.estilo?.nombre_relacion || null; },
         colorPrimario() { return this.aplicacionWeb?.estilo?.primary || null; },
         colorSecundario() { return this.aplicacionWeb?.estilo?.secondary || null; },
         icono() { return this.aplicacionWeb?.estilo?.icono || null; },
-       
+
     },
 
     actions: {
@@ -136,6 +142,39 @@ export const useAuthStore = defineStore("auth", {
         clearUser() {
             this.user = null;
         },
+iniciarContadorSesion() {
+      if (this.intervaloContador) return;
+      let loginTimestamp = sessionStorage.getItem('loginTimestamp');
+      if (!loginTimestamp) {
+        loginTimestamp = Date.now();
+        sessionStorage.setItem('loginTimestamp', loginTimestamp);
+      }
+      this.intervaloContador = setInterval(() => {
+        const segundosTotales = Math.floor((Date.now() - loginTimestamp) / 1000);
+        const horas = Math.floor(segundosTotales / 3600);
+        const minutos = Math.floor((segundosTotales % 3600) / 60);
+        const segundos = segundosTotales % 60;
+        const pad = (num) => num.toString().padStart(2, '0');
+        if (horas > 0) {
+          this.tiempoEnLinea = `${pad(horas)}:${pad(minutos)} horas en línea`;
+        } else if (minutos > 0) {
+          this.tiempoEnLinea = `${pad(minutos)}:${pad(segundos)} minutos en línea`;
+        } else {
+          this.tiempoEnLinea = `${pad(segundos)} segundos en línea`;
+        }
+      }, 1000);
     },
-
+    
+    detenerContadorSesion() {
+      clearInterval(this.intervaloContador);
+      this.intervaloContador = null;
+      sessionStorage.removeItem('loginTimestamp');
+      this.tiempoEnLinea = 'Cerrando sesión...';
+    }
+  },
 });
+
+// ✅ 2. AÑADE ESTE BLOQUE AL FINAL DEL ARCHIVO
+if (import.meta.hot) {
+  import.meta.hot.accept(acceptHMRUpdate(useAuthStore, import.meta.hot));
+}
