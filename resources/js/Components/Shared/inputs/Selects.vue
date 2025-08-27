@@ -1,7 +1,12 @@
 <script setup>
 import { ref, computed, watch, nextTick, onMounted, onUnmounted } from "vue";
+import { usePage } from "@inertiajs/vue3";
 
 const model = defineModel();
+
+const page = usePage();
+
+const isAuthenticated = computed(() => !!page.props.auth.user);
 
 const props = defineProps({
   options: { type: Array, required: true },
@@ -44,7 +49,7 @@ function updateDropdownPosition() {
   if (selectWrapper.value) {
     const rect = selectWrapper.value.getBoundingClientRect();
     dropdownStyle.value = {
-      position: "fixed", // Usamos 'fixed' para un posicionamiento más fiable con Teleport
+      position: "fixed",
       left: `${rect.left}px`,
       top: `${rect.bottom + 8}px`,
       width: `${rect.width}px`,
@@ -121,8 +126,17 @@ const inputContainerClass = computed(() => {
         @click="isActive = !isActive"
       >
         <div class="flex gap-2 items-center">
-          <span class="material-symbols-rounded text-[20px] text-primary">stack</span>
-          <span>{{ selectedOptionText }}</span>
+          <span
+            class="material-symbols-rounded"
+            :class="[
+              'text-[20px]',
+              isAuthenticated ? 'text-primary' : 'text-universal-naranja',
+            ]"
+            >stack</span
+          >
+          <span class="text-mono-negro dark:text-mono-blanco">{{
+            selectedOptionText
+          }}</span>
         </div>
         <span
           class="material-symbols-rounded transition-transform"
@@ -148,7 +162,12 @@ const inputContainerClass = computed(() => {
                 v-model="searchTerm"
                 type="text"
                 placeholder="Buscar..."
-                class="w-full bg-gray-800/50 rounded-md pl-9 pr-2 py-1.5 text-sm focus:border-primary focus:ring-primary border-gray-700"
+                class="w-full bg-gray-800/50 rounded-md pl-9 pr-2 py-1.5 text-sm"
+                :class="[
+                  isAuthenticated
+                    ? 'focus:border-primary focus:ring-primary'
+                    : 'focus:border-universal-naranja focus:ring-universal-naranja',
+                ]"
               />
             </div>
             <ul
@@ -160,7 +179,11 @@ const inputContainerClass = computed(() => {
                 :key="option.id"
                 @click="selectOption(option)"
                 class="hover:bg-mono-blanco_opacity p-1.5 flex items-center rounded-md"
-                :class="{ 'bg-primary text-white': option.id === model }"
+                :class="{
+                  'bg-primary': isAuthenticated && option.id === model,
+                  'bg-universal-naranja': !isAuthenticated && option.id === model,
+                  'text-white': option.id === model,
+                }"
               >
                 {{ option.text }}
               </li>

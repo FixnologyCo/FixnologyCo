@@ -1,39 +1,32 @@
-<script>
-export default {
-  name: "Auth",
-  components: {
-    Head,
-  },
-  mounted() {
-    window.history.pushState(null, "", window.location.href);
-    window.onpopstate = function () {
-      window.history.pushState(null, "", window.location.href);
-      alert("Debes iniciar sesión primero.");
-    };
-  },
-};
-</script>
-
 <script setup>
 import { Head, useForm } from "@inertiajs/vue3";
-import { handleBlur, handleInput, limitesCaracteres } from "@/Utils/formateoInputs";
+import { onMounted, onUnmounted, ref } from "vue";
 import { useTema } from "@/Composables/useTema";
 import { route } from "ziggy-js";
 import MensajesLayout from "@/Layouts/MensajesLayout.vue";
+import InputTexto from "@/Components/Shared/inputs/InputTexto.vue";
 import logoGoogle from "/resources/images/LogoGoogle.png";
 import logoFixDark from "/resources/images/Logo_160px_dark.svg";
 import logoFixWhite from "/resources/images/Logo_160px_white.svg";
+import { handleBlur, handleInput, limitesCaracteres } from "@/Utils/formateoInputs";
+import BtnPrimario from "@/Components/Shared/buttons/btnPrimario.vue";
+import ConfirmacionesPop from "@/Components/Modales/Confirmaciones/ConfirmacionesPop.vue";
+import Selects from "@/Components/Shared/inputs/Selects.vue";
 
-defineProps({});
+const props = defineProps({
+  appsDisponibles: {
+    type: Array,
+    default: null,
+  },
+});
 
 const form = useForm({
   primer_nombre: "",
   primer_apellido: "",
-  id_tipo_documento: 1,
-  id_codigo_pais: 1,
   numero_documento: "",
   password: "",
   password_confirm: "",
+  aplicacion_web_id: "",
 });
 
 const submit = () => {
@@ -41,6 +34,65 @@ const submit = () => {
 };
 
 const { modoOscuro, animando, animarCambioTema } = useTema();
+
+function closeConfirmationModal() {
+  confirmationState.value.isOpen = false;
+}
+
+function handleConfirm() {
+  confirmationState.value.onConfirm();
+  closeConfirmationModal();
+}
+
+const confirmationState = ref({
+  isOpen: false,
+  title: "",
+  message: "",
+  icon: "",
+  iconBgClass: "",
+  confirmText: "",
+  onConfirm: () => {},
+});
+
+function openConfirmationModal({
+  title,
+  message,
+  onConfirm,
+  icon = "help",
+  iconBgClass = "bg-gray-700",
+  confirmText = "Confirmar",
+}) {
+  confirmationState.value = {
+    isOpen: true,
+    title,
+    message,
+    icon,
+    iconBgClass,
+    confirmText,
+    onConfirm,
+  };
+}
+
+const handlePopState = () => {
+  window.history.pushState(null, "", window.location.href);
+  openConfirmationModal({
+    title: "¡Acción Requerida!",
+    message: "Debes iniciar sesión primero.",
+    icon: "lock",
+    iconBgClass: "bg-semaforo-rojo",
+    confirmText: "Entendido",
+    onConfirm: closeConfirmationModal,
+  });
+};
+
+onMounted(() => {
+  window.history.pushState(null, "", window.location.href);
+  window.addEventListener("popstate", handlePopState);
+});
+
+onUnmounted(() => {
+  window.removeEventListener("popstate", handlePopState);
+});
 </script>
 
 <template>
@@ -49,34 +101,36 @@ const { modoOscuro, animando, animarCambioTema } = useTema();
     <MensajesLayout />
 
     <header class="p-[50px] flex justify-between items-center">
-      <div
-        class="logo 2xl:flex 2xl:gap-3 2xl:items-center xl:flex xl:gap-2 xl:items-center flex items-center gap-2"
-      >
-        <div v-if="modoOscuro">
-          <img
-            width="50px"
-            height="50px"
-            class="rounded-xl"
-            :src="logoFixWhite"
-            alt="Fixnology"
-          />
+      <a :href="route('home.index')" class="">
+        <div
+          class="logo 2xl:flex 2xl:gap-3 2xl:items-center xl:flex xl:gap-2 xl:items-center flex items-center gap-2"
+        >
+          <div v-if="modoOscuro">
+            <img
+              width="50px"
+              height="50px"
+              class="rounded-xl"
+              :src="logoFixWhite"
+              alt="Fixnology"
+            />
+          </div>
+          <div v-else>
+            <img
+              width="50px"
+              height="50px"
+              class="rounded-xl"
+              :src="logoFixDark"
+              alt="Fixnology"
+            />
+          </div>
+          <div class="logo flex flex-col gap-1">
+            <h1 class="text-[25px] font-semibold text-universal-naranja">Fixnology CO</h1>
+            <p class="-mt-[8px] text-[14px] font-medium dark:text-mono-blanco">
+              Empresa de software especializada
+            </p>
+          </div>
         </div>
-        <div v-else>
-          <img
-            width="50px"
-            height="50px"
-            class="rounded-xl"
-            :src="logoFixDark"
-            alt="Fixnology"
-          />
-        </div>
-        <div class="logo flex flex-col gap-1">
-          <h1 class="text-[25px] font-semibold text-universal-naranja">Fixnology CO</h1>
-          <p class="-mt-[8px] text-[14px] font-medium dark:text-mono-blanco">
-            Empresa de software especializada
-          </p>
-        </div>
-      </div>
+      </a>
       <div class="btnAcciones flex items-center gap-4">
         <button
           @click="animarCambioTema"
@@ -146,210 +200,90 @@ const { modoOscuro, animando, animarCambioTema } = useTema();
           <div
             class="2xl:flex 2xl:flex-row 2xl:justify-between 2xl:items-center 2xl:gap-2 xl:flex xl:flex-row xl:justify-between xl:items-center xl:gap-2 gap-3 flex flex-col items-center"
           >
-            <div class="2xl:w-[50%] xl:w-[50%] w-full">
-              <div class="contador-label flex items-center justify-between">
-                <p class="my-[5px] text-[14px] dark:text-mono-blanco">Primer nombre:</p>
-                <p class="2xl:text-[10px] xl:text-[12px] text-[8px] text-secundary-light">
-                  {{ form.primer_nombre.length }} /
-                  {{ limitesCaracteres.primer_nombre }}
-                </p>
-              </div>
+            <InputTexto
+              v-model="form.primer_nombre"
+              label="Primer nombre:"
+              icon="format_italic"
+              type="text"
+              placeholder="Ingresa tu nombre"
+              :maxLength="limitesCaracteres.nombresUsuario"
+              :error="form.errors.primer_nombre"
+              @blur="handleBlur(form, 'primer_nombre')"
+              @input="(e) => handleInput(e, form, 'primer_nombre')"
+            />
 
-              <div
-                class="w-[100%] p-[3px] flex items-center gap-[8px] transition-all rounded-[5px] border-[1px] border-secundary-ligh"
-                t
-                :class="{ 'border-universal-naranja': form.errors.primer_nombre }"
-              >
-                <span
-                  class="material-symbols-rounded text-universal-naranja text-[20px] pl-[5px]"
-                  >format_italic</span
-                >
-
-                <input
-                  type="text"
-                  class="2xl:w-full focus:outline-none focus:border-none font-normal bg-transparent dark:text-mono-blanco"
-                  placeholder="Ej: Juan"
-                  v-model="form.primer_nombre"
-                  @blur="handleBlur(form, 'primer_nombre')"
-                  @input="(e) => handleInput(e, form, 'primer_nombre')"
-                />
-              </div>
-              <span
-                v-if="form.errors.primer_nombre"
-                class="2xl:text-sm text-universal-naranja"
-              >
-                {{ form.errors.primer_nombre }}
-              </span>
-            </div>
-
-            <div class="2xl:w-[50%] xl:w-[50%] w-full">
-              <div class="contador-label flex items-center justify-between">
-                <p class="my-[5px] text-[14px] dark:text-mono-blanco">Primer apellido:</p>
-                <p class="2xl:text-[10px] xl:text-[12px] text-[8px] text-secundary-light">
-                  {{ form.primer_apellido.length }} /
-                  {{ limitesCaracteres.primer_apellido }}
-                </p>
-              </div>
-
-              <div
-                class="w-[100%] p-[3px] flex items-center gap-[8px] transition-all rounded-[5px] border-[1px] border-secundary-ligh"
-                t
-                :class="{ 'border-universal-naranja': form.errors.primer_apellido }"
-              >
-                <span
-                  class="material-symbols-rounded text-universal-naranja text-[20px] pl-[5px]"
-                  >format_italic</span
-                >
-
-                <input
-                  type="text"
-                  class="2xl:w-full focus:outline-none focus:border-none font-normal bg-transparent dark:text-mono-blanco"
-                  placeholder="Ej: Guarnizo"
-                  v-model="form.primer_apellido"
-                  @blur="handleBlur(form, 'primer_apellido')"
-                  @input="(e) => handleInput(e, form, 'primer_apellido')"
-                />
-              </div>
-              <span
-                v-if="form.errors.primer_apellido"
-                class="2xl:text-sm text-universal-naranja"
-              >
-                {{ form.errors.primer_apellido }}
-              </span>
-            </div>
+            <InputTexto
+              v-model="form.primer_apellido"
+              label="Primer apellido:"
+              icon="format_italic"
+              type="text"
+              placeholder="Ingresa tu apellido"
+              :maxLength="limitesCaracteres.nombresUsuario"
+              :error="form.errors.primer_apellido"
+              @blur="handleBlur(form, 'primer_apellido')"
+              @input="(e) => handleInput(e, form, 'primer_apellido')"
+            />
           </div>
 
           <div
             class="2xl:flex 2xl:flex-row 2xl:justify-between 2xl:items-center 2xl:gap-2 xl:flex xl:flex-row xl:justify-between xl:items-center xl:gap-2 gap-3 flex flex-col items-center"
           >
-            <div class="2xl:w-[100%] xl:w-[100%] w-full">
-              <div class="contador-label flex items-center justify-between">
-                <p class="my-[5px] text-[14px] dark:text-mono-blanco">
-                  Número de identificación:
-                </p>
-                <p class="2xl:text-[10px] xl:text-[12px] text-[8px] text-secundary-light">
-                  {{ form.numero_documento.length }} /
-                  {{ limitesCaracteres.numero_documento }}
-                </p>
-              </div>
+            <InputTexto
+              v-model="form.numero_documento"
+              label="Número de identificación:"
+              icon="pin"
+              type="number"
+              placeholder="Ingresa tu documento de identidad"
+              :maxLength="limitesCaracteres.numero_documento"
+              :error="form.errors.numero_documento"
+              @blur="handleBlur(form, 'numero_documento')"
+              @input="(e) => handleInput(e, form, 'numero_documento')"
+            />
 
-              <div
-                class="w-[100%] p-[3px] flex items-center gap-[8px] transition-all rounded-[5px] border-[1px] border-secundary-ligh"
-                t
-                :class="{ 'border-universal-naranja': form.errors.numero_documento }"
-              >
-                <span
-                  class="material-symbols-rounded text-universal-naranja text-[20px] pl-[5px]"
-                  >pin</span
-                >
-
-                <input
-                  type="number"
-                  class="2xl:w-full focus:outline-none focus:border-none font-normal bg-transparent dark:text-mono-blanco"
-                  placeholder="Ej: 123456789"
-                  v-model="form.numero_documento"
-                  @blur="handleBlur(form, 'numero_documento')"
-                  @input="(e) => handleInput(e, form, 'numero_documento')"
-                />
-              </div>
-              <span
-                v-if="form.errors.numero_documento"
-                class="2xl:text-sm text-universal-naranja"
-              >
-                {{ form.errors.numero_documento }}
-              </span>
-            </div>
+            <Selects
+              v-model="form.aplicacion_web_id"
+              :options="props.appsDisponibles"
+              :error="form.errors.aplicacion_web_id"
+              label="App de interes:"
+              placeholder="Selecciona tu app"
+              id="aplicacion_web_id"
+            />
           </div>
 
           <div
             class="2xl:flex 2xl:flex-row 2xl:justify-between 2xl:items-center 2xl:gap-2 xl:flex xl:flex-row xl:justify-between xl:items-center xl:gap-2 gap-3 flex flex-col items-center"
           >
-            <div class="2xl:w-[50%] xl:w-[50%] w-full">
-              <div class="contador-label flex items-center justify-between">
-                <p class="my-[5px] text-[14px] dark:text-mono-blanco">Contraseña:</p>
-                <p class="2xl:text-[10px] xl:text-[12px] text-[8px] text-secundary-light">
-                  {{ form.password.length }} /
-                  {{ limitesCaracteres.password }}
-                </p>
-              </div>
+            <InputTexto
+              v-model="form.password"
+              label="Crea una contraseña:"
+              icon="password"
+              type="password"
+              placeholder="Crea una contraseña. (Qué recuerdes)"
+              :maxLength="limitesCaracteres.password"
+              :error="form.errors.password"
+              @blur="handleBlur(form, 'password')"
+              @input="(e) => handleInput(e, form, 'password')"
+            />
 
-              <div
-                class="w-[100%] p-[3px] flex items-center gap-[8px] transition-all rounded-[5px] border-[1px] border-secundary-ligh"
-                t
-                :class="{ 'border-universal-naranja': form.errors.password }"
-              >
-                <span
-                  class="material-symbols-rounded text-universal-naranja text-[20px] pl-[5px]"
-                  >password</span
-                >
-
-                <input
-                  type="password"
-                  class="2xl:w-full focus:outline-none focus:border-none font-normal bg-transparent dark:text-mono-blanco"
-                  placeholder="Mínimo 8 caracteres"
-                  v-model="form.password"
-                  @blur="handleBlur(form, 'password')"
-                  @input="(e) => handleInput(e, form, 'password')"
-                />
-              </div>
-              <span
-                v-if="form.errors.password"
-                class="2xl:text-sm text-universal-naranja"
-              >
-                {{ form.errors.password }}
-              </span>
-            </div>
-
-            <div class="2xl:w-[50%] xl:w-[50%] w-full">
-              <div class="contador-label flex items-center justify-between">
-                <p class="my-[5px] text-[14px] dark:text-mono-blanco">
-                  Repite tu contraseña:
-                </p>
-                <p class="2xl:text-[10px] xl:text-[12px] text-[8px] text-secundary-light">
-                  {{ form.password_confirm.length }} /
-                  {{ limitesCaracteres.password_confirm }}
-                </p>
-              </div>
-
-              <div
-                class="w-[100%] p-[3px] flex items-center gap-[8px] transition-all rounded-[5px] border-[1px] border-secundary-ligh"
-                t
-                :class="{ 'border-universal-naranja': form.errors.password_confirm }"
-              >
-                <span
-                  class="material-symbols-rounded text-universal-naranja text-[20px] pl-[5px]"
-                  >password</span
-                >
-
-                <input
-                  type="password"
-                  class="2xl:w-full focus:outline-none focus:border-none font-normal bg-transparent dark:text-mono-blanco"
-                  placeholder="Debe ser igual a la anterior"
-                  v-model="form.password_confirm"
-                  @blur="handleBlur(form, 'password_confirm')"
-                  @input="(e) => handleInput(e, form, 'password_confirm')"
-                />
-              </div>
-              <span
-                v-if="form.errors.password_confirm"
-                class="2xl:text-sm text-universal-naranja"
-              >
-                {{ form.errors.password_confirm }}
-              </span>
-            </div>
+            <InputTexto
+              v-model="form.password_confirm"
+              label="Confirma tu contraseña:"
+              icon="password"
+              type="password"
+              placeholder="Ingresa la contraseña anterior"
+              :maxLength="limitesCaracteres.password_confirm"
+              :error="form.errors.password_confirm"
+              @blur="handleBlur(form, 'password_confirm')"
+              @input="(e) => handleInput(e, form, 'password_confirm')"
+            />
           </div>
           <a
             href="https://api.whatsapp.com/send/?phone=573219631459&text=Vengo+desde+la+app%2C+quiero+activar+mi+token+por+favor.&type=phone_number&app_absent=0"
-            class="2xl:my-3 text-[14px] text-right text-universal-azul_secundaria"
+            class="2xl:my-3 text-[14px] text-right text-universal-naranja hover:text-universal-azul_secundaria"
             >Contactanos para la activación</a
           >
 
-          <button
-            type="submit"
-            class="flex items-center bg-universal-azul_secundaria px-4 py-2 rounded-md justify-center text-mono-blanco font-semibold shadowM hover:bg-universal-naranja"
-          >
-            Crear cuenta <span class="material-symbols-rounded bg-transparent">bolt</span>
-          </button>
+          <BtnPrimario type="submit" class="w-[100%]"> ¡Empecemos! </BtnPrimario>
 
           <p class="text-[12px] mt-3 text-universal-naranja text-center">
             Versión Deimos 1.0.0
@@ -358,4 +292,14 @@ const { modoOscuro, animando, animarCambioTema } = useTema();
       </div>
     </div>
   </div>
+  <ConfirmacionesPop
+    :is-open="confirmationState.isOpen"
+    :title="confirmationState.title"
+    :message="confirmationState.message"
+    :icon="confirmationState.icon"
+    :icon-bg-class="confirmationState.iconBgClass"
+    :confirm-text="confirmationState.confirmText"
+    @close="closeConfirmationModal"
+    @confirm="handleConfirm"
+  />
 </template>

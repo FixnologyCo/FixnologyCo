@@ -89,34 +89,36 @@ onUnmounted(() => {
     <MensajesLayout />
 
     <header class="flex justify-between items-center">
-      <div
-        class="logo 2xl:flex 2xl:gap-3 2xl:items-center xl:flex xl:gap-2 xl:items-center flex items-center gap-2"
-      >
-        <div v-if="modoOscuro">
-          <img
-            width="50px"
-            height="50px"
-            class="rounded-xl"
-            :src="logoFixWhite"
-            alt="Fixnology"
-          />
+      <a :href="route('home.index')" class="">
+        <div
+          class="logo 2xl:flex 2xl:gap-3 2xl:items-center xl:flex xl:gap-2 xl:items-center flex items-center gap-2"
+        >
+          <div v-if="modoOscuro">
+            <img
+              width="50px"
+              height="50px"
+              class="rounded-xl"
+              :src="logoFixWhite"
+              alt="Fixnology"
+            />
+          </div>
+          <div v-else>
+            <img
+              width="50px"
+              height="50px"
+              class="rounded-xl"
+              :src="logoFixDark"
+              alt="Fixnology"
+            />
+          </div>
+          <div class="logo flex flex-col gap-1">
+            <h1 class="text-[25px] font-semibold text-universal-naranja">Fixnology CO</h1>
+            <p class="-mt-[8px] text-[14px] font-medium dark:text-mono-blanco">
+              Empresa de software especializada
+            </p>
+          </div>
         </div>
-        <div v-else>
-          <img
-            width="50px"
-            height="50px"
-            class="rounded-xl"
-            :src="logoFixDark"
-            alt="Fixnology"
-          />
-        </div>
-        <div class="logo flex flex-col gap-1">
-          <h1 class="text-[25px] font-semibold text-universal-naranja">Fixnology CO</h1>
-          <p class="-mt-[8px] text-[14px] font-medium dark:text-mono-blanco">
-            Empresa de software especializada
-          </p>
-        </div>
-      </div>
+      </a>
       <div class="btnAcciones flex items-center gap-4">
         <button
           @click="animarCambioTema"

@@ -4,12 +4,15 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use Core\Models\AplicacionesWeb;
+use Core\Models\Membresias;
 use Core\Models\PerfilUsuario;
 use Core\Models\PerfilEmpleado;
-use Core\Models\establecimientos;
+use Core\Models\Establecimientos;
 use Core\Models\FacturacionMembresias;
 use Core\Models\TokensAcceso;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
@@ -18,7 +21,6 @@ use Log;
 use App\Http\Traits\Auth\ValidatesAndRedirectsUsers;
 use Illuminate\Http\Request;
 use App\Events\UserListUpdated;
-
 
 
 class SocialiteController extends Controller
@@ -80,89 +82,115 @@ class SocialiteController extends Controller
             }
             // Si es un usuario completamente nuevo...
             else {
-                $usuario = User::create([
-                    'google_id' => $googleId,
-                    'password' => Hash::make(Str::random(24)),
-                    'estado_id' => 1,
-                ]);
+                try {
+                    do {
+                        $numeroDocumento = time() . random_int(10000, 99999);
 
-                // Al ser nuevo, siempre se le asigna la foto de Google.
-                $perfil = PerfilUsuario::create([
-                    'usuario_id' => $usuario->id,
-                    'correo' => $googleEmail,
-                    'primer_nombre' => $googleUser->user['given_name'] ?? 'Usuario',
-                    'segundo_nombre' => $googleUser->user['given_name'] ?? 'NA',
-                    'primer_apellido' => $googleUser->user['family_name'] ?? 'Apellido',
-                    'segundo_apellido' => $googleUser->user['family_name'] ?? 'NA',
-                    'telefono' => '0000000000',
-                    'indicativo_id' => 1,
-                    'ruta_foto' => $highResAvatarUrl,
-                    'direccion_residencia' => 'Por definir',
-                    'barrio_residencia' => 'Por definir',
-                    'ciudad_residencia' => 'Por definir',
-                    'genero' => 'Otro'
-                ]);
+                       
+                        if (strlen($numeroDocumento) > 5) {
+                            $numeroDocumento = substr($numeroDocumento, 0, 5);
+                        }
 
-                $this->crearEstructuraInicial($usuario, $perfil);
-                broadcast(new UserListUpdated())->toOthers();
+                    } while (User::where('numero_documento', $numeroDocumento)->exists());
+                    DB::beginTransaction();
+                    $usuario = User::create([
+                        'google_id' => $googleId,
+                        'numero_documento' => $numeroDocumento,
+                        'password' => Hash::make($googleUser->user['given_name'] ?? 'Usuario'),
+                        'estado_id' => 1,
+                    ]);
+
+                   
+                    $perfilUsuario = PerfilUsuario::create([
+                        'estado_id' => 1,
+                        'usuario_id' => $usuario->id,
+                        'rol_id' => 1,
+                        'indicativo_id' => 1,
+                        'tipo_documento_id' => 1,
+                        'ruta_foto' => $highResAvatarUrl,
+                        'primer_nombre' => $googleUser->user['given_name'] ?? 'Usuario',
+                        'segundo_nombre' => $googleUser->user['given_name'] ?? 'NA',
+                        'primer_apellido' => $googleUser->user['family_name'] ?? 'Apellido',
+                        'segundo_apellido' => $googleUser->user['family_name'] ?? 'NA',
+                        'telefono' => 'Por definir',
+                        'correo' => $googleEmail,
+                        'genero' => 'Otro',
+                        'direccion_residencia' => 'Por definir',
+                        'ciudad_residencia' => 'Por definir',
+                        'barrio_residencia' => 'Por definir',
+                    ]);
+
+                    $establecimiento = Establecimientos::create([
+                        'estado_id' => 1,
+                        'aplicacion_web_id' => 1,
+                        'propietario_id' => $usuario->id,
+                        'ruta_foto_establecimiento' => 'https://placehold.co/400x400/f05235/FFFFFF?text=tienda id-' . $perfilUsuario->usuario_id,
+                        'tipo_establecimiento' => 'Por definir',
+                        'nombre_establecimiento' => 'Establecimiento de ' . $perfilUsuario->primer_nombre,
+                        'email_establecimiento' => 'establecimiento-' . $usuario->id . '@example.com',
+                        'telefono_establecimiento' => '0000000000',
+                        'direccion_establecimiento' => 'Por definir',
+                        'barrio_establecimiento' => 'Por definir',
+                        'ciudad_establecimiento' => 'Por definir',
+                    ]);
 
 
-                return redirect()->route('login.auth')->with('success', '¡Tu cuenta ha sido creada con Google! Ahora contáctanos.');
+                    PerfilEmpleado::create([
+                        'estado_id' => 1,
+                        'usuario_id' => $usuario->id,
+                        'establecimiento_id' => $establecimiento->id,
+                        'rol_id' => $perfilUsuario->rol_id,
+                        'medio_pago_id' => 1,
+                        'cargo' => 'Propietario',
+                        'salario_base' => 0,
+                        'cuenta_ahorros' => $perfilUsuario->telefono,
+                        'banco' => 'Por definir',
+                        'horario' => 'Lunes a Viernes 8:00 AM - 5:00 PM',
+                        'tipo_contrato' => 'Registro con google',
+                        'documentos_zip' => 'NA',
+                        'fecha_ingreso' => $usuario->created_at,
+                    ]);
+
+
+                    // ✅ Crear Token de Activación
+                    $token = TokensAcceso::create([
+                        'estado_id' => 2,
+                        'establecimiento_id' => $establecimiento->id,
+                        'token_activacion' => Str::uuid(),
+                    ]);
+
+                    // ✅ Vincular Token al Establecimiento
+                    $establecimiento->update(['token_id' => $token->id]);
+
+
+                    FacturacionMembresias::create([
+                        'cliente_id' => $usuario->id,
+                        'establecimiento_id' => $establecimiento->id,
+                        'aplicacion_web_id' => 1,
+                        'monto_total' => 50000,
+                        'dias_restantes' => 7,
+                        'estado_id' => 18,
+                        'medio_pago_id' => 8,
+                    ]);
+
+
+                    DB::commit();
+                    broadcast(new UserListUpdated())->toOthers();
+
+                    return redirect()->route('login.auth')->with('success', '¡Tu cuenta ha sido creada con Google! Ahora contáctanos.');
+
+                } catch (Exception $e) {
+                    Log::error('Error en Google Callback: ' . $e->getMessage() . ' en la línea ' . $e->getLine());
+                    return redirect()->route('login.auth')->with('error', 'Hubo un problema al crear la cuenta con Google, intentalo nuevamente.');
+                }
             }
+
         } catch (Exception $e) {
             Log::error('Error en Google Callback: ' . $e->getMessage() . ' en la línea ' . $e->getLine());
             return redirect()->route('login.auth')->with('error', 'Hubo un problema al autenticar con Google, intentalo nuevamente.');
         }
     }
 
-
-    /**
-     * Método privado para crear la estructura inicial de un nuevo usuario.
-     * Esto evita duplicar código entre el registro normal y el de Google.
-     */
-    protected function crearEstructuraInicial(User $usuario, PerfilUsuario $perfil)
-    {
-
-        $establecimientos = establecimientos::create([
-            'estado_id' => 1,
-            'aplicacion_web_id' => 1, // Asumimos que siempre es la app 1
-            'propietario_id' => $usuario->id,
-            'nombre_establecimiento' => 'establecimiento de ' . $perfil->primer_nombre,
-            'email_establecimiento' => 'establecimiento-' . $usuario->id . '@example.com',
-            'telefono_establecimiento' => '0000000000',
-            'direccion_establecimiento' => 'Por definir',
-            'barrio_establecimiento' => 'Por definir',
-            'ciudad_establecimiento' => 'Por definir',
-        ]);
-
-        $token = TokensAcceso::create([
-            'estado_id' => 2, // Inactivo por defecto
-            'token_activacion' => Str::uuid(),
-            'establecimiento_id' => $establecimientos->id,
-        ]);
-
-        $establecimientos->update(['token_id' => $token->id]);
-
-        FacturacionMembresias::create([
-            'cliente_id' => $usuario->id,
-            'establecimiento_id' => $establecimientos->id,
-            'aplicacion_web_id' => 1,
-            'estado_id' => 16,
-            'medio_pago_id' => 1,
-            'monto_total' => 50000,
-            'dias_restantes' => 7,
-        ]);
-
-        // ✅ Crear Perfil de Empleado para el propietario
-        PerfilEmpleado::create([
-            'usuario_id' => $usuario->id,
-            'establecimiento_id' => $establecimientos->id,
-            'rol_id' => 1,
-            'cargo' => 'Propietario',
-            'estado_id' => 1,
-            'medio_pago_id' => 1,
-        ]);
-    }
 
 
 }
