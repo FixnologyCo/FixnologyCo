@@ -4,13 +4,11 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\LinkRecuperacionController;
-use Laravel\Socialite\Facades\Socialite;
 use App\Http\Controllers\HomeController;
-use Core\Http\Controllers\DashboardSuperAdminController;
-
 
 // --- RUTAS PARA INVITADOS (USUARIOS SIN SESIÓN) ---
 Route::middleware('guest')->group(function () {
+
     Route::get('/login', fn() => redirect()->route('login.auth'))->name('login');
 
     Route::prefix('login')->group(function () {
@@ -35,10 +33,7 @@ Route::middleware('guest')->group(function () {
 });
 
 
-// --- RUTAS PARA USUARIOS AUTENTICADOS ---
 Route::middleware('auth')->group(function () {
-    // Esta es la ruta a la que redirige el middleware 'guest' y el login.
-    Route::get('/home', [HomeController::class, 'index'])->name('home');
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 });

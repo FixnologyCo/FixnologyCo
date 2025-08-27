@@ -4,24 +4,29 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
+
 
 class HomeController extends Controller
 {
-    /**
-     * Redirige al usuario a su dashboard específico basado en su rol y aplicación.
-     */
     public function index()
     {
-        $usuario = Auth::user()->load(['perfilUsuario.rol', 'establecimientoAsignado.aplicacionWeb']);
+        // Verificamos si el usuario está autenticado
+        if (Auth::check()) {
+            // Si está autenticado, cargamos todos sus datos
+            $usuario = Auth::user()->load([
+                'perfilUsuario.rol',
+                'establecimientoAsignado.aplicacionWeb',
+            ]);
 
-        // Asegúrate de que estas rutas de datos sean correctas para tu estructura
-        $aplicacion = $usuario->establecimientoAsignado->aplicacionWeb->nombre_app ?? 'defaultApp';
-        $rol = $usuario->perfilUsuario->rol->tipo_rol ?? 'defaultRole';
+            // Y renderizamos la vista pasándole el objeto 'usuario' como prop
+            return Inertia::render('Home/Index', [
+                'usuario' => $usuario
+            ]);
 
-        // Redirige a la ruta del dashboard dinámico con los parámetros correctos
-        return redirect()->route('aplicacion.dashboard', [
-            'aplicacion' => $aplicacion,
-            'rol' => $rol,
-        ]);
+        } else {
+           
+            return Inertia::render('Home/Index');
+        }
     }
 }

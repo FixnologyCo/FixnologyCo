@@ -5,12 +5,12 @@ import { computed } from "vue";
 
 defineProps({
   isOpen: { type: Boolean, required: true },
-  title: { type: String, required: true },
-  message: { type: String, required: true },
-  icon: { type: String, default: "help" },
-  confirmText: { type: String, default: "Confirmar" },
-  cancelText: { type: String, default: "Cancelar" },
-  iconBgClass: { type: String, default: "bg-gray-700" },
+  title: { type: [String, null], required: true },
+  message: { type: [String, null], required: true },
+  icon: { type: [String, null], default: "help" },
+  confirmText: { type: [String, null], default: "Confirmar" },
+  cancelText: { type: [String, null], default: "Cancelar" },
+  iconBgClass: { type: [String, null], default: "bg-gray-700" },
 });
 
 const emit = defineEmits(["close", "confirm"]);

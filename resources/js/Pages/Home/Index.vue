@@ -1,111 +1,138 @@
 <script setup>
-import { onMounted } from "vue";
-
-import { Head, usePage } from "@inertiajs/vue3"; // <-- Añade usePage
-
+import BtnPrimario from "@/Components/Shared/buttons/btnPrimario.vue";
+import { Head, usePage, Link } from "@inertiajs/vue3";
+import { computed } from "vue";
 import { route } from "ziggy-js";
+import { useTema } from "@/Composables/useTema";
+import logoFixDark from "/resources/images/Logo_160px_dark.svg";
+import logoFixWhite from "/resources/images/Logo_160px_white.svg";
+const { modoOscuro, animando, animarCambioTema } = useTema();
 
-import { computed } from "vue"; // <-- Añade computed
-
-import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-
-import { useAuthStore } from "@/stores/auth";
-
-const authStore = useAuthStore();
-
-defineOptions({
-  layout: AuthenticatedLayout,
-
-  inheritAttrs: false,
+const props = defineProps({
+  usuario: {
+    type: Object,
+    default: null,
+  },
 });
 
-// Esta propiedad computada devolverá 'true' si hay un usuario en la sesión, y 'false' si no.
-
-const isAuthenticated = computed(() => !!usePage().props.auth.user);
-
-// onMounted(() => {
-
-// // Escucha en el canal privado 'actualizaciones' el evento 'Estado.Actualizado'
-
-// window.Echo.private("actualizaciones").listen(".Estado.Actualizado", (e) => {
-
-// console.log("¡Evento recibido en tiempo real!");
-
-// console.log(e.mensaje); // "¡El estado de algo ha cambiado!"
-
-// alert("Mensaje del servidor: " + e.mensaje);
-
-// });
-
-// });
-
-// const testBroadcast = () => {
-
-// // Envía un evento de prueba al servidor
-
-// fetch(route("test-broadcast"))
-
-// .then((response) => response.text())
-
-// .then((data) => {
-
-// console.log(data); // "¡Evento enviado!"
-
-// alert(data);
-
-// })
-
-// .catch((error) => console.error("Error al enviar el evento:", error));
-
-// };
-
 const page = usePage();
+const isAuthenticated = computed(() => !!page.props.auth.user);
 
-const usuario = authStore.user;
+const aplicacion = computed(
+  () => props.usuario?.establecimiento_asignado?.aplicacion_web?.nombre_app
+);
+const rol = computed(() => props.usuario?.perfil_usuario?.rol?.tipo_rol);
+const primerNombre = computed(() => props.usuario?.perfil_usuario?.primer_nombre);
 
-const aplicacion = authStore.aplicacion;
-
-const rol = authStore.rol;
+console.log(props);
 </script>
 
 <template>
-  <Head title="Bienvenido a Fixnology CO" />
+  <div class="p-[50px]">
+    <Head title="Bienvenido a Fixnology CO" />
 
-  <div>
     <header class="p-4 flex justify-between items-center">
-      <!-- ... (tu logo se queda igual) ... -->
-
-      <div class="logo ...">
-        <!-- ... -->
+      <div
+        class="logo 2xl:flex 2xl:gap-3 2xl:items-center xl:flex xl:gap-2 xl:items-center flex items-center gap-2"
+      >
+        <div v-if="modoOscuro">
+          <img
+            width="50px"
+            height="50px"
+            class="rounded-xl"
+            :src="logoFixWhite"
+            alt="Fixnology"
+          />
+        </div>
+        <div v-else>
+          <img
+            width="50px"
+            height="50px"
+            class="rounded-xl"
+            :src="logoFixDark"
+            alt="Fixnology"
+          />
+        </div>
+        <div class="logo flex flex-col gap-1">
+          <h1 class="text-[25px] font-semibold text-universal-naranja">Fixnology CO</h1>
+          <p class="-mt-[8px] text-[14px] font-medium dark:text-mono-blanco">
+            Empresa de software especializada
+          </p>
+        </div>
       </div>
 
       <div class="btnAcciones flex items-center gap-4">
-        <!-- Si el usuario TIENE sesión activa... -->
-        <div v-if="isAuthenticated">
-          <!-- ✅ AÑADE ESTA CONDICIÓN: 
-         Solo muestra el enlace si los parámetros para la ruta están listos. -->
+        <div v-if="!isAuthenticated" class="flex items-center gap-4">
+          <div class="btnAcciones flex items-center gap-4">
+            <button
+              @click="animarCambioTema"
+              class="flex items-center justify-center gap-2 h-[35px] w-[35px] rounded-full border border-secundary-light text-sm transition-all duration-500 ease-in-out relative overflow-hidden"
+              :class="[
+                modoOscuro ? 'text-mono-blanco' : 'text-mono-negro',
+                animando ? 'scale-105 shadow-lg rotate-1' : '',
+              ]"
+            >
+              <span
+                class="material-symbols-rounded text-[20px] transition-transform duration-500"
+                :class="{ 'animate-spin-slow': animando }"
+              >
+                {{ modoOscuro ? "light_mode" : "dark_mode" }}
+              </span>
+              <span
+                v-if="animando"
+                class="absolute inset-0 bg-white/10 backdrop-blur-sm animate-ping z-0 rounded-md"
+              ></span>
+            </button>
+
+            <a :href="route('register.auth')" class="">
+              <button
+                class="dark:bg-mono-blanco py-4 px-6 rounded-full shadowM font-semibold"
+              >
+                Registrarme
+              </button>
+            </a>
+          </div>
+        </div>
+
+        <div v-else class="flex items-center gap-4">
+          <button
+            @click="animarCambioTema"
+            class="flex items-center justify-center gap-2 h-[35px] w-[35px] rounded-full border border-secundary-light text-sm transition-all duration-500 ease-in-out relative overflow-hidden"
+            :class="[
+              modoOscuro ? 'text-mono-blanco' : 'text-mono-negro',
+              animando ? 'scale-105 shadow-lg rotate-1' : '',
+            ]"
+          >
+            <span
+              class="material-symbols-rounded text-[20px] transition-transform duration-500"
+              :class="{ 'animate-spin-slow': animando }"
+            >
+              {{ modoOscuro ? "light_mode" : "dark_mode" }}
+            </span>
+            <span
+              v-if="animando"
+              class="absolute inset-0 bg-white/10 backdrop-blur-sm animate-ping z-0 rounded-md"
+            ></span>
+          </button>
+
           <a
-            v-if="authStore.aplicacion && authStore.rol"
+            v-if="aplicacion && rol"
             :href="
               route('aplicacion.dashboard', {
-                aplicacion: authStore.aplicacion,
-                rol: authStore.rol,
+                aplicacion: aplicacion,
+
+                rol: rol,
               })
             "
             class="btn-taurus"
           >
-            {{ authStore.primerNombre }} vuelve
+            <button
+              class="dark:bg-mono-blanco py-4 px-6 rounded-full shadowM font-semibold"
+              type="submit"
+            >
+              {{ primerNombre }}, ¡regresa a tu app!
+            </button>
           </a>
-        </div>
-
-        <!-- Si el usuario NO tiene sesión, muestra estos dos botones -->
-        <div v-else class="flex items-center gap-4">
-          <button class="btn-taurus">
-            <a :href="route('login.auth')" class="">Inicia sesión</a>
-          </button>
-          <button class="rounded-lg p-1">
-            <a :href="route('register.auth')" class="">Registrarme</a>
-          </button>
         </div>
       </div>
     </header>
@@ -121,6 +148,7 @@ const rol = authStore.rol;
 
           <div class="w-[200px] h-[200px] rounded-xl bg-mono-blanco border"></div>
         </div>
+        <div class="w-[200px] h-[200px] rounded-xl bg-primary"></div>
 
         <h1>Universales:</h1>
 

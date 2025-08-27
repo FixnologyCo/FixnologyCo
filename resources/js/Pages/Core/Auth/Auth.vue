@@ -1,29 +1,16 @@
-<script>
-export default {
-  name: "Auth",
-  components: {
-    Head,
-  },
-  mounted() {
-    window.history.pushState(null, "", window.location.href);
-    window.onpopstate = function () {
-      window.history.pushState(null, "", window.location.href);
-      alert("Debes iniciar sesión primero.");
-    };
-  },
-};
-</script>
-
 <script setup>
 import { Head, useForm } from "@inertiajs/vue3";
+import { onMounted, onUnmounted, ref } from "vue";
 import { useTema } from "@/Composables/useTema";
 import { route } from "ziggy-js";
 import MensajesLayout from "@/Layouts/MensajesLayout.vue";
+import InputTexto from "@/Components/Shared/inputs/InputTexto.vue";
 import logoGoogle from "/resources/images/LogoGoogle.png";
 import logoFixDark from "/resources/images/Logo_160px_dark.svg";
 import logoFixWhite from "/resources/images/Logo_160px_white.svg";
-
-defineProps({});
+import { handleBlur, handleInput, limitesCaracteres } from "@/Utils/formateoInputs";
+import BtnPrimario from "@/Components/Shared/buttons/btnPrimario.vue";
+import ConfirmacionesPop from "@/Components/Modales/Confirmaciones/ConfirmacionesPop.vue";
 
 const form = useForm({
   numero_documento: "",
@@ -35,6 +22,65 @@ const submit = () => {
 };
 
 const { modoOscuro, animando, animarCambioTema } = useTema();
+
+function closeConfirmationModal() {
+  confirmationState.value.isOpen = false;
+}
+
+function handleConfirm() {
+  confirmationState.value.onConfirm();
+  closeConfirmationModal();
+}
+
+const confirmationState = ref({
+  isOpen: false,
+  title: "",
+  message: "",
+  icon: "",
+  iconBgClass: "",
+  confirmText: "",
+  onConfirm: () => {},
+});
+
+function openConfirmationModal({
+  title,
+  message,
+  onConfirm,
+  icon = "help",
+  iconBgClass = "bg-gray-700",
+  confirmText = "Confirmar",
+}) {
+  confirmationState.value = {
+    isOpen: true,
+    title,
+    message,
+    icon,
+    iconBgClass,
+    confirmText,
+    onConfirm,
+  };
+}
+
+const handlePopState = () => {
+  window.history.pushState(null, "", window.location.href);
+  openConfirmationModal({
+    title: "¡Acción Requerida!",
+    message: "Debes iniciar sesión primero.",
+    icon: "lock",
+    iconBgClass: "bg-semaforo-rojo",
+    confirmText: "Entendido",
+    onConfirm: closeConfirmationModal,
+  });
+};
+
+onMounted(() => {
+  window.history.pushState(null, "", window.location.href);
+  window.addEventListener("popstate", handlePopState);
+});
+
+onUnmounted(() => {
+  window.removeEventListener("popstate", handlePopState);
+});
 </script>
 
 <template>
@@ -86,7 +132,6 @@ const { modoOscuro, animando, animarCambioTema } = useTema();
           >
             {{ modoOscuro ? "light_mode" : "dark_mode" }}
           </span>
-          <!-- destello -->
           <span
             v-if="animando"
             class="absolute inset-0 bg-white/10 backdrop-blur-sm animate-ping z-0 rounded-md"
@@ -139,85 +184,41 @@ const { modoOscuro, animando, animarCambioTema } = useTema();
           <div
             class="2xl:flex 2xl:flex-row 2xl:justify-between 2xl:items-center 2xl:gap-2 xl:flex xl:flex-row xl:justify-between xl:items-center xl:gap-2 gap-3 flex flex-col items-center"
           >
-            <div class="2xl:w-[100%] xl:w-[100%] w-full">
-              <div class="contador-label flex items-center justify-between">
-                <p class="my-[5px] text-[14px] dark:text-mono-blanco">
-                  Usuario asignado:
-                </p>
-              </div>
-
-              <div
-                class="w-[100%] p-[3px] flex items-center gap-[8px] transition-all rounded-[5px] border-[1px] border-secundary-ligh"
-                t
-                :class="{ 'border-universal-naranja': form.errors.numero_documento }"
-              >
-                <span
-                  class="material-symbols-rounded text-universal-naranja text-[20px] pl-[5px]"
-                  >pin</span
-                >
-
-                <input
-                  type="text"
-                  class="2xl:w-full focus:outline-none focus:border-none font-normal bg-transparent dark:text-mono-blanco w-full"
-                  placeholder="Ingresa tu usuario"
-                  v-model="form.numero_documento"
-                />
-              </div>
-              <span
-                v-if="form.errors.numero_documento"
-                class="2xl:text-sm text-universal-naranja"
-              >
-                {{ form.errors.numero_documento }}
-              </span>
-            </div>
+            <InputTexto
+              v-model="form.numero_documento"
+              label="Usuario asignado:"
+              icon="people"
+              type="text"
+              placeholder="Ingresa tu usuario"
+              :maxLength="limitesCaracteres.numero_documento"
+              :error="form.errors.numero_documento"
+              @blur="handleBlur(form, 'numero_documento')"
+              @input="(e) => handleInput(e, form, 'numero_documento')"
+            />
           </div>
 
           <div
             class="2xl:flex 2xl:flex-row 2xl:justify-between 2xl:items-center 2xl:gap-2 xl:flex xl:flex-row xl:justify-between xl:items-center xl:gap-2 gap-3 flex flex-col items-center"
           >
-            <div class="2xl:w-[100%] xl:w-[100%] w-full">
-              <div class="contador-label flex items-center justify-between">
-                <p class="my-[5px] text-[14px] dark:text-mono-blanco">Contraseña:</p>
-              </div>
-
-              <div
-                class="w-[100%] p-[3px] flex items-center gap-[8px] transition-all rounded-[5px] border-[1px] border-secundary-ligh"
-                t
-                :class="{ 'border-universal-naranja': form.errors.password }"
-              >
-                <span
-                  class="material-symbols-rounded text-universal-naranja text-[20px] pl-[5px]"
-                  >password</span
-                >
-
-                <input
-                  type="password"
-                  class="2xl:w-full focus:outline-none focus:border-none font-normal bg-transparent dark:text-mono-blanco w-full"
-                  placeholder="Ingresa tu contraseña"
-                  v-model="form.password"
-                />
-              </div>
-              <span
-                v-if="form.errors.password"
-                class="2xl:text-sm text-universal-naranja"
-              >
-                {{ form.errors.password }}
-              </span>
-            </div>
+            <InputTexto
+              v-model="form.password"
+              label="Contraseña:"
+              icon="pin"
+              type="password"
+              placeholder="******"
+              :maxLength="limitesCaracteres.password"
+              :error="form.errors.password"
+              @blur="handleBlur(form, 'password')"
+              @input="(e) => handleInput(e, form, 'password')"
+            />
           </div>
           <a
             :href="route('linkRecuperacion.auth')"
-            class="text-universal-naranja text-[14px] text-right"
+            class="text-universal-naranja text-[14px] text-right hover:text-universal-azul_secundaria hover:-translate-x-1"
             >Olvidé mi contraseña</a
           >
 
-          <button
-            type="submit"
-            class="flex items-center bg-universal-azul_secundaria px-4 py-2 rounded-md justify-center text-mono-blanco font-semibold shadowM hover:bg-universal-naranja"
-          >
-            ¡Vamos!
-            <span class="material-symbols-rounded bg-transparent">arrow_outward</span>
-          </button>
+          <BtnPrimario type="submit" class="w-[100%]"> Ingresar </BtnPrimario>
 
           <p class="text-[12px] mt-3 text-universal-naranja text-center">
             Versión Deimos 1.0.0
@@ -226,4 +227,14 @@ const { modoOscuro, animando, animarCambioTema } = useTema();
       </div>
     </div>
   </div>
+  <ConfirmacionesPop
+    :is-open="confirmationState.isOpen"
+    :title="confirmationState.title"
+    :message="confirmationState.message"
+    :icon="confirmationState.icon"
+    :icon-bg-class="confirmationState.iconBgClass"
+    :confirm-text="confirmationState.confirmText"
+    @close="closeConfirmationModal"
+    @confirm="handleConfirm"
+  />
 </template>

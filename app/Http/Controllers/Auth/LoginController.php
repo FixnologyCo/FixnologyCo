@@ -10,7 +10,7 @@ use Inertia\Inertia;
 
 class LoginController extends Controller
 {
-    use ValidatesAndRedirectsUsers; // <-- 2. USA EL TRAIT
+    use ValidatesAndRedirectsUsers;
 
     public function show()
     {
@@ -22,12 +22,15 @@ class LoginController extends Controller
         $credenciales = $request->validate([
             'numero_documento' => 'required|string',
             'password' => 'required|string',
+        ],[
+            'numero_documento.required' => 'El usuario no puede quedar vacio.',
+            'password.required' => 'La contraseña no puede quedar vacia.'
         ]);
 
         if (Auth::attempt($credenciales)) {
             $request->session()->regenerate();
             $usuario = Auth::user();
-            return $this->validateAndRedirect($usuario); // <-- Esto ahora funciona
+            return $this->validateAndRedirect($usuario);
         }
 
         return back()->withErrors([

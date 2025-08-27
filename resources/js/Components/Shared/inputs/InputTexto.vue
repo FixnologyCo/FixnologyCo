@@ -1,5 +1,10 @@
 <script setup>
 import { computed } from "vue";
+import { usePage } from "@inertiajs/vue3";
+
+const page = usePage();
+
+const isAuthenticated = computed(() => !!page.props.auth.user);
 
 const model = defineModel();
 
@@ -32,16 +37,21 @@ const inputContainerClass = computed(() => {
     </div>
 
     <div :class="inputContainerClass">
-      <span class="material-symbols-rounded text-primary text-[20px] pl-[5px]">{{
-        icon
-      }}</span>
+      <span
+        class="material-symbols-rounded"
+        :class="[
+          'text-[20px] pl-[5px]',
+          isAuthenticated ? 'text-primary' : 'text-universal-naranja',
+        ]"
+        >{{ icon }}</span
+      >
       <input
         :type="type"
         :placeholder="placeholder"
         v-model="model"
         @blur="emit('blur')"
         @input="emit('input', $event)"
-        class="w-full focus:outline-none focus:border-none font-normal bg-transparent dark:text-mono-blanco"
+        class="w-full outline-none font-normal bg-transparent dark:text-mono-blanco placeholder:text-[14px]"
       />
     </div>
 

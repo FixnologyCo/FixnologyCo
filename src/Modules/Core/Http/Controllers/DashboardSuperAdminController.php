@@ -13,7 +13,7 @@ use function Laravel\Prompts\alert;
 
 class DashboardSuperAdminController extends Controller
 {
-    
+
     public function show($aplicacion, $rol, Request $request)
     {
         $usuario = Auth::user()->load([
@@ -48,13 +48,16 @@ class DashboardSuperAdminController extends Controller
 
 
         if (!in_array($usuario->perfilUsuario->rol->id, [4])) {
-            abort(403, 'No tienes permisos para acceder a esta sección.');
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+            return redirect()->route('login.auth')->with('error', 'No tienes permisos para acceder a esta sección.');
         }
 
-        
+
         return Inertia::render('Apps/' . ucfirst($aplicacion) . '/' . ucfirst($rol) . '/Dashboard/Dashboard', [
             'usuario' => $usuario,
-            
+
         ]);
     }
 
