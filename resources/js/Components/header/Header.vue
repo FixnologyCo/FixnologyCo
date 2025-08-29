@@ -307,14 +307,15 @@ const logout = () => {
       </div>
     </div>
 
+    
+
+    <div class="flex gap-2 items-center">
     <p
       class="text-[12px] font-medium text-mono-negro dark:text-mono-blanco flex items-center"
     >
       <span class="material-symbols-rounded text-[13px] mr-1">timer</span>
       {{ authStore.tiempoEnLinea }}
     </p>
-
-    <div class="flex gap-2 items-center">
       <a :href="route('aplicacion.miPerfil', { aplicacion, rol })">
         <div
           class="user h-[30px] w-[30px] rounded-full overflow-hidden flex items-center justify-center cursor-pointer hover:bg-primary hover:shadow-[0px_4px_20px] hover:shadow-primary"
