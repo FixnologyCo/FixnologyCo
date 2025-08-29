@@ -34,6 +34,10 @@ const props = defineProps({
   generosDisponibles: { type: Array },
   appsDisponibles: { type: Array },
   estadosDisponibles: { type: Array },
+  auth: {
+    type: Object,
+    required: true,
+  },
 });
 
 const authStore = useAuthStore();
@@ -325,7 +329,10 @@ const rol = authStore.rol;
               </div>
               <div class="contenido w-[80%]">
                 <div class="header flex items-center gap-2">
-                  <barraBusqueda v-model:searchTerm="searchTerm" />
+                  <barraBusqueda
+                    placeholder="Buscar usuario (Ingresa palabra clave)."
+                    v-model:searchTerm="searchTerm"
+                  />
                   <vistasDatos v-model:viewMode="viewMode" />
                   <div class="text-[30px]">|</div>
                   <div class="" v-if="selectedUserIds.length === 0">
@@ -363,12 +370,12 @@ const rol = authStore.rol;
                   >
                     auto_delete</BtnSecundario
                   >
-                  <BtnPrimario @click="openUserCreationModal()" class="w-[35%]"
-                    ><span>Crear cliente</span
-                    ><span class="material-symbols-rounded text-[16px]"
-                      >people</span
-                    ></BtnPrimario
-                  >
+                  <BtnPrimario
+                    @click="openUserCreationModal()"
+                    class="w-[30%]"
+                    label="Crear cliente"
+                    icon="person_add"
+                  ></BtnPrimario>
                 </div>
                 <div
                   class="my-3 min-h-[75dvh] max-h-[80dvh] overflow-auto scrollbar-custom"

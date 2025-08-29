@@ -14,6 +14,12 @@ import ConfirmacionesPop from "../Modales/Confirmaciones/ConfirmacionesPop.vue";
 // Store
 import { useAuthStore } from "@/stores/auth";
 
+const props = defineProps({
+  auth: {
+    type: Object,
+    required: true,
+  },
+});
 // --- SETUP INICIAL ---
 const authStore = useAuthStore();
 defineOptions({

@@ -36,13 +36,14 @@ const { getEstadoClass } = useEstadoClass();
         <template v-if="getFotoUrlCompleta(usuario)">
           <div class="relative group w-[75px] h-[75px]">
             <div
-              class="h-3 w-3 rounded-full absolute -top-1 -left-1"
+              class="absolute flex rounded-full animate-ping opacity-75 h-30 w-30 -top-2 -left-2"
               :class="
                 usuario.tiene_sesion_activa === true
                   ? 'bg-semaforo-verde shadow-[0px_10px_20px] shadow-semaforo-verde'
                   : 'bg-semaforo-rojo shadow-[0px_10px_20px] shadow-semaforo-rojo'
               "
             ></div>
+
             <img
               :src="getFotoUrlCompleta(usuario)"
               class="rounded-[10px] border-2 w-full h-full object-cover shadow-lg"
@@ -53,7 +54,7 @@ const { getEstadoClass } = useEstadoClass();
         <template v-else>
           <div class="relative group w-[75px] h-[75px]">
             <div
-              class="h-3 w-3 rounded-full absolute -top-1 -left-1"
+              class="absolute flex rounded-full animate-ping opacity-75 h-30 w-3 -top-2 -left-2"
               :class="
                 usuario.tiene_sesion_activa === true
                   ? 'bg-semaforo-verde shadow-[0px_10px_20px] shadow-semaforo-verde'
