@@ -28,44 +28,13 @@ const props = defineProps({
 
 defineEmits(["close"]);
 
-// --- 2. LÓGICA PARA EL MODAL DE CONFIRMACIÓN ---
-const confirmationState = ref({
-  isOpen: false,
-  title: "",
-  message: "",
-  icon: "help",
-  iconBgClass: "bg-gray-700",
-  confirmText: "Confirmar",
-  onConfirm: () => {},
-});
-
-function openConfirmationModal({
-  title,
-  message,
-  onConfirm,
-  icon = "help",
-  iconBgClass = "bg-gray-700",
-  confirmText = "Confirmar",
-}) {
-  confirmationState.value = {
-    isOpen: true,
-    title,
-    message,
-    icon,
-    iconBgClass,
-    confirmText,
-    onConfirm,
-  };
-}
-
-function closeConfirmationModal() {
-  confirmationState.value.isOpen = false;
-}
-
-function handleConfirm() {
-  confirmationState.value.onConfirm();
-  closeConfirmationModal();
-}
+import { useConfirmationModal } from "@/Composables/useConfirmationModal";
+const {
+  confirmationState,
+  openConfirmationModal,
+  closeConfirmationModal,
+  handleConfirm,
+} = useConfirmationModal();
 
 // --- 3. FUNCIONES DE ACCIÓN ACTUALIZADAS ---
 function restaurarUsuario(usuario) {
@@ -76,11 +45,12 @@ function restaurarUsuario(usuario) {
     iconBgClass: "bg-green-500/20 border-semaforo-verde",
     confirmText: "Sí, restaurar",
     onConfirm: () => {
-      router.post(
-        route("usuarios.restore", { id: usuario.id }),
-        {},
-        { preserveScroll: true }
-      );
+      router.post(route("usuarios.restore", { id: usuario.id }), {
+        preserveScroll: true,
+        onSuccess: () => {
+          emit("close");
+        },
+      });
     },
   });
 }
@@ -95,6 +65,9 @@ function eliminarPermanentemente(usuario) {
     onConfirm: () => {
       router.delete(route("usuarios.forceDestroy", { id: usuario.id }), {
         preserveScroll: true,
+        onSuccess: () => {
+          emit("close");
+        },
       });
     },
   });
@@ -109,7 +82,16 @@ function vaciarPapelera() {
     iconBgClass: "bg-red-500/20 border-semaforo-rojo",
     confirmText: "Sí, vaciar todo",
     onConfirm: () => {
-      router.post(route("usuarios.emptyTrash"), {}, { preserveScroll: true });
+      router.post(
+        route("usuarios.emptyTrash"),
+
+        {
+          onSuccess: () => {
+            emit("close");
+          },
+          preserveScroll: true,
+        }
+      );
     },
   });
 }

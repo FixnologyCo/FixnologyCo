@@ -166,44 +166,13 @@ const submit = () => {
   );
 };
 
-// --- 2. LÓGICA PARA EL MODAL DE CONFIRMACIÓN ---
-const confirmationState = ref({
-  isOpen: false,
-  title: "",
-  message: "",
-  icon: "help",
-  iconBgClass: "bg-gray-700",
-  confirmText: "Confirmar",
-  onConfirm: () => {},
-});
-
-function openConfirmationModal({
-  title,
-  message,
-  onConfirm,
-  icon = "help",
-  iconBgClass = "bg-gray-700",
-  confirmText = "Confirmar",
-}) {
-  confirmationState.value = {
-    isOpen: true,
-    title,
-    message,
-    icon,
-    iconBgClass,
-    confirmText,
-    onConfirm,
-  };
-}
-
-function closeConfirmationModal() {
-  confirmationState.value.isOpen = false;
-}
-
-function handleConfirm() {
-  confirmationState.value.onConfirm();
-  closeConfirmationModal();
-}
+import { useConfirmationModal } from "@/Composables/useConfirmationModal";
+const {
+  confirmationState,
+  openConfirmationModal,
+  closeConfirmationModal,
+  handleConfirm,
+} = useConfirmationModal();
 
 function eliminarUsuario() {
   openConfirmationModal({

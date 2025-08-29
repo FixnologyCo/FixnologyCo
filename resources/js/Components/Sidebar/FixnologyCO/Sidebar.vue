@@ -12,6 +12,13 @@ defineOptions({
   layout: AuthenticatedLayout,
 });
 
+const props = defineProps({
+  auth: {
+    type: Object,
+    required: true,
+  },
+});
+
 import Header from "@/Components/header/Header.vue";
 const { sidebarExpandido, toggleSidebar } = useSidebar();
 const {

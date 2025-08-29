@@ -33,9 +33,9 @@ class LoginController extends Controller
             return $this->validateAndRedirect($usuario);
         }
 
-        return back()->withErrors([
-            'numero_documento' => 'Las credenciales proporcionadas no son correctas.',
-        ])->onlyInput('numero_documento');
+        return back()->with([
+            'error' => 'Las credenciales proporcionadas no son correctas.',
+        ]);
     }
 
     public function logout(Request $request)
